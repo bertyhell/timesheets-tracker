@@ -10,7 +10,7 @@ import {
   startOfDay,
   subHours,
 } from 'date-fns';
-import { TimelineEvent, TimelineType } from '../../components/Timeline/Timeline.types';
+import { type TimelineEvent, TimelineType } from '../../components/Timeline/Timeline.types';
 import {
   useActiveStatesServiceActiveStatesControllerFindAll,
   useActivitiesServiceActivitiesControllerFindAll,
@@ -57,11 +57,8 @@ function TimelinesPage() {
       startedAt: startOfDay(viewDate).toISOString(),
       endedAt: endOfDay(viewDate).toISOString(),
     });
-  const {
-    data: tagNamesCount,
-    isLoading: isLoadingTagNamesCount,
-    refetch: refetchTagNamesCount,
-  } = useTagNamesServiceTagNamesControllerCount();
+  const { data: tagNamesCount, refetch: refetchTagNamesCount } =
+    useTagNamesServiceTagNamesControllerCount();
   const { data: allAutoTags, isLoading: isLoadingAllAutoTags } =
     useAutoTagsServiceAutoTagsControllerFindAll({ term: undefined });
   const { mutateAsync: deleteTag } = useTagsServiceTagsControllerRemove();
@@ -99,24 +96,22 @@ function TimelinesPage() {
       },
       color: COLOR_LIST[stringToColorIndex(new URL(website.websiteUrl).host, COLOR_LIST.length)],
       startedAt: new Date(website.startedAt),
-      endedAt: new Date(website.endedAt),
+      endedAt: new Date(website.endedAt as string),
       type: TimelineType.Program,
     };
   });
-  const activeStateEvents = (activeStates || []).map(
-    (activeState: ActiveState, activeStateIndex: number): TimelineEvent => {
-      return {
-        id: activeState.id,
-        info: {
-          state: String(activeState.isActive),
-        },
-        color: activeState.isActive ? '#00FF00' : '#FF0000',
-        startedAt: new Date(activeState.startedAt),
-        endedAt: new Date(activeState.endedAt),
-        type: TimelineType.Program,
-      };
-    }
-  );
+  const activeStateEvents = (activeStates || []).map((activeState: ActiveState): TimelineEvent => {
+    return {
+      id: activeState.id,
+      info: {
+        state: String(activeState.isActive),
+      },
+      color: activeState.isActive ? '#00FF00' : '#FF0000',
+      startedAt: new Date(activeState.startedAt),
+      endedAt: new Date(activeState.endedAt),
+      type: TimelineType.Program,
+    };
+  });
   const [autoTagEvents, setAutoTagEvents] = useState<TimelineEvent[]>([]);
 
   const { mutateAsync: createTagName } = useTagNamesServiceTagNamesControllerCreate();

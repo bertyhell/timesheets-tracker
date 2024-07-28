@@ -1,7 +1,7 @@
 import { IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Activity } from '../../types/types';
+import { type Activity } from '../../types/types';
 
 export class ResponseActivityDto implements Activity {
   @IsString()

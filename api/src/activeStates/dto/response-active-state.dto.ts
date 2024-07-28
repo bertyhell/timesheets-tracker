@@ -1,7 +1,7 @@
 import { IsBoolean, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { ActiveState } from '../../types/types';
+import { type ActiveState } from '../../types/types';
 
 export class ResponseActiveStateDto implements ActiveState {
   @IsString()

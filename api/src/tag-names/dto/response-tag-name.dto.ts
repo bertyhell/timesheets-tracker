@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsOptional, IsString } from 'class-validator';
-import { TagName } from '../../types/types';
+import { type TagName } from '../../types/types';
 
 export class TagNameDto implements TagName {
   @IsString()

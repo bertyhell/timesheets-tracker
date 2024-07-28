@@ -1,13 +1,14 @@
 import './DateSelect.scss';
 
-import React from 'react';
-import { useAtom } from 'jotai';
-import { viewDateAtom } from '../../store/store';
 import { addDays, format, parseISO } from 'date-fns';
+import { useAtom } from 'jotai';
+import React from 'react';
 
-interface DateSelectProps {}
+import { viewDateAtom } from '../../store/store';
 
-function DateSelect({}: DateSelectProps) {
+// interface DateSelectProps {}
+
+function DateSelect() {
   const [viewDate, setViewDate] = useAtom(viewDateAtom);
 
   return (

@@ -5,7 +5,7 @@ import EditAutoTagModal from './components/EditAutoTagModal/EditAutoTagModal';
 import TagNamesPage from './views/TagNamesPage/TagNamesPage';
 import EditTagNameModal from './components/EditTagNameModal/EditTagNameModal';
 import React from 'react';
-import { redirect, RouteObject } from 'react-router-dom';
+import { redirect, type RouteObject } from 'react-router-dom';
 import NotesPage from './views/NotesPage/NotesPage';
 import EditAutoNoteModal from './components/EditNoteModal/EditAutoNoteModal';
 

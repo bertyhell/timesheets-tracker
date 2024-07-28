@@ -1,8 +1,12 @@
 import './EditAutoNoteModal.scss';
 
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { type ChangeEvent, useEffect, useState } from 'react';
 import { Modal } from 'react-responsive-modal';
-import { ConditionVariable, AutoNote, TagName } from '../../types/types';
+import { useNavigate, useParams } from 'react-router-dom';
+import Select, { type ActionMeta, type MultiValue, type OnChangeValue } from 'react-select';
+import { toast } from 'react-toastify';
+
+import * as types from '../../../../types/types';
 import { ROUTE_PARTS } from '../../App';
 import {
   useAutoNotesServiceAutoNotesControllerCreate,
@@ -11,13 +15,9 @@ import {
   useAutoNotesServiceAutoNotesControllerUpdate,
   useTagNamesServiceTagNamesControllerFindAll,
 } from '../../generated/api/queries';
-import { useNavigate, useParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import Select from 'react-select';
-import * as types from '../../../../types/types';
-import { SelectOption } from '../../helpers/select-option.types';
+import { type SelectOption } from '../../helpers/select-option.types';
+import { type AutoNote, ConditionVariable, type TagName } from '../../types/types';
 import TagSelectMulti from '../TagSelect/TagSelectMulti';
-import { ActionMeta, MultiValue, OnChangeValue } from 'react-select/dist/declarations/src/types';
 
 function EditAutoNoteModal() {
   const { id } = useParams();

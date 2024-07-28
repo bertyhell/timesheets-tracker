@@ -13,23 +13,29 @@
     "copy-database": "cp ./api/timesheets-tracker-database.sqlite3 ./dist/timesheets-tracker-database.sqlite3",
     "replace-ports": "replace-in-files --string='55577' --replacement='55566' dist/client/**/*.js dist/api/src/**/*.js dist/chrome-extension/**/*.js",
     "clean": "rm -rf ./dist/api ./dist/client ./dist/chrome-extension && cd dist && mkdir api && mkdir client && mkdir chrome-extension && cd ..",
-    "build": "npm run clean && npm run build-api && npm run build-client && npm run copy-chrome-extension && npm run replace-ports"
+    "build": "npm run clean && npm run build-api && npm run build-client && npm run copy-chrome-extension && npm run replace-ports",
+    "lint:fix": "eslint ./client/src ./api/src --ext .jsx,.js,.ts,.tsx --quiet --fix --ignore-path ./.gitignore",
+    "lint:format": "prettier  --loglevel warn --write \"./**/*.{js,jsx,ts,tsx,css,md,json}\" ",
+    "lint": "yarn lint:format && yarn lint:fix ",
+    "type-check": "tsc"
   },
   "author": "Bert Verhelst",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.4.5",
     "@types/uuid": "^9.0.2",
-    "@typescript-eslint/eslint-plugin": "^5.59.11",
-    "@typescript-eslint/parser": "^5.59.11",
     "bump-package-versions": "^1.0.7",
-    "eslint": "^8.42.0",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-prettier": "^4.2.1",
     "nexe": "^4.0.0-rc.4",
-    "prettier": "^3.0.0",
     "ts-node": "^10.9.1",
-    "replace-in-files-cli": "^2.2.0"
+    "replace-in-files-cli": "^2.2.0",
+    "prettier": "3.3.3",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-prettier": "^5.2.1",
+    "@typescript-eslint/eslint-plugin": "6.7.0",
+    "@typescript-eslint/parser": "6.7.0"
   },
   "dependencies": {
     "node-windows": "^1.0.0-beta.8",

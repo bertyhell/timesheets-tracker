@@ -1,7 +1,6 @@
-import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import { CreateTagDto } from './create-tag.dto';
-import { IsString } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+import { IsString } from 'class-validator';
 
 export class TagDto {
   @IsString()

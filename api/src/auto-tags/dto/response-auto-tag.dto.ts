@@ -2,12 +2,12 @@ import { IsArray, IsEnum, IsNumber, IsObject, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
-  AutoTag,
-  AutoTagCondition,
-  BooleanOperator,
+  type AutoTag,
+  type AutoTagCondition,
+  type BooleanOperator,
   ConditionOperator,
   ConditionVariable,
-  TagName,
+  type TagName,
 } from '../../types/types';
 import { TagNameDto } from '../../tag-names/dto/response-tag-name.dto';
 

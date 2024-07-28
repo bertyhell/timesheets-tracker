@@ -1,2 +1,2 @@
 DELETE FROM activeStates
-WHERE id = :id
+WHERE id = $id

@@ -5,20 +5,20 @@ import {
   useAutoTagsServiceAutoTagsControllerDelete,
   useAutoTagsServiceAutoTagsControllerFindAll,
 } from '../../generated/api/queries';
-import React, { ReactNode, useCallback, useEffect } from 'react';
+import React, { type ReactNode, useCallback, useEffect } from 'react';
 import { sortBy } from 'lodash-es';
 import { ROUTE_PARTS } from '../../App';
 import { toast } from 'react-toastify';
-import { AutoTag } from '../../types/types';
+import { type AutoTag } from '../../types/types';
 import copy from 'copy-to-clipboard';
 import { mapLimit } from 'blend-promise-utils';
-import { AutoTagConditionDto } from '../../generated/api/requests';
+import { type AutoTagConditionDto } from '../../generated/api/requests';
 
 const AUTOTAGS_PROPERTY_NAME = 'timesheetTrackerAutoTags';
 
-interface AutoTagsPageProps {}
+// interface AutoTagsPageProps {}
 
-function AutoTagsPage({}: AutoTagsPageProps) {
+function AutoTagsPage() {
   const location = useLocation();
   const { data: autoTagItems, refetch: refetchAutoTags } =
     useAutoTagsServiceAutoTagsControllerFindAll({

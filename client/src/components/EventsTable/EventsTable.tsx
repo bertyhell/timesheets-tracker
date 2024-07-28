@@ -9,10 +9,10 @@ import {
   TableHeader,
   TableView,
   useAsyncList,
-  Selection,
-  AsyncListData,
+  type Selection,
+  type AsyncListData,
 } from '@adobe/react-spectrum';
-import { TimelineEvent } from '../Timeline/Timeline.types';
+import { type TimelineEvent } from '../Timeline/Timeline.types';
 import { orderBy } from 'lodash-es';
 import { format } from 'date-fns';
 import { useAtom } from 'jotai/index';
@@ -24,7 +24,7 @@ interface EventsTableProps {
 
 function EventsTable({ events }: EventsTableProps) {
   const [searchTerm] = useAtom(searchTermAtom);
-  let [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([0]));
+  const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([0]));
 
   const tableEvents = useAsyncList<TimelineEvent>({
     initialSortDescriptor: {

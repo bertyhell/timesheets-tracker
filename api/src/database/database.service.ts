@@ -1,10 +1,11 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, type OnModuleInit } from '@nestjs/common';
 import * as path from 'path';
 import { logger } from '../shared/logger';
 import * as fsPromise from 'fs/promises';
 import * as fs from 'fs';
 
-import initSqlJs, { Database } from 'sql.js/dist/sql-wasm.js';
+import initSqlJs, { type Database } from 'sql.js/dist/sql-wasm.js';
+import { CustomError } from '../shared/CustomError';
 
 @Injectable()
 export class DatabaseService implements OnModuleInit {
@@ -27,19 +28,26 @@ export class DatabaseService implements OnModuleInit {
   }
 
   public async exec<TResult>(sqlFile: string, params?: Record<string, any>): Promise<TResult[]> {
-    const sqlQuery: string = (await fsPromise.readFile(sqlFile)).toString('utf-8');
-    const results = this.db.exec(sqlQuery, params);
-    if (!results.length) {
-      return [];
-    }
-    const columns = results[0].columns;
-    return results.map((result) => {
-      return Object.fromEntries(
-        columns.map((column, index) => {
-          return [column, result.values[index]];
-        })
+    try {
+      const sqlQuery: string = (await fsPromise.readFile(sqlFile)).toString('utf-8');
+      logger.debug(
+        '[DATABASE]: executing sql query: ' + JSON.stringify({ sqlQuery, params }, null, 2)
       );
-    }) as TResult[];
+      const results = this.db.exec(sqlQuery, params);
+      if (!results.length) {
+        return [];
+      }
+      const columns = results[0].columns;
+      return results.map((result) => {
+        return Object.fromEntries(
+          columns.map((column, index) => {
+            return [column, result.values[index]];
+          })
+        );
+      }) as TResult[];
+    } catch (err) {
+      throw new CustomError('Failed to execute SQL query', err, { sqlFile, params });
+    }
   }
 
   /**

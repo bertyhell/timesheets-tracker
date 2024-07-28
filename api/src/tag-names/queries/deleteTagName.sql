@@ -1,2 +1,2 @@
 DELETE FROM tagNames
-WHERE id = :id
+WHERE id = $id

@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
-import { DatabaseService } from './database.service';
-import { ApiTags } from '@nestjs/swagger';
+
+import { type DatabaseService } from './database.service';
 
 @Controller('api/database')
 export class DatabaseController {

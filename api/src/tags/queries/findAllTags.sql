@@ -8,4 +8,4 @@ SELECT
     tagNames.color as tagName.color
 FROM tags
 LEFT JOIN tagNames ON tagNames.id = tags.tagNameId
-WHERE startedAt > :startedAt AND endedAt < :endedAt
+WHERE startedAt > $startedAt AND endedAt < $endedAt

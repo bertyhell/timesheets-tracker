@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Query, Param, Patch, Delete } from '@nestjs/common';
-import { ActiveStatesService } from './active-states.service';
-import type { ActiveState } from '../types/types';
+import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { endOfDay, startOfDay } from 'date-fns';
+
+import type { ActiveState } from '../types/types';
+
+import { type ActiveStatesService } from './active-states.service';
 
 @ApiTags('active-states')
 @Controller('api/active-states')

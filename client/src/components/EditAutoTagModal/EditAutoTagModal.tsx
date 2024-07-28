@@ -1,19 +1,12 @@
 import './EditAutoTagModal.scss';
 
-import React, { ChangeEvent, useEffect, useState } from 'react';
-import { Modal } from 'react-responsive-modal';
-import AutoTagConditionInput from '../AutoTagCondition/AutoTagConditionInput';
 import { cloneDeep } from 'lodash-es';
-import TagSelectSingle from '../TagSelect/TagSelectSingle';
-import {
-  AutoTag,
-  AutoTagCondition,
-  BooleanOperator,
-  ConditionOperator,
-  ConditionVariable,
-  TagName,
-} from '../../types/types';
-import ToggleButton from '../ToggleButton/ToggleButton';
+import React, { type ChangeEvent, useEffect, useState } from 'react';
+import { Modal } from 'react-responsive-modal';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
+import { ROUTE_PARTS } from '../../App';
 import {
   useAutoTagsServiceAutoTagsControllerCount,
   useAutoTagsServiceAutoTagsControllerCreate,
@@ -22,11 +15,19 @@ import {
   useAutoTagsServiceAutoTagsControllerUpdate,
   useTagNamesServiceTagNamesControllerCreate,
 } from '../../generated/api/queries';
-import { useNavigate, useParams } from 'react-router-dom';
-import { ROUTE_PARTS } from '../../App';
-import { CreateAutoTagDto, UpdateAutoTagsDto } from '../../generated/api/requests';
+import { type CreateAutoTagDto, type UpdateAutoTagsDto } from '../../generated/api/requests';
+import {
+  type AutoTag,
+  type AutoTagCondition,
+  BooleanOperator,
+  ConditionOperator,
+  ConditionVariable,
+  type TagName,
+} from '../../types/types';
 import { COLOR_LIST } from '../../views/TimelinesPage/TimelinesPage.consts';
-import { toast } from 'react-toastify';
+import AutoTagConditionInput from '../AutoTagCondition/AutoTagConditionInput';
+import TagSelectSingle from '../TagSelect/TagSelectSingle';
+import ToggleButton from '../ToggleButton/ToggleButton';
 
 const NEW_CONDITION = {
   booleanOperator: BooleanOperator.OR,
@@ -40,7 +41,7 @@ function EditAutoTagModal() {
   const navigate = useNavigate();
   const [name, setName] = useState<string>('');
   const [selectedTagName, setSelectedTagName] = useState<TagName | null>(null);
-  const [priority, setPriority] = useState<number>(0); // TODO allow drag and drop
+  const [_priority, setPriority] = useState<number>(0); // TODO allow drag and drop
   const [conditions, setConditions] = useState<AutoTagCondition[]>([NEW_CONDITION, NEW_CONDITION]);
   const [showCreateNewTagControls, setShowCreateNewTagControls] = useState<boolean>(false);
   const [newTagName, setNewTagName] = useState<string>('');

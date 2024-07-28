@@ -1,4 +1,4 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test, type TestingModule } from '@nestjs/testing';
 import { TagNamesController } from './tag-names.controller';
 import { TagNamesService } from './tag-names.service';
 

@@ -1,25 +1,23 @@
 import './Timeline.scss';
-
-import AsyncCreatableSelect from 'react-select/async-creatable';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
-import React, { MouseEvent } from 'react';
-import { TimelineEvent } from './Timeline.types';
+import React, { type MouseEvent } from 'react';
+import { type TimelineEvent } from './Timeline.types';
 import {
   addHours,
+  addMilliseconds,
   addMinutes,
   differenceInMilliseconds,
+  differenceInSeconds,
   endOfHour,
   format,
+  isAfter,
   isBefore,
   roundToNearestMinutes,
-  addMilliseconds,
-  differenceInSeconds,
-  isAfter,
 } from 'date-fns';
 import { formatDuration } from '../../helpers/format-duration';
 import type { TagName } from '../../types/types';
-import { ActionMeta, MultiValue, OnChangeValue } from 'react-select/dist/declarations/src/types';
+import { type ActionMeta, type MultiValue, type OnChangeValue } from 'react-select';
 import TagSelectMulti from '../TagSelect/TagSelectMulti';
 
 interface TimelineProps {

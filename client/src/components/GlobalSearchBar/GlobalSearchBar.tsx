@@ -1,12 +1,13 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import './GlobalSearchBar.scss';
 import { useAtom } from 'jotai/index';
+
 import { searchTermAtom } from '../../store/store';
 
-interface GlobalSearchBarProps {}
+// interface GlobalSearchBarProps {}
 
-function GlobalSearchBar({}: GlobalSearchBarProps) {
+function GlobalSearchBar() {
   const [searchTerm, setSearchTerm] = useAtom(searchTermAtom);
 
   // useEffect(() => {

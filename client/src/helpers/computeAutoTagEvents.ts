@@ -1,6 +1,11 @@
-import { TimelineEvent, TimelineType } from '../components/Timeline/Timeline.types';
-import { Activity, BooleanOperator, ConditionVariable } from '../../../types/types';
-import { AutoTag, AutoTagCondition, ConditionOperator, Website } from '../types/types';
+import { type TimelineEvent, TimelineType } from '../components/Timeline/Timeline.types';
+import { type Activity, BooleanOperator, ConditionVariable } from '../../../types/types';
+import {
+  type AutoTag,
+  type AutoTagCondition,
+  ConditionOperator,
+  type Website,
+} from '../types/types';
 import { compact } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 

@@ -1,2 +1,2 @@
 DELETE FROM websites
-WHERE id = :id
+WHERE id = $id

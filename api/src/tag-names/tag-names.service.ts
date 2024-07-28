@@ -1,9 +1,9 @@
-import { CreateTagNameDto } from './dto/create-tag-name.dto';
+import { type CreateTagNameDto } from './dto/create-tag-name.dto';
 import { Inject, Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { v4 as uuid } from 'uuid';
 import type { TagName } from '../types/types';
-import { UpdateTagNameDto } from './dto/update-tag-name.dto';
+import { type UpdateTagNameDto } from './dto/update-tag-name.dto';
 
 @Injectable()
 export class TagNamesService {
@@ -22,10 +22,12 @@ export class TagNamesService {
     let rawTagNames: TagName[];
     if (searchTerm) {
       rawTagNames = await this.databaseService.exec<TagName>(
-        './queries/findAllTagNamesBySearchTerm'
+        './src/tag-names/queries/findAllTagNamesBySearchTerm.sql'
       );
     } else {
-      rawTagNames = await this.databaseService.exec<TagName>('./queries/findAllTagNames');
+      rawTagNames = await this.databaseService.exec<TagName>(
+        './src/tag-names/queries/findAllTagNames.sql'
+      );
     }
 
     return rawTagNames.map(this.adapt);
@@ -33,43 +35,48 @@ export class TagNamesService {
 
   async count(): Promise<number> {
     const result = (
-      await this.databaseService.exec<{ count: number }>('./queries/countTagNames')
+      await this.databaseService.exec<{ count: number }>(
+        './src/tag-names/queries/countTagNames.sql'
+      )
     )[0];
 
     return result.count;
   }
 
   async findOne(id: string): Promise<TagName> {
-    const tagNames = await this.databaseService.exec<TagName>('./queries/findOneTagName', { id });
+    const tagNames = await this.databaseService.exec<TagName>(
+      './src/tag-names/queries/findOneTagName.sql',
+      { id }
+    );
 
     return this.adapt(tagNames[0]);
   }
 
   async create(tagName: CreateTagNameDto): Promise<TagName> {
     const values = {
-      id: uuid(),
-      name: tagName.name,
-      code: tagName.code,
-      color: tagName.color,
+      $id: uuid(),
+      $name: tagName.name,
+      $code: tagName.code,
+      $color: tagName.color,
     };
-    await this.databaseService.exec('./queries/createTagName');
+    await this.databaseService.exec('./src/tag-names/queries/createTagName.sql', values);
 
-    return await this.findOne(values.id);
+    return await this.findOne(values.$id);
   }
 
   async update(id: string, updateTagDto: UpdateTagNameDto): Promise<TagName> {
     const values = {
-      id,
-      name: updateTagDto.name,
-      code: updateTagDto.code,
-      color: updateTagDto.color,
+      $id: id,
+      $name: updateTagDto.name,
+      $code: updateTagDto.code,
+      $color: updateTagDto.color,
     };
-    await this.databaseService.exec('./queries/updateTagName', values);
+    await this.databaseService.exec('./src/tag-names/queries/updateTagName.sql', values);
 
-    return await this.findOne(id);
+    return await this.findOne(values.$id);
   }
 
   async remove(id: string): Promise<void> {
-    await this.databaseService.exec('./queries/removeTagName', { id });
+    await this.databaseService.exec('./src/tag-names/queries/removeTagName.sql', { $id: id });
   }
 }

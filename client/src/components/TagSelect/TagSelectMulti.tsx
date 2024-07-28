@@ -1,10 +1,11 @@
 import './TagSelect.scss';
 
 import React from 'react';
+import { type ActionMeta, type OnChangeValue } from 'react-select';
 import AsyncCreatableSelect from 'react-select/async-creatable';
+
 import { TagNamesService } from '../../generated/api/requests';
 import type { TagName } from '../../types/types';
-import { ActionMeta, OnChangeValue } from 'react-select/dist/declarations/src/types';
 
 interface TagSelectProps {
   className?: string;

@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
-import { CreateActiveStateDto } from './dto/create-active-state.dto';
-import { UpdateActiveStateDto } from './dto/update-active-state.dto';
+import { type CreateActiveStateDto } from './dto/create-active-state.dto';
+import { type UpdateActiveStateDto } from './dto/update-active-state.dto';
 import RealIdle from '@paymoapp/real-idle';
-import { ResponseActiveStateDto } from './dto/response-active-state.dto';
+import { type ResponseActiveStateDto } from './dto/response-active-state.dto';
 import { ActiveStatesService } from './active-states.service';
 import { noop } from 'lodash';
 import { logger } from '../shared/logger';

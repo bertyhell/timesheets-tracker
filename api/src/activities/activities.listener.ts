@@ -1,8 +1,10 @@
-import { Inject, Injectable, OnApplicationBootstrap } from '@nestjs/common';
-import ActiveWindow, { WindowInfo } from '@paymoapp/active-window';
-import { CreateActivityDto } from './dto/create-activity.dto';
-import { ActivitiesService } from './activities.service';
+import { Inject, Injectable, type OnApplicationBootstrap } from '@nestjs/common';
+import ActiveWindow, { type WindowInfo } from '@paymoapp/active-window';
+
 import { logger } from '../shared/logger';
+
+import { ActivitiesService } from './activities.service';
+import { type CreateActivityDto } from './dto/create-activity.dto';
 
 @Injectable()
 export class ActivitiesListener implements OnApplicationBootstrap {
@@ -58,7 +60,7 @@ export class ActivitiesListener implements OnApplicationBootstrap {
           // ignore entry since it's the same activity as this.lastActivity
         } else {
           // Activity changes, write last activity to database
-          const { icon, ...info } = windowInfo;
+          const { icon: _icon, ...info } = windowInfo;
           logger.info(
             'changed application or title: ',
             new Date().toISOString(),

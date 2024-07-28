@@ -1,22 +1,23 @@
 import './NotesPage.scss';
+import React, { type ReactNode, useEffect, useState } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
-import type { AutoNote } from '../../types/types';
+import { toast } from 'react-toastify';
+
+import { ROUTE_PARTS } from '../../App';
 import {
   useAutoNotesServiceAutoNotesControllerFindAll,
   useAutoNotesServiceAutoNotesControllerRemove,
 } from '../../generated/api/queries';
-import React, { ReactNode, useEffect, useState } from 'react';
-import { ROUTE_PARTS } from '../../App';
-import { toast } from 'react-toastify';
+import type { AutoNote } from '../../types/types';
 
-interface NotesPageProps {}
+// interface NotesPageProps {}
 
-function NotesPage({}: NotesPageProps) {
+function NotesPage() {
   const navigate = useNavigate();
   const params = useParams();
-  const action = params.action;
+  // const action = params.action;
   const id = params.id;
-  const [selectedNote, setSelectedNote] = useState<AutoNote | null>(null);
+  const [_selectedNote, setSelectedNote] = useState<AutoNote | null>(null);
 
   const { data: notes, refetch: refetchNotes } = useAutoNotesServiceAutoNotesControllerFindAll({
     term: '',

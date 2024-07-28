@@ -1,22 +1,19 @@
 import './EditTagNameModal.scss';
 
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { type ChangeEvent, useEffect, useState } from 'react';
 import { Modal } from 'react-responsive-modal';
 import { COLOR_LIST } from '../../views/TimelinesPage/TimelinesPage.consts';
-import { TagName } from '../../types/types';
+import { type TagName } from '../../types/types';
 import { ROUTE_PARTS } from '../../App';
 import {
   useAutoTagsServiceAutoTagsControllerFindOneKey,
   useTagNamesServiceTagNamesControllerCreate,
-  useTagNamesServiceTagNamesControllerFindAllKey,
   useTagNamesServiceTagNamesControllerFindOne,
-  useTagNamesServiceTagNamesControllerFindOneKey,
   useTagNamesServiceTagNamesControllerUpdate,
 } from '../../generated/api/queries';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { ColorInput } from '../ColorInput/ColorInput';
-import { useQueryClient } from '@tanstack/react-query';
 
 function EditTagNameModal() {
   const { id } = useParams();
@@ -32,7 +29,6 @@ function EditTagNameModal() {
     { enabled: !!id }
   );
   const tagName = tagNameResponse as TagName;
-  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (tagName) {
@@ -79,7 +75,7 @@ function EditTagNameModal() {
 
   return (
     <Modal
-      open
+      open={true}
       onClose={handleClose}
       classNames={{ modal: 'c-edit-tag-name-modal', closeButton: 'c-button c-button--small' }}
     >

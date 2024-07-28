@@ -1,8 +1,8 @@
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import pkg from '../package.json';
-import { DatabaseService } from './database/database.service';
 
 @Injectable()
 export class AppService {

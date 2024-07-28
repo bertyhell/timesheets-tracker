@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Query, Delete, Param, Patch } from '@nestjs/common';
-import { TagsService } from './tags.service';
-import { CreateTagDto } from './dto/create-tag.dto';
+import { type TagsService } from './tags.service';
+import { type CreateTagDto } from './dto/create-tag.dto';
 import type { Tag } from '../types/types';
 import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { endOfDay, startOfDay } from 'date-fns';
 import { TagDto } from './dto/response-tag.dto';
-import { UpdateTagDto } from './dto/update-tag.dto';
+import { type UpdateTagDto } from './dto/update-tag.dto';
 
 @ApiTags('tags')
 @Controller('api/tags')

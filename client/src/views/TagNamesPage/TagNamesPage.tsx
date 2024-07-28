@@ -6,19 +6,19 @@ import {
   useTagNamesServiceTagNamesControllerFindAllKey,
   useTagNamesServiceTagNamesControllerRemove,
 } from '../../generated/api/queries';
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { type ReactNode, useEffect, useState } from 'react';
 import { ROUTE_PARTS } from '../../App';
 import { toast } from 'react-toastify';
 
-interface TagNamesPageProps {}
+// interface TagNamesPageProps {}
 
-function TagNamesPage({}: TagNamesPageProps) {
+function TagNamesPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const params = useParams();
-  const action = params.action;
+  // const action = params.action;
   const id = params.id;
-  const [selectedTagName, setSelectedTagName] = useState<TagName | null>(null);
+  const [_selectedTagName, setSelectedTagName] = useState<TagName | null>(null);
 
   const { data: tagNames, refetch: refetchTagNames } = useTagNamesServiceTagNamesControllerFindAll(
     {

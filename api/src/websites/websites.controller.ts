@@ -8,12 +8,12 @@ import {
   Delete,
   NotFoundException,
 } from '@nestjs/common';
-import { type WebsitesService } from './websites.service';
+import { WebsitesService } from './websites.service';
 import type { Website } from '../types/types';
 import { ApiBody, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { endOfDay, startOfDay } from 'date-fns';
 import { CreateWebsiteDto } from './dto/create-website.dto';
-import { type ActivitiesService } from '../activities/activities.service';
+import { ActivitiesService } from '../activities/activities.service';
 import { compact, uniqBy } from 'lodash';
 import { logger } from '../shared/logger';
 

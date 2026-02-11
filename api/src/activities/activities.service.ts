@@ -3,7 +3,7 @@ import type { Activity } from '../types/types';
 import { DatabaseService } from '../database/database.service';
 import { v4 as uuid } from 'uuid';
 import { differenceInSeconds, max, min } from 'date-fns';
-import { type CreateActivityDto } from './dto/create-activity.dto';
+import { CreateActivityDto } from './dto/create-activity.dto';
 import { unflatten } from 'nested-objects-util';
 
 const MINIMUM_ACTIVITY_DURATION_SECONDS = 5;

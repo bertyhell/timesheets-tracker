@@ -12,7 +12,7 @@ import { toast } from 'react-toastify';
 import { type AutoTag } from '../../types/types';
 import copy from 'copy-to-clipboard';
 import { mapLimit } from 'blend-promise-utils';
-import { type AutoTagConditionDto } from '../../generated/api/requests';
+import { AutoTagConditionDto } from '../../generated/api/requests';
 
 const AUTOTAGS_PROPERTY_NAME = 'timesheetTrackerAutoTags';
 

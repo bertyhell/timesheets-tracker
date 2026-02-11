@@ -4,7 +4,7 @@ import { endOfDay, startOfDay } from 'date-fns';
 
 import type { ActiveState } from '../types/types';
 
-import { type ActiveStatesService } from './active-states.service';
+import { ActiveStatesService } from './active-states.service';
 
 @ApiTags('active-states')
 @Controller('api/active-states')

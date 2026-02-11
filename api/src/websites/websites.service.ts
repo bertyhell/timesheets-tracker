@@ -2,9 +2,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { Website } from '../types/types';
 import { DatabaseService } from '../database/database.service';
 import { v4 as uuid } from 'uuid';
-import { type CreateWebsiteDto } from './dto/create-website.dto';
+import { CreateWebsiteDto } from './dto/create-website.dto';
 import { unflatten } from 'nested-objects-util';
-import { type UpdateWebsiteDto } from './dto/update-website.dto';
+import { UpdateWebsiteDto } from './dto/update-website.dto';
 
 @Injectable()
 export class WebsitesService {

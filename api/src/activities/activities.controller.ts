@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
-import { type ActivitiesService } from './activities.service';
+import { ActivitiesService } from './activities.service';
 import type { Activity } from '../types/types';
 import { ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { endOfDay, startOfDay } from 'date-fns';

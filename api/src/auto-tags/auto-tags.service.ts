@@ -1,10 +1,10 @@
-import { type CreateAutoTagDto } from './dto/create-auto-tag.dto';
+import {  CreateAutoTagDto } from './dto/create-auto-tag.dto';
 import { Inject, Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { v4 as uuid } from 'uuid';
 import type { AutoTag } from '../types/types';
 import { unflatten } from 'nested-objects-util';
-import { type UpdateAutoTagsDto } from './dto/update-auto-tags.dto';
+import { UpdateAutoTagsDto } from './dto/update-auto-tags.dto';
 
 @Injectable()
 export class AutoTagsService {

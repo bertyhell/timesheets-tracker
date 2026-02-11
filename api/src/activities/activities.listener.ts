@@ -4,7 +4,7 @@ import { Inject, Injectable, type OnApplicationBootstrap } from '@nestjs/common'
 import { logger } from '../shared/logger';
 
 import { ActivitiesService } from './activities.service';
-import { type CreateActivityDto } from './dto/create-activity.dto';
+import { CreateActivityDto } from './dto/create-activity.dto';
 
 @Injectable()
 export class ActivitiesListener implements OnApplicationBootstrap {

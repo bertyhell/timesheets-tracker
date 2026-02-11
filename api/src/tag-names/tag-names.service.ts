@@ -1,9 +1,9 @@
-import { type CreateTagNameDto } from './dto/create-tag-name.dto';
+import { CreateTagNameDto } from './dto/create-tag-name.dto';
 import { Inject, Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { v4 as uuid } from 'uuid';
 import type { TagName } from '../types/types';
-import { type UpdateTagNameDto } from './dto/update-tag-name.dto';
+import { UpdateTagNameDto } from './dto/update-tag-name.dto';
 
 @Injectable()
 export class TagNamesService {

@@ -1,9 +1,9 @@
-import { type CreateAutoNoteDto } from './dto/create-auto-note.dto';
+import { CreateAutoNoteDto } from './dto/create-auto-note.dto';
 import { Inject, Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { v4 as uuid } from 'uuid';
 import type { AutoNote } from '../types/types';
-import { type UpdateAutoNoteDto } from './dto/update-auto-note.dto';
+import { UpdateAutoNoteDto } from './dto/update-auto-note.dto';
 
 const TAG_NAME_IDS_SEPARATOR = ';';
 

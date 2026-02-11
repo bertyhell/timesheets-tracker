@@ -2,9 +2,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { ActiveState } from '../types/types';
 import { DatabaseService } from '../database/database.service';
 import { v4 as uuid } from 'uuid';
-import { type CreateActiveStateDto } from './dto/create-active-state.dto';
+import { CreateActiveStateDto } from './dto/create-active-state.dto';
 import { unflatten } from 'nested-objects-util';
-import { type UpdateActiveStateDto } from './dto/update-active-state.dto';
+import { UpdateActiveStateDto } from './dto/update-active-state.dto';
 import { CustomError } from '../shared/CustomError';
 
 @Injectable()

@@ -15,7 +15,7 @@ import {
   useAutoTagsServiceAutoTagsControllerUpdate,
   useTagNamesServiceTagNamesControllerCreate,
 } from '../../generated/api/queries';
-import { type CreateAutoTagDto, type UpdateAutoTagsDto } from '../../generated/api/requests';
+import { CreateAutoTagDto, UpdateAutoTagsDto } from '../../generated/api/requests';
 import {
   type AutoTag,
   type AutoTagCondition,

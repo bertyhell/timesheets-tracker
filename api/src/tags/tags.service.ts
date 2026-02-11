@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { type CreateTagDto } from './dto/create-tag.dto';
+import { CreateTagDto } from './dto/create-tag.dto';
 import { DatabaseService } from '../database/database.service';
 import { v4 as uuid } from 'uuid';
 import type { Tag } from '../types/types';
 import { unflatten } from 'nested-objects-util';
 import { max, min } from 'date-fns';
-import { type UpdateTagDto } from './dto/update-tag.dto';
+import { UpdateTagDto } from './dto/update-tag.dto';
 
 @Injectable()
 export class TagsService {

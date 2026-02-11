@@ -17,6 +17,9 @@ export class DatabaseService implements OnModuleInit {
     if (!fs.existsSync(databasePath)) {
       databasePath = path.resolve('../timesheets-tracker-database.sqlite3');
     }
+    if (!fs.existsSync(databasePath)) {
+      fs.writeFileSync(databasePath, '', {encoding: 'utf8'});
+    }
     logger.info('databasePath: ' + databasePath);
     const fileBuffer = fs.readFileSync(databasePath);
     initSqlJs().then(async (SQL) => {

@@ -21,7 +21,6 @@ export class ActiveStatesListener {
   @Interval(ACTIVE_STATE_POLLING_INTERVAL_SECONDS * 1000)
   private async checkActiveState(): Promise<void> {
     // const idleState = RealIdle.getIdleState(ACTIVE_STATE_POLLING_INTERVAL_SECONDS);
-
     // const currentIsActiveState: boolean = {
     //   active: true,
     //   idlePrevented: true,
@@ -29,7 +28,6 @@ export class ActiveStatesListener {
     //   locked: false,
     //   unknown: false,
     // }[idleState];
-
     // if (!this.lastActiveState) {
     //   this.lastActiveState = {
     //     isActive: currentIsActiveState,

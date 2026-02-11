@@ -28,6 +28,7 @@ export class AutoTagConditionDto implements AutoTagCondition {
     description: 'Variable to check',
     default: ConditionVariable.programName,
     enum: ConditionVariable,
+    enumName: 'ConditionVariable',
     nullable: true,
   })
   variable: ConditionVariable | null;
@@ -39,6 +40,7 @@ export class AutoTagConditionDto implements AutoTagCondition {
     description: 'Operator of the condition',
     default: 'OR',
     enum: ConditionOperator,
+    enumName: 'ConditionOperator',
     nullable: true,
   })
   operator: ConditionOperator | null;

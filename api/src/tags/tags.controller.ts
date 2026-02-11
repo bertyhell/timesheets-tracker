@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Query, Delete, Param, Patch } from '@nestjs/common';
-import { type TagsService } from './tags.service';
+import { TagsService } from './tags.service';
 import { type CreateTagDto } from './dto/create-tag.dto';
 import type { Tag } from '../types/types';
 import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';

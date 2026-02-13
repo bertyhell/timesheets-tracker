@@ -19,7 +19,10 @@
     "noFallthroughCasesInSwitch": false,
     "resolveJsonModule": true,
     "composite": true,
-    "esModuleInterop": true,
+    "esModuleInterop": true
   },
-  "files": ["install-timesheet-tracker-as-a-windows-service.ts", "uninstall-timesheet-tracker-as-a-windows-service.ts"]
+  "files": [
+    "install-timesheet-tracker-as-a-windows-service.ts",
+    "uninstall-timesheet-tracker-as-a-windows-service.ts"
+  ]
 }

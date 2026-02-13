@@ -2,6 +2,8 @@
   "name": "timesheets-tracker",
   "version": "1.0.0",
   "description": "Track active window and tag activities to easily track timesheets",
+  "license": "MIT",
+  "author": "Bert Verhelst",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -15,29 +17,23 @@
     "clean": "rm -rf ./dist/api ./dist/client ./dist/chrome-extension && cd dist && mkdir api && mkdir client && mkdir chrome-extension && cd ..",
     "build": "npm run clean && npm run build-api && npm run build-client && npm run copy-chrome-extension && npm run replace-ports",
     "lint": "oxlint",
-    "format":  "oxfmt",
+    "format": "oxfmt",
     "type-check": "tsc"
-  },
-  "author": "Bert Verhelst",
-  "license": "MIT",
-  "devDependencies": {
-    "@types/node": "^20.4.5",
-    "@types/uuid": "^9.0.2",
-    "bump-package-versions": "^1.0.7",
-    "nexe": "^4.0.0-rc.4",
-    "ts-node": "^10.9.1",
-    "replace-in-files-cli": "^2.2.0",
-    "prettier": "3.3.3",
-    "eslint": "^8.57.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-import-resolver-typescript": "^3.6.1",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-prettier": "^5.2.1",
-    "@typescript-eslint/eslint-plugin": "6.7.0",
-    "@typescript-eslint/parser": "6.7.0"
   },
   "dependencies": {
     "node-windows": "^1.0.0-beta.8",
     "symlink-dir": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.4.5",
+    "@types/uuid": "^9.0.2",
+    "@typescript-eslint/eslint-plugin": "6.7.0",
+    "@typescript-eslint/parser": "6.7.0",
+    "bump-package-versions": "^1.0.7",
+    "nexe": "^4.0.0-rc.4",
+    "oxfmt": "^0.32.0",
+    "oxlint": "^1.47.0",
+    "replace-in-files-cli": "^2.2.0",
+    "ts-node": "^10.9.1"
   }
 }

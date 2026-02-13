@@ -21,18 +21,24 @@ export class ActiveStatesService {
   }
 
   async findAll(startedAt: string, endedAt: string): Promise<ActiveState[]> {
-    const results = await this.databaseService.exec('./src/activeStates/queries/findAllActiveStates.sql', {
-      $startedAt: startedAt,
-      $endedAt: endedAt,
-    });
+    const results = await this.databaseService.exec(
+      './src/activeStates/queries/findAllActiveStates.sql',
+      {
+        $startedAt: startedAt,
+        $endedAt: endedAt,
+      }
+    );
     return results.map(this.adapt);
   }
 
   async findOne(id: string): Promise<ActiveState> {
     try {
-      const result = await this.databaseService.exec('./src/activeStates/queries/findOneActiveState.sql', {
-        $id: id,
-      });
+      const result = await this.databaseService.exec(
+        './src/activeStates/queries/findOneActiveState.sql',
+        {
+          $id: id,
+        }
+      );
 
       return this.adapt(result);
     } catch (err) {
@@ -71,6 +77,8 @@ export class ActiveStatesService {
   }
 
   async delete(id: string): Promise<void> {
-    await this.databaseService.exec('./src/activeStates/queries/deleteActiveState.sql', { $id: id });
+    await this.databaseService.exec('./src/activeStates/queries/deleteActiveState.sql', {
+      $id: id,
+    });
   }
 }

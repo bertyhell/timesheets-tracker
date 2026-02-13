@@ -30,8 +30,5 @@
   "background": {
     "service_worker": "src/background/background.js"
   },
-  "permissions": [
-    "activeTab",
-    "tabs"
-  ]
+  "permissions": ["activeTab", "tabs"]
 }

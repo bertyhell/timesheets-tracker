@@ -131,7 +131,8 @@ function EditAutoNoteModal() {
       <h3>{id ? 'Update note' : 'Add note'}</h3>
 
       <p>
-        Allows you to extract some information from an activity and add it as a note to a tag. Force instance, you can extract the jira ticket id from a url and add it as a note to the tag.
+        Allows you to extract some information from an activity and add it as a note to a tag. Force
+        instance, you can extract the jira ticket id from a url and add it as a note to the tag.
       </p>
 
       <h4 className="mt-4">Name</h4>

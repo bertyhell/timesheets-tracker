@@ -5,7 +5,7 @@ import {
   type UseMutationOptions,
   useQuery,
   type UseQueryOptions,
-} from '@tanstack/react-query';
+} from "@tanstack/react-query";
 import {
   ActiveStatesService,
   ActivitiesService,
@@ -24,7 +24,7 @@ import {
   type UpdateTagDto,
   type UpdateTagNameDto,
   WebsitesService,
-} from '../requests';
+} from "../requests";
 
 export const useWebsitesServiceWebsitesControllerCreate = (
   options?: Omit<
@@ -36,15 +36,15 @@ export const useWebsitesServiceWebsitesControllerCreate = (
       },
       unknown
     >,
-    'mutationFn'
-  >
+    "mutationFn"
+  >,
 ) =>
   useMutation({
     mutationFn: ({ requestBody }) => WebsitesService.websitesControllerCreate(requestBody),
     ...options,
   });
 export const useWebsitesServiceWebsitesControllerFindAllKey =
-  'WebsitesServiceWebsitesControllerFindAll';
+  "WebsitesServiceWebsitesControllerFindAll";
 export const useWebsitesServiceWebsitesControllerFindAll = <
   TQueryKey extends Array<unknown> = unknown[],
 >(
@@ -63,8 +63,8 @@ export const useWebsitesServiceWebsitesControllerFindAll = <
       Awaited<ReturnType<typeof WebsitesService.websitesControllerFindAll>>,
       unknown[]
     >,
-    'queryKey' | 'queryFn' | 'initialData'
-  >
+    "queryKey" | "queryFn" | "initialData"
+  >,
 ) =>
   useQuery({
     queryKey: [
@@ -84,12 +84,12 @@ export const useWebsitesServiceWebsitesControllerDelete = (
       },
       unknown
     >,
-    'mutationFn'
-  >
+    "mutationFn"
+  >,
 ) =>
   useMutation({ mutationFn: ({ id }) => WebsitesService.websitesControllerDelete(id), ...options });
 export const useWebsitesServiceWebsitesControllerFindOneKey =
-  'WebsitesServiceWebsitesControllerFindOne';
+  "WebsitesServiceWebsitesControllerFindOne";
 export const useWebsitesServiceWebsitesControllerFindOne = <
   TQueryKey extends Array<unknown> = unknown[],
 >(
@@ -106,8 +106,8 @@ export const useWebsitesServiceWebsitesControllerFindOne = <
       Awaited<ReturnType<typeof WebsitesService.websitesControllerFindOne>>,
       unknown[]
     >,
-    'queryKey' | 'queryFn' | 'initialData'
-  >
+    "queryKey" | "queryFn" | "initialData"
+  >,
 ) =>
   useQuery({
     queryKey: [useWebsitesServiceWebsitesControllerFindOneKey, ...(queryKey ?? [{ id }])],
@@ -124,14 +124,14 @@ export const useTagsServiceTagsControllerCreate = (
       },
       unknown
     >,
-    'mutationFn'
-  >
+    "mutationFn"
+  >,
 ) =>
   useMutation({
     mutationFn: ({ requestBody }) => TagsService.tagsControllerCreate(requestBody),
     ...options,
   });
-export const useTagsServiceTagsControllerFindAllKey = 'TagsServiceTagsControllerFindAll';
+export const useTagsServiceTagsControllerFindAllKey = "TagsServiceTagsControllerFindAll";
 export const useTagsServiceTagsControllerFindAll = <TQueryKey extends Array<unknown> = unknown[]>(
   {
     startedAt,
@@ -148,15 +148,15 @@ export const useTagsServiceTagsControllerFindAll = <TQueryKey extends Array<unkn
       Awaited<ReturnType<typeof TagsService.tagsControllerFindAll>>,
       unknown[]
     >,
-    'queryKey' | 'queryFn' | 'initialData'
-  >
+    "queryKey" | "queryFn" | "initialData"
+  >,
 ) =>
   useQuery({
     queryKey: [useTagsServiceTagsControllerFindAllKey, ...(queryKey ?? [{ startedAt, endedAt }])],
     queryFn: () => TagsService.tagsControllerFindAll(startedAt, endedAt),
     ...options,
   });
-export const useTagsServiceTagsControllerFindOneKey = 'TagsServiceTagsControllerFindOne';
+export const useTagsServiceTagsControllerFindOneKey = "TagsServiceTagsControllerFindOne";
 export const useTagsServiceTagsControllerFindOne = <TQueryKey extends Array<unknown> = unknown[]>(
   {
     id,
@@ -171,8 +171,8 @@ export const useTagsServiceTagsControllerFindOne = <TQueryKey extends Array<unkn
       Awaited<ReturnType<typeof TagsService.tagsControllerFindOne>>,
       unknown[]
     >,
-    'queryKey' | 'queryFn' | 'initialData'
-  >
+    "queryKey" | "queryFn" | "initialData"
+  >,
 ) =>
   useQuery({
     queryKey: [useTagsServiceTagsControllerFindOneKey, ...(queryKey ?? [{ id }])],
@@ -190,8 +190,8 @@ export const useTagsServiceTagsControllerUpdate = (
       },
       unknown
     >,
-    'mutationFn'
-  >
+    "mutationFn"
+  >,
 ) =>
   useMutation({
     mutationFn: ({ id, requestBody }) => TagsService.tagsControllerUpdate(id, requestBody),
@@ -207,8 +207,8 @@ export const useTagsServiceTagsControllerRemove = (
       },
       unknown
     >,
-    'mutationFn'
-  >
+    "mutationFn"
+  >,
 ) => useMutation({ mutationFn: ({ id }) => TagsService.tagsControllerRemove(id), ...options });
 export const useTagNamesServiceTagNamesControllerCreate = (
   options?: Omit<
@@ -220,15 +220,15 @@ export const useTagNamesServiceTagNamesControllerCreate = (
       },
       unknown
     >,
-    'mutationFn'
-  >
+    "mutationFn"
+  >,
 ) =>
   useMutation({
     mutationFn: ({ requestBody }) => TagNamesService.tagNamesControllerCreate(requestBody),
     ...options,
   });
 export const useTagNamesServiceTagNamesControllerFindAllKey =
-  'TagNamesServiceTagNamesControllerFindAll';
+  "TagNamesServiceTagNamesControllerFindAll";
 export const useTagNamesServiceTagNamesControllerFindAll = <
   TQueryKey extends Array<unknown> = unknown[],
 >(
@@ -245,8 +245,8 @@ export const useTagNamesServiceTagNamesControllerFindAll = <
       Awaited<ReturnType<typeof TagNamesService.tagNamesControllerFindAll>>,
       unknown[]
     >,
-    'queryKey' | 'queryFn' | 'initialData'
-  >
+    "queryKey" | "queryFn" | "initialData"
+  >,
 ) =>
   useQuery({
     queryKey: [useTagNamesServiceTagNamesControllerFindAllKey, ...(queryKey ?? [{ term }])],
@@ -254,7 +254,7 @@ export const useTagNamesServiceTagNamesControllerFindAll = <
     ...options,
   });
 export const useTagNamesServiceTagNamesControllerCountKey =
-  'TagNamesServiceTagNamesControllerCount';
+  "TagNamesServiceTagNamesControllerCount";
 export const useTagNamesServiceTagNamesControllerCount = <
   TQueryKey extends Array<unknown> = unknown[],
 >(
@@ -266,8 +266,8 @@ export const useTagNamesServiceTagNamesControllerCount = <
       Awaited<ReturnType<typeof TagNamesService.tagNamesControllerCount>>,
       unknown[]
     >,
-    'queryKey' | 'queryFn' | 'initialData'
-  >
+    "queryKey" | "queryFn" | "initialData"
+  >,
 ) =>
   useQuery({
     queryKey: [useTagNamesServiceTagNamesControllerCountKey, ...(queryKey ?? [])],
@@ -275,7 +275,7 @@ export const useTagNamesServiceTagNamesControllerCount = <
     ...options,
   });
 export const useTagNamesServiceTagNamesControllerFindOneKey =
-  'TagNamesServiceTagNamesControllerFindOne';
+  "TagNamesServiceTagNamesControllerFindOne";
 export const useTagNamesServiceTagNamesControllerFindOne = <
   TQueryKey extends Array<unknown> = unknown[],
 >(
@@ -292,8 +292,8 @@ export const useTagNamesServiceTagNamesControllerFindOne = <
       Awaited<ReturnType<typeof TagNamesService.tagNamesControllerFindOne>>,
       unknown[]
     >,
-    'queryKey' | 'queryFn' | 'initialData'
-  >
+    "queryKey" | "queryFn" | "initialData"
+  >,
 ) =>
   useQuery({
     queryKey: [useTagNamesServiceTagNamesControllerFindOneKey, ...(queryKey ?? [{ id }])],
@@ -311,8 +311,8 @@ export const useTagNamesServiceTagNamesControllerUpdate = (
       },
       unknown
     >,
-    'mutationFn'
-  >
+    "mutationFn"
+  >,
 ) =>
   useMutation({
     mutationFn: ({ id, requestBody }) => TagNamesService.tagNamesControllerUpdate(id, requestBody),
@@ -328,11 +328,11 @@ export const useTagNamesServiceTagNamesControllerRemove = (
       },
       unknown
     >,
-    'mutationFn'
-  >
+    "mutationFn"
+  >,
 ) =>
   useMutation({ mutationFn: ({ id }) => TagNamesService.tagNamesControllerRemove(id), ...options });
-export const useStatusServiceAppControllerStatusKey = 'StatusServiceAppControllerStatus';
+export const useStatusServiceAppControllerStatusKey = "StatusServiceAppControllerStatus";
 export const useStatusServiceAppControllerStatus = <TQueryKey extends Array<unknown> = unknown[]>(
   queryKey?: TQueryKey,
   options?: Omit<
@@ -342,8 +342,8 @@ export const useStatusServiceAppControllerStatus = <TQueryKey extends Array<unkn
       Awaited<ReturnType<typeof StatusService.appControllerStatus>>,
       unknown[]
     >,
-    'queryKey' | 'queryFn' | 'initialData'
-  >
+    "queryKey" | "queryFn" | "initialData"
+  >,
 ) =>
   useQuery({
     queryKey: [useStatusServiceAppControllerStatusKey, ...(queryKey ?? [])],
@@ -360,15 +360,15 @@ export const useAutoTagsServiceAutoTagsControllerCreate = (
       },
       unknown
     >,
-    'mutationFn'
-  >
+    "mutationFn"
+  >,
 ) =>
   useMutation({
     mutationFn: ({ requestBody }) => AutoTagsService.autoTagsControllerCreate(requestBody),
     ...options,
   });
 export const useAutoTagsServiceAutoTagsControllerFindAllKey =
-  'AutoTagsServiceAutoTagsControllerFindAll';
+  "AutoTagsServiceAutoTagsControllerFindAll";
 export const useAutoTagsServiceAutoTagsControllerFindAll = <
   TQueryKey extends Array<unknown> = unknown[],
 >(
@@ -385,8 +385,8 @@ export const useAutoTagsServiceAutoTagsControllerFindAll = <
       Awaited<ReturnType<typeof AutoTagsService.autoTagsControllerFindAll>>,
       unknown[]
     >,
-    'queryKey' | 'queryFn' | 'initialData'
-  >
+    "queryKey" | "queryFn" | "initialData"
+  >,
 ) =>
   useQuery({
     queryKey: [useAutoTagsServiceAutoTagsControllerFindAllKey, ...(queryKey ?? [{ term }])],
@@ -394,7 +394,7 @@ export const useAutoTagsServiceAutoTagsControllerFindAll = <
     ...options,
   });
 export const useAutoTagsServiceAutoTagsControllerCountKey =
-  'AutoTagsServiceAutoTagsControllerCount';
+  "AutoTagsServiceAutoTagsControllerCount";
 export const useAutoTagsServiceAutoTagsControllerCount = <
   TQueryKey extends Array<unknown> = unknown[],
 >(
@@ -406,8 +406,8 @@ export const useAutoTagsServiceAutoTagsControllerCount = <
       Awaited<ReturnType<typeof AutoTagsService.autoTagsControllerCount>>,
       unknown[]
     >,
-    'queryKey' | 'queryFn' | 'initialData'
-  >
+    "queryKey" | "queryFn" | "initialData"
+  >,
 ) =>
   useQuery({
     queryKey: [useAutoTagsServiceAutoTagsControllerCountKey, ...(queryKey ?? [])],
@@ -415,7 +415,7 @@ export const useAutoTagsServiceAutoTagsControllerCount = <
     ...options,
   });
 export const useAutoTagsServiceAutoTagsControllerFindOneKey =
-  'AutoTagsServiceAutoTagsControllerFindOne';
+  "AutoTagsServiceAutoTagsControllerFindOne";
 export const useAutoTagsServiceAutoTagsControllerFindOne = <
   TQueryKey extends Array<unknown> = unknown[],
 >(
@@ -432,8 +432,8 @@ export const useAutoTagsServiceAutoTagsControllerFindOne = <
       Awaited<ReturnType<typeof AutoTagsService.autoTagsControllerFindOne>>,
       unknown[]
     >,
-    'queryKey' | 'queryFn' | 'initialData'
-  >
+    "queryKey" | "queryFn" | "initialData"
+  >,
 ) =>
   useQuery({
     queryKey: [useAutoTagsServiceAutoTagsControllerFindOneKey, ...(queryKey ?? [{ id }])],
@@ -451,8 +451,8 @@ export const useAutoTagsServiceAutoTagsControllerUpdate = (
       },
       unknown
     >,
-    'mutationFn'
-  >
+    "mutationFn"
+  >,
 ) =>
   useMutation({
     mutationFn: ({ id, requestBody }) => AutoTagsService.autoTagsControllerUpdate(id, requestBody),
@@ -468,8 +468,8 @@ export const useAutoTagsServiceAutoTagsControllerDelete = (
       },
       unknown
     >,
-    'mutationFn'
-  >
+    "mutationFn"
+  >,
 ) =>
   useMutation({ mutationFn: ({ id }) => AutoTagsService.autoTagsControllerDelete(id), ...options });
 export const useAutoNotesServiceAutoNotesControllerCreate = (
@@ -482,15 +482,15 @@ export const useAutoNotesServiceAutoNotesControllerCreate = (
       },
       unknown
     >,
-    'mutationFn'
-  >
+    "mutationFn"
+  >,
 ) =>
   useMutation({
     mutationFn: ({ requestBody }) => AutoNotesService.autoNotesControllerCreate(requestBody),
     ...options,
   });
 export const useAutoNotesServiceAutoNotesControllerFindAllKey =
-  'AutoNotesServiceAutoNotesControllerFindAll';
+  "AutoNotesServiceAutoNotesControllerFindAll";
 export const useAutoNotesServiceAutoNotesControllerFindAll = <
   TQueryKey extends Array<unknown> = unknown[],
 >(
@@ -507,8 +507,8 @@ export const useAutoNotesServiceAutoNotesControllerFindAll = <
       Awaited<ReturnType<typeof AutoNotesService.autoNotesControllerFindAll>>,
       unknown[]
     >,
-    'queryKey' | 'queryFn' | 'initialData'
-  >
+    "queryKey" | "queryFn" | "initialData"
+  >,
 ) =>
   useQuery({
     queryKey: [useAutoNotesServiceAutoNotesControllerFindAllKey, ...(queryKey ?? [{ term }])],
@@ -516,7 +516,7 @@ export const useAutoNotesServiceAutoNotesControllerFindAll = <
     ...options,
   });
 export const useAutoNotesServiceAutoNotesControllerCountKey =
-  'AutoNotesServiceAutoNotesControllerCount';
+  "AutoNotesServiceAutoNotesControllerCount";
 export const useAutoNotesServiceAutoNotesControllerCount = <
   TQueryKey extends Array<unknown> = unknown[],
 >(
@@ -528,8 +528,8 @@ export const useAutoNotesServiceAutoNotesControllerCount = <
       Awaited<ReturnType<typeof AutoNotesService.autoNotesControllerCount>>,
       unknown[]
     >,
-    'queryKey' | 'queryFn' | 'initialData'
-  >
+    "queryKey" | "queryFn" | "initialData"
+  >,
 ) =>
   useQuery({
     queryKey: [useAutoNotesServiceAutoNotesControllerCountKey, ...(queryKey ?? [])],
@@ -537,7 +537,7 @@ export const useAutoNotesServiceAutoNotesControllerCount = <
     ...options,
   });
 export const useAutoNotesServiceAutoNotesControllerFindOneKey =
-  'AutoNotesServiceAutoNotesControllerFindOne';
+  "AutoNotesServiceAutoNotesControllerFindOne";
 export const useAutoNotesServiceAutoNotesControllerFindOne = <
   TQueryKey extends Array<unknown> = unknown[],
 >(
@@ -554,8 +554,8 @@ export const useAutoNotesServiceAutoNotesControllerFindOne = <
       Awaited<ReturnType<typeof AutoNotesService.autoNotesControllerFindOne>>,
       unknown[]
     >,
-    'queryKey' | 'queryFn' | 'initialData'
-  >
+    "queryKey" | "queryFn" | "initialData"
+  >,
 ) =>
   useQuery({
     queryKey: [useAutoNotesServiceAutoNotesControllerFindOneKey, ...(queryKey ?? [{ id }])],
@@ -573,8 +573,8 @@ export const useAutoNotesServiceAutoNotesControllerUpdate = (
       },
       unknown
     >,
-    'mutationFn'
-  >
+    "mutationFn"
+  >,
 ) =>
   useMutation({
     mutationFn: ({ id, requestBody }) =>
@@ -591,8 +591,8 @@ export const useAutoNotesServiceAutoNotesControllerRemove = (
       },
       unknown
     >,
-    'mutationFn'
-  >
+    "mutationFn"
+  >,
 ) =>
   useMutation({
     mutationFn: ({ id }) => AutoNotesService.autoNotesControllerRemove(id),
@@ -606,11 +606,11 @@ export const useActivitiesServiceActivitiesControllerCreate = (
       void,
       unknown
     >,
-    'mutationFn'
-  >
+    "mutationFn"
+  >,
 ) => useMutation({ mutationFn: () => ActivitiesService.activitiesControllerCreate(), ...options });
 export const useActivitiesServiceActivitiesControllerFindAllKey =
-  'ActivitiesServiceActivitiesControllerFindAll';
+  "ActivitiesServiceActivitiesControllerFindAll";
 export const useActivitiesServiceActivitiesControllerFindAll = <
   TQueryKey extends Array<unknown> = unknown[],
 >(
@@ -629,8 +629,8 @@ export const useActivitiesServiceActivitiesControllerFindAll = <
       Awaited<ReturnType<typeof ActivitiesService.activitiesControllerFindAll>>,
       unknown[]
     >,
-    'queryKey' | 'queryFn' | 'initialData'
-  >
+    "queryKey" | "queryFn" | "initialData"
+  >,
 ) =>
   useQuery({
     queryKey: [
@@ -650,15 +650,15 @@ export const useActivitiesServiceActivitiesControllerDelete = (
       },
       unknown
     >,
-    'mutationFn'
-  >
+    "mutationFn"
+  >,
 ) =>
   useMutation({
     mutationFn: ({ id }) => ActivitiesService.activitiesControllerDelete(id),
     ...options,
   });
 export const useActivitiesServiceActivitiesControllerFindOneKey =
-  'ActivitiesServiceActivitiesControllerFindOne';
+  "ActivitiesServiceActivitiesControllerFindOne";
 export const useActivitiesServiceActivitiesControllerFindOne = <
   TQueryKey extends Array<unknown> = unknown[],
 >(
@@ -675,8 +675,8 @@ export const useActivitiesServiceActivitiesControllerFindOne = <
       Awaited<ReturnType<typeof ActivitiesService.activitiesControllerFindOne>>,
       unknown[]
     >,
-    'queryKey' | 'queryFn' | 'initialData'
-  >
+    "queryKey" | "queryFn" | "initialData"
+  >,
 ) =>
   useQuery({
     queryKey: [useActivitiesServiceActivitiesControllerFindOneKey, ...(queryKey ?? [{ id }])],
@@ -691,12 +691,12 @@ export const useActiveStatesServiceActiveStatesControllerCreate = (
       void,
       unknown
     >,
-    'mutationFn'
-  >
+    "mutationFn"
+  >,
 ) =>
   useMutation({ mutationFn: () => ActiveStatesService.activeStatesControllerCreate(), ...options });
 export const useActiveStatesServiceActiveStatesControllerFindAllKey =
-  'ActiveStatesServiceActiveStatesControllerFindAll';
+  "ActiveStatesServiceActiveStatesControllerFindAll";
 export const useActiveStatesServiceActiveStatesControllerFindAll = <
   TQueryKey extends Array<unknown> = unknown[],
 >(
@@ -715,8 +715,8 @@ export const useActiveStatesServiceActiveStatesControllerFindAll = <
       Awaited<ReturnType<typeof ActiveStatesService.activeStatesControllerFindAll>>,
       unknown[]
     >,
-    'queryKey' | 'queryFn' | 'initialData'
-  >
+    "queryKey" | "queryFn" | "initialData"
+  >,
 ) =>
   useQuery({
     queryKey: [
@@ -736,15 +736,15 @@ export const useActiveStatesServiceActiveStatesControllerDelete = (
       },
       unknown
     >,
-    'mutationFn'
-  >
+    "mutationFn"
+  >,
 ) =>
   useMutation({
     mutationFn: ({ id }) => ActiveStatesService.activeStatesControllerDelete(id),
     ...options,
   });
 export const useActiveStatesServiceActiveStatesControllerFindOneKey =
-  'ActiveStatesServiceActiveStatesControllerFindOne';
+  "ActiveStatesServiceActiveStatesControllerFindOne";
 export const useActiveStatesServiceActiveStatesControllerFindOne = <
   TQueryKey extends Array<unknown> = unknown[],
 >(
@@ -761,8 +761,8 @@ export const useActiveStatesServiceActiveStatesControllerFindOne = <
       Awaited<ReturnType<typeof ActiveStatesService.activeStatesControllerFindOne>>,
       unknown[]
     >,
-    'queryKey' | 'queryFn' | 'initialData'
-  >
+    "queryKey" | "queryFn" | "initialData"
+  >,
 ) =>
   useQuery({
     queryKey: [useActiveStatesServiceActiveStatesControllerFindOneKey, ...(queryKey ?? [{ id }])],

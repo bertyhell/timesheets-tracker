@@ -39,7 +39,9 @@ export class AutoNotesService {
 
   async count(): Promise<number> {
     const result = (
-      await this.databaseService.exec<{ count: number }>('./src/auto-notes/queries/countAutoNotes.sql')
+      await this.databaseService.exec<{ count: number }>(
+        './src/auto-notes/queries/countAutoNotes.sql'
+      )
     )[0];
 
     return result.count;

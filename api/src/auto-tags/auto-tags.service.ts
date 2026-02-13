@@ -1,4 +1,4 @@
-import {  CreateAutoTagDto } from './dto/create-auto-tag.dto';
+import { CreateAutoTagDto } from './dto/create-auto-tag.dto';
 import { Inject, Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { v4 as uuid } from 'uuid';

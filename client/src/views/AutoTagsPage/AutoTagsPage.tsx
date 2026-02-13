@@ -59,7 +59,7 @@ function AutoTagsPage() {
             toast("The pasted text doesn't contain any valid auto tags", { type: 'error' });
           }
         }
-      } catch (err) {
+      } catch {
         toast("The pasted text doesn't contain any valid auto tags", { type: 'error' });
       }
     },

@@ -15,7 +15,7 @@ import {
 import { type TimelineEvent } from '../Timeline/Timeline.types';
 import { orderBy } from 'lodash-es';
 import { format } from 'date-fns';
-import { useAtom } from 'jotai/index';
+import { useAtom } from 'jotai';
 import { searchTermAtom } from '../../store/store';
 
 interface EventsTableProps {
@@ -80,26 +80,9 @@ function EventsTable({ events }: EventsTableProps) {
     }
   }, [events, searchTerm]);
 
-  const renderTooltipContent = () => {
-    return (
-      <ul
-        className="c-events-table__event-tooltip__content"
-        key={'c-events-table__event-tooltip__content'}
-      >
-        <li>selected events</li>
-      </ul>
-    );
-  };
-
   return (
     <div>
       <Provider theme={defaultTheme} colorScheme="light">
-        {/*<Tippy*/}
-        {/*  key="c-events-table__event-tooltip"*/}
-        {/*  visible={!!selectedKeys}*/}
-        {/*  interactive*/}
-        {/*  content={renderTooltipContent()}*/}
-        {/*>*/}
         <TableView
           aria-label="Example table with static contents"
           selectionMode="multiple"
@@ -144,7 +127,6 @@ function EventsTable({ events }: EventsTableProps) {
             })}
           </TableBody>
         </TableView>
-        {/*</Tippy>*/}
       </Provider>
     </div>
   );

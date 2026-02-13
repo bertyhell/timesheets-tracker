@@ -6,3 +6,4 @@ dist/
 exe/target/release/
 
 timesheets-tracker-database.sqlite3
+.claude

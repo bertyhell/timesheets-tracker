@@ -64,24 +64,6 @@ export class ActivitiesService {
     return this.findOne(values.$id);
   }
 
-  // async update(id: string, updateActivityDto: UpdateActivityDto): Promise<Activity> {
-  //   await this.databaseService.exec('./src/activities/queries/updateActivity.sql', {
-  //     $id: id,
-  //     $programName: updateActivityDto.programName,
-  //     $windowTitle: updateActivityDto.windowTitle,
-  //     $startedAt: min([
-  //       new Date(updateActivityDto.startedAt),
-  //       new Date(updateActivityDto.endedAt),
-  //     ]).toISOString(),
-  //     $endedAt: max([
-  //       new Date(updateActivityDto.startedAt),
-  //       new Date(updateActivityDto.endedAt),
-  //     ]).toISOString(),
-  //   });
-  //
-  //   return this.findOne(id);
-  // }
-
   async delete(id: string): Promise<void> {
     await this.databaseService.exec('./src/activities/queries/deleteActivity.sql', { $id: id });
   }

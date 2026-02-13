@@ -26,11 +26,11 @@ export class AutoNotesService {
     let rawAutoNotes: AutoNote[];
     if (searchTerm) {
       rawAutoNotes = await this.databaseService.exec<AutoNote>(
-        './src/auto-notes/queries/findAllAutoNotesBySearchTerm'
+        './src/auto-notes/queries/findAllAutoNotesBySearchTerm.sql'
       );
     } else {
       rawAutoNotes = await this.databaseService.exec<AutoNote>(
-        './src/auto-notes/queries/findAllAutoNotes'
+        './src/auto-notes/queries/findAllAutoNotes.sql'
       );
     }
 
@@ -39,14 +39,14 @@ export class AutoNotesService {
 
   async count(): Promise<number> {
     const result = (
-      await this.databaseService.exec<{ count: number }>('./src/auto-notes/queries/countAutoNotes')
+      await this.databaseService.exec<{ count: number }>('./src/auto-notes/queries/countAutoNotes.sql')
     )[0];
 
     return result.count;
   }
 
   async findOne(id: string): Promise<AutoNote> {
-    const result = await this.databaseService.exec('./src/auto-notes/queries/findOneAutoNote', {
+    const result = await this.databaseService.exec('./src/auto-notes/queries/findOneAutoNote.sql', {
       $id: id,
     });
 
@@ -62,7 +62,7 @@ export class AutoNotesService {
       $extractRegex: autoNote.extractRegex,
       $extractRegexReplacement: autoNote.extractRegexReplacement,
     };
-    await this.databaseService.exec('./src/auto-notes/queries/createAutoNote', values);
+    await this.databaseService.exec('./src/auto-notes/queries/createAutoNote.sql', values);
 
     return this.findOne(values.$id);
   }
@@ -76,12 +76,12 @@ export class AutoNotesService {
       $extractRegex: updateTagDto.extractRegex,
       $extractRegexReplacement: updateTagDto.extractRegexReplacement,
     };
-    await this.databaseService.exec('./src/auto-notes/queries/updateAutoNote');
+    await this.databaseService.exec('./src/auto-notes/queries/updateAutoNote.sql');
 
     return await this.findOne(values.$id);
   }
 
   async remove(id: string): Promise<void> {
-    await this.databaseService.exec('./src/auto-notes/queries/deleteAutoNote', { id });
+    await this.databaseService.exec('./src/auto-notes/queries/deleteAutoNote.sql', { id });
   }
 }

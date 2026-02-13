@@ -14,9 +14,8 @@
     "replace-ports": "replace-in-files --string='55577' --replacement='55566' dist/client/**/*.js dist/api/src/**/*.js dist/chrome-extension/**/*.js",
     "clean": "rm -rf ./dist/api ./dist/client ./dist/chrome-extension && cd dist && mkdir api && mkdir client && mkdir chrome-extension && cd ..",
     "build": "npm run clean && npm run build-api && npm run build-client && npm run copy-chrome-extension && npm run replace-ports",
-    "lint:fix": "eslint ./client/src ./api/src --ext .jsx,.js,.ts,.tsx --quiet --fix --ignore-path ./.gitignore",
-    "lint:format": "prettier  --loglevel warn --write \"./**/*.{js,jsx,ts,tsx,css,md,json}\" ",
-    "lint": "yarn lint:format && yarn lint:fix ",
+    "lint": "oxlint",
+    "format":  "oxfmt",
     "type-check": "tsc"
   },
   "author": "Bert Verhelst",

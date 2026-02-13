@@ -6,26 +6,25 @@ import * as fs from 'fs';
 
 import initSqlJs, { type Database } from 'sql.js/dist/sql-wasm.js';
 import { CustomError } from '../shared/CustomError';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class DatabaseService implements OnModuleInit {
   private db: Database;
+  private databasePath = path.resolve('../timesheets-tracker-database.sqlite3');
 
   async onModuleInit(): Promise<void> {
     logger.info('starting database module');
-    let databasePath: string | null = path.resolve('timesheets-tracker-database.sqlite3');
-    if (!fs.existsSync(databasePath)) {
-      databasePath = path.resolve('../timesheets-tracker-database.sqlite3');
+    if (!fs.existsSync(this.databasePath)) {
+      fs.writeFileSync(this.databasePath, '', { encoding: 'utf8' });
     }
-    if (!fs.existsSync(databasePath)) {
-      fs.writeFileSync(databasePath, '', {encoding: 'utf8'});
-    }
-    logger.info('databasePath: ' + databasePath);
-    const fileBuffer = fs.readFileSync(databasePath);
+    logger.info('databasePath: ' + this.databasePath);
+    const fileBuffer = fs.readFileSync(this.databasePath);
     initSqlJs().then(async (SQL) => {
       this.db = new SQL.Database(fileBuffer);
       logger.info('creating database tables');
       await this.createTables();
+      await this.saveToDisk();
       logger.info('database module started successfully');
     });
   }
@@ -58,5 +57,21 @@ export class DatabaseService implements OnModuleInit {
    */
   async createTables(): Promise<void> {
     await this.exec(path.resolve('./src/database/queries/create-database-tables.sql'));
+  }
+
+  private saveToDisk() {
+    const data: Uint8Array = this.db.export();
+    fs.writeFileSync(this.databasePath, data);
+  }
+
+  // Save every 10 seconds
+  @Cron(CronExpression.EVERY_10_SECONDS)
+  handleCron() {
+    this.saveToDisk();
+  }
+
+  // Also flush on shutdown
+  async onModuleDestroy() {
+    this.saveToDisk();
   }
 }

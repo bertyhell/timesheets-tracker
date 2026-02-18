@@ -30,8 +30,9 @@ export class DatabaseService implements OnModuleInit {
   }
 
   public async exec<TResult>(sqlFile: string, params?: Record<string, any>): Promise<TResult[]> {
+    let sqlQuery: string | null = null;
     try {
-      const sqlQuery: string = (await fsPromise.readFile(sqlFile)).toString('utf-8');
+      sqlQuery = (await fsPromise.readFile(sqlFile)).toString('utf-8');
       logger.debug(
         '[DATABASE]: executing sql query: ' + JSON.stringify({ sqlQuery, params }, null, 2)
       );
@@ -48,7 +49,7 @@ export class DatabaseService implements OnModuleInit {
         );
       }) as TResult[];
     } catch (err) {
-      throw new CustomError('Failed to execute SQL query', err, { sqlFile, params });
+      throw new CustomError('Failed to execute SQL query', err, { sqlFile, sqlQuery, params });
     }
   }
 

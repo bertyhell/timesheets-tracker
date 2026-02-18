@@ -7,7 +7,6 @@
   "author": "Bert Verhelst",
   "scripts": {
     "build": "nest build",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "install-server": "node ./dist/src/install-timesheet-tracker-as-a-windows-service.js",
     "uninstall-server": "node ./dist/src/uninstall-timesheet-tracker-as-a-windows-service.js",
@@ -16,7 +15,8 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "check-types": "tsc -p ./tsconfig.json --diagnostics",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "lint": "cd .. && npm run lint",
+    "format": "cd .. && npm run format",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",

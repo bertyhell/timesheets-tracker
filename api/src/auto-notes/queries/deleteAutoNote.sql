@@ -1,2 +1,2 @@
 DELETE FROM autoNotes
-WHERE id = :id
+WHERE id = $id

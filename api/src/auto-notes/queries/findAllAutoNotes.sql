@@ -1,2 +1,2 @@
-SELECT id, `name`, tagNameIds, variable, extractRegex, extractRegexReplacement
+SELECT id, name, tagNameIds, variable, extractRegex, extractRegexReplacement
 FROM autoNotes

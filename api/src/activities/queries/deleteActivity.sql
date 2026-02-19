@@ -1,2 +1,2 @@
 DELETE FROM activities
-WHERE id = :id
+WHERE id = $id

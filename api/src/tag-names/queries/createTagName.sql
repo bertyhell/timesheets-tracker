@@ -1,5 +1,5 @@
 INSERT INTO tagNames
-(id, `name`, code, color)
-VALUES (:id, :`name`, :code, :color)
+(id, name, code, color)
+VALUES ($id, $name, $code, $color)
 
 

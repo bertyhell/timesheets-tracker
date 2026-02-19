@@ -2,18 +2,18 @@ import { Injectable, type OnModuleInit } from '@nestjs/common';
 import * as path from 'path';
 import { logger } from '../shared/logger';
 import * as fsPromise from 'fs/promises';
-import { DatabaseSync } from 'node:sqlite';
+import { Database } from 'bun:sqlite';
 import { CustomError } from '../shared/CustomError';
 
 @Injectable()
 export class DatabaseService implements OnModuleInit {
-  private db: DatabaseSync;
+  private db: Database;
   private databasePath = path.resolve('../timesheets-tracker-database.sqlite3');
 
   async onModuleInit(): Promise<void> {
     logger.info('starting database module');
     logger.info('databasePath: ' + this.databasePath);
-    this.db = new DatabaseSync(this.databasePath);
+    this.db = new Database(this.databasePath);
     logger.info('creating database tables');
     await this.createTables();
     logger.info('database module started successfully');
@@ -30,7 +30,12 @@ export class DatabaseService implements OnModuleInit {
       const stmt = this.db.prepare(sqlQuery);
 
       if (params) {
-        return stmt.all(params) as TResult[];
+        // Bun SQLite expects parameter names with $ prefix in the object keys
+        const prefixedParams: Record<string, any> = {};
+        for (const [key, value] of Object.entries(params)) {
+          prefixedParams[key.startsWith('$') ? key : `$${key}`] = value;
+        }
+        return stmt.all(prefixedParams) as TResult[];
       }
 
       return stmt.all() as TResult[];

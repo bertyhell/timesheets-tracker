@@ -8,4 +8,4 @@ SELECT
     tagNames.name as `tagName.name`,
     tagNames.color as `tagName.color`
 FROM autoTags
-WHERE `name` like '%' + $searchTerm + '%'
+WHERE `name` like '%' + :searchTerm + '%'

@@ -24,8 +24,8 @@ export class ActiveStatesService {
     const results = await this.databaseService.exec(
       './src/activeStates/queries/findAllActiveStates.sql',
       {
-        $startedAt: startedAt,
-        $endedAt: endedAt,
+        startedAt: startedAt,
+        endedAt: endedAt,
       }
     );
     return results.map(this.adapt);
@@ -36,7 +36,7 @@ export class ActiveStatesService {
       const result = await this.databaseService.exec(
         './src/activeStates/queries/findOneActiveState.sql',
         {
-          $id: id,
+          id: id,
         }
       );
 
@@ -49,14 +49,14 @@ export class ActiveStatesService {
   async create(activeState: CreateActiveStateDto): Promise<ActiveState> {
     try {
       const values = {
-        $id: uuid(),
-        $isActive: activeState.isActive ? 1 : 0,
-        $startedAt: activeState.startedAt,
-        $endedAt: activeState.endedAt,
+        id: uuid(),
+        isActive: activeState.isActive ? 1 : 0,
+        startedAt: activeState.startedAt,
+        endedAt: activeState.endedAt,
       };
       await this.databaseService.exec('./src/activeStates/queries/createActiveState.sql', values);
 
-      return this.findOne(values.$id);
+      return this.findOne(values.id);
     } catch (err) {
       throw new CustomError('failed to create active state entry in the database', err, {
         activeState,
@@ -66,10 +66,10 @@ export class ActiveStatesService {
 
   async update(id: string, updateActiveStateDto: UpdateActiveStateDto): Promise<ActiveState> {
     const values = {
-      $id: id,
-      $isActive: updateActiveStateDto.isActive ? 1 : 0,
-      $startedAt: updateActiveStateDto.startedAt,
-      $endedAt: updateActiveStateDto.endedAt,
+      id: id,
+      isActive: updateActiveStateDto.isActive ? 1 : 0,
+      startedAt: updateActiveStateDto.startedAt,
+      endedAt: updateActiveStateDto.endedAt,
     };
     await this.databaseService.exec('./src/activeStates/queries/updateActiveState.sql', values);
 
@@ -78,7 +78,7 @@ export class ActiveStatesService {
 
   async delete(id: string): Promise<void> {
     await this.databaseService.exec('./src/activeStates/queries/deleteActiveState.sql', {
-      $id: id,
+      id: id,
     });
   }
 }

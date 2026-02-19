@@ -16,8 +16,8 @@ export class WebsitesService {
 
   async findAll(startedAt: string, endedAt: string): Promise<Website[]> {
     const results = await this.databaseService.exec('./src/websites/queries/findAllWebsites.sql', {
-      $startedAt: startedAt,
-      $endedAt: endedAt,
+      startedAt: startedAt,
+      endedAt: endedAt,
     });
 
     return results.map(this.adapt);
@@ -25,7 +25,7 @@ export class WebsitesService {
 
   async findOne(id: string): Promise<Website> {
     const result = await this.databaseService.exec('./src/websites/queries/findOneWebsite.sql', {
-      $id: id,
+      id: id,
     });
 
     return this.adapt(result);
@@ -35,7 +35,7 @@ export class WebsitesService {
     const result = await this.databaseService.exec(
       './src/websites/queries/findOneWebsiteByStartTime.sql',
       {
-        $startedAt: startedAt,
+        startedAt: startedAt,
       }
     );
 
@@ -48,29 +48,29 @@ export class WebsitesService {
 
   async create(website: CreateWebsiteDto): Promise<Website> {
     const values = {
-      $id: uuid(),
-      $websiteTitle: website.websiteTitle,
-      $websiteUrl: website.websiteUrl,
-      $startedAt: website.startedAt,
+      id: uuid(),
+      websiteTitle: website.websiteTitle,
+      websiteUrl: website.websiteUrl,
+      startedAt: website.startedAt,
     };
     await this.databaseService.exec('./src/websites/queries/createWebsite.sql', values);
 
-    return this.findOne(values.$id);
+    return this.findOne(values.id);
   }
 
   async update(id: string, updateWebsiteDto: UpdateWebsiteDto): Promise<Website> {
     const values = {
-      $id: id,
-      $websiteTitle: updateWebsiteDto.websiteTitle,
-      $websiteUrl: updateWebsiteDto.websiteUrl,
-      $startedAt: updateWebsiteDto.startedAt,
+      id: id,
+      websiteTitle: updateWebsiteDto.websiteTitle,
+      websiteUrl: updateWebsiteDto.websiteUrl,
+      startedAt: updateWebsiteDto.startedAt,
     };
     await this.databaseService.exec('./src/websites/queries/updateWebsite.sql', values);
 
-    return await this.findOne(values.$id);
+    return await this.findOne(values.id);
   }
 
   async delete(id: string): Promise<void> {
-    await this.databaseService.exec('./src/websites/queries/deleteWebsite.sql', { $id: id });
+    await this.databaseService.exec('./src/websites/queries/deleteWebsite.sql', { id: id });
   }
 }

@@ -34,35 +34,35 @@ export class TagsService {
 
   async create(createTagDto: CreateTagDto): Promise<Tag> {
     const values = {
-      $id: uuid(),
-      $tagNameId: createTagDto.tagNameId,
-      $startedAt: min([
+      id: uuid(),
+      tagNameId: createTagDto.tagNameId,
+      startedAt: min([
         new Date(createTagDto.startedAt),
         new Date(createTagDto.endedAt),
       ]).toISOString(),
-      $endedAt: max([
+      endedAt: max([
         new Date(createTagDto.startedAt),
         new Date(createTagDto.endedAt),
       ]).toISOString(),
     };
     await this.databaseService.exec('./src/tags/queries/createTag.sql', values);
 
-    return this.findOne(values.$id);
+    return this.findOne(values.id);
   }
 
   async update(id: string, updateTagDto: UpdateTagDto): Promise<Tag> {
     const values = {
-      $id: id,
-      $tagNameId: updateTagDto.tagNameId,
-      $startedAt: updateTagDto.startedAt,
-      $endedAt: updateTagDto.endedAt,
+      id: id,
+      tagNameId: updateTagDto.tagNameId,
+      startedAt: updateTagDto.startedAt,
+      endedAt: updateTagDto.endedAt,
     };
     await this.databaseService.exec('./src/tags/queries/updateTag.sql', values);
 
-    return await this.findOne(values.$id);
+    return await this.findOne(values.id);
   }
 
   async remove(id: string): Promise<void> {
-    await this.databaseService.exec('./src/tags/queries/removeTag.sql', { $id: id });
+    await this.databaseService.exec('./src/tags/queries/removeTag.sql', { id: id });
   }
 }

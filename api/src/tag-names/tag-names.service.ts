@@ -54,29 +54,29 @@ export class TagNamesService {
 
   async create(tagName: CreateTagNameDto): Promise<TagName> {
     const values = {
-      $id: uuid(),
-      $name: tagName.name,
-      $code: tagName.code,
-      $color: tagName.color,
+      id: uuid(),
+      name: tagName.name,
+      code: tagName.code,
+      color: tagName.color,
     };
     await this.databaseService.exec('./src/tag-names/queries/createTagName.sql', values);
 
-    return await this.findOne(values.$id);
+    return await this.findOne(values.id);
   }
 
   async update(id: string, updateTagDto: UpdateTagNameDto): Promise<TagName> {
     const values = {
-      $id: id,
-      $name: updateTagDto.name,
-      $code: updateTagDto.code,
-      $color: updateTagDto.color,
+      id: id,
+      name: updateTagDto.name,
+      code: updateTagDto.code,
+      color: updateTagDto.color,
     };
     await this.databaseService.exec('./src/tag-names/queries/updateTagName.sql', values);
 
-    return await this.findOne(values.$id);
+    return await this.findOne(values.id);
   }
 
   async remove(id: string): Promise<void> {
-    await this.databaseService.exec('./src/tag-names/queries/removeTagName.sql', { $id: id });
+    await this.databaseService.exec('./src/tag-names/queries/removeTagName.sql', { id: id });
   }
 }

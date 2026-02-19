@@ -23,7 +23,7 @@ export class AutoTagsService {
       rawAutoTags = await this.databaseService.exec(
         './src/auto-tags/queries/findAllAutoTagsBySearchTerm.sql',
         {
-          $searchTerm: searchTerm,
+          searchTerm: searchTerm,
         }
       );
     } else {
@@ -54,31 +54,31 @@ export class AutoTagsService {
 
   async create(autoTag: CreateAutoTagDto): Promise<AutoTag> {
     const values = {
-      $id: uuid(),
-      $name: autoTag.name,
-      $tagNameId: autoTag.tagNameId,
-      $priority: autoTag.priority,
-      $conditions: JSON.stringify(autoTag.conditions),
+      id: uuid(),
+      name: autoTag.name,
+      tagNameId: autoTag.tagNameId,
+      priority: autoTag.priority,
+      conditions: JSON.stringify(autoTag.conditions),
     };
     await this.databaseService.exec('./src/auto-tags/queries/createAutoTag.sql', values);
 
-    return this.findOne(values.$id); // is already adapted
+    return this.findOne(values.id); // is already adapted
   }
 
   async update(id: string, updateAutoTagDto: UpdateAutoTagsDto): Promise<AutoTag> {
     const values = {
-      $id: id,
-      $name: updateAutoTagDto.name,
-      $tagNameId: updateAutoTagDto.tagNameId,
-      $priority: updateAutoTagDto.priority,
-      $conditions: JSON.stringify(updateAutoTagDto.conditions),
+      id: id,
+      name: updateAutoTagDto.name,
+      tagNameId: updateAutoTagDto.tagNameId,
+      priority: updateAutoTagDto.priority,
+      conditions: JSON.stringify(updateAutoTagDto.conditions),
     };
     await this.databaseService.exec('./src/auto-tags/queries/updateAutoTag.sql', values);
 
-    return this.findOne(values.$id);
+    return this.findOne(values.id);
   }
 
   async delete(id: string) {
-    await this.databaseService.exec('./src/auto-tags/queries/deleteAutoTag.sql', { $id: id });
+    await this.databaseService.exec('./src/auto-tags/queries/deleteAutoTag.sql', { id: id });
   }
 }

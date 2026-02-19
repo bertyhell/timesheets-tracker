@@ -9,4 +9,4 @@ INSERT INTO autoTags
     tagNames.name as `tagName.name`,
     tagNames.color as `tagName.color`
 )
-VALUES ($id, $`name`, $tagNameIds, $variable, $extractRegex, $extractRegexReplacement)
+VALUES (:id, :`name`, :tagNameIds, :variable, :extractRegex, :extractRegexReplacement)

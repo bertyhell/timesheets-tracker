@@ -24,7 +24,7 @@ export class DatabaseService implements OnModuleInit {
       this.db = new SQL.Database(fileBuffer);
       logger.info('creating database tables');
       await this.createTables();
-      await this.saveToDisk();
+      this.saveToDisk();
       logger.info('database module started successfully');
     });
   }
@@ -36,18 +36,18 @@ export class DatabaseService implements OnModuleInit {
       logger.debug(
         '[DATABASE]: executing sql query: ' + JSON.stringify({ sqlQuery, params }, null, 2)
       );
-      const results = this.db.exec(sqlQuery, params);
-      if (!results.length) {
-        return [];
+      const stmt = this.db.prepare(sqlQuery);
+      if (params) {
+        stmt.bind(params);
       }
-      const columns = results[0].columns;
-      return results.map((result) => {
-        return Object.fromEntries(
-          columns.map((column, index) => {
-            return [column, result.values[index]];
-          })
-        );
-      }) as TResult[];
+
+      const results: TResult[] = [];
+      while (stmt.step()) {
+        results.push(stmt.getAsObject() as TResult);
+      }
+
+      stmt.free();
+      return results;
     } catch (err) {
       throw new CustomError('Failed to execute SQL query', err, { sqlFile, sqlQuery, params });
     }
@@ -61,6 +61,9 @@ export class DatabaseService implements OnModuleInit {
   }
 
   private saveToDisk() {
+    if (!this.db) {
+      return;
+    }
     const data: Uint8Array = this.db.export();
     fs.writeFileSync(this.databasePath, data);
   }

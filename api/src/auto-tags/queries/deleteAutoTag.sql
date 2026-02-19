@@ -1,2 +1,2 @@
 DELETE FROM autoTags
-WHERE id = $id
+WHERE id = :id

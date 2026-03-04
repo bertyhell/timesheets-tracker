@@ -21,7 +21,7 @@ export class ActiveStatesService {
   }
 
   async findAll(startedAt: string, endedAt: string): Promise<ActiveState[]> {
-    const results = await this.databaseService.exec(
+    const results = await this.databaseService.query(
       './src/activeStates/queries/findAllActiveStates.sql',
       {
         startedAt: startedAt,
@@ -33,7 +33,7 @@ export class ActiveStatesService {
 
   async findOne(id: string): Promise<ActiveState> {
     try {
-      const result = await this.databaseService.exec(
+      const result = await this.databaseService.query(
         './src/activeStates/queries/findOneActiveState.sql',
         {
           id: id,
@@ -54,7 +54,7 @@ export class ActiveStatesService {
         startedAt: activeState.startedAt,
         endedAt: activeState.endedAt,
       };
-      await this.databaseService.exec('./src/activeStates/queries/createActiveState.sql', values);
+      await this.databaseService.mutate('./src/activeStates/queries/createActiveState.sql', values);
 
       return this.findOne(values.id);
     } catch (err) {
@@ -71,13 +71,13 @@ export class ActiveStatesService {
       startedAt: updateActiveStateDto.startedAt,
       endedAt: updateActiveStateDto.endedAt,
     };
-    await this.databaseService.exec('./src/activeStates/queries/updateActiveState.sql', values);
+    await this.databaseService.mutate('./src/activeStates/queries/updateActiveState.sql', values);
 
     return this.findOne(id);
   }
 
   async delete(id: string): Promise<void> {
-    await this.databaseService.exec('./src/activeStates/queries/deleteActiveState.sql', {
+    await this.databaseService.mutate('./src/activeStates/queries/deleteActiveState.sql', {
       id: id,
     });
   }

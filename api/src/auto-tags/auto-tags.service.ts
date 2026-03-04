@@ -20,21 +20,21 @@ export class AutoTagsService {
   async findAll(searchTerm: string | undefined): Promise<AutoTag[]> {
     let rawAutoTags: Record<string, string>[];
     if (searchTerm) {
-      rawAutoTags = await this.databaseService.exec(
+      rawAutoTags = await this.databaseService.query(
         './src/auto-tags/queries/findAllAutoTagsBySearchTerm.sql',
         {
           searchTerm: searchTerm,
         }
       );
     } else {
-      rawAutoTags = await this.databaseService.exec('./src/auto-tags/queries/findAllAutoTags.sql');
+      rawAutoTags = await this.databaseService.query('./src/auto-tags/queries/findAllAutoTags.sql');
     }
     return rawAutoTags.map(this.adapt);
   }
 
   async count(): Promise<number> {
     const result = (
-      await this.databaseService.exec<{ count: number }>(
+      await this.databaseService.query<{ count: number }>(
         './src/auto-tags/queries/countAutoTags.sql'
       )
     )[0];
@@ -42,7 +42,7 @@ export class AutoTagsService {
   }
 
   async findOne(id: string): Promise<AutoTag> {
-    const autoTags = await this.databaseService.exec<AutoTag>(
+    const autoTags = await this.databaseService.query<AutoTag>(
       './src/auto-tags/queries/findOneAutoTag.sql',
       {
         id,
@@ -60,7 +60,7 @@ export class AutoTagsService {
       priority: autoTag.priority,
       conditions: JSON.stringify(autoTag.conditions),
     };
-    await this.databaseService.exec('./src/auto-tags/queries/createAutoTag.sql', values);
+    await this.databaseService.mutate('./src/auto-tags/queries/createAutoTag.sql', values);
 
     return this.findOne(values.id); // is already adapted
   }
@@ -73,12 +73,12 @@ export class AutoTagsService {
       priority: updateAutoTagDto.priority,
       conditions: JSON.stringify(updateAutoTagDto.conditions),
     };
-    await this.databaseService.exec('./src/auto-tags/queries/updateAutoTag.sql', values);
+    await this.databaseService.mutate('./src/auto-tags/queries/updateAutoTag.sql', values);
 
     return this.findOne(values.id);
   }
 
   async delete(id: string) {
-    await this.databaseService.exec('./src/auto-tags/queries/deleteAutoTag.sql', { id: id });
+    await this.databaseService.mutate('./src/auto-tags/queries/deleteAutoTag.sql', { id: id });
   }
 }

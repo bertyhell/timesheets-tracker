@@ -6,4 +6,7 @@ dist/
 exe/target/release/
 
 timesheets-tracker-database.sqlite3
-.claude
+.clude
+
+tsconfig.tsbuildinfo
+api/manic-time-export.csv

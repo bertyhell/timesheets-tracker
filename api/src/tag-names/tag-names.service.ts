@@ -21,11 +21,11 @@ export class TagNamesService {
   async findAll(searchTerm: string | undefined): Promise<TagName[]> {
     let rawTagNames: TagName[];
     if (searchTerm) {
-      rawTagNames = await this.databaseService.exec<TagName>(
+      rawTagNames = await this.databaseService.query<TagName>(
         './src/tag-names/queries/findAllTagNamesBySearchTerm.sql'
       );
     } else {
-      rawTagNames = await this.databaseService.exec<TagName>(
+      rawTagNames = await this.databaseService.query<TagName>(
         './src/tag-names/queries/findAllTagNames.sql'
       );
     }
@@ -35,7 +35,7 @@ export class TagNamesService {
 
   async count(): Promise<number> {
     const result = (
-      await this.databaseService.exec<{ count: number }>(
+      await this.databaseService.query<{ count: number }>(
         './src/tag-names/queries/countTagNames.sql'
       )
     )[0];
@@ -44,7 +44,7 @@ export class TagNamesService {
   }
 
   async findOne(id: string): Promise<TagName> {
-    const tagNames = await this.databaseService.exec<TagName>(
+    const tagNames = await this.databaseService.query<TagName>(
       './src/tag-names/queries/findOneTagName.sql',
       { id }
     );
@@ -59,7 +59,7 @@ export class TagNamesService {
       code: tagName.code,
       color: tagName.color,
     };
-    await this.databaseService.exec('./src/tag-names/queries/createTagName.sql', values);
+    await this.databaseService.mutate('./src/tag-names/queries/createTagName.sql', values);
 
     return await this.findOne(values.id);
   }
@@ -71,12 +71,12 @@ export class TagNamesService {
       code: updateTagDto.code,
       color: updateTagDto.color,
     };
-    await this.databaseService.exec('./src/tag-names/queries/updateTagName.sql', values);
+    await this.databaseService.mutate('./src/tag-names/queries/updateTagName.sql', values);
 
     return await this.findOne(values.id);
   }
 
   async remove(id: string): Promise<void> {
-    await this.databaseService.exec('./src/tag-names/queries/removeTagName.sql', { id: id });
+    await this.databaseService.mutate('./src/tag-names/queries/removeTagName.sql', { id: id });
   }
 }

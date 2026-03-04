@@ -15,7 +15,7 @@ export class WebsitesService {
   }
 
   async findAll(startedAt: string, endedAt: string): Promise<Website[]> {
-    const results = await this.databaseService.exec('./src/websites/queries/findAllWebsites.sql', {
+    const results = await this.databaseService.query('./src/websites/queries/findAllWebsites.sql', {
       startedAt: startedAt,
       endedAt: endedAt,
     });
@@ -24,7 +24,7 @@ export class WebsitesService {
   }
 
   async findOne(id: string): Promise<Website> {
-    const result = await this.databaseService.exec('./src/websites/queries/findOneWebsite.sql', {
+    const result = await this.databaseService.query('./src/websites/queries/findOneWebsite.sql', {
       id: id,
     });
 
@@ -32,7 +32,7 @@ export class WebsitesService {
   }
 
   async findOneByStartTime(startedAt: string): Promise<Website | null> {
-    const result = await this.databaseService.exec(
+    const result = await this.databaseService.query(
       './src/websites/queries/findOneWebsiteByStartTime.sql',
       {
         startedAt: startedAt,
@@ -53,7 +53,7 @@ export class WebsitesService {
       websiteUrl: website.websiteUrl,
       startedAt: website.startedAt,
     };
-    await this.databaseService.exec('./src/websites/queries/createWebsite.sql', values);
+    await this.databaseService.mutate('./src/websites/queries/createWebsite.sql', values);
 
     return this.findOne(values.id);
   }
@@ -65,12 +65,12 @@ export class WebsitesService {
       websiteUrl: updateWebsiteDto.websiteUrl,
       startedAt: updateWebsiteDto.startedAt,
     };
-    await this.databaseService.exec('./src/websites/queries/updateWebsite.sql', values);
+    await this.databaseService.mutate('./src/websites/queries/updateWebsite.sql', values);
 
     return await this.findOne(values.id);
   }
 
   async delete(id: string): Promise<void> {
-    await this.databaseService.exec('./src/websites/queries/deleteWebsite.sql', { id: id });
+    await this.databaseService.mutate('./src/websites/queries/deleteWebsite.sql', { id: id });
   }
 }

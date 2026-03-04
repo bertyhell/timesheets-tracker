@@ -1,0 +1,15 @@
+INSERT OR IGNORE INTO tagNames ("id", "name", "code", "color") VALUES (uuid(), 'hermes', 'hermes', '#2083CC');
+INSERT OR IGNORE INTO tagNames ("id", "name", "code", "color") VALUES (uuid(), 'redactietool', 'redactietool', '#4C3442');
+INSERT OR IGNORE INTO tagNames ("id", "name", "code", "color") VALUES (uuid(), 'reporting', 'reporting', '#BEA42E');
+INSERT OR IGNORE INTO tagNames ("id", "name", "code", "color") VALUES (uuid(), 'crunch', 'crunch', '#87692F');
+INSERT OR IGNORE INTO tagNames ("id", "name", "code", "color") VALUES (uuid(), 'avo-server-side-rendering', 'avo-server-side-rendering', '#249983');
+INSERT OR IGNORE INTO tagNames ("id", "name", "code", "color") VALUES (uuid(), 'wg-knowledge', 'wg-knowledge', '#249A83');
+INSERT OR IGNORE INTO tagNames ("id", "name", "code", "color") VALUES (uuid(), 'tiberghien', 'tiberghien', '#1932B4');
+INSERT OR IGNORE INTO tagNames ("id", "name", "code", "color") VALUES (uuid(), 'shd-intern', 'shd-intern', '#1831B2');
+INSERT OR IGNORE INTO tagNames ("id", "name", "code", "color") VALUES (uuid(), 'avo-support', 'avo-support', '#803481');
+INSERT OR IGNORE INTO tagNames ("id", "name", "code", "color") VALUES (uuid(), 'meemoo-presales', 'meemoo-presales', '#67C85D');
+INSERT OR IGNORE INTO tagNames ("id", "name", "code", "color") VALUES (uuid(), 'lifecyclemanagement-avo-hetarchief', 'lifecyclemanagement-avo-hetarchief', '#1932B4');
+INSERT OR IGNORE INTO tagNames ("id", "name", "code", "color") VALUES (uuid(), 'pom-economische-kaart', 'pom-economische-kaart', '#259A84');
+INSERT OR IGNORE INTO tagNames ("id", "name", "code", "color") VALUES (uuid(), 'prive', 'prive', '#249983');
+INSERT OR IGNORE INTO tagNames ("id", "name", "code", "color") VALUES (uuid(), 'tia-sync', 'tia-sync', '#173BAE');
+INSERT OR IGNORE INTO tagNames ("id", "name", "code", "color") VALUES (uuid(), 'hermes cluster 234', 'hermes-cluster-234', '#249882');

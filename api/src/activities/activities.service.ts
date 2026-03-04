@@ -17,7 +17,7 @@ export class ActivitiesService {
   }
 
   async findAll(startedAt: string, endedAt: string): Promise<Activity[]> {
-    const results = await this.databaseService.exec<Activity>(
+    const results = await this.databaseService.query<Activity>(
       './src/activities/queries/findAllActivities.sql',
       {
         startedAt,
@@ -33,15 +33,18 @@ export class ActivitiesService {
   }
 
   async findOne(id: string): Promise<Activity> {
-    const result = await this.databaseService.exec('./src/activities/queries/findOneActivity.sql', {
-      id: id,
-    });
+    const result = await this.databaseService.query(
+      './src/activities/queries/findOneActivity.sql',
+      {
+        id: id,
+      }
+    );
 
     return this.adapt(result);
   }
 
   async findByNextStartedAt(startedAt: string): Promise<Activity> {
-    const result = await this.databaseService.exec(
+    const result = await this.databaseService.query(
       './src/activities/queries/findByNextStartedAt.sql',
       {
         startedAt: startedAt,
@@ -59,12 +62,12 @@ export class ActivitiesService {
       startedAt: min([new Date(activity.startedAt), new Date(activity.endedAt)]).toISOString(),
       endedAt: max([new Date(activity.startedAt), new Date(activity.endedAt)]).toISOString(),
     };
-    await this.databaseService.exec('./src/activities/queries/createActivity.sql', values);
+    await this.databaseService.mutate('./src/activities/queries/createActivity.sql', values);
 
     return this.findOne(values.id);
   }
 
   async delete(id: string): Promise<void> {
-    await this.databaseService.exec('./src/activities/queries/deleteActivity.sql', { id: id });
+    await this.databaseService.mutate('./src/activities/queries/deleteActivity.sql', { id: id });
   }
 }

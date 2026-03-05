@@ -1,17 +1,17 @@
-import { Injectable, type OnModuleInit, Logger } from '@nestjs/common';
+import { Injectable, type OnModuleInit, Logger, OnModuleDestroy } from '@nestjs/common';
 import * as path from 'path';
-import { logger } from '../shared/logger';
 import * as fsPromise from 'fs/promises';
 import { Database, Statement, Changes } from 'bun:sqlite';
 import { CustomError } from '../shared/CustomError';
 import { SeedService } from '../seed/seed.service';
+import { resolve } from 'node:path';
+import { DbQueryParams } from './database.types';
 
 @Injectable()
-export class DatabaseService implements OnModuleInit {
+export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   private db: Database;
-  private databasePath = path.resolve('../timesheets-tracker-database.sqlite3');
+  private databasePath = path.resolve('./timesheets-tracker-database.sqlite3');
   private readonly logger = new Logger(DatabaseService.name);
-  private preparedStatementsCache: Record<string, Statement> = {};
 
   constructor(private readonly seedService: SeedService) {}
 
@@ -34,34 +34,29 @@ export class DatabaseService implements OnModuleInit {
     }
   }
 
-  private async getStatement(sqlFile: string): Promise<Statement> {
-    let sqlQuery = (await fsPromise.readFile(sqlFile)).toString('utf-8');
-    logger.debug('[DATABASE]: prepare sql query: ' + JSON.stringify({ sqlQuery }, null, 2));
-
-    let preparedStatement: Statement | undefined = this.preparedStatementsCache[sqlFile];
-    if (!preparedStatement) {
-      preparedStatement = this.db.prepare(sqlQuery);
-      this.preparedStatementsCache[sqlFile] = preparedStatement;
-    }
-
-    return preparedStatement;
+  private async getQueryFromFile(sqlFile: string): Promise<string> {
+    const sqlFilePath = resolve('api', sqlFile);
+    const sqlQuery = (await fsPromise.readFile(sqlFilePath)).toString('utf-8');
+    return sqlQuery.replace(/\s*[\r\n]\s*/g, ' ').trim();
   }
 
-  public async query<TResult>(sqlFile: string, params?: Record<string, any>): Promise<TResult[]> {
+  public async query<TResult>(sqlFile: string, params?: DbQueryParams): Promise<TResult[]> {
     let sqlQuery: string | null = null;
     try {
-      const preparedStatement: Statement = await this.getStatement(sqlFile);
-      return preparedStatement.all(params) as TResult[];
+      sqlQuery = await this.getQueryFromFile(sqlFile);
+      const statement = this.db.query(sqlQuery);
+      return statement.all(params) as TResult[];
     } catch (err) {
       throw new CustomError('Failed to execute SQL query', err, { sqlFile, sqlQuery, params });
     }
   }
 
-  public async mutate(sqlFile: string, params?: Record<string, any>): Promise<Changes> {
+  public async mutate(sqlFile: string, params?: DbQueryParams): Promise<Changes> {
     let sqlQuery: string | null = null;
     try {
-      const preparedStatement: Statement = await this.getStatement(sqlFile);
-      return preparedStatement.run(params);
+      sqlQuery = await this.getQueryFromFile(sqlFile);
+      const statement: Statement = this.db.query(sqlQuery);
+      return statement.run(params);
     } catch (err) {
       throw new CustomError('Failed to execute SQL query', err, { sqlFile, sqlQuery, params });
     }
@@ -71,7 +66,7 @@ export class DatabaseService implements OnModuleInit {
    * Create database tables if they do not exist yet
    */
   async createTables(): Promise<void> {
-    await this.query('./src/database/queries/create-database-tables.sql');
+    await this.mutate('./src/database/queries/create-database-tables.sql');
   }
 
   async onModuleDestroy() {

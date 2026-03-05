@@ -6,6 +6,7 @@ import type { Tag } from '../types/types';
 import { unflatten } from 'nested-objects-util';
 import { max, min } from 'date-fns';
 import { UpdateTagDto } from './dto/update-tag.dto';
+import { DbQueryParams } from '../database/database.types';
 
 @Injectable()
 export class TagsService {
@@ -17,8 +18,8 @@ export class TagsService {
 
   async findAll(startedAt: string, endedAt: string): Promise<Tag[]> {
     const rawTags = await this.databaseService.query<Tag>('./src/tags/queries/findAllTags.sql', {
-      startedAt,
-      endedAt,
+      $startedAt: startedAt,
+      $endedAt: endedAt,
     });
 
     return rawTags.map(this.adapt);
@@ -26,43 +27,43 @@ export class TagsService {
 
   async findOne(id: string): Promise<Tag> {
     const rawTag = await this.databaseService.query<Tag>('./src/tags/queries/findOneTag.sql', {
-      id,
+      $id: id,
     });
 
     return this.adapt(rawTag);
   }
 
   async create(createTagDto: CreateTagDto): Promise<Tag> {
-    const values = {
-      id: uuid(),
-      tagNameId: createTagDto.tagNameId,
-      startedAt: min([
+    const values: DbQueryParams = {
+      $id: uuid(),
+      $tagNameId: createTagDto.tagNameId,
+      $startedAt: min([
         new Date(createTagDto.startedAt),
         new Date(createTagDto.endedAt),
       ]).toISOString(),
-      endedAt: max([
+      $endedAt: max([
         new Date(createTagDto.startedAt),
         new Date(createTagDto.endedAt),
       ]).toISOString(),
     };
     await this.databaseService.mutate('./src/tags/queries/createTag.sql', values);
 
-    return this.findOne(values.id);
+    return this.findOne(values.$id as string);
   }
 
   async update(id: string, updateTagDto: UpdateTagDto): Promise<Tag> {
-    const values = {
-      id: id,
-      tagNameId: updateTagDto.tagNameId,
-      startedAt: updateTagDto.startedAt,
-      endedAt: updateTagDto.endedAt,
+    const values: DbQueryParams = {
+      $id: id,
+      $tagNameId: updateTagDto.tagNameId,
+      $startedAt: updateTagDto.startedAt,
+      $endedAt: updateTagDto.endedAt,
     };
     await this.databaseService.mutate('./src/tags/queries/updateTag.sql', values);
 
-    return await this.findOne(values.id);
+    return await this.findOne(values.$id as string);
   }
 
   async remove(id: string): Promise<void> {
-    await this.databaseService.mutate('./src/tags/queries/removeTag.sql', { id: id });
+    await this.databaseService.mutate('./src/tags/queries/removeTag.sql', { $id: id });
   }
 }

@@ -5,6 +5,7 @@ import { v4 as uuid } from 'uuid';
 import { CreateWebsiteDto } from './dto/create-website.dto';
 import { unflatten } from 'nested-objects-util';
 import { UpdateWebsiteDto } from './dto/update-website.dto';
+import { DbQueryParams } from '../database/database.types';
 
 @Injectable()
 export class WebsitesService {
@@ -16,8 +17,8 @@ export class WebsitesService {
 
   async findAll(startedAt: string, endedAt: string): Promise<Website[]> {
     const results = await this.databaseService.query('./src/websites/queries/findAllWebsites.sql', {
-      startedAt: startedAt,
-      endedAt: endedAt,
+      $startedAt: startedAt,
+      $endedAt: endedAt,
     });
 
     return results.map(this.adapt);
@@ -25,7 +26,7 @@ export class WebsitesService {
 
   async findOne(id: string): Promise<Website> {
     const result = await this.databaseService.query('./src/websites/queries/findOneWebsite.sql', {
-      id: id,
+      $id: id,
     });
 
     return this.adapt(result);
@@ -35,7 +36,7 @@ export class WebsitesService {
     const result = await this.databaseService.query(
       './src/websites/queries/findOneWebsiteByStartTime.sql',
       {
-        startedAt: startedAt,
+        $startedAt: startedAt,
       }
     );
 
@@ -47,30 +48,30 @@ export class WebsitesService {
   }
 
   async create(website: CreateWebsiteDto): Promise<Website> {
-    const values = {
-      id: uuid(),
-      websiteTitle: website.websiteTitle,
-      websiteUrl: website.websiteUrl,
-      startedAt: website.startedAt,
+    const values: DbQueryParams = {
+      $id: uuid(),
+      $websiteTitle: website.websiteTitle,
+      $websiteUrl: website.websiteUrl,
+      $startedAt: website.startedAt,
     };
     await this.databaseService.mutate('./src/websites/queries/createWebsite.sql', values);
 
-    return this.findOne(values.id);
+    return this.findOne(values.$id as string);
   }
 
   async update(id: string, updateWebsiteDto: UpdateWebsiteDto): Promise<Website> {
-    const values = {
-      id: id,
-      websiteTitle: updateWebsiteDto.websiteTitle,
-      websiteUrl: updateWebsiteDto.websiteUrl,
-      startedAt: updateWebsiteDto.startedAt,
+    const values: DbQueryParams = {
+      $id: id,
+      $websiteTitle: updateWebsiteDto.websiteTitle,
+      $websiteUrl: updateWebsiteDto.websiteUrl,
+      $startedAt: updateWebsiteDto.startedAt,
     };
     await this.databaseService.mutate('./src/websites/queries/updateWebsite.sql', values);
 
-    return await this.findOne(values.id);
+    return await this.findOne(values.$id as string);
   }
 
   async delete(id: string): Promise<void> {
-    await this.databaseService.mutate('./src/websites/queries/deleteWebsite.sql', { id: id });
+    await this.databaseService.mutate('./src/websites/queries/deleteWebsite.sql', { $id: id });
   }
 }

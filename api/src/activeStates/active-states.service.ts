@@ -6,6 +6,7 @@ import { CreateActiveStateDto } from './dto/create-active-state.dto';
 import { unflatten } from 'nested-objects-util';
 import { UpdateActiveStateDto } from './dto/update-active-state.dto';
 import { CustomError } from '../shared/CustomError';
+import { DbQueryParams } from '../database/database.types';
 
 @Injectable()
 export class ActiveStatesService {
@@ -24,8 +25,8 @@ export class ActiveStatesService {
     const results = await this.databaseService.query(
       './src/activeStates/queries/findAllActiveStates.sql',
       {
-        startedAt: startedAt,
-        endedAt: endedAt,
+        $startedAt: startedAt,
+        $endedAt: endedAt,
       }
     );
     return results.map(this.adapt);
@@ -36,7 +37,7 @@ export class ActiveStatesService {
       const result = await this.databaseService.query(
         './src/activeStates/queries/findOneActiveState.sql',
         {
-          id: id,
+          $id: id,
         }
       );
 
@@ -48,15 +49,15 @@ export class ActiveStatesService {
 
   async create(activeState: CreateActiveStateDto): Promise<ActiveState> {
     try {
-      const values = {
-        id: uuid(),
-        isActive: activeState.isActive ? 1 : 0,
-        startedAt: activeState.startedAt,
-        endedAt: activeState.endedAt,
+      const values: DbQueryParams = {
+        $id: uuid(),
+        $isActive: activeState.isActive ? 1 : 0,
+        $startedAt: activeState.startedAt,
+        $endedAt: activeState.endedAt,
       };
       await this.databaseService.mutate('./src/activeStates/queries/createActiveState.sql', values);
 
-      return this.findOne(values.id);
+      return this.findOne(values.$id);
     } catch (err) {
       throw new CustomError('failed to create active state entry in the database', err, {
         activeState,
@@ -65,11 +66,11 @@ export class ActiveStatesService {
   }
 
   async update(id: string, updateActiveStateDto: UpdateActiveStateDto): Promise<ActiveState> {
-    const values = {
-      id: id,
-      isActive: updateActiveStateDto.isActive ? 1 : 0,
-      startedAt: updateActiveStateDto.startedAt,
-      endedAt: updateActiveStateDto.endedAt,
+    const values: DbQueryParams = {
+      $id: id,
+      $isActive: updateActiveStateDto.isActive ? 1 : 0,
+      $startedAt: updateActiveStateDto.startedAt,
+      $endedAt: updateActiveStateDto.endedAt,
     };
     await this.databaseService.mutate('./src/activeStates/queries/updateActiveState.sql', values);
 
@@ -78,7 +79,7 @@ export class ActiveStatesService {
 
   async delete(id: string): Promise<void> {
     await this.databaseService.mutate('./src/activeStates/queries/deleteActiveState.sql', {
-      id: id,
+      $id: id,
     });
   }
 }

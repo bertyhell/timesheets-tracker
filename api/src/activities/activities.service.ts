@@ -5,6 +5,7 @@ import { v4 as uuid } from 'uuid';
 import { differenceInSeconds, max, min } from 'date-fns';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { unflatten } from 'nested-objects-util';
+import { DbQueryParams } from '../database/database.types';
 
 const MINIMUM_ACTIVITY_DURATION_SECONDS = 5;
 
@@ -20,8 +21,8 @@ export class ActivitiesService {
     const results = await this.databaseService.query<Activity>(
       './src/activities/queries/findAllActivities.sql',
       {
-        startedAt,
-        endedAt,
+        $startedAt: startedAt,
+        $endedAt: endedAt,
       }
     );
 
@@ -36,7 +37,7 @@ export class ActivitiesService {
     const result = await this.databaseService.query(
       './src/activities/queries/findOneActivity.sql',
       {
-        id: id,
+        $id: id,
       }
     );
 
@@ -47,7 +48,7 @@ export class ActivitiesService {
     const result = await this.databaseService.query(
       './src/activities/queries/findByNextStartedAt.sql',
       {
-        startedAt: startedAt,
+        $startedAt: startedAt,
       }
     );
 
@@ -55,19 +56,19 @@ export class ActivitiesService {
   }
 
   async create(activity: CreateActivityDto): Promise<Activity> {
-    const values = {
-      id: uuid(),
-      programName: activity.programName,
-      windowTitle: activity.windowTitle,
-      startedAt: min([new Date(activity.startedAt), new Date(activity.endedAt)]).toISOString(),
-      endedAt: max([new Date(activity.startedAt), new Date(activity.endedAt)]).toISOString(),
+    const values: DbQueryParams = {
+      $id: uuid(),
+      $programName: activity.programName,
+      $windowTitle: activity.windowTitle,
+      $startedAt: min([new Date(activity.startedAt), new Date(activity.endedAt)]).toISOString(),
+      $endedAt: max([new Date(activity.startedAt), new Date(activity.endedAt)]).toISOString(),
     };
     await this.databaseService.mutate('./src/activities/queries/createActivity.sql', values);
 
-    return this.findOne(values.id);
+    return this.findOne(values.$id as string);
   }
 
   async delete(id: string): Promise<void> {
-    await this.databaseService.mutate('./src/activities/queries/deleteActivity.sql', { id: id });
+    await this.databaseService.mutate('./src/activities/queries/deleteActivity.sql', { $id: id });
   }
 }

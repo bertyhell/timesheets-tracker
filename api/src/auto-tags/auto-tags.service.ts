@@ -5,6 +5,7 @@ import { v4 as uuid } from 'uuid';
 import type { AutoTag } from '../types/types';
 import { unflatten } from 'nested-objects-util';
 import { UpdateAutoTagsDto } from './dto/update-auto-tags.dto';
+import { DbQueryParams } from '../database/database.types';
 
 @Injectable()
 export class AutoTagsService {
@@ -23,7 +24,7 @@ export class AutoTagsService {
       rawAutoTags = await this.databaseService.query(
         './src/auto-tags/queries/findAllAutoTagsBySearchTerm.sql',
         {
-          searchTerm: searchTerm,
+          $searchTerm: searchTerm,
         }
       );
     } else {
@@ -45,7 +46,7 @@ export class AutoTagsService {
     const autoTags = await this.databaseService.query<AutoTag>(
       './src/auto-tags/queries/findOneAutoTag.sql',
       {
-        id,
+        $id: id,
       }
     );
 
@@ -53,29 +54,29 @@ export class AutoTagsService {
   }
 
   async create(autoTag: CreateAutoTagDto): Promise<AutoTag> {
-    const values = {
-      id: uuid(),
-      name: autoTag.name,
-      tagNameId: autoTag.tagNameId,
-      priority: autoTag.priority,
-      conditions: JSON.stringify(autoTag.conditions),
+    const values: DbQueryParams = {
+      $id: uuid(),
+      $name: autoTag.name,
+      $tagNameId: autoTag.tagNameId,
+      $priority: autoTag.priority,
+      $conditions: JSON.stringify(autoTag.conditions),
     };
     await this.databaseService.mutate('./src/auto-tags/queries/createAutoTag.sql', values);
 
-    return this.findOne(values.id); // is already adapted
+    return this.findOne(values.$id as string); // is already adapted
   }
 
   async update(id: string, updateAutoTagDto: UpdateAutoTagsDto): Promise<AutoTag> {
-    const values = {
-      id: id,
-      name: updateAutoTagDto.name,
-      tagNameId: updateAutoTagDto.tagNameId,
-      priority: updateAutoTagDto.priority,
-      conditions: JSON.stringify(updateAutoTagDto.conditions),
+    const values: DbQueryParams = {
+      $id: id,
+      $name: updateAutoTagDto.name,
+      $tagNameId: updateAutoTagDto.tagNameId,
+      $priority: updateAutoTagDto.priority,
+      $conditions: JSON.stringify(updateAutoTagDto.conditions),
     };
     await this.databaseService.mutate('./src/auto-tags/queries/updateAutoTag.sql', values);
 
-    return this.findOne(values.id);
+    return this.findOne(values.$id as string);
   }
 
   async delete(id: string) {

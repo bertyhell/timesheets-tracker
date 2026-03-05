@@ -8,5 +8,5 @@ SELECT
     tagNames.color as `tagName.color`
 FROM tags
 LEFT JOIN tagNames ON tagNames.id = tags.tagNameId
-WHERE id = :id
+WHERE id = $id
 LIMIT 1

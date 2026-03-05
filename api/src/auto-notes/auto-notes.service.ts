@@ -4,6 +4,7 @@ import { DatabaseService } from '../database/database.service';
 import { v4 as uuid } from 'uuid';
 import type { AutoNote } from '../types/types';
 import { UpdateAutoNoteDto } from './dto/update-auto-note.dto';
+import { DbQueryParams } from '../database/database.types';
 
 const TAG_NAME_IDS_SEPARATOR = ';';
 
@@ -51,7 +52,7 @@ export class AutoNotesService {
     const result = await this.databaseService.query(
       './src/auto-notes/queries/findOneAutoNote.sql',
       {
-        id: id,
+        $id: id,
       }
     );
 
@@ -59,34 +60,34 @@ export class AutoNotesService {
   }
 
   async create(autoNote: CreateAutoNoteDto): Promise<AutoNote> {
-    const values = {
-      id: uuid(),
-      name: autoNote.name,
-      tagNameIds: autoNote.tagNameIds.join(TAG_NAME_IDS_SEPARATOR),
-      variable: autoNote.variable,
-      extractRegex: autoNote.extractRegex,
-      extractRegexReplacement: autoNote.extractRegexReplacement,
+    const values: DbQueryParams = {
+      $id: uuid(),
+      $name: autoNote.name,
+      $tagNameIds: autoNote.tagNameIds.join(TAG_NAME_IDS_SEPARATOR),
+      $variable: autoNote.variable,
+      $extractRegex: autoNote.extractRegex,
+      $extractRegexReplacement: autoNote.extractRegexReplacement,
     };
     await this.databaseService.mutate('./src/auto-notes/queries/createAutoNote.sql', values);
 
-    return this.findOne(values.id);
+    return this.findOne(values.$id as string);
   }
 
   async update(id: string, updateTagDto: UpdateAutoNoteDto): Promise<AutoNote> {
-    const values = {
-      id: id,
-      name: updateTagDto.name,
-      tagNameIds: updateTagDto.tagNameIds.join(TAG_NAME_IDS_SEPARATOR),
-      variable: updateTagDto.variable,
-      extractRegex: updateTagDto.extractRegex,
-      extractRegexReplacement: updateTagDto.extractRegexReplacement,
+    const values: DbQueryParams = {
+      $id: id,
+      $name: updateTagDto.name,
+      $tagNameIds: updateTagDto.tagNameIds.join(TAG_NAME_IDS_SEPARATOR),
+      $variable: updateTagDto.variable,
+      $extractRegex: updateTagDto.extractRegex,
+      $extractRegexReplacement: updateTagDto.extractRegexReplacement,
     };
     await this.databaseService.mutate('./src/auto-notes/queries/updateAutoNote.sql');
 
-    return await this.findOne(values.id);
+    return await this.findOne(values.$id as string);
   }
 
   async remove(id: string): Promise<void> {
-    await this.databaseService.mutate('./src/auto-notes/queries/deleteAutoNote.sql', { id });
+    await this.databaseService.mutate('./src/auto-notes/queries/deleteAutoNote.sql', { $id: id });
   }
 }

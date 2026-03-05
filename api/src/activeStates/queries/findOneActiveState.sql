@@ -1,4 +1,4 @@
 SELECT id, isActive, startedAt, endedAt
 FROM activeStates
-WHERE id = :id
+WHERE id = $id
 LIMIT 1

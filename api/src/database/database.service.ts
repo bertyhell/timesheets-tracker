@@ -47,7 +47,13 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       const statement = this.db.query(sqlQuery);
       return statement.all(params) as TResult[];
     } catch (err) {
-      throw new CustomError('Failed to execute SQL query', err, { sqlFile, sqlQuery, params });
+      const error = new CustomError('Failed to execute SQL query', err, {
+        sqlFile,
+        sqlQuery,
+        params,
+      });
+      console.error(error);
+      throw error;
     }
   }
 

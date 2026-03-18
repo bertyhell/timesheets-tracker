@@ -57,7 +57,7 @@ export class ActiveStatesService {
       };
       await this.databaseService.mutate('./src/activeStates/queries/createActiveState.sql', values);
 
-      return this.findOne(values.$id);
+      return this.findOne(values.$id as string);
     } catch (err) {
       throw new CustomError('failed to create active state entry in the database', err, {
         activeState,

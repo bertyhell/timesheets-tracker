@@ -10,3 +10,6 @@ timesheets-tracker-database.sqlite3
 
 tsconfig.tsbuildinfo
 api/manic-time-export.csv
+
+.claude/
+ManicTime_*

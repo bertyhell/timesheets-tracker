@@ -6,6 +6,7 @@ import { CustomError } from '../shared/CustomError';
 import { SeedService } from '../seed/seed.service';
 import { resolve } from 'node:path';
 import { DbQueryParams } from './database.types';
+import { resolveProjectPath } from '../shared/resolve-src-path';
 
 @Injectable()
 export class DatabaseService implements OnModuleInit, OnModuleDestroy {
@@ -28,6 +29,7 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       this.logger.log('SEED_AT_STARTUP is set, running seeders...');
       await Promise.all([
         this.seedService.seedTags(this.db),
+        this.seedService.seedAutoTags(this.db),
         this.seedService.seedActivities(this.db),
       ]);
       this.logger.log('Seeders completed successfully');
@@ -35,7 +37,7 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   }
 
   private async getQueryFromFile(sqlFile: string): Promise<string> {
-    const sqlFilePath = resolve('api', sqlFile);
+    const sqlFilePath = resolveProjectPath(sqlFile);
     const sqlQuery = (await fsPromise.readFile(sqlFilePath)).toString('utf-8');
     return sqlQuery.replace(/\s*[\r\n]\s*/g, ' ').trim();
   }

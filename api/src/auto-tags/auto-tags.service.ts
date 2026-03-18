@@ -80,6 +80,6 @@ export class AutoTagsService {
   }
 
   async delete(id: string) {
-    await this.databaseService.mutate('./src/auto-tags/queries/deleteAutoTag.sql', { id: id });
+    await this.databaseService.mutate('./src/auto-tags/queries/deleteAutoTag.sql', { $id: id });
   }
 }

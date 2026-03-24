@@ -1,12 +1,9 @@
 INSERT INTO autoTags 
 ( 
-    autoTags.id, 
-    autoTags.name, 
-    autoTags.tagNameId, 
-    autoTags.priority, 
-    autoTags.conditions, 
-    tagNames.id as "tagName.id", 
-    tagNames.name as "tagName.name", 
-    tagNames.color as "tagName.color" 
+    id,
+    title,
+    tagNameId,
+    priority,
+    conditions
 ) 
-VALUES ($id, $name, $tagNameIds, $variable, $extractRegex, $extractRegexReplacement)
+VALUES ($id, $title, $tagNameId, $priority, $conditions)

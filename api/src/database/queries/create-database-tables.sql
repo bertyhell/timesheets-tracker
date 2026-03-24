@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS activeStates
 CREATE TABLE IF NOT EXISTS tagNames
 (
     "id"    text NOT NULL PRIMARY KEY,
-    "name"  text NOT NULL,
+    "title" text NOT NULL,
     "code"  text,
     "color" text NOT NULL
 );
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS tags
 CREATE TABLE IF NOT EXISTS autoTags
 (
     "id"            text NOT NULL PRIMARY KEY,
-    "name"          text NOT NULL,
+    "title"         text NOT NULL,
     "tagNameId"     text NOT NULL,
     "priority"      int NOT NULL,
     "conditions"    text NOT NULL,
@@ -60,8 +60,8 @@ CREATE TABLE IF NOT EXISTS autoTags
 CREATE TABLE IF NOT EXISTS autoNotes
 (
     "id"                        text NOT NULL PRIMARY KEY,
-    "name"                      text NOT NULL,
-    "tagNameIds"                text,
+    "title"                     text NOT NULL,
+    "tagNameId"                 text,
     "variable"                  text NOT NULL,
     "extractRegex"              text,
     "extractRegexReplacement"   text

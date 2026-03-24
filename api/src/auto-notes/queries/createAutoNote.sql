@@ -1,3 +1,3 @@
 INSERT INTO autoNotes
-(id, name, tagNameIds, variable, extractRegex, extractRegexReplacement)
-VALUES ($id, $name, $tagNameIds, $variable, $extractRegex, $extractRegexReplacement)
+(id, title, tagNameId, variable, extractRegex, extractRegexReplacement)
+VALUES ($id, $title, $tagNameId, $variable, $extractRegex, $extractRegexReplacement)

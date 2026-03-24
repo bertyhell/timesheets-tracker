@@ -1,7 +1,7 @@
 UPDATE autoNotes
 SET
-    name = $name,
-    tagNameIds = $tagNameIds,
+    title = $title,
+    tagNameId = $tagNameId,
     variable = $variable,
     extractRegex = $extractRegex,
     extractRegexReplacement = $extractRegexReplacement

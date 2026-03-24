@@ -1,5 +1,5 @@
 INSERT INTO websites
-(id, `name`, code, color)
-VALUES ($id, $`name`, $code, $color)
+(id, websiteTitle, websiteUrl, startedAt)
+VALUES ($id, $websiteTitle, $websiteUrl, $startedAt)
 
 

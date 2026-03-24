@@ -4,9 +4,9 @@ SELECT
     tags.startedAt as startedAt,
     tags.endedAt as endedAt,
     tagNames.id as `tagName.id`,
-    tagNames.name as `tagName.name`,
+    tagNames.title as `tagName.title`,
     tagNames.color as `tagName.color`
 FROM tags
 LEFT JOIN tagNames ON tagNames.id = tags.tagNameId
-WHERE id = $id
+WHERE tags.id = $id
 LIMIT 1

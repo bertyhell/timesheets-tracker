@@ -1,6 +1,6 @@
 UPDATE tagNames
 SET
-    name = $name,
+    title = $title,
     code = $code,
     color = $color
 WHERE id = $id

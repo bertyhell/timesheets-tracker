@@ -1,5 +1,5 @@
 INSERT INTO tagNames
-(id, name, code, color)
-VALUES ($id, $name, $code, $color)
+(id, title, code, color)
+VALUES ($id, $title, $code, $color)
 
 

@@ -1,8 +1,7 @@
 UPDATE autoTags
 SET
-    name = $name,
+    title = $title,
     tagNameId = $tagNameId,
-    variable = $variable 
-    extractRegex = $extractRegex 
-    extractRegexReplacement = $extractRegexReplacement 
+    priority = $priority,
+    conditions = $conditions
 WHERE id = $id

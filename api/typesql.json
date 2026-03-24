@@ -1,0 +1,10 @@
+{
+  "databaseUri": "../timesheets-tracker-database.sqlite3",
+  "sqlDir": "./src",
+  "client": "bun:sqlite",
+  "includeCrudTables": [],
+  "ignoreFiles": [
+    "./src/seed/**",
+    "./src/database/queries/create-database-tables.sql"
+  ]
+}

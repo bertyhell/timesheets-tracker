@@ -1,3 +1,3 @@
-SELECT id, name, code, color
+SELECT id, title, code, color
 FROM tagNames
-WHERE name like '%' || $searchTerm || '%'
+WHERE title like '%' || $searchTerm || '%'

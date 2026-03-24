@@ -1,12 +1,12 @@
 SELECT
     autoTags.id,
-    autoTags.name,
+    autoTags.title,
     autoTags.tagNameId,
     autoTags.priority,
     autoTags.conditions,
     tagNames.id as "tagName.id",
-    tagNames.name as "tagName.name",
+    tagNames.title as "tagName.title",
     tagNames.color as "tagName.color"
 FROM autoTags
 LEFT JOIN tagNames ON tagNames.id = autoTags.tagNameId
-WHERE autoTags.name like '%' || $searchTerm || '%'
+WHERE autoTags.title like '%' || $searchTerm || '%'

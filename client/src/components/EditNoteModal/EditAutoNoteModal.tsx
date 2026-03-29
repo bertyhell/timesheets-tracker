@@ -45,7 +45,7 @@ function EditAutoNoteModal() {
 
   useEffect(() => {
     if (autoNote) {
-      setName(autoNote.name);
+      setName(autoNote.title);
       setTagNames(
         (tags || []).filter(
           (tagName) => tagName.id && autoNote.tagNameIds.includes(tagName.id)
@@ -64,7 +64,7 @@ function EditAutoNoteModal() {
       await updateNote({
         id,
         requestBody: {
-          name: autoNote.name,
+          title: autoNote.title,
           tagNameIds: autoNote.tagNameIds,
           variable: autoNote.variable,
           extractRegex: autoNote.extractRegex || undefined,
@@ -78,7 +78,7 @@ function EditAutoNoteModal() {
     } else {
       await createNote({
         requestBody: {
-          name: autoNote.name,
+          title: autoNote.title,
           tagNameIds: autoNote.tagNameIds,
           variable: autoNote.variable,
           extractRegex: autoNote.extractRegex || undefined,
@@ -183,7 +183,7 @@ function EditAutoNoteModal() {
           disabled={!name || !variable}
           onClick={async () => {
             await handleSave({
-              name,
+              title: name,
               tagNameIds: tagNames.map((tagName) => tagName.id),
               variable,
               extractRegex,

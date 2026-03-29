@@ -19,7 +19,7 @@ export class AutoNoteDto implements AutoNote {
     type: String,
     description: 'Name of the autoNote',
   })
-  name: string;
+  title: string;
 
   @IsString()
   @Type(() => String)

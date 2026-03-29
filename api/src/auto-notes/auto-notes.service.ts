@@ -27,7 +27,7 @@ export class AutoNotesService {
   ): AutoNote {
     return {
       id: rawAutoNote.id,
-      name: rawAutoNote.title,
+      title: rawAutoNote.title,
       tagNameIds: rawAutoNote.tagNameId ? rawAutoNote.tagNameId.split(TAG_NAME_IDS_SEPARATOR) : [],
       variable: rawAutoNote.variable as ConditionVariable,
       extractRegex: rawAutoNote.extractRegex,
@@ -66,7 +66,7 @@ export class AutoNotesService {
     const id = uuid();
     createAutoNote(db, {
       id,
-      title: autoNote.name,
+      title: autoNote.title,
       tagNameId: autoNote.tagNameIds ? autoNote.tagNameIds.join(TAG_NAME_IDS_SEPARATOR) : null,
       variable: autoNote.variable,
       extractRegex: autoNote.extractRegex ?? null,
@@ -81,7 +81,7 @@ export class AutoNotesService {
     updateAutoNote(
       db,
       {
-        title: updateTagDto.name,
+        title: updateTagDto.title,
         tagNameId: updateTagDto.tagNameIds
           ? updateTagDto.tagNameIds.join(TAG_NAME_IDS_SEPARATOR)
           : null,

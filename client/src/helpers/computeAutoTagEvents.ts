@@ -99,7 +99,7 @@ export function calculateAutoTagEvents(
           startedAt: new Date(activity.startedAt),
           endedAt: new Date(activity.endedAt),
           color: autoTag.tagName?.color || '',
-          info: { tag: autoTag.tagName?.name || '', autoTagRule: autoTag.name },
+          info: { tag: autoTag.tagName?.title || '', autoTagRule: autoTag.title },
           id: uuid(),
         };
       } else {

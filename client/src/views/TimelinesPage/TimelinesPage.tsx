@@ -237,10 +237,10 @@ function TimelinesPage() {
     }
   };
 
-  const handleCreateTagName = async (name: string): Promise<TagName> => {
+  const handleCreateTagName = async (title: string): Promise<TagName> => {
     return createTagName({
       requestBody: {
-        name,
+        title,
         color: COLOR_LIST[(tagNamesCount || 0) % COLOR_LIST.length], // Get a new color that hasn't been recently used
       },
     }) as Promise<TagName>;

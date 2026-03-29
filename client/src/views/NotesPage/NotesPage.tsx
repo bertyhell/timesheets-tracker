@@ -45,7 +45,7 @@ function NotesPage() {
         {(notes || []).map(
           (note): ReactNode => (
             <li className="c-row" key={'tag-name-' + note.id}>
-              <span className="flex-grow">{note.name}</span>
+              <span className="flex-grow">{note.title}</span>
               <button
                 className="c-button"
                 onClick={() => {

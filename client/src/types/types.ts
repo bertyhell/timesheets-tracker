@@ -38,7 +38,7 @@ export interface TagName {
 
 export interface AutoNote {
   id: string;
-  name: string;
+  title: string;
   tagNameIds: string[];
   variable: ConditionVariable;
   extractRegex: string;

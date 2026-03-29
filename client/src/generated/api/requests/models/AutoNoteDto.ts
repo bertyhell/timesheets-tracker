@@ -10,7 +10,7 @@ export type AutoNoteDto = {
   /**
    * Name of the autoNote
    */
-  name?: string;
+  title?: string;
   /**
    * ids of the tags this autoNote is linked to. Value is semicolon separated. null for all tags
    */

@@ -6,6 +6,10 @@ SELECT
     tagNames.id as "tagName.id",
     tagNames.title as "tagName.title",
     tagNames.color as "tagName.color"
-FROM tags
+FROM (
+    SELECT *, ROW_NUMBER() OVER (PARTITION BY startedAt ORDER BY (julianday(endedAt) - julianday(startedAt)) DESC) as rn
+    FROM tags
+    WHERE startedAt > :startedAt AND endedAt < :endedAt
+) tags
 LEFT JOIN tagNames ON tagNames.id = tags.tagNameId
-WHERE startedAt > :startedAt AND endedAt < :endedAt
+WHERE tags.rn = 1

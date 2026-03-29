@@ -74,7 +74,6 @@ function EventsTable({ events }: EventsTableProps) {
   });
 
   useEffect(() => {
-    console.log('search term: ' + searchTerm);
     if (events?.length && !tableEvents.items.length) {
       tableEvents.reload();
     }

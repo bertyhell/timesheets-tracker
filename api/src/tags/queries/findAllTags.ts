@@ -10,9 +10,9 @@ export type FindAllTagsResult = {
 	tagNameId: string;
 	startedAt: string;
 	endedAt: string;
-	"tagName.id": string;
-	"tagName.title": string;
-	"tagName.color": string;
+	"tagName.id"?: string;
+	"tagName.title"?: string;
+	"tagName.color"?: string;
 }
 
 export function findAllTags(db: Database, params: FindAllTagsParams): FindAllTagsResult[] {
@@ -25,9 +25,13 @@ export function findAllTags(db: Database, params: FindAllTagsParams): FindAllTag
 	    tagNames.id as "tagName.id",
 	    tagNames.title as "tagName.title",
 	    tagNames.color as "tagName.color"
-	FROM tags
+	FROM (
+	    SELECT *, ROW_NUMBER() OVER (PARTITION BY startedAt ORDER BY (julianday(endedAt) - julianday(startedAt)) DESC) as rn
+	    FROM tags
+	    WHERE startedAt > ? AND endedAt < ?
+	) tags
 	LEFT JOIN tagNames ON tagNames.id = tags.tagNameId
-	WHERE startedAt > ? AND endedAt < ?
+	WHERE tags.rn = 1
 	`
 	return db.prepare(sql)
 		.values(params.startedAt, params.endedAt)

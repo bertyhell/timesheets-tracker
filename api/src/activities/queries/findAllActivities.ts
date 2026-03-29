@@ -16,8 +16,12 @@ export type FindAllActivitiesResult = {
 export function findAllActivities(db: Database, params: FindAllActivitiesParams): FindAllActivitiesResult[] {
 	const sql = `
 	SELECT id, programName, windowTitle, startedAt, endedAt
-	FROM activities
-	WHERE startedAt > ? AND endedAt < ?
+	FROM (
+	    SELECT *, ROW_NUMBER() OVER (PARTITION BY startedAt ORDER BY (julianday(endedAt) - julianday(startedAt)) DESC) as rn
+	    FROM activities
+	    WHERE startedAt > ? AND endedAt < ?
+	)
+	WHERE rn = 1
 	`
 	return db.prepare(sql)
 		.values(params.startedAt, params.endedAt)

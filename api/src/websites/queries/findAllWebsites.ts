@@ -15,8 +15,12 @@ export type FindAllWebsitesResult = {
 export function findAllWebsites(db: Database, params: FindAllWebsitesParams): FindAllWebsitesResult[] {
 	const sql = `
 	SELECT id, websiteTitle, websiteUrl, startedAt
-	FROM websites
-	WHERE startedAt > ? AND startedAt < ?
+	FROM (
+	    SELECT *, ROW_NUMBER() OVER (PARTITION BY startedAt ORDER BY id) as rn
+	    FROM websites
+	    WHERE startedAt > ? AND startedAt < ?
+	)
+	WHERE rn = 1
 	`
 	return db.prepare(sql)
 		.values(params.startedAt, params.endedAt)

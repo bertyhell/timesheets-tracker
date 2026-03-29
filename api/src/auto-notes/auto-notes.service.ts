@@ -4,18 +4,17 @@ import { DatabaseService } from '../database/database.service';
 import { v4 as uuid } from 'uuid';
 import { type AutoNote, ConditionVariable } from '../types/types';
 import { UpdateAutoNoteDto } from './dto/update-auto-note.dto';
+import { countAutoNotes } from './queries/countAutoNotes';
+import { createAutoNote } from './queries/createAutoNote';
+import { deleteAutoNote } from './queries/deleteAutoNote';
+import { findAllAutoNotes } from './queries/findAllAutoNotes';
 import {
-  countAutoNotes,
-  createAutoNote,
-  deleteAutoNote,
-  findAllAutoNotes,
   findAllAutoNotesBySearchTerm,
-  FindAllAutoNotesResult,
   FindAllAutoNotesBySearchTermResult,
-  FindOneAutoNoteResult,
-  findOneAutoNote,
-  updateAutoNote,
-} from './queries/index.js';
+} from './queries/findAllAutoNotesBySearchTerm';
+import { FindAllAutoNotesResult } from './queries/findAllAutoNotes';
+import { findOneAutoNote, FindOneAutoNoteResult } from './queries/findOneAutoNote';
+import { updateAutoNote } from './queries/updateAutoNote';
 
 const TAG_NAME_IDS_SEPARATOR = ';';
 

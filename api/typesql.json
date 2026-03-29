@@ -3,5 +3,6 @@
   "sqlDir": "./src",
   "client": "bun:sqlite",
   "includeCrudTables": [],
-  "ignoreFiles": ["./src/seed/**", "./src/database/queries/create-database-tables.sql"]
+  "ignoreFiles": ["./src/seed/**", "./src/database/queries/create-database-tables.sql"],
+  "generateIndexFile": false
 }

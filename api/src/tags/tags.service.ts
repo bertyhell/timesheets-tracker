@@ -40,8 +40,14 @@ export class TagsService {
     await createTag(this.databaseService.getDb(), {
       id,
       tagNameId: createTagDto.tagNameId,
-      startedAt: min([new Date(createTagDto.startedAt), new Date(createTagDto.endedAt)]).toISOString(),
-      endedAt: max([new Date(createTagDto.startedAt), new Date(createTagDto.endedAt)]).toISOString(),
+      startedAt: min([
+        new Date(createTagDto.startedAt),
+        new Date(createTagDto.endedAt),
+      ]).toISOString(),
+      endedAt: max([
+        new Date(createTagDto.startedAt),
+        new Date(createTagDto.endedAt),
+      ]).toISOString(),
     });
 
     return this.findOne(id);

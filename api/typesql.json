@@ -4,5 +4,5 @@
   "client": "bun:sqlite",
   "includeCrudTables": [],
   "ignoreFiles": ["./src/seed/**", "./src/database/queries/create-database-tables.sql"],
-  "generateIndexFile": false
+  "generateIndexFiles": false
 }

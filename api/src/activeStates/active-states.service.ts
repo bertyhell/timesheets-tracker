@@ -27,15 +27,15 @@ export class ActiveStatesService {
 
   async findAll(startedAt: string, endedAt: string): Promise<ActiveState[]> {
     const results = await findAllActiveStates(this.databaseService.getDb(), {
-      param1: startedAt,
-      param2: endedAt,
+      startedAt,
+      endedAt,
     });
     return results.map(this.adapt);
   }
 
   async findOne(id: string): Promise<ActiveState> {
     try {
-      const result = await findOneActiveState(this.databaseService.getDb(), { param1: id });
+      const result = await findOneActiveState(this.databaseService.getDb(), { id });
 
       return this.adapt(result);
     } catch (err) {
@@ -47,10 +47,10 @@ export class ActiveStatesService {
     try {
       const id = uuid();
       await createActiveState(this.databaseService.getDb(), {
-        param1: id,
-        param2: activeState.isActive ? 1 : 0,
-        param3: activeState.startedAt,
-        param4: activeState.endedAt,
+        id,
+        isActive: activeState.isActive ? 1 : 0,
+        startedAt: activeState.startedAt,
+        endedAt: activeState.endedAt,
       });
 
       return this.findOne(id);
@@ -65,17 +65,17 @@ export class ActiveStatesService {
     await updateActiveState(
       this.databaseService.getDb(),
       {
-        param1: updateActiveStateDto.isActive ? 1 : 0,
-        param2: updateActiveStateDto.startedAt,
-        param3: updateActiveStateDto.endedAt,
+        isActive: updateActiveStateDto.isActive ? 1 : 0,
+        startedAt: updateActiveStateDto.startedAt,
+        endedAt: updateActiveStateDto.endedAt,
       },
-      { param1: id }
+      { id }
     );
 
     return this.findOne(id);
   }
 
   async delete(id: string): Promise<void> {
-    await deleteActiveState(this.databaseService.getDb(), { param1: id });
+    await deleteActiveState(this.databaseService.getDb(), { id });
   }
 }

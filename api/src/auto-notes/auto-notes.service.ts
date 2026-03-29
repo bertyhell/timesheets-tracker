@@ -40,7 +40,7 @@ export class AutoNotesService {
     const db = this.databaseService.getDb();
     let rawAutoNotes: FindAllAutoNotesResult[] | FindAllAutoNotesBySearchTermResult[];
     if (searchTerm) {
-      rawAutoNotes = findAllAutoNotesBySearchTerm(db, { param1: searchTerm });
+      rawAutoNotes = findAllAutoNotesBySearchTerm(db, { searchTerm });
     } else {
       rawAutoNotes = findAllAutoNotes(db);
     }
@@ -57,7 +57,7 @@ export class AutoNotesService {
 
   async findOne(id: string): Promise<AutoNote> {
     const db = this.databaseService.getDb();
-    const result = findOneAutoNote(db, { param1: id });
+    const result = findOneAutoNote(db, { id });
 
     return this.adapt(result);
   }
@@ -66,12 +66,12 @@ export class AutoNotesService {
     const db = this.databaseService.getDb();
     const id = uuid();
     createAutoNote(db, {
-      param1: id,
-      param2: autoNote.name,
-      param3: autoNote.tagNameIds ? autoNote.tagNameIds.join(TAG_NAME_IDS_SEPARATOR) : null,
-      param4: autoNote.variable,
-      param5: autoNote.extractRegex ?? null,
-      param6: autoNote.extractRegexReplacement ?? null,
+      id,
+      title: autoNote.name,
+      tagNameId: autoNote.tagNameIds ? autoNote.tagNameIds.join(TAG_NAME_IDS_SEPARATOR) : null,
+      variable: autoNote.variable,
+      extractRegex: autoNote.extractRegex ?? null,
+      extractRegexReplacement: autoNote.extractRegexReplacement ?? null,
     });
 
     return this.findOne(id);
@@ -82,15 +82,15 @@ export class AutoNotesService {
     updateAutoNote(
       db,
       {
-        param1: updateTagDto.name,
-        param2: updateTagDto.tagNameIds
+        title: updateTagDto.name,
+        tagNameId: updateTagDto.tagNameIds
           ? updateTagDto.tagNameIds.join(TAG_NAME_IDS_SEPARATOR)
           : null,
-        param3: updateTagDto.variable,
-        param4: updateTagDto.extractRegex ?? null,
-        param5: updateTagDto.extractRegexReplacement ?? null,
+        variable: updateTagDto.variable,
+        extractRegex: updateTagDto.extractRegex ?? null,
+        extractRegexReplacement: updateTagDto.extractRegexReplacement ?? null,
       },
-      { param1: id }
+      { id }
     );
 
     return await this.findOne(id);
@@ -98,6 +98,6 @@ export class AutoNotesService {
 
   async remove(id: string): Promise<void> {
     const db = this.databaseService.getDb();
-    deleteAutoNote(db, { param1: id });
+    deleteAutoNote(db, { id });
   }
 }

@@ -29,7 +29,7 @@ export class TagNamesService {
     const db = this.databaseService.getDb();
     let rawTagNames;
     if (searchTerm) {
-      rawTagNames = await findAllTagNamesBySearchTerm(db, { param1: searchTerm });
+      rawTagNames = await findAllTagNamesBySearchTerm(db, { searchTerm });
     } else {
       rawTagNames = await findAllTagNames(db);
     }
@@ -46,7 +46,7 @@ export class TagNamesService {
 
   async findOne(id: string): Promise<TagName> {
     const db = this.databaseService.getDb();
-    const tagName = await findOneTagName(db, { param1: id });
+    const tagName = await findOneTagName(db, { id });
 
     return this.adapt(tagName);
   }
@@ -55,10 +55,10 @@ export class TagNamesService {
     const db = this.databaseService.getDb();
     const id = uuid();
     await createTagName(db, {
-      param1: id,
-      param2: tagName.name,
-      param3: tagName.code,
-      param4: tagName.color,
+      id,
+      title: tagName.name,
+      code: tagName.code,
+      color: tagName.color,
     });
 
     return await this.findOne(id);
@@ -68,8 +68,8 @@ export class TagNamesService {
     const db = this.databaseService.getDb();
     await updateTagName(
       db,
-      { param1: updateTagDto.name, param2: updateTagDto.code, param3: updateTagDto.color },
-      { param1: id }
+      { title: updateTagDto.name, code: updateTagDto.code, color: updateTagDto.color },
+      { id }
     );
 
     return await this.findOne(id);
@@ -77,6 +77,6 @@ export class TagNamesService {
 
   async remove(id: string): Promise<void> {
     const db = this.databaseService.getDb();
-    await deleteTagName(db, { param1: id });
+    await deleteTagName(db, { id });
   }
 }

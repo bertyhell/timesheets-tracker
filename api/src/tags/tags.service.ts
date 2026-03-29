@@ -22,15 +22,15 @@ export class TagsService {
 
   async findAll(startedAt: string, endedAt: string): Promise<Tag[]> {
     const rawTags = findAllTags(this.databaseService.getDb(), {
-      param1: startedAt,
-      param2: endedAt,
+      startedAt,
+      endedAt,
     });
 
     return rawTags.map(this.adapt);
   }
 
   async findOne(id: string): Promise<Tag> {
-    const rawTag = findOneTag(this.databaseService.getDb(), { param1: id });
+    const rawTag = findOneTag(this.databaseService.getDb(), { id });
 
     return this.adapt(rawTag);
   }
@@ -38,10 +38,10 @@ export class TagsService {
   async create(createTagDto: CreateTagDto): Promise<Tag> {
     const id = uuid();
     await createTag(this.databaseService.getDb(), {
-      param1: id,
-      param2: createTagDto.tagNameId,
-      param3: min([new Date(createTagDto.startedAt), new Date(createTagDto.endedAt)]).toISOString(),
-      param4: max([new Date(createTagDto.startedAt), new Date(createTagDto.endedAt)]).toISOString(),
+      id,
+      tagNameId: createTagDto.tagNameId,
+      startedAt: min([new Date(createTagDto.startedAt), new Date(createTagDto.endedAt)]).toISOString(),
+      endedAt: max([new Date(createTagDto.startedAt), new Date(createTagDto.endedAt)]).toISOString(),
     });
 
     return this.findOne(id);
@@ -51,18 +51,18 @@ export class TagsService {
     await updateTag(
       this.databaseService.getDb(),
       {
-        param1: updateTagDto.tagNameId,
-        param2: updateTagDto.startedAt,
-        param3: updateTagDto.endedAt,
-        param4: null,
+        tagNameId: updateTagDto.tagNameId,
+        startedAt: updateTagDto.startedAt,
+        endedAt: updateTagDto.endedAt,
+        note: null,
       },
-      { param1: id }
+      { id }
     );
 
     return await this.findOne(id);
   }
 
   async remove(id: string): Promise<void> {
-    await deleteTag(this.databaseService.getDb(), { param1: id });
+    await deleteTag(this.databaseService.getDb(), { id });
   }
 }

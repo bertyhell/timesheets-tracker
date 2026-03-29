@@ -22,22 +22,22 @@ export class WebsitesService {
 
   async findAll(startedAt: string, endedAt: string): Promise<Website[]> {
     const results = await findAllWebsites(this.databaseService.getDb(), {
-      param1: startedAt,
-      param2: endedAt,
+      startedAt,
+      endedAt,
     });
 
     return results.map(this.adapt);
   }
 
   async findOne(id: string): Promise<Website> {
-    const result = await findOneWebsite(this.databaseService.getDb(), { param1: id });
+    const result = await findOneWebsite(this.databaseService.getDb(), { id });
 
     return this.adapt(result);
   }
 
   async findOneByStartTime(startedAt: string): Promise<Website | null> {
     const result = await findOneWebsiteByStartTime(this.databaseService.getDb(), {
-      param1: startedAt,
+      startedAt,
     });
 
     if (!result) {
@@ -50,10 +50,10 @@ export class WebsitesService {
   async create(website: CreateWebsiteDto): Promise<Website> {
     const id = uuid();
     await createWebsite(this.databaseService.getDb(), {
-      param1: id,
-      param2: website.websiteTitle,
-      param3: website.websiteUrl,
-      param4: website.startedAt,
+      id,
+      websiteTitle: website.websiteTitle,
+      websiteUrl: website.websiteUrl,
+      startedAt: website.startedAt,
     });
 
     return this.findOne(id);
@@ -63,17 +63,17 @@ export class WebsitesService {
     await updateWebsite(
       this.databaseService.getDb(),
       {
-        param1: updateWebsiteDto.websiteTitle,
-        param2: updateWebsiteDto.websiteUrl,
-        param3: updateWebsiteDto.startedAt,
+        websiteTitle: updateWebsiteDto.websiteTitle,
+        websiteUrl: updateWebsiteDto.websiteUrl,
+        startedAt: updateWebsiteDto.startedAt,
       },
-      { param1: id }
+      { id }
     );
 
     return await this.findOne(id);
   }
 
   async delete(id: string): Promise<void> {
-    await deleteWebsite(this.databaseService.getDb(), { param1: id });
+    await deleteWebsite(this.databaseService.getDb(), { id });
   }
 }

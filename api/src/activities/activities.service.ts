@@ -22,8 +22,8 @@ export class ActivitiesService {
 
   async findAll(startedAt: string, endedAt: string): Promise<Activity[]> {
     const results = await findAllActivities(this.databaseService.getDb(), {
-      param1: startedAt,
-      param2: endedAt,
+      startedAt,
+      endedAt,
     });
 
     const realResults = results.filter((result) => {
@@ -34,13 +34,13 @@ export class ActivitiesService {
   }
 
   async findOne(id: string): Promise<Activity> {
-    const result = await findOneActivity(this.databaseService.getDb(), { param1: id });
+    const result = await findOneActivity(this.databaseService.getDb(), { id });
 
     return this.adapt(result);
   }
 
   async findByNextStartedAt(startedAt: string): Promise<Activity> {
-    const result = await findByNextStartedAt(this.databaseService.getDb(), { param1: startedAt });
+    const result = await findByNextStartedAt(this.databaseService.getDb(), { startedAt });
 
     return this.adapt(result);
   }
@@ -48,17 +48,17 @@ export class ActivitiesService {
   async create(activity: CreateActivityDto): Promise<Activity> {
     const id = uuid();
     await createActivity(this.databaseService.getDb(), {
-      param1: id,
-      param2: activity.programName,
-      param3: activity.windowTitle,
-      param4: min([new Date(activity.startedAt), new Date(activity.endedAt)]).toISOString(),
-      param5: max([new Date(activity.startedAt), new Date(activity.endedAt)]).toISOString(),
+      id,
+      programName: activity.programName,
+      windowTitle: activity.windowTitle,
+      startedAt: min([new Date(activity.startedAt), new Date(activity.endedAt)]).toISOString(),
+      endedAt: max([new Date(activity.startedAt), new Date(activity.endedAt)]).toISOString(),
     });
 
     return this.findOne(id);
   }
 
   async delete(id: string): Promise<void> {
-    await deleteActivity(this.databaseService.getDb(), { param1: id });
+    await deleteActivity(this.databaseService.getDb(), { id });
   }
 }

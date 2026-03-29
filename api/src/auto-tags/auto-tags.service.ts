@@ -28,7 +28,7 @@ export class AutoTagsService {
     const db = this.databaseService.getDb();
     let rawAutoTags: Record<string, any>[];
     if (searchTerm) {
-      rawAutoTags = await findAllAutoTagsBySearchTerm(db, { param1: searchTerm });
+      rawAutoTags = await findAllAutoTagsBySearchTerm(db, { searchTerm });
     } else {
       rawAutoTags = await findAllAutoTags(db);
     }
@@ -43,7 +43,7 @@ export class AutoTagsService {
 
   async findOne(id: string): Promise<AutoTag> {
     const db = this.databaseService.getDb();
-    const autoTag = await findOneAutoTag(db, { param1: id });
+    const autoTag = await findOneAutoTag(db, { id });
 
     return this.adapt(autoTag);
   }
@@ -52,11 +52,11 @@ export class AutoTagsService {
     const db = this.databaseService.getDb();
     const id = uuid();
     await createAutoTag(db, {
-      param1: id,
-      param2: autoTag.name,
-      param3: autoTag.tagNameId,
-      param4: autoTag.priority,
-      param5: JSON.stringify(autoTag.conditions),
+      id,
+      title: autoTag.name,
+      tagNameId: autoTag.tagNameId,
+      priority: autoTag.priority,
+      conditions: JSON.stringify(autoTag.conditions),
     });
 
     return this.findOne(id); // is already adapted
@@ -67,12 +67,12 @@ export class AutoTagsService {
     await updateAutoTag(
       db,
       {
-        param1: updateAutoTagDto.name,
-        param2: updateAutoTagDto.tagNameId,
-        param3: updateAutoTagDto.priority,
-        param4: JSON.stringify(updateAutoTagDto.conditions),
+        title: updateAutoTagDto.name,
+        tagNameId: updateAutoTagDto.tagNameId,
+        priority: updateAutoTagDto.priority,
+        conditions: JSON.stringify(updateAutoTagDto.conditions),
       },
-      { param1: id }
+      { id }
     );
 
     return this.findOne(id);
@@ -80,6 +80,6 @@ export class AutoTagsService {
 
   async delete(id: string) {
     const db = this.databaseService.getDb();
-    await deleteAutoTag(db, { param1: id });
+    await deleteAutoTag(db, { id });
   }
 }

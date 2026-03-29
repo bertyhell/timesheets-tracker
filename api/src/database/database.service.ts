@@ -77,6 +77,10 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     await this.mutate('./src/database/queries/create-database-tables.sql');
   }
 
+  public getDb(): Database {
+    return this.db;
+  }
+
   async onModuleDestroy() {
     if (this.db) {
       this.db.close();

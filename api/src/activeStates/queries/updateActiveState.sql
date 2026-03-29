@@ -1,3 +1,3 @@
 UPDATE activeStates
-SET isActive = $isActive, startedAt = $startedAt, endedAt = $endedAt
-WHERE id = $id
+SET isActive = :isActive, startedAt = :startedAt, endedAt = :endedAt
+WHERE id = :id

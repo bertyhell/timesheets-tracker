@@ -6,7 +6,11 @@ import { CreateActiveStateDto } from './dto/create-active-state.dto';
 import { unflatten } from 'nested-objects-util';
 import { UpdateActiveStateDto } from './dto/update-active-state.dto';
 import { CustomError } from '../shared/CustomError';
-import { DbQueryParams } from '../database/database.types';
+import { findAllActiveStates } from './queries/findAllActiveStates';
+import { findOneActiveState } from './queries/findOneActiveState';
+import { createActiveState } from './queries/createActiveState';
+import { updateActiveState } from './queries/updateActiveState';
+import { deleteActiveState } from './queries/deleteActiveState';
 
 @Injectable()
 export class ActiveStatesService {
@@ -22,24 +26,16 @@ export class ActiveStatesService {
   }
 
   async findAll(startedAt: string, endedAt: string): Promise<ActiveState[]> {
-    const results = await this.databaseService.query(
-      './src/activeStates/queries/findAllActiveStates.sql',
-      {
-        $startedAt: startedAt,
-        $endedAt: endedAt,
-      }
-    );
+    const results = await findAllActiveStates(this.databaseService.getDb(), {
+      param1: startedAt,
+      param2: endedAt,
+    });
     return results.map(this.adapt);
   }
 
   async findOne(id: string): Promise<ActiveState> {
     try {
-      const result = await this.databaseService.query(
-        './src/activeStates/queries/findOneActiveState.sql',
-        {
-          $id: id,
-        }
-      );
+      const result = await findOneActiveState(this.databaseService.getDb(), { param1: id });
 
       return this.adapt(result);
     } catch (err) {
@@ -49,15 +45,15 @@ export class ActiveStatesService {
 
   async create(activeState: CreateActiveStateDto): Promise<ActiveState> {
     try {
-      const values: DbQueryParams = {
-        $id: uuid(),
-        $isActive: activeState.isActive ? 1 : 0,
-        $startedAt: activeState.startedAt,
-        $endedAt: activeState.endedAt,
-      };
-      await this.databaseService.mutate('./src/activeStates/queries/createActiveState.sql', values);
+      const id = uuid();
+      await createActiveState(this.databaseService.getDb(), {
+        param1: id,
+        param2: activeState.isActive ? 1 : 0,
+        param3: activeState.startedAt,
+        param4: activeState.endedAt,
+      });
 
-      return this.findOne(values.$id as string);
+      return this.findOne(id);
     } catch (err) {
       throw new CustomError('failed to create active state entry in the database', err, {
         activeState,
@@ -66,20 +62,20 @@ export class ActiveStatesService {
   }
 
   async update(id: string, updateActiveStateDto: UpdateActiveStateDto): Promise<ActiveState> {
-    const values: DbQueryParams = {
-      $id: id,
-      $isActive: updateActiveStateDto.isActive ? 1 : 0,
-      $startedAt: updateActiveStateDto.startedAt,
-      $endedAt: updateActiveStateDto.endedAt,
-    };
-    await this.databaseService.mutate('./src/activeStates/queries/updateActiveState.sql', values);
+    await updateActiveState(
+      this.databaseService.getDb(),
+      {
+        param1: updateActiveStateDto.isActive ? 1 : 0,
+        param2: updateActiveStateDto.startedAt,
+        param3: updateActiveStateDto.endedAt,
+      },
+      { param1: id }
+    );
 
     return this.findOne(id);
   }
 
   async delete(id: string): Promise<void> {
-    await this.databaseService.mutate('./src/activeStates/queries/deleteActiveState.sql', {
-      $id: id,
-    });
+    await deleteActiveState(this.databaseService.getDb(), { param1: id });
   }
 }

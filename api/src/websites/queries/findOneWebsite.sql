@@ -1,4 +1,4 @@
 SELECT id, websiteTitle, websiteUrl, startedAt
 FROM websites
-WHERE id = $id
+WHERE id = :id
 LIMIT 1

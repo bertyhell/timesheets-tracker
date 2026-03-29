@@ -5,7 +5,12 @@ import { v4 as uuid } from 'uuid';
 import { CreateWebsiteDto } from './dto/create-website.dto';
 import { unflatten } from 'nested-objects-util';
 import { UpdateWebsiteDto } from './dto/update-website.dto';
-import { DbQueryParams } from '../database/database.types';
+import { findAllWebsites } from './queries/findAllWebsites';
+import { findOneWebsite } from './queries/findOneWebsite';
+import { findOneWebsiteByStartTime } from './queries/findOneWebsiteByStartTime';
+import { createWebsite } from './queries/createWebsite';
+import { updateWebsite } from './queries/updateWebsite';
+import { deleteWebsite } from './queries/deleteWebsite';
 
 @Injectable()
 export class WebsitesService {
@@ -16,29 +21,24 @@ export class WebsitesService {
   }
 
   async findAll(startedAt: string, endedAt: string): Promise<Website[]> {
-    const results = await this.databaseService.query('./src/websites/queries/findAllWebsites.sql', {
-      $startedAt: startedAt,
-      $endedAt: endedAt,
+    const results = await findAllWebsites(this.databaseService.getDb(), {
+      param1: startedAt,
+      param2: endedAt,
     });
 
     return results.map(this.adapt);
   }
 
   async findOne(id: string): Promise<Website> {
-    const result = await this.databaseService.query('./src/websites/queries/findOneWebsite.sql', {
-      $id: id,
-    });
+    const result = await findOneWebsite(this.databaseService.getDb(), { param1: id });
 
     return this.adapt(result);
   }
 
   async findOneByStartTime(startedAt: string): Promise<Website | null> {
-    const result = await this.databaseService.query(
-      './src/websites/queries/findOneWebsiteByStartTime.sql',
-      {
-        $startedAt: startedAt,
-      }
-    );
+    const result = await findOneWebsiteByStartTime(this.databaseService.getDb(), {
+      param1: startedAt,
+    });
 
     if (!result) {
       return null;
@@ -48,30 +48,32 @@ export class WebsitesService {
   }
 
   async create(website: CreateWebsiteDto): Promise<Website> {
-    const values: DbQueryParams = {
-      $id: uuid(),
-      $websiteTitle: website.websiteTitle,
-      $websiteUrl: website.websiteUrl,
-      $startedAt: website.startedAt,
-    };
-    await this.databaseService.mutate('./src/websites/queries/createWebsite.sql', values);
+    const id = uuid();
+    await createWebsite(this.databaseService.getDb(), {
+      param1: id,
+      param2: website.websiteTitle,
+      param3: website.websiteUrl,
+      param4: website.startedAt,
+    });
 
-    return this.findOne(values.$id as string);
+    return this.findOne(id);
   }
 
   async update(id: string, updateWebsiteDto: UpdateWebsiteDto): Promise<Website> {
-    const values: DbQueryParams = {
-      $id: id,
-      $websiteTitle: updateWebsiteDto.websiteTitle,
-      $websiteUrl: updateWebsiteDto.websiteUrl,
-      $startedAt: updateWebsiteDto.startedAt,
-    };
-    await this.databaseService.mutate('./src/websites/queries/updateWebsite.sql', values);
+    await updateWebsite(
+      this.databaseService.getDb(),
+      {
+        param1: updateWebsiteDto.websiteTitle,
+        param2: updateWebsiteDto.websiteUrl,
+        param3: updateWebsiteDto.startedAt,
+      },
+      { param1: id }
+    );
 
-    return await this.findOne(values.$id as string);
+    return await this.findOne(id);
   }
 
   async delete(id: string): Promise<void> {
-    await this.databaseService.mutate('./src/websites/queries/deleteWebsite.sql', { $id: id });
+    await deleteWebsite(this.databaseService.getDb(), { param1: id });
   }
 }

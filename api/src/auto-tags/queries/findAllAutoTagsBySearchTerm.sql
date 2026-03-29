@@ -9,4 +9,4 @@ SELECT
     tagNames.color as "tagName.color"
 FROM autoTags
 LEFT JOIN tagNames ON tagNames.id = autoTags.tagNameId
-WHERE autoTags.title like '%' || $searchTerm || '%'
+WHERE autoTags.title like '%' || :searchTerm || '%'

@@ -1,2 +1,2 @@
 DELETE FROM tags
-WHERE id = $id
+WHERE id = :id

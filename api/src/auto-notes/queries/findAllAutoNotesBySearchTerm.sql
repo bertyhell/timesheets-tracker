@@ -1,3 +1,3 @@
 SELECT id, title, tagNameId, variable, extractRegex, extractRegexReplacement
 FROM autoNotes
-WHERE title like '%' || $searchTerm || '%'
+WHERE title like '%' || :searchTerm || '%'

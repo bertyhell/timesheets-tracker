@@ -6,4 +6,4 @@ INSERT INTO autoTags
     priority,
     conditions
 ) 
-VALUES ($id, $title, $tagNameId, $priority, $conditions)
+VALUES (:id, :title, :tagNameId, :priority, :conditions)

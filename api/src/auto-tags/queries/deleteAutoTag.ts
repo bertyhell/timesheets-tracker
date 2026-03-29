@@ -1,7 +1,7 @@
 import type { Database } from 'bun:sqlite';
 
 export type DeleteAutoTagParams = {
-  param1: string;
+  id: string;
 };
 
 export type DeleteAutoTagResult = {
@@ -11,8 +11,8 @@ export type DeleteAutoTagResult = {
 export function deleteAutoTag(db: Database, params: DeleteAutoTagParams): DeleteAutoTagResult {
   const sql = `
 	DELETE FROM autoTags
-	WHERE id = $id
+	WHERE id = ?
 	
 	`;
-  return db.prepare(sql).run(params.param1) as DeleteAutoTagResult;
+  return db.prepare(sql).run(params.id) as DeleteAutoTagResult;
 }

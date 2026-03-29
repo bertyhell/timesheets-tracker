@@ -1,10 +1,10 @@
 import type { Database } from 'bun:sqlite';
 
 export type CreateTagParams = {
-  param1: string;
-  param2: string;
-  param3: string;
-  param4: string;
+  id: string;
+  tagNameId: string;
+  startedAt: string;
+  endedAt: string;
 };
 
 export type CreateTagResult = {
@@ -16,10 +16,10 @@ export function createTag(db: Database, params: CreateTagParams): CreateTagResul
   const sql = `
 	INSERT INTO tags
 	(id, tagNameId, startedAt, endedAt)
-	VALUES ($id, $tagNameId, $startedAt, $endedAt)
+	VALUES (?, ?, ?, ?)
 	
 	`;
   return db
     .prepare(sql)
-    .run(params.param1, params.param2, params.param3, params.param4) as CreateTagResult;
+    .run(params.id, params.tagNameId, params.startedAt, params.endedAt) as CreateTagResult;
 }

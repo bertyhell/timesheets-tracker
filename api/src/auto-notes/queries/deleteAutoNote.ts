@@ -1,7 +1,7 @@
 import type { Database } from 'bun:sqlite';
 
 export type DeleteAutoNoteParams = {
-  param1: string;
+  id: string;
 };
 
 export type DeleteAutoNoteResult = {
@@ -11,8 +11,8 @@ export type DeleteAutoNoteResult = {
 export function deleteAutoNote(db: Database, params: DeleteAutoNoteParams): DeleteAutoNoteResult {
   const sql = `
 	DELETE FROM autoNotes
-	WHERE id = $id
+	WHERE id = ?
 	
 	`;
-  return db.prepare(sql).run(params.param1) as DeleteAutoNoteResult;
+  return db.prepare(sql).run(params.id) as DeleteAutoNoteResult;
 }

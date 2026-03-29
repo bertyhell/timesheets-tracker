@@ -1,18 +1,18 @@
 import type { Database } from 'bun:sqlite';
 
 export type DeleteTagParams = {
-  id: string;
-};
+	id: string;
+}
 
 export type DeleteTagResult = {
-  changes: number;
-};
+	changes: number;
+}
 
 export function deleteTag(db: Database, params: DeleteTagParams): DeleteTagResult {
-  const sql = `
+	const sql = `
 	DELETE FROM tags
 	WHERE id = ?
-	
-	`;
-  return db.prepare(sql).run(params.id) as DeleteTagResult;
+	`
+	return db.prepare(sql)
+		.run(params.id) as DeleteTagResult;
 }

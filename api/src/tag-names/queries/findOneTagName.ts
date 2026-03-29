@@ -1,38 +1,35 @@
 import type { Database } from 'bun:sqlite';
 
 export type FindOneTagNameParams = {
-  id: string;
-};
+	id: string;
+}
 
 export type FindOneTagNameResult = {
-  id: string;
-  title: string;
-  code?: string;
-  color: string;
-};
+	id: string;
+	title: string;
+	code?: string;
+	color: string;
+}
 
-export function findOneTagName(
-  db: Database,
-  params: FindOneTagNameParams
-): FindOneTagNameResult | null {
-  const sql = `
+export function findOneTagName(db: Database, params: FindOneTagNameParams): FindOneTagNameResult | null {
+	const sql = `
 	SELECT id, title, code, color
 	FROM tagNames
 	WHERE id = ?
 	LIMIT 1
-	
-	`;
-  const res = db.prepare(sql).values(params.id);
+	`
+	const res = db.prepare(sql)
+		.values(params.id);
 
-  return res.length > 0 ? mapArrayToFindOneTagNameResult(res[0]) : null;
+	return res.length > 0 ? mapArrayToFindOneTagNameResult(res[0]) : null;
 }
 
 function mapArrayToFindOneTagNameResult(data: any) {
-  const result: FindOneTagNameResult = {
-    id: data[0],
-    title: data[1],
-    code: data[2],
-    color: data[3],
-  };
-  return result;
+	const result: FindOneTagNameResult = {
+		id: data[0],
+		title: data[1],
+		code: data[2],
+		color: data[3]
+	}
+	return result;
 }

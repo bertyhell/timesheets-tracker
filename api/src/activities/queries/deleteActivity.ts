@@ -1,18 +1,18 @@
 import type { Database } from 'bun:sqlite';
 
 export type DeleteActivityParams = {
-  id: string;
-};
+	id: string;
+}
 
 export type DeleteActivityResult = {
-  changes: number;
-};
+	changes: number;
+}
 
 export function deleteActivity(db: Database, params: DeleteActivityParams): DeleteActivityResult {
-  const sql = `
+	const sql = `
 	DELETE FROM activities
 	WHERE id = ?
-	
-	`;
-  return db.prepare(sql).run(params.id) as DeleteActivityResult;
+	`
+	return db.prepare(sql)
+		.run(params.id) as DeleteActivityResult;
 }

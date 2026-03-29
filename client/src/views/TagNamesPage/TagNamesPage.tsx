@@ -25,7 +25,7 @@ function TagNamesPage() {
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
   const toggleSort = () => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
-  const sortIndicator = <span style={{ fontSize: '0.7em' }}>{sortDir === 'asc' ? ' ▲' : ' ▼'}</span>;
+  const sortIndicator = <span style={{ fontSize: '0.7em', color: 'black' }}>{sortDir === 'asc' ? ' ▲' : ' ▼'}</span>;
 
   const { data: tagNames, refetch: refetchTagNames } = useTagNamesServiceTagNamesControllerFindAll(
     {

@@ -37,7 +37,9 @@ function AutoTagsPage() {
   };
 
   const sortIndicator = (col: 'title' | 'priority') =>
-    sortCol === col ? <span style={{ fontSize: '0.7em' }}>{sortDir === 'asc' ? ' ▲' : ' ▼'}</span> : null;
+    sortCol === col
+      ? <span style={{ fontSize: '0.7em', color: 'black' }}>{sortDir === 'asc' ? ' ▲' : ' ▼'}</span>
+      : <span style={{ fontSize: '0.7em', color: '#aaa' }}> ▲▼</span>;
   const { data: autoTagItems, refetch: refetchAutoTags } =
     useAutoTagsServiceAutoTagsControllerFindAll({
       term: '',

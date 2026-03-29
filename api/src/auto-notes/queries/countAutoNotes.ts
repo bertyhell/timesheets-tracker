@@ -1,24 +1,23 @@
 import type { Database } from 'bun:sqlite';
 
 export type CountAutoNotesResult = {
-	count: number;
-}
+  count: number;
+};
 
 export function countAutoNotes(db: Database): CountAutoNotesResult | null {
-	const sql = `
+  const sql = `
 	SELECT count(*) as count
 	FROM autoNotes
 	
-	`
-	const res = db.prepare(sql)
-		.values();
+	`;
+  const res = db.prepare(sql).values();
 
-	return res.length > 0 ? mapArrayToCountAutoNotesResult(res[0]) : null;
+  return res.length > 0 ? mapArrayToCountAutoNotesResult(res[0]) : null;
 }
 
 function mapArrayToCountAutoNotesResult(data: any) {
-	const result: CountAutoNotesResult = {
-		count: data[0]
-	}
-	return result;
+  const result: CountAutoNotesResult = {
+    count: data[0],
+  };
+  return result;
 }

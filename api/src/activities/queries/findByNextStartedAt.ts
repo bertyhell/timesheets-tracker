@@ -1,19 +1,22 @@
 import type { Database } from 'bun:sqlite';
 
 export type FindByNextStartedAtParams = {
-	param1: string;
-}
+  param1: string;
+};
 
 export type FindByNextStartedAtResult = {
-	id: string;
-	programName?: string;
-	windowTitle?: string;
-	startedAt: string;
-	endedAt: string;
-}
+  id: string;
+  programName?: string;
+  windowTitle?: string;
+  startedAt: string;
+  endedAt: string;
+};
 
-export function findByNextStartedAt(db: Database, params: FindByNextStartedAtParams): FindByNextStartedAtResult | null {
-	const sql = `
+export function findByNextStartedAt(
+  db: Database,
+  params: FindByNextStartedAtParams
+): FindByNextStartedAtResult | null {
+  const sql = `
 	SELECT id, programName, windowTitle, startedAt, endedAt
 	FROM activities
 	WHERE startedAt > $startedAt
@@ -21,20 +24,19 @@ export function findByNextStartedAt(db: Database, params: FindByNextStartedAtPar
 	limit 1
 	
 	
-	`
-	const res = db.prepare(sql)
-		.values(params.param1);
+	`;
+  const res = db.prepare(sql).values(params.param1);
 
-	return res.length > 0 ? mapArrayToFindByNextStartedAtResult(res[0]) : null;
+  return res.length > 0 ? mapArrayToFindByNextStartedAtResult(res[0]) : null;
 }
 
 function mapArrayToFindByNextStartedAtResult(data: any) {
-	const result: FindByNextStartedAtResult = {
-		id: data[0],
-		programName: data[1],
-		windowTitle: data[2],
-		startedAt: data[3],
-		endedAt: data[4]
-	}
-	return result;
+  const result: FindByNextStartedAtResult = {
+    id: data[0],
+    programName: data[1],
+    windowTitle: data[2],
+    startedAt: data[3],
+    endedAt: data[4],
+  };
+  return result;
 }

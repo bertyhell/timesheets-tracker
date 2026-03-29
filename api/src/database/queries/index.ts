@@ -1,1 +1,1 @@
-export * from "./create-database-tables.js";
+export * from './create-database-tables.js';

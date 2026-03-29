@@ -1,22 +1,26 @@
 import type { Database } from 'bun:sqlite';
 
 export type UpdateAutoTagData = {
-	param1: string;
-	param2: string;
-	param3: number;
-	param4: string;
-}
+  param1: string;
+  param2: string;
+  param3: number;
+  param4: string;
+};
 
 export type UpdateAutoTagParams = {
-	param1: string;
-}
+  param1: string;
+};
 
 export type UpdateAutoTagResult = {
-	changes: number;
-}
+  changes: number;
+};
 
-export function updateAutoTag(db: Database, data: UpdateAutoTagData, params: UpdateAutoTagParams): UpdateAutoTagResult {
-	const sql = `
+export function updateAutoTag(
+  db: Database,
+  data: UpdateAutoTagData,
+  params: UpdateAutoTagParams
+): UpdateAutoTagResult {
+  const sql = `
 	UPDATE autoTags
 	SET
 	    title = $title,
@@ -25,7 +29,8 @@ export function updateAutoTag(db: Database, data: UpdateAutoTagData, params: Upd
 	    conditions = $conditions
 	WHERE id = $id
 	
-	`
-	return db.prepare(sql)
-		.run(data.param1, data.param2, data.param3, data.param4, params.param1) as UpdateAutoTagResult;
+	`;
+  return db
+    .prepare(sql)
+    .run(data.param1, data.param2, data.param3, data.param4, params.param1) as UpdateAutoTagResult;
 }

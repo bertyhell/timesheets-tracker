@@ -9,6 +9,3 @@ SELECT
     tagNames.color as "tagName.color"
 FROM autoTags
 LEFT JOIN tagNames ON tagNames.id = autoTags.tagNameId
-
-
-

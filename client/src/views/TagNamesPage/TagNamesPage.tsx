@@ -52,45 +52,60 @@ function TagNamesPage() {
         Add tag name
       </button>
 
-      <ul>
-        {(tagNames || []).map(
-          (tagName): ReactNode => (
-            <li className="c-row" key={'tag-name-' + tagName.id}>
-              <span
-                className="block h-16 w-16 ml-2"
-                style={{ backgroundColor: tagName.color }}
-              ></span>
-              <span className="flex-grow">{tagName.title}</span>
-              <button
-                className="c-button"
-                onClick={() => {
-                  setSelectedTagName(tagName as unknown as TagName);
-                  navigate('/' + ROUTE_PARTS.tagNames + '/' + tagName.id + '/' + ROUTE_PARTS.edit);
-                }}
-              >
-                EDIT
-              </button>
-              <button
-                className="c-button"
-                onClick={async () => {
-                  if (tagName.id) {
-                    await deleteTagName({
-                      id: tagName.id,
-                    });
-                    await refetchTagNames();
-
-                    toast('Tag name has been deleted', { type: 'success' });
-                  } else {
-                    toast('Tag name could not be deleted, no id has been set', { type: 'warning' });
-                  }
-                }}
-              >
-                DELETE
-              </button>
-            </li>
-          )
-        )}
-      </ul>
+      <table className="w-full">
+        <thead>
+          <tr className="h-10 bg-white">
+            <th className="w-px"></th>
+            <th className="text-left pl-3">Title</th>
+            <th className="w-px whitespace-nowrap"></th>
+            <th className="w-px whitespace-nowrap"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {(tagNames || []).map(
+            (tagName): ReactNode => (
+              <tr key={'tag-name-' + tagName.id}>
+                <td className="w-px py-1 pl-2">
+                  <span
+                    className="block h-16 w-16"
+                    style={{ backgroundColor: tagName.color }}
+                  ></span>
+                </td>
+                <td className="pl-3">{tagName.title}</td>
+                <td className="w-px whitespace-nowrap">
+                  <button
+                    className="c-button"
+                    onClick={() => {
+                      setSelectedTagName(tagName as unknown as TagName);
+                      navigate('/' + ROUTE_PARTS.tagNames + '/' + tagName.id + '/' + ROUTE_PARTS.edit);
+                    }}
+                  >
+                    EDIT
+                  </button>
+                </td>
+                <td className="w-px whitespace-nowrap">
+                  <button
+                    className="c-button"
+                    onClick={async () => {
+                      if (tagName.id) {
+                        await deleteTagName({
+                          id: tagName.id,
+                        });
+                        await refetchTagNames();
+                        toast('Tag name has been deleted', { type: 'success' });
+                      } else {
+                        toast('Tag name could not be deleted, no id has been set', { type: 'warning' });
+                      }
+                    }}
+                  >
+                    DELETE
+                  </button>
+                </td>
+              </tr>
+            )
+          )}
+        </tbody>
+      </table>
 
       <Outlet />
     </div>

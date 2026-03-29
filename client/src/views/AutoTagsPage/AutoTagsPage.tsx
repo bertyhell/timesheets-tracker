@@ -88,45 +88,61 @@ function AutoTagsPage() {
         Copy autotags
       </button>
 
-      <ul>
-        {sortBy(autoTags || [], (autoTag) => autoTag.priority).map(
-          (autoTag): ReactNode => (
-            <li className="c-row" key={'auto-tag-' + autoTag.id}>
-              <span
-                className="w-16 h-16 ml-2"
-                style={{ backgroundColor: autoTag.tagName?.color }}
-              ></span>
-              <span className="flex-grow">
-                {autoTag.priority} {autoTag.title}{' '}
-              </span>
-              <NavLink
-                className="c-button"
-                to={'/' + ROUTE_PARTS.autoTagRules + '/' + autoTag.id + '/' + ROUTE_PARTS.edit}
-              >
-                EDIT
-              </NavLink>
-              <button
-                className="c-button"
-                onClick={async () => {
-                  if (autoTag.id) {
-                    await deleteAutoTag({
-                      id: autoTag.id,
-                    });
-                    await refetchAutoTags();
-                    toast('Auto tag has been deleted', { type: 'success' });
-                  } else {
-                    toast("Cannot delete an auto tag since it doesn't have an id", {
-                      type: 'error',
-                    });
-                  }
-                }}
-              >
-                DELETE
-              </button>
-            </li>
-          )
-        )}
-      </ul>
+      <table className="w-full">
+        <thead>
+          <tr className="h-10 bg-white">
+            <th className="w-px"></th>
+            <th className="text-left pl-3">Title</th>
+            <th className="text-left pl-3">Priority</th>
+            <th className="w-px whitespace-nowrap"></th>
+            <th className="w-px whitespace-nowrap"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {sortBy(autoTags || [], (autoTag) => autoTag.priority).map(
+            (autoTag): ReactNode => (
+              <tr key={'auto-tag-' + autoTag.id}>
+                <td className="w-px py-1 pl-2">
+                  <span
+                    className="block w-16 h-16"
+                    style={{ backgroundColor: autoTag.tagName?.color }}
+                  ></span>
+                </td>
+                <td className="pl-3">{autoTag.title}</td>
+                <td className="pl-3">{autoTag.priority}</td>
+                <td className="w-px whitespace-nowrap">
+                  <NavLink
+                    className="c-button"
+                    to={'/' + ROUTE_PARTS.autoTagRules + '/' + autoTag.id + '/' + ROUTE_PARTS.edit}
+                  >
+                    EDIT
+                  </NavLink>
+                </td>
+                <td className="w-px whitespace-nowrap">
+                  <button
+                    className="c-button"
+                    onClick={async () => {
+                      if (autoTag.id) {
+                        await deleteAutoTag({
+                          id: autoTag.id,
+                        });
+                        await refetchAutoTags();
+                        toast('Auto tag has been deleted', { type: 'success' });
+                      } else {
+                        toast("Cannot delete an auto tag since it doesn't have an id", {
+                          type: 'error',
+                        });
+                      }
+                    }}
+                  >
+                    DELETE
+                  </button>
+                </td>
+              </tr>
+            )
+          )}
+        </tbody>
+      </table>
 
       <Outlet />
     </div>

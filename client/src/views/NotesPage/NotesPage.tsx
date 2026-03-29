@@ -41,41 +41,53 @@ function NotesPage() {
         Add note
       </button>
 
-      <ul>
-        {(notes || []).map(
-          (note): ReactNode => (
-            <li className="c-row" key={'tag-name-' + note.id}>
-              <span className="flex-grow">{note.title}</span>
-              <button
-                className="c-button"
-                onClick={() => {
-                  setSelectedNote(note as unknown as AutoNote);
-                  navigate('/' + ROUTE_PARTS.notes + '/' + note.id + '/' + ROUTE_PARTS.edit);
-                }}
-              >
-                EDIT
-              </button>
-              <button
-                className="c-button"
-                onClick={async () => {
-                  if (note.id) {
-                    await deleteNote({
-                      id: note.id,
-                    });
-                    await refetchNotes();
-
-                    toast('Note has been deleted', { type: 'success' });
-                  } else {
-                    toast('Note could not be deleted, no id has been set', { type: 'warning' });
-                  }
-                }}
-              >
-                DELETE
-              </button>
-            </li>
-          )
-        )}
-      </ul>
+      <table className="w-full">
+        <thead>
+          <tr className="h-10 bg-white">
+            <th className="text-left pl-3">Title</th>
+            <th className="w-px whitespace-nowrap"></th>
+            <th className="w-px whitespace-nowrap"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {(notes || []).map(
+            (note): ReactNode => (
+              <tr key={'note-' + note.id}>
+                <td className="pl-3">{note.title}</td>
+                <td className="w-px whitespace-nowrap">
+                  <button
+                    className="c-button"
+                    onClick={() => {
+                      setSelectedNote(note as unknown as AutoNote);
+                      navigate('/' + ROUTE_PARTS.notes + '/' + note.id + '/' + ROUTE_PARTS.edit);
+                    }}
+                  >
+                    EDIT
+                  </button>
+                </td>
+                <td className="w-px whitespace-nowrap">
+                  <button
+                    className="c-button"
+                    onClick={async () => {
+                      if (note.id) {
+                        await deleteNote({
+                          id: note.id,
+                        });
+                        await refetchNotes();
+                        toast('Note has been deleted', { type: 'success' });
+                      } else {
+                        toast('Note could not be deleted, no id has been set', { type: 'warning' });
+                      }
+                    }}
+                  >
+                    DELETE
+                  </button>
+                </td>
+              </tr>
+            )
+          )}
+        </tbody>
+      </table>
 
       <Outlet />
     </div>

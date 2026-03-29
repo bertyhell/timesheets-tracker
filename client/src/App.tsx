@@ -27,7 +27,7 @@ function App() {
           <NavLink to={'/' + ROUTE_PARTS.timelines}>timeline</NavLink>
           <NavLink to={'/' + ROUTE_PARTS.autoTagRules}>auto tag rules</NavLink>
           <NavLink to={'/' + ROUTE_PARTS.tagNames}>tag names</NavLink>
-          <NavLink to={'/' + ROUTE_PARTS.notes}>notes</NavLink>
+          <NavLink to={'/' + ROUTE_PARTS.notes}>auto notes</NavLink>
         </div>
         {isTimelinesTab && <GlobalSearchBar />}
         {isTimelinesTab && <DateSelect />}

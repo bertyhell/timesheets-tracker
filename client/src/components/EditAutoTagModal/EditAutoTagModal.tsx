@@ -58,7 +58,7 @@ function EditAutoTagModal() {
 
   useEffect(() => {
     if (autoTag) {
-      setName(autoTag.name);
+      setName(autoTag.title);
       if (autoTag.tagName) {
         setSelectedTagName(autoTag.tagName);
       }
@@ -110,7 +110,7 @@ function EditAutoTagModal() {
     if (showCreateNewTagControls) {
       // create tag and get its id
       const createdTagName = await createTagName({
-        requestBody: { name: newTagName, color: COLOR_LIST[0] },
+        requestBody: { title: newTagName, color: COLOR_LIST[0] },
       });
       tagNameId = createdTagName.id as string;
     } else {
@@ -119,7 +119,7 @@ function EditAutoTagModal() {
 
     const updatedAutoTag: Omit<AutoTag, 'id'> & { id?: string } = {
       tagNameId,
-      name,
+      title: name,
       priority: autoTagsCount?.count || 0,
       conditions: conditions.filter((condition) => !!condition.value),
     };
@@ -163,7 +163,7 @@ function EditAutoTagModal() {
           onChange={(newTagName) => {
             setSelectedTagName(newTagName);
             if (!name) {
-              setName(newTagName?.name || '');
+              setName(newTagName?.title || '');
             }
           }}
           autoFocus={true}

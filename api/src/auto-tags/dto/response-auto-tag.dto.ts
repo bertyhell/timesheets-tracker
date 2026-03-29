@@ -80,7 +80,7 @@ export class AutoTagDto implements AutoTag {
     description: 'Name of the tagName',
     default: undefined,
   })
-  name: string;
+  title: string;
 
   @IsNumber()
   @Type(() => Number)

@@ -20,7 +20,7 @@ export class TagNameDto implements TagName {
     description: 'Name of the tag',
     default: undefined,
   })
-  name: string;
+  title: string;
 
   @IsString()
   @IsOptional()

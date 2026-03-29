@@ -32,7 +32,7 @@ function EditTagNameModal() {
 
   useEffect(() => {
     if (tagName) {
-      setName(tagName.name);
+      setName(tagName.title);
       setCode(tagName.code);
       setColor(tagName.color);
     }
@@ -47,7 +47,7 @@ function EditTagNameModal() {
       await updateTagName({
         id,
         requestBody: {
-          name: tagName.name,
+          title: tagName.title,
           code: tagName.code,
           color: tagName.color,
         },
@@ -59,7 +59,7 @@ function EditTagNameModal() {
     } else {
       await createTagName({
         requestBody: {
-          name: tagName.name,
+          title: tagName.title,
           code: tagName.code,
           color: tagName.color,
         },
@@ -107,7 +107,7 @@ function EditTagNameModal() {
           disabled={!name || !color}
           onClick={async () => {
             await handleSave({
-              name,
+              title: name,
               code,
               color,
             });

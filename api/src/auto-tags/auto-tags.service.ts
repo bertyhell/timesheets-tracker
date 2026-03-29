@@ -53,7 +53,7 @@ export class AutoTagsService {
     const id = uuid();
     await createAutoTag(db, {
       id,
-      title: autoTag.name,
+      title: autoTag.title,
       tagNameId: autoTag.tagNameId,
       priority: autoTag.priority,
       conditions: JSON.stringify(autoTag.conditions),
@@ -67,7 +67,7 @@ export class AutoTagsService {
     await updateAutoTag(
       db,
       {
-        title: updateAutoTagDto.name,
+        title: updateAutoTagDto.title,
         tagNameId: updateAutoTagDto.tagNameId,
         priority: updateAutoTagDto.priority,
         conditions: JSON.stringify(updateAutoTagDto.conditions),

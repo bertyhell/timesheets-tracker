@@ -26,7 +26,7 @@ function TagSelectMulti({ className, selectedValues, onChange }: TagSelectProps)
       }
       defaultOptions
       autoFocus={true}
-      formatOptionLabel={(option: TagName) => option.name}
+      formatOptionLabel={(option: TagName) => option.title}
       placeholder="Tag selection..."
       isClearable
       isMulti

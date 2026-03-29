@@ -16,7 +16,7 @@ export type AutoTagDto = {
   /**
    * Name of the tagName
    */
-  name?: string;
+  title?: string;
   /**
    * Priority order in which the auto tags are checked. 0 is checked first, 1 second, ...
    */

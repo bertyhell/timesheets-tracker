@@ -36,7 +36,7 @@ function AutoTagsPage() {
     await mapLimit(pastedAutoTags, 5, async (pastedAutoTag: AutoTag) => {
       return await insertAutoTag({
         requestBody: {
-          name: pastedAutoTag.name,
+          title: pastedAutoTag.title,
           priority: pastedAutoTag.priority,
           tagNameId: pastedAutoTag.tagNameId,
           conditions: pastedAutoTag.conditions as AutoTagConditionDto[],
@@ -97,7 +97,7 @@ function AutoTagsPage() {
                 style={{ backgroundColor: autoTag.tagName?.color }}
               ></span>
               <span className="flex-grow">
-                {autoTag.priority} {autoTag.name}{' '}
+                {autoTag.priority} {autoTag.title}{' '}
               </span>
               <NavLink
                 className="c-button"

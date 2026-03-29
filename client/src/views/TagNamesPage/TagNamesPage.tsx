@@ -60,7 +60,7 @@ function TagNamesPage() {
                 className="block h-16 w-16 ml-2"
                 style={{ backgroundColor: tagName.color }}
               ></span>
-              <span className="flex-grow">{tagName.name}</span>
+              <span className="flex-grow">{tagName.title}</span>
               <button
                 className="c-button"
                 onClick={() => {

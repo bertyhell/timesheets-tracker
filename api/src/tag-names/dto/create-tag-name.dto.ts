@@ -10,7 +10,7 @@ export class CreateTagNameDto {
     description: 'Name of the tag',
     default: undefined,
   })
-  name: string;
+  title: string;
 
   @IsString()
   @IsOptional()

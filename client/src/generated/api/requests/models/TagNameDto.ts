@@ -10,7 +10,7 @@ export type TagNameDto = {
   /**
    * Name of the tag
    */
-  name?: string;
+  title?: string;
   /**
    * Timesheet code for this tag (optional)
    */

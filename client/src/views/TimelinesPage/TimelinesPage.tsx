@@ -66,7 +66,7 @@ function TimelinesPage() {
     return {
       id: tag.id,
       info: {
-        name: tag.tagName?.name as string,
+        name: tag.tagName?.title as string,
       },
       color: tag.tagName?.color as string,
       startedAt: new Date(tag.startedAt),

@@ -19,7 +19,7 @@ export class TagNamesService {
   private adapt(rawTagName: Record<string, any>): TagName {
     return {
       id: rawTagName.id,
-      name: rawTagName.title,
+      title: rawTagName.title,
       code: rawTagName.code,
       color: rawTagName.color,
     };
@@ -56,7 +56,7 @@ export class TagNamesService {
     const id = uuid();
     await createTagName(db, {
       id,
-      title: tagName.name,
+      title: tagName.title,
       code: tagName.code,
       color: tagName.color,
     });
@@ -68,7 +68,7 @@ export class TagNamesService {
     const db = this.databaseService.getDb();
     await updateTagName(
       db,
-      { title: updateTagDto.name, code: updateTagDto.code, color: updateTagDto.color },
+      { title: updateTagDto.title, code: updateTagDto.code, color: updateTagDto.color },
       { id }
     );
 

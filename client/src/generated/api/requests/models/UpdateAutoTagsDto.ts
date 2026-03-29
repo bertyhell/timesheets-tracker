@@ -12,7 +12,7 @@ export type UpdateAutoTagsDto = {
   /**
    * Name of the tagName
    */
-  name?: string;
+  title?: string;
   /**
    * Priority order in which the auto tags are checked
    */

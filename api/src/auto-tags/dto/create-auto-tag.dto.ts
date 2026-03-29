@@ -21,7 +21,7 @@ export class CreateAutoTagDto {
     description: 'Name of the tagName',
     default: undefined,
   })
-  name: string;
+  title: string;
 
   @IsNumber()
   @Type(() => Number)

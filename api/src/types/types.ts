@@ -31,7 +31,7 @@ export interface Tag {
 
 export interface TagName {
   id: string;
-  name: string;
+  title: string;
   code: string;
   color: string;
 }
@@ -47,7 +47,7 @@ export interface AutoNote {
 
 export interface AutoTag {
   id: string;
-  name: string;
+  title: string;
   tagNameId: string;
   priority: number;
   conditions: AutoTagCondition[];

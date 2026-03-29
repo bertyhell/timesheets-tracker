@@ -22,7 +22,7 @@ function TagSelectSingle({ className, value, onChange, autoFocus }: TagSelectPro
         TagNamesService.tagNamesControllerFindAll(searchTerm) as Promise<TagName[]>
       }
       autoFocus={autoFocus ?? false}
-      formatOptionLabel={(option: TagName) => option.name}
+      formatOptionLabel={(option: TagName) => option.title}
       placeholder="Tag selection..."
       isClearable
       isMulti={false}

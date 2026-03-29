@@ -1,5 +1,5 @@
 import './AutoTagsPage.scss';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   useAutoTagsServiceAutoTagsControllerCreate,
   useAutoTagsServiceAutoTagsControllerDelete,
@@ -22,6 +22,7 @@ const AUTOTAGS_PROPERTY_NAME = 'timesheetTrackerAutoTags';
 
 function AutoTagsPage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [, setHeaderActions] = useAtom(headerActionsAtom);
   const { data: autoTagItems, refetch: refetchAutoTags } =
     useAutoTagsServiceAutoTagsControllerFindAll({
@@ -111,7 +112,7 @@ function AutoTagsPage() {
         <tbody>
           {sortBy(autoTags || [], (autoTag) => autoTag.priority).map(
             (autoTag): ReactNode => (
-              <tr key={'auto-tag-' + autoTag.id}>
+              <tr key={'auto-tag-' + autoTag.id} onClick={() => navigate('/' + ROUTE_PARTS.autoTagRules + '/' + autoTag.id + '/' + ROUTE_PARTS.edit)}>
                 <td className="w-px py-1 pl-2">
                   <span
                     className="block w-16 h-16"
@@ -124,6 +125,7 @@ function AutoTagsPage() {
                   <NavLink
                     className="c-button"
                     to={'/' + ROUTE_PARTS.autoTagRules + '/' + autoTag.id + '/' + ROUTE_PARTS.edit}
+                    onClick={(e) => e.stopPropagation()}
                   >
                     EDIT
                   </NavLink>
@@ -131,7 +133,8 @@ function AutoTagsPage() {
                 <td className="w-px whitespace-nowrap">
                   <button
                     className="c-button"
-                    onClick={async () => {
+                    onClick={async (e) => {
+                      e.stopPropagation();
                       if (autoTag.id) {
                         await deleteAutoTag({
                           id: autoTag.id,

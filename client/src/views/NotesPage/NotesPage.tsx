@@ -58,12 +58,13 @@ function NotesPage() {
         <tbody>
           {(notes || []).map(
             (note): ReactNode => (
-              <tr key={'note-' + note.id}>
+              <tr key={'note-' + note.id} onClick={() => navigate('/' + ROUTE_PARTS.notes + '/' + note.id + '/' + ROUTE_PARTS.edit)}>
                 <td className="pl-3">{note.title}</td>
                 <td className="w-px whitespace-nowrap">
                   <button
                     className="c-button"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setSelectedNote(note as unknown as AutoNote);
                       navigate('/' + ROUTE_PARTS.notes + '/' + note.id + '/' + ROUTE_PARTS.edit);
                     }}
@@ -74,7 +75,8 @@ function NotesPage() {
                 <td className="w-px whitespace-nowrap">
                   <button
                     className="c-button"
-                    onClick={async () => {
+                    onClick={async (e) => {
+                      e.stopPropagation();
                       if (note.id) {
                         await deleteNote({
                           id: note.id,

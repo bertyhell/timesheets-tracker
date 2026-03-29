@@ -70,7 +70,7 @@ function TagNamesPage() {
         <tbody>
           {(tagNames || []).map(
             (tagName): ReactNode => (
-              <tr key={'tag-name-' + tagName.id}>
+              <tr key={'tag-name-' + tagName.id} onClick={() => navigate('/' + ROUTE_PARTS.tagNames + '/' + tagName.id + '/' + ROUTE_PARTS.edit)}>
                 <td className="w-px py-1 pl-2">
                   <span
                     className="block h-16 w-16"
@@ -81,7 +81,8 @@ function TagNamesPage() {
                 <td className="w-px whitespace-nowrap">
                   <button
                     className="c-button"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setSelectedTagName(tagName as unknown as TagName);
                       navigate('/' + ROUTE_PARTS.tagNames + '/' + tagName.id + '/' + ROUTE_PARTS.edit);
                     }}
@@ -92,7 +93,8 @@ function TagNamesPage() {
                 <td className="w-px whitespace-nowrap">
                   <button
                     className="c-button"
-                    onClick={async () => {
+                    onClick={async (e) => {
+                      e.stopPropagation();
                       if (tagName.id) {
                         await deleteTagName({
                           id: tagName.id,

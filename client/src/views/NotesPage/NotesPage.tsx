@@ -11,6 +11,7 @@ import {
 import type { AutoNote } from '../../types/types';
 import { useAtom } from 'jotai/index';
 import { headerActionsAtom } from '../../store/store';
+import { orderBy } from 'lodash-es';
 
 // interface NotesPageProps {}
 
@@ -20,6 +21,10 @@ function NotesPage() {
   const id = params.id;
   const [_selectedNote, setSelectedNote] = useState<AutoNote | null>(null);
   const [, setHeaderActions] = useAtom(headerActionsAtom);
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+
+  const toggleSort = () => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+  const sortIndicator = <span style={{ fontSize: '0.7em' }}>{sortDir === 'asc' ? ' ▲' : ' ▼'}</span>;
 
   const { data: notes, refetch: refetchNotes } = useAutoNotesServiceAutoNotesControllerFindAll({
     term: '',
@@ -50,13 +55,13 @@ function NotesPage() {
       <table className="w-full">
         <thead>
           <tr className="h-10 bg-white">
-            <th className="text-left pl-3">Title</th>
+            <th className="text-left pl-3 cursor-pointer select-none" onClick={toggleSort}>Title{sortIndicator}</th>
             <th className="w-px whitespace-nowrap"></th>
             <th className="w-px whitespace-nowrap"></th>
           </tr>
         </thead>
         <tbody>
-          {(notes || []).map(
+          {orderBy(notes || [], (n) => n.title?.toLowerCase(), sortDir).map(
             (note): ReactNode => (
               <tr key={'note-' + note.id} onClick={() => navigate('/' + ROUTE_PARTS.notes + '/' + note.id + '/' + ROUTE_PARTS.edit)}>
                 <td className="pl-3">{note.title}</td>

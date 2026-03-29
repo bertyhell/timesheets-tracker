@@ -10,6 +10,7 @@ import React, { type ReactNode, useEffect, useState } from 'react';
 import { ROUTE_PARTS } from '../../App';
 import { toast } from 'react-toastify';
 import { useAtom } from 'jotai/index';
+import { orderBy } from 'lodash-es';
 import { headerActionsAtom } from '../../store/store';
 
 // interface TagNamesPageProps {}
@@ -21,6 +22,10 @@ function TagNamesPage() {
   const id = params.id;
   const [_selectedTagName, setSelectedTagName] = useState<TagName | null>(null);
   const [, setHeaderActions] = useAtom(headerActionsAtom);
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+
+  const toggleSort = () => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+  const sortIndicator = <span style={{ fontSize: '0.7em' }}>{sortDir === 'asc' ? ' ▲' : ' ▼'}</span>;
 
   const { data: tagNames, refetch: refetchTagNames } = useTagNamesServiceTagNamesControllerFindAll(
     {
@@ -62,13 +67,13 @@ function TagNamesPage() {
         <thead>
           <tr className="h-10 bg-white">
             <th className="w-px"></th>
-            <th className="text-left pl-3">Title</th>
+            <th className="text-left pl-3 cursor-pointer select-none" onClick={toggleSort}>Title{sortIndicator}</th>
             <th className="w-px whitespace-nowrap"></th>
             <th className="w-px whitespace-nowrap"></th>
           </tr>
         </thead>
         <tbody>
-          {(tagNames || []).map(
+          {orderBy(tagNames || [], (t) => t.title?.toLowerCase(), sortDir).map(
             (tagName): ReactNode => (
               <tr key={'tag-name-' + tagName.id} onClick={() => navigate('/' + ROUTE_PARTS.tagNames + '/' + tagName.id + '/' + ROUTE_PARTS.edit)}>
                 <td className="w-px py-1 pl-2">

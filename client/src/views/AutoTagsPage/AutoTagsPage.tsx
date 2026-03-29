@@ -5,8 +5,8 @@ import {
   useAutoTagsServiceAutoTagsControllerDelete,
   useAutoTagsServiceAutoTagsControllerFindAll,
 } from '../../generated/api/queries';
-import React, { type ReactNode, useCallback, useEffect } from 'react';
-import { sortBy } from 'lodash-es';
+import React, { type ReactNode, useCallback, useEffect, useState } from 'react';
+import { orderBy } from 'lodash-es';
 import { ROUTE_PARTS } from '../../App';
 import { toast } from 'react-toastify';
 import { type AutoTag } from '../../types/types';
@@ -24,6 +24,20 @@ function AutoTagsPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const [, setHeaderActions] = useAtom(headerActionsAtom);
+  const [sortCol, setSortCol] = useState<'title' | 'priority'>('priority');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+
+  const toggleSort = (col: 'title' | 'priority') => {
+    if (sortCol === col) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortCol(col);
+      setSortDir('asc');
+    }
+  };
+
+  const sortIndicator = (col: 'title' | 'priority') =>
+    sortCol === col ? <span style={{ fontSize: '0.7em' }}>{sortDir === 'asc' ? ' ▲' : ' ▼'}</span> : null;
   const { data: autoTagItems, refetch: refetchAutoTags } =
     useAutoTagsServiceAutoTagsControllerFindAll({
       term: '',
@@ -103,14 +117,14 @@ function AutoTagsPage() {
         <thead>
           <tr className="h-10 bg-white">
             <th className="w-px"></th>
-            <th className="text-left pl-3">Title</th>
-            <th className="text-left pl-3">Priority</th>
+            <th className="text-left pl-3 cursor-pointer select-none" onClick={() => toggleSort('title')}>Title{sortIndicator('title')}</th>
+            <th className="text-left pl-3 cursor-pointer select-none" onClick={() => toggleSort('priority')}>Priority{sortIndicator('priority')}</th>
             <th className="w-px whitespace-nowrap"></th>
             <th className="w-px whitespace-nowrap"></th>
           </tr>
         </thead>
         <tbody>
-          {sortBy(autoTags || [], (autoTag) => autoTag.priority).map(
+          {orderBy(autoTags || [], (autoTag) => sortCol === 'title' ? autoTag.title?.toLowerCase() : autoTag.priority, sortDir).map(
             (autoTag): ReactNode => (
               <tr key={'auto-tag-' + autoTag.id} onClick={() => navigate('/' + ROUTE_PARTS.autoTagRules + '/' + autoTag.id + '/' + ROUTE_PARTS.edit)}>
                 <td className="w-px py-1 pl-2">

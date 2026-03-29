@@ -23,7 +23,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "bump": "npx bump-package-versions --part=patch --strategy=highest ./package.json ../package.json ../client/package.json",
-    "generate-database-types": "npx typesql compile"
+    "generate-database-types": "npx typesql compile",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.13",
@@ -43,6 +44,7 @@
     "nest-winston": "^1.10.2",
     "nested-objects-util": "^1.1.2",
     "node-startup-manager": "^0.1.3",
+    "patch-package": "^8.0.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "systray": "^1.0.5",

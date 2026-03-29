@@ -1,7 +1,7 @@
 import './App.scss';
 
 import React from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import DateSelect from './components/DateSelect/DateSelect';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -17,6 +17,9 @@ export enum ROUTE_PARTS {
 }
 
 function App() {
+  const location = useLocation();
+  const isTimelinesTab = location.pathname.startsWith('/' + ROUTE_PARTS.timelines);
+
   return (
     <div>
       <nav className="m-main-navigation">
@@ -26,8 +29,8 @@ function App() {
           <NavLink to={'/' + ROUTE_PARTS.tagNames}>tag names</NavLink>
           <NavLink to={'/' + ROUTE_PARTS.notes}>notes</NavLink>
         </div>
-        <GlobalSearchBar />
-        <DateSelect />
+        {isTimelinesTab && <GlobalSearchBar />}
+        {isTimelinesTab && <DateSelect />}
       </nav>
       <Outlet />
       <ToastContainer position={'bottom-left'} theme="dark" />

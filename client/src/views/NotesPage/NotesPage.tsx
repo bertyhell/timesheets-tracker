@@ -9,15 +9,17 @@ import {
   useAutoNotesServiceAutoNotesControllerRemove,
 } from '../../generated/api/queries';
 import type { AutoNote } from '../../types/types';
+import { useAtom } from 'jotai/index';
+import { headerActionsAtom } from '../../store/store';
 
 // interface NotesPageProps {}
 
 function NotesPage() {
   const navigate = useNavigate();
   const params = useParams();
-  // const action = params.action;
   const id = params.id;
   const [_selectedNote, setSelectedNote] = useState<AutoNote | null>(null);
+  const [, setHeaderActions] = useAtom(headerActionsAtom);
 
   const { data: notes, refetch: refetchNotes } = useAutoNotesServiceAutoNotesControllerFindAll({
     term: '',
@@ -26,21 +28,25 @@ function NotesPage() {
 
   useEffect(() => {
     if (notes) {
-      // Set autoTag from url id
       const noteFromUrl = (notes.find((note) => note.id === id) || null) as AutoNote | null;
       setSelectedNote(noteFromUrl);
     }
   }, [id, notes]);
 
-  return (
-    <div className="p-tag-names">
+  useEffect(() => {
+    setHeaderActions(
       <button
         className="c-button"
         onClick={() => navigate('/' + ROUTE_PARTS.notes + '/' + ROUTE_PARTS.create)}
       >
-        Add note
+        Add auto note
       </button>
+    );
+    return () => setHeaderActions(null);
+  }, [navigate]);
 
+  return (
+    <div className="p-tag-names">
       <table className="w-full">
         <thead>
           <tr className="h-10 bg-white">

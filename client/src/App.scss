@@ -4,6 +4,7 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  background-color: #ccc;
 
   .c-tabs {
     display: block;
@@ -37,4 +38,18 @@
   .c-date-select {
     flex-shrink: 1;
   }
+
+  .m-header-actions {
+    .c-button {
+      margin: 0;
+
+      + .c-button {
+        margin-left: 0.5rem;
+      }
+    }
+  }
+}
+
+.m-page-content {
+  padding-top: 1.5rem;
 }

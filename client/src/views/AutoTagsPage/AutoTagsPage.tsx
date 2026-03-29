@@ -13,6 +13,8 @@ import { type AutoTag } from '../../types/types';
 import copy from 'copy-to-clipboard';
 import { mapLimit } from 'blend-promise-utils';
 import { AutoTagConditionDto } from '../../generated/api/requests';
+import { useAtom } from 'jotai/index';
+import { headerActionsAtom } from '../../store/store';
 
 const AUTOTAGS_PROPERTY_NAME = 'timesheetTrackerAutoTags';
 
@@ -20,6 +22,7 @@ const AUTOTAGS_PROPERTY_NAME = 'timesheetTrackerAutoTags';
 
 function AutoTagsPage() {
   const location = useLocation();
+  const [, setHeaderActions] = useAtom(headerActionsAtom);
   const { data: autoTagItems, refetch: refetchAutoTags } =
     useAutoTagsServiceAutoTagsControllerFindAll({
       term: '',
@@ -79,15 +82,22 @@ function AutoTagsPage() {
     toast('Auto tag copied to clipboard', { type: 'success' });
   };
 
+  useEffect(() => {
+    setHeaderActions(
+      <>
+        <NavLink className="c-button" to={'/' + ROUTE_PARTS.autoTagRules + '/' + ROUTE_PARTS.create}>
+          Add auto tag
+        </NavLink>
+        <button className="c-button" onClick={copyAutoTagsToClipboard}>
+          Copy autotags
+        </button>
+      </>
+    );
+    return () => setHeaderActions(null);
+  }, [copyAutoTagsToClipboard]);
+
   return (
     <div>
-      <NavLink className="c-button" to={'/' + ROUTE_PARTS.autoTagRules + '/' + ROUTE_PARTS.create}>
-        Add auto tag
-      </NavLink>
-      <button className="c-button" onClick={copyAutoTagsToClipboard}>
-        Copy autotags
-      </button>
-
       <table className="w-full">
         <thead>
           <tr className="h-10 bg-white">

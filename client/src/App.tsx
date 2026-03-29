@@ -6,6 +6,8 @@ import DateSelect from './components/DateSelect/DateSelect';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import GlobalSearchBar from './components/GlobalSearchBar/GlobalSearchBar';
+import { useAtom } from 'jotai/index';
+import { headerActionsAtom } from './store/store';
 
 export enum ROUTE_PARTS {
   timelines = 'timelines',
@@ -19,6 +21,7 @@ export enum ROUTE_PARTS {
 function App() {
   const location = useLocation();
   const isTimelinesTab = location.pathname.startsWith('/' + ROUTE_PARTS.timelines);
+  const [headerActions] = useAtom(headerActionsAtom);
 
   return (
     <div>
@@ -29,10 +32,13 @@ function App() {
           <NavLink to={'/' + ROUTE_PARTS.tagNames}>tag names</NavLink>
           <NavLink to={'/' + ROUTE_PARTS.notes}>auto notes</NavLink>
         </div>
+        {headerActions && <div className="m-header-actions" style={{ marginLeft: 'auto' }}>{headerActions}</div>}
         {isTimelinesTab && <GlobalSearchBar />}
         {isTimelinesTab && <DateSelect />}
       </nav>
-      <Outlet />
+      <div className={isTimelinesTab ? undefined : 'm-page-content'}>
+        <Outlet />
+      </div>
       <ToastContainer position={'bottom-left'} theme="dark" />
     </div>
   );

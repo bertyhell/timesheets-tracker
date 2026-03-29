@@ -9,6 +9,8 @@ import {
 import React, { type ReactNode, useEffect, useState } from 'react';
 import { ROUTE_PARTS } from '../../App';
 import { toast } from 'react-toastify';
+import { useAtom } from 'jotai/index';
+import { headerActionsAtom } from '../../store/store';
 
 // interface TagNamesPageProps {}
 
@@ -16,9 +18,9 @@ function TagNamesPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const params = useParams();
-  // const action = params.action;
   const id = params.id;
   const [_selectedTagName, setSelectedTagName] = useState<TagName | null>(null);
+  const [, setHeaderActions] = useAtom(headerActionsAtom);
 
   const { data: tagNames, refetch: refetchTagNames } = useTagNamesServiceTagNamesControllerFindAll(
     {
@@ -36,22 +38,26 @@ function TagNamesPage() {
 
   useEffect(() => {
     if (tagNames) {
-      // Set autoTag from url id
       const tagNameFromUrl = (tagNames.find((tagName) => tagName.id === id) ||
         null) as TagName | null;
       setSelectedTagName(tagNameFromUrl);
     }
   }, [id, tagNames]);
 
-  return (
-    <div className="p-tag-names">
+  useEffect(() => {
+    setHeaderActions(
       <button
         className="c-button"
         onClick={() => navigate('/' + ROUTE_PARTS.tagNames + '/' + ROUTE_PARTS.create)}
       >
         Add tag name
       </button>
+    );
+    return () => setHeaderActions(null);
+  }, [navigate]);
 
+  return (
+    <div className="p-tag-names">
       <table className="w-full">
         <thead>
           <tr className="h-10 bg-white">

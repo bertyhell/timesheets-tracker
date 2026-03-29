@@ -1,0 +1,15 @@
+INSERT OR IGNORE INTO tagNames ("id", "title", "code", "color") VALUES ('cbd05d45-ff73-4772-ac9b-be79c2f739ef', 'hermes', 'hermes', '#2083CC');
+INSERT OR IGNORE INTO tagNames ("id", "title", "code", "color") VALUES ('cef75a43-3032-48c3-807d-09db9c890200', 'redactietool', 'redactietool', '#4C3442');
+INSERT OR IGNORE INTO tagNames ("id", "title", "code", "color") VALUES ('3a6267ac-4548-4ec2-baee-d6bae46fec81', 'reporting', 'reporting', '#BEA42E');
+INSERT OR IGNORE INTO tagNames ("id", "title", "code", "color") VALUES ('a4be4b32-62b8-4c55-a51c-54661a8ef45b', 'crunch', 'crunch', '#87692F');
+INSERT OR IGNORE INTO tagNames ("id", "title", "code", "color") VALUES ('a26524b2-0a34-48fb-b033-7b7aa9399906', 'avo-server-side-rendering', 'avo-server-side-rendering', '#249983');
+INSERT OR IGNORE INTO tagNames ("id", "title", "code", "color") VALUES ('ffe2aa10-27e6-4ee6-b6f8-5af3b9caec94', 'wg-knowledge', 'wg-knowledge', '#249A83');
+INSERT OR IGNORE INTO tagNames ("id", "title", "code", "color") VALUES ('c0d505f4-fa80-4545-b9fe-92e7b786a064', 'tiberghien', 'tiberghien', '#1932B4');
+INSERT OR IGNORE INTO tagNames ("id", "title", "code", "color") VALUES ('7643bfa7-cfa4-4229-ba44-15e66a3bd559', 'shd-intern', 'shd-intern', '#1831B2');
+INSERT OR IGNORE INTO tagNames ("id", "title", "code", "color") VALUES ('7d627efc-1bbe-4ade-9ce6-316ba13cd323', 'avo-support', 'avo-support', '#803481');
+INSERT OR IGNORE INTO tagNames ("id", "title", "code", "color") VALUES ('210832a9-534c-4d8d-be30-2563a1702f49', 'meemoo-presales', 'meemoo-presales', '#67C85D');
+INSERT OR IGNORE INTO tagNames ("id", "title", "code", "color") VALUES ('60b34969-6cfb-4a2c-8ba1-53f346be8a81', 'lifecyclemanagement-avo-hetarchief', 'lifecyclemanagement-avo-hetarchief', '#1932B4');
+INSERT OR IGNORE INTO tagNames ("id", "title", "code", "color") VALUES ('2c27536a-29ac-4797-bc74-0419346071c0', 'pom-economische-kaart', 'pom-economische-kaart', '#259A84');
+INSERT OR IGNORE INTO tagNames ("id", "title", "code", "color") VALUES ('1cff1166-81cc-4521-ac1a-2d45ae765b90', 'prive', 'prive', '#249983');
+INSERT OR IGNORE INTO tagNames ("id", "title", "code", "color") VALUES ('106f3546-9c65-4047-822c-47bac3be407c', 'tia-sync', 'tia-sync', '#173BAE');
+INSERT OR IGNORE INTO tagNames ("id", "title", "code", "color") VALUES ('adb62390-1faa-4730-853e-0385112bdb85', 'hermes cluster 234', 'hermes-cluster-234', '#249882');

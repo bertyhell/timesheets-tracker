@@ -5,5 +5,5 @@
   "includeCrudTables": [],
   "ignoreFiles": ["./src/seed/**", "./src/database/queries/create-database-tables.sql"],
   "generateIndexFiles": false,
-  "lineEndings": "\n"
+  "endOfLine": "LF"
 }

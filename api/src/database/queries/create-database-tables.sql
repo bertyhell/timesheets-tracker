@@ -57,6 +57,15 @@ CREATE TABLE IF NOT EXISTS autoTags
 );
 
 
+CREATE TABLE IF NOT EXISTS calendars
+(
+    "id"    text NOT NULL PRIMARY KEY,
+    "title" text NOT NULL,
+    "url"   text NOT NULL,
+    "color" text NOT NULL
+);
+
+
 CREATE TABLE IF NOT EXISTS autoNotes
 (
     "id"                        text NOT NULL PRIMARY KEY,

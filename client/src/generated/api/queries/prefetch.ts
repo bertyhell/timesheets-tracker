@@ -1,7 +1,7 @@
 // generated with @7nohe/openapi-react-query-codegen@1.3.0 
 
 import { type QueryClient } from "@tanstack/react-query";
-import { ActiveStatesService, ActivitiesService, AutoNotesService, AutoTagsService, StatusService, TagNamesService, TagsService, WebsitesService } from "../requests/services.gen";
+import { ActiveStatesService, ActivitiesService, AutoNotesService, AutoTagsService, CalendarsService, StatusService, TagNamesService, TagsService, WebsitesService } from "../requests/services.gen";
 import * as Common from "./common";
 /**
 * @returns unknown
@@ -157,3 +157,30 @@ export const prefetchUseAutoNotesServiceAutoNotesControllerCount = (queryClient:
 export const prefetchUseAutoNotesServiceAutoNotesControllerFindOne = (queryClient: QueryClient, { id }: {
   id: string;
 }) => queryClient.prefetchQuery({ queryKey: [Common.useAutoNotesServiceAutoNotesControllerFindOneKey, [{ id }]], queryFn: () => AutoNotesService.autoNotesControllerFindOne({ id }) });
+/**
+* @returns CalendarDto Get a list of all calendars
+* @throws ApiError
+*/
+export const prefetchUseCalendarsServiceCalendarsControllerFindAll = (queryClient: QueryClient) => queryClient.prefetchQuery({ queryKey: [Common.useCalendarsServiceCalendarsControllerFindAllKey, []], queryFn: () => CalendarsService.calendarsControllerFindAll() });
+/**
+* @param data The data for the request.
+* @param data.id
+* @returns CalendarDto Return a single calendar by id
+* @throws ApiError
+*/
+export const prefetchUseCalendarsServiceCalendarsControllerFindOne = (queryClient: QueryClient, { id }: {
+  id: string;
+}) => queryClient.prefetchQuery({ queryKey: [Common.useCalendarsServiceCalendarsControllerFindOneKey, [{ id }]], queryFn: () => CalendarsService.calendarsControllerFindOne({ id }) });
+/**
+* @param data The data for the request.
+* @param data.id
+* @param data.start Start timestamp in ISO format
+* @param data.end End timestamp in ISO format
+* @returns unknown Get events from a calendar for a given time range
+* @throws ApiError
+*/
+export const prefetchUseCalendarsServiceCalendarsControllerParseEvents = (queryClient: QueryClient, { end, id, start }: {
+  end: string;
+  id: string;
+  start: string;
+}) => queryClient.prefetchQuery({ queryKey: [Common.useCalendarsServiceCalendarsControllerParseEventsKey, [{ end, id, start }]], queryFn: () => CalendarsService.calendarsControllerParseEvents({ end, id, start }) });

@@ -14,6 +14,7 @@ export enum ROUTE_PARTS {
   autoTagRules = 'auto-tag-rules',
   tagNames = 'tag-names',
   notes = 'notes',
+  calendars = 'calendars',
   create = 'create',
   edit = 'edit',
 }
@@ -31,6 +32,7 @@ function App() {
           <NavLink to={'/' + ROUTE_PARTS.autoTagRules}>auto tag rules</NavLink>
           <NavLink to={'/' + ROUTE_PARTS.tagNames}>tag names</NavLink>
           <NavLink to={'/' + ROUTE_PARTS.notes}>auto notes</NavLink>
+          <NavLink to={'/' + ROUTE_PARTS.calendars}>calendars</NavLink>
         </div>
         {headerActions && <div className="m-header-actions" style={{ marginLeft: 'auto' }}>{headerActions}</div>}
         {isTimelinesTab && <GlobalSearchBar />}

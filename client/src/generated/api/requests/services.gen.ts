@@ -3,7 +3,7 @@
 import type { CancelablePromise } from './core/CancelablePromise';
 import { OpenAPI } from './core/OpenAPI';
 import { request as __request } from './core/request';
-import type { AppControllerStatusResponse, ActivitiesControllerCreateResponse, ActivitiesControllerFindAllData, ActivitiesControllerFindAllResponse, ActivitiesControllerDeleteData, ActivitiesControllerDeleteResponse, ActivitiesControllerFindOneData, ActivitiesControllerFindOneResponse, ActiveStatesControllerCreateResponse, ActiveStatesControllerFindAllData, ActiveStatesControllerFindAllResponse, ActiveStatesControllerDeleteData, ActiveStatesControllerDeleteResponse, ActiveStatesControllerFindOneData, ActiveStatesControllerFindOneResponse, TagsControllerCreateData, TagsControllerCreateResponse, TagsControllerFindAllData, TagsControllerFindAllResponse, TagsControllerFindOneData, TagsControllerFindOneResponse, TagsControllerUpdateData, TagsControllerUpdateResponse, TagsControllerRemoveData, TagsControllerRemoveResponse, TagNamesControllerCreateData, TagNamesControllerCreateResponse, TagNamesControllerFindAllData, TagNamesControllerFindAllResponse, TagNamesControllerCountResponse, TagNamesControllerFindOneData, TagNamesControllerFindOneResponse, TagNamesControllerUpdateData, TagNamesControllerUpdateResponse, TagNamesControllerRemoveData, TagNamesControllerRemoveResponse, AutoTagsControllerCreateData, AutoTagsControllerCreateResponse, AutoTagsControllerFindAllData, AutoTagsControllerFindAllResponse, AutoTagsControllerCountResponse, AutoTagsControllerFindOneData, AutoTagsControllerFindOneResponse, AutoTagsControllerUpdateData, AutoTagsControllerUpdateResponse, AutoTagsControllerDeleteData, AutoTagsControllerDeleteResponse, WebsitesControllerCreateData, WebsitesControllerCreateResponse, WebsitesControllerFindAllData, WebsitesControllerFindAllResponse, WebsitesControllerDeleteData, WebsitesControllerDeleteResponse, WebsitesControllerFindOneData, WebsitesControllerFindOneResponse, AutoNotesControllerCreateData, AutoNotesControllerCreateResponse, AutoNotesControllerFindAllData, AutoNotesControllerFindAllResponse, AutoNotesControllerCountResponse, AutoNotesControllerFindOneData, AutoNotesControllerFindOneResponse, AutoNotesControllerUpdateData, AutoNotesControllerUpdateResponse, AutoNotesControllerRemoveData, AutoNotesControllerRemoveResponse } from './types.gen';
+import type { AppControllerStatusResponse, ActivitiesControllerCreateResponse, ActivitiesControllerFindAllData, ActivitiesControllerFindAllResponse, ActivitiesControllerDeleteData, ActivitiesControllerDeleteResponse, ActivitiesControllerFindOneData, ActivitiesControllerFindOneResponse, ActiveStatesControllerCreateResponse, ActiveStatesControllerFindAllData, ActiveStatesControllerFindAllResponse, ActiveStatesControllerDeleteData, ActiveStatesControllerDeleteResponse, ActiveStatesControllerFindOneData, ActiveStatesControllerFindOneResponse, TagsControllerCreateData, TagsControllerCreateResponse, TagsControllerFindAllData, TagsControllerFindAllResponse, TagsControllerFindOneData, TagsControllerFindOneResponse, TagsControllerUpdateData, TagsControllerUpdateResponse, TagsControllerRemoveData, TagsControllerRemoveResponse, TagNamesControllerCreateData, TagNamesControllerCreateResponse, TagNamesControllerFindAllData, TagNamesControllerFindAllResponse, TagNamesControllerCountResponse, TagNamesControllerFindOneData, TagNamesControllerFindOneResponse, TagNamesControllerUpdateData, TagNamesControllerUpdateResponse, TagNamesControllerRemoveData, TagNamesControllerRemoveResponse, AutoTagsControllerCreateData, AutoTagsControllerCreateResponse, AutoTagsControllerFindAllData, AutoTagsControllerFindAllResponse, AutoTagsControllerCountResponse, AutoTagsControllerFindOneData, AutoTagsControllerFindOneResponse, AutoTagsControllerUpdateData, AutoTagsControllerUpdateResponse, AutoTagsControllerDeleteData, AutoTagsControllerDeleteResponse, WebsitesControllerCreateData, WebsitesControllerCreateResponse, WebsitesControllerFindAllData, WebsitesControllerFindAllResponse, WebsitesControllerDeleteData, WebsitesControllerDeleteResponse, WebsitesControllerFindOneData, WebsitesControllerFindOneResponse, AutoNotesControllerCreateData, AutoNotesControllerCreateResponse, AutoNotesControllerFindAllData, AutoNotesControllerFindAllResponse, AutoNotesControllerCountResponse, AutoNotesControllerFindOneData, AutoNotesControllerFindOneResponse, AutoNotesControllerUpdateData, AutoNotesControllerUpdateResponse, AutoNotesControllerRemoveData, AutoNotesControllerRemoveResponse, CalendarsControllerCreateData, CalendarsControllerCreateResponse, CalendarsControllerFindAllResponse, CalendarsControllerFindOneData, CalendarsControllerFindOneResponse, CalendarsControllerUpdateData, CalendarsControllerUpdateResponse, CalendarsControllerDeleteData, CalendarsControllerDeleteResponse, CalendarsControllerParseEventsData, CalendarsControllerParseEventsResponse } from './types.gen';
 
 export class StatusService {
     /**
@@ -492,6 +492,86 @@ export class WebsitesService {
         });
     }
     
+}
+
+export class CalendarsService {
+    /**
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @returns CalendarDto Create a calendar
+     * @throws ApiError
+     */
+    public static calendarsControllerCreate(data: CalendarsControllerCreateData): CancelablePromise<CalendarsControllerCreateResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/calendars',
+            body: data.requestBody,
+            mediaType: 'application/json'
+        });
+    }
+
+    /**
+     * @returns CalendarDto Get a list of all calendars
+     * @throws ApiError
+     */
+    public static calendarsControllerFindAll(): CancelablePromise<CalendarsControllerFindAllResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/calendars'
+        });
+    }
+
+    /**
+     * @param data The data for the request.
+     * @param data.id
+     * @returns CalendarDto Return a single calendar by id
+     * @throws ApiError
+     */
+    public static calendarsControllerFindOne(data: CalendarsControllerFindOneData): CancelablePromise<CalendarsControllerFindOneResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/calendars/{id}',
+            path: {
+                id: data.id
+            }
+        });
+    }
+
+    /**
+     * @param data The data for the request.
+     * @param data.id
+     * @param data.requestBody
+     * @returns CalendarDto Update a calendar by id
+     * @throws ApiError
+     */
+    public static calendarsControllerUpdate(data: CalendarsControllerUpdateData): CancelablePromise<CalendarsControllerUpdateResponse> {
+        return __request(OpenAPI, {
+            method: 'PATCH',
+            url: '/api/calendars/{id}',
+            path: {
+                id: data.id
+            },
+            body: data.requestBody,
+            mediaType: 'application/json'
+        });
+    }
+
+    /**
+     * @param data The data for the request.
+     * @param data.id
+     * @returns unknown
+     * @throws ApiError
+     */
+    public static calendarsControllerDelete(data: CalendarsControllerDeleteData): CancelablePromise<CalendarsControllerDeleteResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/calendars/{id}',
+            path: {
+                id: data.id
+            }
+        });
+    }
+
 }
 
 export class AutoNotesService {

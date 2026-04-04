@@ -287,6 +287,55 @@ export type UpdateAutoNoteDto = {
     extractRegexReplacement?: string;
 };
 
+export type CreateCalendarDto = {
+    /**
+     * Title of the calendar
+     */
+    title: string;
+    /**
+     * URL to the iCalendar (.ics) file
+     */
+    url: string;
+    /**
+     * Color used to display the calendar
+     */
+    color: string;
+};
+
+export type CalendarDto = {
+    /**
+     * Id of the calendar
+     */
+    id: string;
+    /**
+     * Title of the calendar
+     */
+    title: string;
+    /**
+     * URL to the iCalendar (.ics) file
+     */
+    url: string;
+    /**
+     * Color used to display the calendar
+     */
+    color: string;
+};
+
+export type UpdateCalendarDto = {
+    /**
+     * Title of the calendar
+     */
+    title?: string;
+    /**
+     * URL to the iCalendar (.ics) file
+     */
+    url?: string;
+    /**
+     * Color used to display the calendar
+     */
+    color?: string;
+};
+
 export type AppControllerStatusResponse = unknown;
 
 export type ActivitiesControllerCreateResponse = unknown;
@@ -486,6 +535,47 @@ export type AutoNotesControllerRemoveData = {
 };
 
 export type AutoNotesControllerRemoveResponse = unknown;
+
+export type CalendarsControllerCreateData = {
+    requestBody: CreateCalendarDto;
+};
+
+export type CalendarsControllerCreateResponse = CalendarDto;
+
+export type CalendarsControllerFindAllResponse = Array<CalendarDto>;
+
+export type CalendarsControllerFindOneData = {
+    id: string;
+};
+
+export type CalendarsControllerFindOneResponse = CalendarDto;
+
+export type CalendarsControllerUpdateData = {
+    id: string;
+    requestBody: UpdateCalendarDto;
+};
+
+export type CalendarsControllerUpdateResponse = CalendarDto;
+
+export type CalendarsControllerDeleteData = {
+    id: string;
+};
+
+export type CalendarsControllerDeleteResponse = unknown;
+
+export type CalendarsControllerParseEventsData = {
+    /**
+     * End timestamp in ISO format
+     */
+    end: string;
+    id: string;
+    /**
+     * Start timestamp in ISO format
+     */
+    start: string;
+};
+
+export type CalendarsControllerParseEventsResponse = unknown;
 
 export type $OpenApiTs = {
     '/api/status': {
@@ -843,6 +933,81 @@ export type $OpenApiTs = {
                 id: string;
             };
             res: {
+                200: unknown;
+            };
+        };
+    };
+    '/api/calendars': {
+        post: {
+            req: {
+                requestBody: CreateCalendarDto;
+            };
+            res: {
+                /**
+                 * Create a calendar
+                 */
+                200: CalendarDto;
+            };
+        };
+        get: {
+            res: {
+                /**
+                 * Get a list of all calendars
+                 */
+                200: Array<CalendarDto>;
+            };
+        };
+    };
+    '/api/calendars/{id}': {
+        get: {
+            req: {
+                id: string;
+            };
+            res: {
+                /**
+                 * Return a single calendar by id
+                 */
+                200: CalendarDto;
+            };
+        };
+        patch: {
+            req: {
+                id: string;
+                requestBody: UpdateCalendarDto;
+            };
+            res: {
+                /**
+                 * Update a calendar by id
+                 */
+                200: CalendarDto;
+            };
+        };
+        delete: {
+            req: {
+                id: string;
+            };
+            res: {
+                200: unknown;
+            };
+        };
+    };
+    '/api/calendars/{id}/events': {
+        get: {
+            req: {
+                /**
+                 * End timestamp in ISO format
+                 */
+                end: string;
+                id: string;
+                /**
+                 * Start timestamp in ISO format
+                 */
+                start: string;
+            };
+            res: {
+                /**
+                 * Get events from a calendar for a given time range
+                 */
                 200: unknown;
             };
         };

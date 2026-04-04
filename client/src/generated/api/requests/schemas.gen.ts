@@ -370,3 +370,63 @@ export const $UpdateAutoNoteDto = {
         }
     }
 } as const;
+
+export const $CreateCalendarDto = {
+    type: 'object',
+    properties: {
+        title: {
+            type: 'string',
+            description: 'Title of the calendar'
+        },
+        url: {
+            type: 'string',
+            description: 'URL to the iCalendar (.ics) file'
+        },
+        color: {
+            type: 'string',
+            description: 'Color used to display the calendar'
+        }
+    },
+    required: ['title', 'url', 'color']
+} as const;
+
+export const $CalendarDto = {
+    type: 'object',
+    properties: {
+        id: {
+            type: 'string',
+            description: 'Id of the calendar'
+        },
+        title: {
+            type: 'string',
+            description: 'Title of the calendar'
+        },
+        url: {
+            type: 'string',
+            description: 'URL to the iCalendar (.ics) file'
+        },
+        color: {
+            type: 'string',
+            description: 'Color used to display the calendar'
+        }
+    },
+    required: ['id', 'title', 'url', 'color']
+} as const;
+
+export const $UpdateCalendarDto = {
+    type: 'object',
+    properties: {
+        title: {
+            type: 'string',
+            description: 'Title of the calendar'
+        },
+        url: {
+            type: 'string',
+            description: 'URL to the iCalendar (.ics) file'
+        },
+        color: {
+            type: 'string',
+            description: 'Color used to display the calendar'
+        }
+    }
+} as const;

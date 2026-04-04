@@ -1,7 +1,7 @@
 // generated with @7nohe/openapi-react-query-codegen@1.3.0 
 
 import { UseQueryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { ActiveStatesService, ActivitiesService, AutoNotesService, AutoTagsService, StatusService, TagNamesService, TagsService, WebsitesService } from "../requests/services.gen";
+import { ActiveStatesService, ActivitiesService, AutoNotesService, AutoTagsService, CalendarsService, StatusService, TagNamesService, TagsService, WebsitesService } from "../requests/services.gen";
 import * as Common from "./common";
 /**
 * @returns unknown
@@ -157,3 +157,30 @@ export const useAutoNotesServiceAutoNotesControllerCountSuspense = <TData = Comm
 export const useAutoNotesServiceAutoNotesControllerFindOneSuspense = <TData = Common.AutoNotesServiceAutoNotesControllerFindOneDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>({ id }: {
   id: string;
 }, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useSuspenseQuery<TData, TError>({ queryKey: Common.UseAutoNotesServiceAutoNotesControllerFindOneKeyFn({ id }, queryKey), queryFn: () => AutoNotesService.autoNotesControllerFindOne({ id }) as TData, ...options });
+/**
+* @returns CalendarDto Get a list of all calendars
+* @throws ApiError
+*/
+export const useCalendarsServiceCalendarsControllerFindAllSuspense = <TData = Common.CalendarsServiceCalendarsControllerFindAllDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>(queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useSuspenseQuery<TData, TError>({ queryKey: Common.UseCalendarsServiceCalendarsControllerFindAllKeyFn(), queryFn: () => CalendarsService.calendarsControllerFindAll() as TData, ...options });
+/**
+* @param data The data for the request.
+* @param data.id
+* @returns CalendarDto Return a single calendar by id
+* @throws ApiError
+*/
+export const useCalendarsServiceCalendarsControllerFindOneSuspense = <TData = Common.CalendarsServiceCalendarsControllerFindOneDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>({ id }: {
+  id: string;
+}, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useSuspenseQuery<TData, TError>({ queryKey: Common.UseCalendarsServiceCalendarsControllerFindOneKeyFn({ id }, queryKey), queryFn: () => CalendarsService.calendarsControllerFindOne({ id }) as TData, ...options });
+/**
+* @param data The data for the request.
+* @param data.id
+* @param data.start Start timestamp in ISO format
+* @param data.end End timestamp in ISO format
+* @returns unknown Get events from a calendar for a given time range
+* @throws ApiError
+*/
+export const useCalendarsServiceCalendarsControllerParseEventsSuspense = <TData = Common.CalendarsServiceCalendarsControllerParseEventsDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>({ end, id, start }: {
+  end: string;
+  id: string;
+  start: string;
+}, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useSuspenseQuery<TData, TError>({ queryKey: Common.UseCalendarsServiceCalendarsControllerParseEventsKeyFn({ end, id, start }, queryKey), queryFn: () => CalendarsService.calendarsControllerParseEvents({ end, id, start }) as TData, ...options });

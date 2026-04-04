@@ -1,8 +1,8 @@
 // generated with @7nohe/openapi-react-query-codegen@1.3.0 
 
 import { UseMutationOptions, UseQueryOptions, useMutation, useQuery } from "@tanstack/react-query";
-import { ActiveStatesService, ActivitiesService, AutoNotesService, AutoTagsService, StatusService, TagNamesService, TagsService, WebsitesService } from "../requests/services.gen";
-import { CreateAutoNoteDto, CreateAutoTagDto, CreateTagDto, CreateTagNameDto, CreateWebsiteDto, UpdateAutoNoteDto, UpdateAutoTagsDto, UpdateTagDto, UpdateTagNameDto } from "../requests/types.gen";
+import { ActiveStatesService, ActivitiesService, AutoNotesService, AutoTagsService, CalendarsService, StatusService, TagNamesService, TagsService, WebsitesService } from "../requests/services.gen";
+import { CreateAutoNoteDto, CreateAutoTagDto, CreateCalendarDto, CreateTagDto, CreateTagNameDto, CreateWebsiteDto, UpdateAutoNoteDto, UpdateAutoTagsDto, UpdateCalendarDto, UpdateTagDto, UpdateTagNameDto } from "../requests/types.gen";
 import * as Common from "./common";
 /**
 * @returns unknown
@@ -159,6 +159,33 @@ export const useAutoNotesServiceAutoNotesControllerFindOne = <TData = Common.Aut
   id: string;
 }, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useQuery<TData, TError>({ queryKey: Common.UseAutoNotesServiceAutoNotesControllerFindOneKeyFn({ id }, queryKey), queryFn: () => AutoNotesService.autoNotesControllerFindOne({ id }) as TData, ...options });
 /**
+* @returns CalendarDto Get a list of all calendars
+* @throws ApiError
+*/
+export const useCalendarsServiceCalendarsControllerFindAll = <TData = Common.CalendarsServiceCalendarsControllerFindAllDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>(queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useQuery<TData, TError>({ queryKey: Common.UseCalendarsServiceCalendarsControllerFindAllKeyFn(), queryFn: () => CalendarsService.calendarsControllerFindAll() as TData, ...options });
+/**
+* @param data The data for the request.
+* @param data.id
+* @returns CalendarDto Return a single calendar by id
+* @throws ApiError
+*/
+export const useCalendarsServiceCalendarsControllerFindOne = <TData = Common.CalendarsServiceCalendarsControllerFindOneDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>({ id }: {
+  id: string;
+}, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useQuery<TData, TError>({ queryKey: Common.UseCalendarsServiceCalendarsControllerFindOneKeyFn({ id }, queryKey), queryFn: () => CalendarsService.calendarsControllerFindOne({ id }) as TData, ...options });
+/**
+* @param data The data for the request.
+* @param data.id
+* @param data.start Start timestamp in ISO format
+* @param data.end End timestamp in ISO format
+* @returns unknown Get events from a calendar for a given time range
+* @throws ApiError
+*/
+export const useCalendarsServiceCalendarsControllerParseEvents = <TData = Common.CalendarsServiceCalendarsControllerParseEventsDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>({ end, id, start }: {
+  end: string;
+  id: string;
+  start: string;
+}, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useQuery<TData, TError>({ queryKey: Common.UseCalendarsServiceCalendarsControllerParseEventsKeyFn({ end, id, start }, queryKey), queryFn: () => CalendarsService.calendarsControllerParseEvents({ end, id, start }) as TData, ...options });
+/**
 * @returns unknown
 * @throws ApiError
 */
@@ -225,6 +252,17 @@ export const useAutoNotesServiceAutoNotesControllerCreate = <TData = Common.Auto
 }, TContext>({ mutationFn: ({ requestBody }) => AutoNotesService.autoNotesControllerCreate({ requestBody }) as unknown as Promise<TData>, ...options });
 /**
 * @param data The data for the request.
+* @param data.requestBody
+* @returns CalendarDto Create a calendar
+* @throws ApiError
+*/
+export const useCalendarsServiceCalendarsControllerCreate = <TData = Common.CalendarsServiceCalendarsControllerCreateMutationResult, TError = unknown, TContext = unknown>(options?: Omit<UseMutationOptions<TData, TError, {
+  requestBody: CreateCalendarDto;
+}, TContext>, "mutationFn">) => useMutation<TData, TError, {
+  requestBody: CreateCalendarDto;
+}, TContext>({ mutationFn: ({ requestBody }) => CalendarsService.calendarsControllerCreate({ requestBody }) as unknown as Promise<TData>, ...options });
+/**
+* @param data The data for the request.
 * @param data.id
 * @param data.requestBody
 * @returns unknown
@@ -279,6 +317,20 @@ export const useAutoNotesServiceAutoNotesControllerUpdate = <TData = Common.Auto
   id: string;
   requestBody: UpdateAutoNoteDto;
 }, TContext>({ mutationFn: ({ id, requestBody }) => AutoNotesService.autoNotesControllerUpdate({ id, requestBody }) as unknown as Promise<TData>, ...options });
+/**
+* @param data The data for the request.
+* @param data.id
+* @param data.requestBody
+* @returns CalendarDto Update a calendar by id
+* @throws ApiError
+*/
+export const useCalendarsServiceCalendarsControllerUpdate = <TData = Common.CalendarsServiceCalendarsControllerUpdateMutationResult, TError = unknown, TContext = unknown>(options?: Omit<UseMutationOptions<TData, TError, {
+  id: string;
+  requestBody: UpdateCalendarDto;
+}, TContext>, "mutationFn">) => useMutation<TData, TError, {
+  id: string;
+  requestBody: UpdateCalendarDto;
+}, TContext>({ mutationFn: ({ id, requestBody }) => CalendarsService.calendarsControllerUpdate({ id, requestBody }) as unknown as Promise<TData>, ...options });
 /**
 * @param data The data for the request.
 * @param data.id
@@ -356,3 +408,14 @@ export const useAutoNotesServiceAutoNotesControllerRemove = <TData = Common.Auto
 }, TContext>, "mutationFn">) => useMutation<TData, TError, {
   id: string;
 }, TContext>({ mutationFn: ({ id }) => AutoNotesService.autoNotesControllerRemove({ id }) as unknown as Promise<TData>, ...options });
+/**
+* @param data The data for the request.
+* @param data.id
+* @returns unknown
+* @throws ApiError
+*/
+export const useCalendarsServiceCalendarsControllerDelete = <TData = Common.CalendarsServiceCalendarsControllerDeleteMutationResult, TError = unknown, TContext = unknown>(options?: Omit<UseMutationOptions<TData, TError, {
+  id: string;
+}, TContext>, "mutationFn">) => useMutation<TData, TError, {
+  id: string;
+}, TContext>({ mutationFn: ({ id }) => CalendarsService.calendarsControllerDelete({ id }) as unknown as Promise<TData>, ...options });

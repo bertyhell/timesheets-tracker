@@ -8,6 +8,8 @@ import React from 'react';
 import { redirect, type RouteObject } from 'react-router-dom';
 import NotesPage from './views/NotesPage/NotesPage';
 import EditAutoNoteModal from './components/EditNoteModal/EditAutoNoteModal';
+import CalendarsPage from './views/CalendarsPage/CalendarsPage';
+import EditCalendarModal from './components/EditCalendarModal/EditCalendarModal';
 
 export const routes: RouteObject[] = [
   {
@@ -61,6 +63,20 @@ export const routes: RouteObject[] = [
           {
             path: ':id/' + ROUTE_PARTS.edit,
             element: <EditAutoNoteModal />,
+          },
+        ],
+      },
+      {
+        path: ROUTE_PARTS.calendars,
+        element: <CalendarsPage />,
+        children: [
+          {
+            path: ROUTE_PARTS.create,
+            element: <EditCalendarModal />,
+          },
+          {
+            path: ':id/' + ROUTE_PARTS.edit,
+            element: <EditCalendarModal />,
           },
         ],
       },

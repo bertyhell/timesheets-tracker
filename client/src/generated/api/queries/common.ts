@@ -1,7 +1,7 @@
 // generated with @7nohe/openapi-react-query-codegen@1.3.0 
 
 import { UseQueryResult } from "@tanstack/react-query";
-import { ActiveStatesService, ActivitiesService, AutoNotesService, AutoTagsService, StatusService, TagNamesService, TagsService, WebsitesService } from "../requests/services.gen";
+import { ActiveStatesService, ActivitiesService, AutoNotesService, AutoTagsService, CalendarsService, StatusService, TagNamesService, TagsService, WebsitesService } from "../requests/services.gen";
 export type StatusServiceAppControllerStatusDefaultResponse = Awaited<ReturnType<typeof StatusService.appControllerStatus>>;
 export type StatusServiceAppControllerStatusQueryResult<TData = StatusServiceAppControllerStatusDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
 export const useStatusServiceAppControllerStatusKey = "StatusServiceAppControllerStatus";
@@ -106,6 +106,24 @@ export const useAutoNotesServiceAutoNotesControllerFindOneKey = "AutoNotesServic
 export const UseAutoNotesServiceAutoNotesControllerFindOneKeyFn = ({ id }: {
   id: string;
 }, queryKey?: Array<unknown>) => [useAutoNotesServiceAutoNotesControllerFindOneKey, ...(queryKey ?? [{ id }])];
+export type CalendarsServiceCalendarsControllerFindAllDefaultResponse = Awaited<ReturnType<typeof CalendarsService.calendarsControllerFindAll>>;
+export type CalendarsServiceCalendarsControllerFindAllQueryResult<TData = CalendarsServiceCalendarsControllerFindAllDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
+export const useCalendarsServiceCalendarsControllerFindAllKey = "CalendarsServiceCalendarsControllerFindAll";
+export const UseCalendarsServiceCalendarsControllerFindAllKeyFn = () => [useCalendarsServiceCalendarsControllerFindAllKey];
+export type CalendarsServiceCalendarsControllerFindOneDefaultResponse = Awaited<ReturnType<typeof CalendarsService.calendarsControllerFindOne>>;
+export type CalendarsServiceCalendarsControllerFindOneQueryResult<TData = CalendarsServiceCalendarsControllerFindOneDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
+export const useCalendarsServiceCalendarsControllerFindOneKey = "CalendarsServiceCalendarsControllerFindOne";
+export const UseCalendarsServiceCalendarsControllerFindOneKeyFn = ({ id }: {
+  id: string;
+}, queryKey?: Array<unknown>) => [useCalendarsServiceCalendarsControllerFindOneKey, ...(queryKey ?? [{ id }])];
+export type CalendarsServiceCalendarsControllerParseEventsDefaultResponse = Awaited<ReturnType<typeof CalendarsService.calendarsControllerParseEvents>>;
+export type CalendarsServiceCalendarsControllerParseEventsQueryResult<TData = CalendarsServiceCalendarsControllerParseEventsDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
+export const useCalendarsServiceCalendarsControllerParseEventsKey = "CalendarsServiceCalendarsControllerParseEvents";
+export const UseCalendarsServiceCalendarsControllerParseEventsKeyFn = ({ end, id, start }: {
+  end: string;
+  id: string;
+  start: string;
+}, queryKey?: Array<unknown>) => [useCalendarsServiceCalendarsControllerParseEventsKey, ...(queryKey ?? [{ end, id, start }])];
 export type ActivitiesServiceActivitiesControllerCreateMutationResult = Awaited<ReturnType<typeof ActivitiesService.activitiesControllerCreate>>;
 export type ActiveStatesServiceActiveStatesControllerCreateMutationResult = Awaited<ReturnType<typeof ActiveStatesService.activeStatesControllerCreate>>;
 export type TagsServiceTagsControllerCreateMutationResult = Awaited<ReturnType<typeof TagsService.tagsControllerCreate>>;
@@ -113,10 +131,12 @@ export type TagNamesServiceTagNamesControllerCreateMutationResult = Awaited<Retu
 export type AutoTagsServiceAutoTagsControllerCreateMutationResult = Awaited<ReturnType<typeof AutoTagsService.autoTagsControllerCreate>>;
 export type WebsitesServiceWebsitesControllerCreateMutationResult = Awaited<ReturnType<typeof WebsitesService.websitesControllerCreate>>;
 export type AutoNotesServiceAutoNotesControllerCreateMutationResult = Awaited<ReturnType<typeof AutoNotesService.autoNotesControllerCreate>>;
+export type CalendarsServiceCalendarsControllerCreateMutationResult = Awaited<ReturnType<typeof CalendarsService.calendarsControllerCreate>>;
 export type TagsServiceTagsControllerUpdateMutationResult = Awaited<ReturnType<typeof TagsService.tagsControllerUpdate>>;
 export type TagNamesServiceTagNamesControllerUpdateMutationResult = Awaited<ReturnType<typeof TagNamesService.tagNamesControllerUpdate>>;
 export type AutoTagsServiceAutoTagsControllerUpdateMutationResult = Awaited<ReturnType<typeof AutoTagsService.autoTagsControllerUpdate>>;
 export type AutoNotesServiceAutoNotesControllerUpdateMutationResult = Awaited<ReturnType<typeof AutoNotesService.autoNotesControllerUpdate>>;
+export type CalendarsServiceCalendarsControllerUpdateMutationResult = Awaited<ReturnType<typeof CalendarsService.calendarsControllerUpdate>>;
 export type ActivitiesServiceActivitiesControllerDeleteMutationResult = Awaited<ReturnType<typeof ActivitiesService.activitiesControllerDelete>>;
 export type ActiveStatesServiceActiveStatesControllerDeleteMutationResult = Awaited<ReturnType<typeof ActiveStatesService.activeStatesControllerDelete>>;
 export type TagsServiceTagsControllerRemoveMutationResult = Awaited<ReturnType<typeof TagsService.tagsControllerRemove>>;
@@ -124,3 +144,4 @@ export type TagNamesServiceTagNamesControllerRemoveMutationResult = Awaited<Retu
 export type AutoTagsServiceAutoTagsControllerDeleteMutationResult = Awaited<ReturnType<typeof AutoTagsService.autoTagsControllerDelete>>;
 export type WebsitesServiceWebsitesControllerDeleteMutationResult = Awaited<ReturnType<typeof WebsitesService.websitesControllerDelete>>;
 export type AutoNotesServiceAutoNotesControllerRemoveMutationResult = Awaited<ReturnType<typeof AutoNotesService.autoNotesControllerRemove>>;
+export type CalendarsServiceCalendarsControllerDeleteMutationResult = Awaited<ReturnType<typeof CalendarsService.calendarsControllerDelete>>;

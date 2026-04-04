@@ -14,6 +14,7 @@ import { resolve } from 'node:path';
 import fs from 'fs';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { logger } from './shared/logger';
+import { CalendarsModule } from './calendars/calendars.module';
 
 let clientDistFolder: string;
 if (fs.existsSync(resolve('./client/index.html'))) {
@@ -39,6 +40,7 @@ logger.info('client folder: ' + clientDistFolder);
     AutoTagsModule,
     WebsitesModule,
     AutoNotesModule,
+    CalendarsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

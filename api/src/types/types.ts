@@ -82,3 +82,10 @@ export enum ConditionOperator {
   matchesRegex = 'matchesRegex',
   doesNotMatchRegex = 'doesNotMatchRegex',
 }
+
+export interface Calendar {
+  id: string;
+  title: string;
+  url: string;
+  color: string;
+}

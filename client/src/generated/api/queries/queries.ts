@@ -180,11 +180,11 @@ export const useCalendarsServiceCalendarsControllerFindOne = <TData = Common.Cal
 * @returns unknown Get events from a calendar for a given time range
 * @throws ApiError
 */
-export const useCalendarsServiceCalendarsControllerParseEvents = <TData = Common.CalendarsServiceCalendarsControllerParseEventsDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>({ end, id, start }: {
+export const useCalendarsServiceCalendarsControllerGetEvents = <TData = Common.CalendarsServiceCalendarsControllerGetEventsDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>({ end, id, start }: {
   end: string;
   id: string;
   start: string;
-}, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useQuery<TData, TError>({ queryKey: Common.UseCalendarsServiceCalendarsControllerParseEventsKeyFn({ end, id, start }, queryKey), queryFn: () => CalendarsService.calendarsControllerParseEvents({ end, id, start }) as TData, ...options });
+}, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useQuery<TData, TError>({ queryKey: Common.UseCalendarsServiceCalendarsControllerGetEventsKeyFn({ end, id, start }, queryKey), queryFn: () => CalendarsService.calendarsControllerGetEvents({ end, id, start }) as TData, ...options });
 /**
 * @returns unknown
 * @throws ApiError

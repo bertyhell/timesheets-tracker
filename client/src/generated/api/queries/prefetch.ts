@@ -179,8 +179,8 @@ export const prefetchUseCalendarsServiceCalendarsControllerFindOne = (queryClien
 * @returns unknown Get events from a calendar for a given time range
 * @throws ApiError
 */
-export const prefetchUseCalendarsServiceCalendarsControllerParseEvents = (queryClient: QueryClient, { end, id, start }: {
+export const prefetchUseCalendarsServiceCalendarsControllerGetEvents = (queryClient: QueryClient, { end, id, start }: {
   end: string;
   id: string;
   start: string;
-}) => queryClient.prefetchQuery({ queryKey: [Common.useCalendarsServiceCalendarsControllerParseEventsKey, [{ end, id, start }]], queryFn: () => CalendarsService.calendarsControllerParseEvents({ end, id, start }) });
+}) => queryClient.prefetchQuery({ queryKey: [Common.useCalendarsServiceCalendarsControllerGetEventsKey, [{ end, id, start }]], queryFn: () => CalendarsService.calendarsControllerGetEvents({ end, id, start }) });

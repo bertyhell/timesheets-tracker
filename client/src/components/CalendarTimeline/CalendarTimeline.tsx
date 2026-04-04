@@ -1,14 +1,15 @@
 import React from 'react';
 import { endOfDay, startOfDay } from 'date-fns';
-import { useCalendarsServiceCalendarsControllerParseEvents } from '../../generated/api/queries';
+import { useAtom } from 'jotai/index';
+import { useCalendarsServiceCalendarsControllerGetEvents } from '../../generated/api/queries';
 import { type CalendarDto } from '../../generated/api/requests/types.gen';
 import { type TimelineEvent, TimelineType } from '../Timeline/Timeline.types';
 import Timeline from '../Timeline/Timeline';
 import type { TagName } from '../../types/types';
+import { viewDateAtom } from '../../store/store';
 
 interface CalendarTimelineProps {
   calendar: CalendarDto;
-  viewDate: Date;
   minTime: Date;
   maxTime: Date;
   onMouseDown: (posX: number) => void;
@@ -23,7 +24,6 @@ interface CalendarTimelineProps {
 
 function CalendarTimeline({
   calendar,
-  viewDate,
   minTime,
   maxTime,
   onMouseDown,
@@ -35,7 +35,9 @@ function CalendarTimeline({
   selectedEvent,
   setSelectedEvent,
 }: CalendarTimelineProps) {
-  const { data: rawEvents } = useCalendarsServiceCalendarsControllerParseEvents({
+  const [viewDate] = useAtom(viewDateAtom);
+
+  const { data: rawEvents } = useCalendarsServiceCalendarsControllerGetEvents({
     id: calendar.id,
     start: startOfDay(viewDate).toISOString(),
     end: endOfDay(viewDate).toISOString(),

@@ -70,7 +70,7 @@ export class CalendarsService {
     await deleteCalendar(db, { id });
   }
 
-  async parseEvents(id: string, start: string, end: string): Promise<CalendarEvent[]> {
+  async getEvents(id: string, start: string, end: string): Promise<CalendarEvent[]> {
     const calendar = await this.findOne(id);
     const icsString = (
       await fs.readFile('C:/Users/verheb4/Downloads/verhelstbert-gmail-calendar.ics', 'utf8')

@@ -563,7 +563,7 @@ export type CalendarsControllerDeleteData = {
 
 export type CalendarsControllerDeleteResponse = unknown;
 
-export type CalendarsControllerParseEventsData = {
+export type CalendarsControllerGetEventsData = {
     /**
      * End timestamp in ISO format
      */
@@ -575,7 +575,7 @@ export type CalendarsControllerParseEventsData = {
     start: string;
 };
 
-export type CalendarsControllerParseEventsResponse = unknown;
+export type CalendarsControllerGetEventsResponse = unknown;
 
 export type $OpenApiTs = {
     '/api/status': {

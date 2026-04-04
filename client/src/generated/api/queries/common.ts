@@ -116,14 +116,14 @@ export const useCalendarsServiceCalendarsControllerFindOneKey = "CalendarsServic
 export const UseCalendarsServiceCalendarsControllerFindOneKeyFn = ({ id }: {
   id: string;
 }, queryKey?: Array<unknown>) => [useCalendarsServiceCalendarsControllerFindOneKey, ...(queryKey ?? [{ id }])];
-export type CalendarsServiceCalendarsControllerParseEventsDefaultResponse = Awaited<ReturnType<typeof CalendarsService.calendarsControllerParseEvents>>;
-export type CalendarsServiceCalendarsControllerParseEventsQueryResult<TData = CalendarsServiceCalendarsControllerParseEventsDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
-export const useCalendarsServiceCalendarsControllerParseEventsKey = "CalendarsServiceCalendarsControllerParseEvents";
-export const UseCalendarsServiceCalendarsControllerParseEventsKeyFn = ({ end, id, start }: {
+export type CalendarsServiceCalendarsControllerGetEventsDefaultResponse = Awaited<ReturnType<typeof CalendarsService.calendarsControllerGetEvents>>;
+export type CalendarsServiceCalendarsControllerGetEventsQueryResult<TData = CalendarsServiceCalendarsControllerGetEventsDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
+export const useCalendarsServiceCalendarsControllerGetEventsKey = "CalendarsServiceCalendarsControllerGetEvents";
+export const UseCalendarsServiceCalendarsControllerGetEventsKeyFn = ({ end, id, start }: {
   end: string;
   id: string;
   start: string;
-}, queryKey?: Array<unknown>) => [useCalendarsServiceCalendarsControllerParseEventsKey, ...(queryKey ?? [{ end, id, start }])];
+}, queryKey?: Array<unknown>) => [useCalendarsServiceCalendarsControllerGetEventsKey, ...(queryKey ?? [{ end, id, start }])];
 export type ActivitiesServiceActivitiesControllerCreateMutationResult = Awaited<ReturnType<typeof ActivitiesService.activitiesControllerCreate>>;
 export type ActiveStatesServiceActiveStatesControllerCreateMutationResult = Awaited<ReturnType<typeof ActiveStatesService.activeStatesControllerCreate>>;
 export type TagsServiceTagsControllerCreateMutationResult = Awaited<ReturnType<typeof TagsService.tagsControllerCreate>>;

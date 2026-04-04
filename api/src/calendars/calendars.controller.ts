@@ -44,10 +44,7 @@ export class CalendarsController {
     type: CalendarDto,
   })
   @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateCalendarDto: UpdateCalendarDto
-  ): Promise<Calendar> {
+  update(@Param('id') id: string, @Body() updateCalendarDto: UpdateCalendarDto): Promise<Calendar> {
     return this.calendarsService.update(id, updateCalendarDto);
   }
 
@@ -75,11 +72,7 @@ export class CalendarsController {
     description: 'End timestamp in ISO format',
     example: '2026-04-30T23:59:59.999Z',
   })
-  parseEvents(
-    @Param('id') id: string,
-    @Query('start') start: string,
-    @Query('end') end: string
-  ) {
-    return this.calendarsService.parseEvents(id, start, end);
+  getEvents(@Param('id') id: string, @Query('start') start: string, @Query('end') end: string) {
+    return this.calendarsService.getEvents(id, start, end);
   }
 }

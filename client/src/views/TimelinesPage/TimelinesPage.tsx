@@ -31,8 +31,9 @@ import { useAtom } from 'jotai/index';
 import { viewDateAtom } from '../../store/store';
 import { stringToColorIndex } from '../../helpers/string-to-color-index';
 import EventsTable from '../../components/EventsTable/EventsTable';
-import CalendarTimeline from '../../components/CalendarTimeline/CalendarTimeline';
 import { type CalendarDto } from '../../generated/api/requests/types.gen';
+import { CalendarsService } from '../../generated/api/requests/services.gen';
+import { useQueries } from '@tanstack/react-query';
 
 function TimelinesPage() {
   const [viewDate] = useAtom(viewDateAtom);
@@ -56,6 +57,35 @@ function TimelinesPage() {
       endedAt: endOfDay(viewDate).toISOString(),
     });
   const { data: calendars } = useCalendarsServiceCalendarsControllerFindAll();
+  const calendarList = (calendars as CalendarDto[]) || [];
+
+  const calendarEventResults = useQueries({
+    queries: calendarList.map((calendar) => ({
+      queryKey: ['CalendarsControllerGetEvents', calendar.id, startOfDay(viewDate).toISOString(), endOfDay(viewDate).toISOString()],
+      queryFn: () => CalendarsService.calendarsControllerGetEvents({
+        id: calendar.id,
+        start: startOfDay(viewDate).toISOString(),
+        end: endOfDay(viewDate).toISOString(),
+      }),
+    })),
+  });
+
+  const getEventsForCalendar = (calendarId: string): TimelineEvent[] => {
+    const index = calendarList.findIndex((c) => c.id === calendarId);
+    const calendar = calendarList[index];
+    const rawEvents = (calendarEventResults[index]?.data as any[]) || [];
+    return rawEvents.map((event) => ({
+      id: event.id,
+      info: {
+        ...(event.summary ? { summary: event.summary } : {}),
+        ...(event.location ? { location: event.location } : {}),
+      },
+      color: calendar.color,
+      startedAt: event.allDay ? startOfDay(viewDate) : new Date(event.start),
+      endedAt: event.allDay ? endOfDay(viewDate) : new Date(event.end),
+      type: TimelineType.Calendar,
+    }));
+  };
 
   const { data: activeStates, isLoading: isLoadingActiveStates } =
     useActiveStatesServiceActiveStatesControllerFindAll({
@@ -360,11 +390,11 @@ function TimelinesPage() {
           selectedEvent={selectedEvent}
           setSelectedEvent={setSelectedEventAndTimeline}
         ></Timeline>
-        {((calendars as CalendarDto[]) || []).map((calendar) => (
-          <CalendarTimeline
+        {calendarList.map((calendar) => (
+          <Timeline
             key={'calendar-timeline-' + calendar.id}
-            calendar={calendar}
-            viewDate={viewDate}
+            name={calendar.title}
+            events={getEventsForCalendar(calendar.id)}
             minTime={minTime}
             maxTime={maxTime}
             onMouseDown={(posX: number) => handleMouseDown(TimelineType.Calendar, posX)}

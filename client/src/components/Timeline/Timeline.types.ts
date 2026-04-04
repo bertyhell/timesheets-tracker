@@ -4,6 +4,7 @@ export enum TimelineType {
   Tag = 'Tag',
   AutoTag = 'AutoTag',
   Active = 'Active',
+  Calendar = 'Calendar',
 }
 
 export interface TimelineEvent {

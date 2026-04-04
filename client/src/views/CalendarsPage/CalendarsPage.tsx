@@ -14,7 +14,7 @@ import { headerActionsAtom } from '../../store/store';
 function maskCalendarUrl(url: string): string {
   try {
     const { hostname } = new URL(url);
-    return hostname + '***';
+    return hostname + '/***';
   } catch {
     return '***';
   }

@@ -15,6 +15,7 @@ import {
   useActiveStatesServiceActiveStatesControllerFindAll,
   useActivitiesServiceActivitiesControllerFindAll,
   useAutoTagsServiceAutoTagsControllerFindAll,
+  useCalendarsServiceCalendarsControllerFindAll,
   useTagNamesServiceTagNamesControllerCount,
   useTagNamesServiceTagNamesControllerCreate,
   useTagsServiceTagsControllerCreate,
@@ -30,6 +31,8 @@ import { useAtom } from 'jotai/index';
 import { viewDateAtom } from '../../store/store';
 import { stringToColorIndex } from '../../helpers/string-to-color-index';
 import EventsTable from '../../components/EventsTable/EventsTable';
+import CalendarTimeline from '../../components/CalendarTimeline/CalendarTimeline';
+import { type CalendarDto } from '../../generated/api/requests/types.gen';
 
 function TimelinesPage() {
   const [viewDate] = useAtom(viewDateAtom);
@@ -52,6 +55,8 @@ function TimelinesPage() {
       startedAt: startOfDay(viewDate).toISOString(),
       endedAt: endOfDay(viewDate).toISOString(),
     });
+  const { data: calendars } = useCalendarsServiceCalendarsControllerFindAll();
+
   const { data: activeStates, isLoading: isLoadingActiveStates } =
     useActiveStatesServiceActiveStatesControllerFindAll({
       startedAt: startOfDay(viewDate).toISOString(),
@@ -355,6 +360,23 @@ function TimelinesPage() {
           selectedEvent={selectedEvent}
           setSelectedEvent={setSelectedEventAndTimeline}
         ></Timeline>
+        {((calendars as CalendarDto[]) || []).map((calendar) => (
+          <CalendarTimeline
+            key={'calendar-timeline-' + calendar.id}
+            calendar={calendar}
+            viewDate={viewDate}
+            minTime={minTime}
+            maxTime={maxTime}
+            onMouseDown={(posX: number) => handleMouseDown(TimelineType.Calendar, posX)}
+            onMouseMove={(posX: number) => handleMouseMove(TimelineType.Calendar, posX)}
+            onMouseUp={(posX: number) => handleMouseUp(TimelineType.Calendar, posX)}
+            selectionPercentages={activeSelectionTimeline === TimelineType.Calendar ? selection : null}
+            onCreateTagName={handleCreateTagName}
+            onCreateTag={handleCreateTag}
+            selectedEvent={selectedEvent}
+            setSelectedEvent={setSelectedEventAndTimeline}
+          />
+        ))}
       </div>
       <EventsTable events={timelineEvents[selectedTimeline]} />
     </div>

@@ -74,7 +74,17 @@ function EditCalendarModal() {
         onChange={(evt: ChangeEvent<HTMLInputElement>) => setTitle(evt.target.value)}
       />
 
-      <h4 className="mt-4">URL</h4>
+      <h4 className="mt-4 flex justify-between items-baseline">
+        URL to .ics file
+        <a
+          href="https://www.onecal.io/blog/how-to-get-an-ics-url-for-your-calendar"
+          target="_blank"
+          rel="noreferrer"
+          style={{ color: 'darkslategray', textDecoration: 'underline', fontSize: '0.8rem', fontWeight: 'normal' }}
+        >
+          (how do I get this url)
+        </a>
+      </h4>
       <input
         className="c-input"
         value={url}

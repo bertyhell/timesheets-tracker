@@ -119,11 +119,11 @@ export const UseCalendarsServiceCalendarsControllerFindOneKeyFn = ({ id }: {
 export type CalendarsServiceCalendarsControllerGetEventsDefaultResponse = Awaited<ReturnType<typeof CalendarsService.calendarsControllerGetEvents>>;
 export type CalendarsServiceCalendarsControllerGetEventsQueryResult<TData = CalendarsServiceCalendarsControllerGetEventsDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
 export const useCalendarsServiceCalendarsControllerGetEventsKey = "CalendarsServiceCalendarsControllerGetEvents";
-export const UseCalendarsServiceCalendarsControllerGetEventsKeyFn = ({ end, id, start }: {
-  end: string;
+export const UseCalendarsServiceCalendarsControllerGetEventsKeyFn = ({ endedAt, id, startedAt }: {
+  endedAt: string;
   id: string;
-  start: string;
-}, queryKey?: Array<unknown>) => [useCalendarsServiceCalendarsControllerGetEventsKey, ...(queryKey ?? [{ end, id, start }])];
+  startedAt: string;
+}, queryKey?: Array<unknown>) => [useCalendarsServiceCalendarsControllerGetEventsKey, ...(queryKey ?? [{ endedAt, id, startedAt }])];
 export type ActivitiesServiceActivitiesControllerCreateMutationResult = Awaited<ReturnType<typeof ActivitiesService.activitiesControllerCreate>>;
 export type ActiveStatesServiceActiveStatesControllerCreateMutationResult = Awaited<ReturnType<typeof ActiveStatesService.activeStatesControllerCreate>>;
 export type TagsServiceTagsControllerCreateMutationResult = Awaited<ReturnType<typeof TagsService.tagsControllerCreate>>;

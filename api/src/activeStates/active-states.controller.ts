@@ -1,10 +1,11 @@
 import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
-import { ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { endOfDay, startOfDay } from 'date-fns';
 
 import type { ActiveState } from '../types/types';
 
 import { ActiveStatesService } from './active-states.service';
+import { ResponseActiveStateDto } from './dto/response-active-state.dto';
 
 @ApiTags('active-states')
 @Controller('api/active-states')
@@ -16,6 +17,11 @@ export class ActiveStatesController {
     return this.activeStatesService.create(createActiveStateDto);
   }
 
+  @ApiOkResponse({
+    description: 'Get a list of all active states',
+    type: ResponseActiveStateDto,
+    isArray: true,
+  })
   @Get()
   @ApiQuery({
     type: 'string',

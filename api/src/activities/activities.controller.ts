@@ -1,8 +1,9 @@
 import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 import { ActivitiesService } from './activities.service';
 import type { Activity } from '../types/types';
-import { ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { endOfDay, startOfDay } from 'date-fns';
+import { ResponseActivityDto } from './dto/response-activity.dto';
 
 @ApiTags('activities')
 @Controller('api/activities')
@@ -14,6 +15,11 @@ export class ActivitiesController {
     return this.activitiesService.create(createActivityDto);
   }
 
+  @ApiOkResponse({
+    description: 'Get a list of all activities',
+    type: ResponseActivityDto,
+    isArray: true,
+  })
   @Get()
   @ApiQuery({
     type: 'string',

@@ -174,13 +174,13 @@ export const prefetchUseCalendarsServiceCalendarsControllerFindOne = (queryClien
 /**
 * @param data The data for the request.
 * @param data.id
-* @param data.start Start timestamp in ISO format
-* @param data.end End timestamp in ISO format
+* @param data.startedAt Start timestamp in ISO format
+* @param data.endedAt End timestamp in ISO format
 * @returns unknown Get events from a calendar for a given time range
 * @throws ApiError
 */
-export const prefetchUseCalendarsServiceCalendarsControllerGetEvents = (queryClient: QueryClient, { end, id, start }: {
-  end: string;
+export const prefetchUseCalendarsServiceCalendarsControllerGetEvents = (queryClient: QueryClient, { endedAt, id, startedAt }: {
+  endedAt: string;
   id: string;
-  start: string;
-}) => queryClient.prefetchQuery({ queryKey: [Common.useCalendarsServiceCalendarsControllerGetEventsKey, [{ end, id, start }]], queryFn: () => CalendarsService.calendarsControllerGetEvents({ end, id, start }) });
+  startedAt: string;
+}) => queryClient.prefetchQuery({ queryKey: [Common.useCalendarsServiceCalendarsControllerGetEventsKey, [{ endedAt, id, startedAt }]], queryFn: () => CalendarsService.calendarsControllerGetEvents({ endedAt, id, startedAt }) });

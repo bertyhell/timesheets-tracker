@@ -27,7 +27,7 @@ import type { ActiveState, Activity, AutoTag, Tag, TagName, Website } from '../.
 import { COLOR_LIST } from './TimelinesPage.consts';
 import { clamp, maxBy, minBy } from 'lodash-es';
 import { calculateAutoTagEvents } from '../../helpers/computeAutoTagEvents';
-import { useAtom } from 'jotai/index';
+import { useAtom } from 'jotai';
 import { viewDateAtom } from '../../store/store';
 import { stringToColorIndex } from '../../helpers/string-to-color-index';
 import EventsTable from '../../components/EventsTable/EventsTable';
@@ -61,12 +61,18 @@ function TimelinesPage() {
 
   const calendarEventResults = useQueries({
     queries: calendarList.map((calendar) => ({
-      queryKey: ['CalendarsControllerGetEvents', calendar.id, startOfDay(viewDate).toISOString(), endOfDay(viewDate).toISOString()],
-      queryFn: () => CalendarsService.calendarsControllerGetEvents({
-        id: calendar.id,
-        start: startOfDay(viewDate).toISOString(),
-        end: endOfDay(viewDate).toISOString(),
-      }),
+      queryKey: [
+        'CalendarsControllerGetEvents',
+        calendar.id,
+        startOfDay(viewDate).toISOString(),
+        endOfDay(viewDate).toISOString(),
+      ],
+      queryFn: () =>
+        CalendarsService.calendarsControllerGetEvents({
+          id: calendar.id,
+          startedAt: startOfDay(viewDate).toISOString(),
+          endedAt: endOfDay(viewDate).toISOString(),
+        }),
     })),
   });
 
@@ -74,17 +80,20 @@ function TimelinesPage() {
     const index = calendarList.findIndex((c) => c.id === calendarId);
     const calendar = calendarList[index];
     const rawEvents = (calendarEventResults[index]?.data as any[]) || [];
-    return rawEvents.map((event) => ({
-      id: event.id,
-      info: {
-        ...(event.summary ? { summary: event.summary } : {}),
-        ...(event.location ? { location: event.location } : {}),
-      },
-      color: calendar.color,
-      startedAt: event.allDay ? startOfDay(viewDate) : new Date(event.start),
-      endedAt: event.allDay ? endOfDay(viewDate) : new Date(event.end),
-      type: TimelineType.Calendar,
-    }));
+    const events = rawEvents.map((event) => {
+      return {
+        id: event.id,
+        info: {
+          ...(event.summary ? { summary: event.summary } : {}),
+          ...(event.location ? { location: event.location } : {}),
+        },
+        color: calendar.color,
+        startedAt: event.allDay ? startOfDay(viewDate) : new Date(event.start),
+        endedAt: event.allDay ? endOfDay(viewDate) : new Date(event.end),
+        type: TimelineType.Calendar,
+      };
+    });
+    return events;
   };
 
   const { data: activeStates, isLoading: isLoadingActiveStates } =
@@ -181,12 +190,16 @@ function TimelinesPage() {
     (windowInMilliseconds / 100) * (selectionEndPercent || 0)
   );
 
-  const timelineEvents: Record<TimelineType, TimelineEvent[]> = {
-    [TimelineType.Tag]: tagEvents,
-    [TimelineType.AutoTag]: autoTagEvents,
-    [TimelineType.Active]: activeStateEvents,
-    [TimelineType.Program]: programEvents,
-    [TimelineType.Website]: websiteEvents,
+  const timelineEvents: Record<TimelineType, (id?: string) => TimelineEvent[]> = {
+    [TimelineType.Tag]: () => tagEvents,
+    [TimelineType.AutoTag]: () => autoTagEvents,
+    [TimelineType.Active]: () => activeStateEvents,
+    [TimelineType.Program]: () => programEvents,
+    [TimelineType.Website]: () => websiteEvents,
+    [TimelineType.Calendar]: (calendarId: string) => {
+      const calendarIndex = calendarList.findIndex((calendar) => calendar.id === calendarId);
+      return calendarEventResults[calendarIndex].data;
+    },
   };
 
   useEffect(() => {
@@ -400,7 +413,9 @@ function TimelinesPage() {
             onMouseDown={(posX: number) => handleMouseDown(TimelineType.Calendar, posX)}
             onMouseMove={(posX: number) => handleMouseMove(TimelineType.Calendar, posX)}
             onMouseUp={(posX: number) => handleMouseUp(TimelineType.Calendar, posX)}
-            selectionPercentages={activeSelectionTimeline === TimelineType.Calendar ? selection : null}
+            selectionPercentages={
+              activeSelectionTimeline === TimelineType.Calendar ? selection : null
+            }
             onCreateTagName={handleCreateTagName}
             onCreateTag={handleCreateTag}
             selectedEvent={selectedEvent}

@@ -174,13 +174,13 @@ export const useCalendarsServiceCalendarsControllerFindOneSuspense = <TData = Co
 /**
 * @param data The data for the request.
 * @param data.id
-* @param data.start Start timestamp in ISO format
-* @param data.end End timestamp in ISO format
+* @param data.startedAt Start timestamp in ISO format
+* @param data.endedAt End timestamp in ISO format
 * @returns unknown Get events from a calendar for a given time range
 * @throws ApiError
 */
-export const useCalendarsServiceCalendarsControllerGetEventsSuspense = <TData = Common.CalendarsServiceCalendarsControllerGetEventsDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>({ end, id, start }: {
-  end: string;
+export const useCalendarsServiceCalendarsControllerGetEventsSuspense = <TData = Common.CalendarsServiceCalendarsControllerGetEventsDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>({ endedAt, id, startedAt }: {
+  endedAt: string;
   id: string;
-  start: string;
-}, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useSuspenseQuery<TData, TError>({ queryKey: Common.UseCalendarsServiceCalendarsControllerGetEventsKeyFn({ end, id, start }, queryKey), queryFn: () => CalendarsService.calendarsControllerGetEvents({ end, id, start }) as TData, ...options });
+  startedAt: string;
+}, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useSuspenseQuery<TData, TError>({ queryKey: Common.UseCalendarsServiceCalendarsControllerGetEventsKeyFn({ endedAt, id, startedAt }, queryKey), queryFn: () => CalendarsService.calendarsControllerGetEvents({ endedAt, id, startedAt }) as TData, ...options });

@@ -10,9 +10,10 @@ import {
 } from '@nestjs/common';
 import { WebsitesService } from './websites.service';
 import type { Website } from '../types/types';
-import { ApiBody, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { endOfDay, startOfDay } from 'date-fns';
 import { CreateWebsiteDto } from './dto/create-website.dto';
+import { ResponseWebsiteDto } from './dto/response-website.dto';
 import { ActivitiesService } from '../activities/activities.service';
 import { compact, uniqBy } from 'lodash';
 import { logger } from '../shared/logger';
@@ -40,6 +41,11 @@ export class WebsitesController {
     return this.websitesService.create(createWebsiteDto);
   }
 
+  @ApiOkResponse({
+    description: 'Get a list of all websites',
+    type: ResponseWebsiteDto,
+    isArray: true,
+  })
   @Get()
   @ApiQuery({
     type: 'string',

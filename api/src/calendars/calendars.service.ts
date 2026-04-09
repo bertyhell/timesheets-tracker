@@ -1,12 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 import * as ical from 'node-ical';
-import type { CalendarEvent } from './types';
-import type { Calendar } from '../types/types';
+import type { Calendar, CalendarEvent } from '../types/types';
 import fs from 'node:fs/promises';
 import { DatabaseService } from '../database/database.service';
 import { v4 as uuid } from 'uuid';
 import { CreateCalendarDto } from './dto/create-calendar.dto';
 import { UpdateCalendarDto } from './dto/update-calendar.dto';
+import { CalendarEventDto } from './dto/calendar-event.dto';
 import { findAllCalendars } from './queries/findAllCalendars';
 import { findOneCalendar } from './queries/findOneCalendar';
 import { createCalendar } from './queries/createCalendar';
@@ -70,7 +70,7 @@ export class CalendarsService {
     await deleteCalendar(db, { id });
   }
 
-  async getEvents(id: string, start: string, end: string): Promise<CalendarEvent[]> {
+  async getEvents(id: string, startedAt: string, endedAt: string): Promise<CalendarEventDto[]> {
     const calendar = await this.findOne(id);
     const icsString = (
       await fs.readFile('C:/Users/verheb4/Downloads/verhelstbert-gmail-calendar.ics', 'utf8')
@@ -87,17 +87,19 @@ export class CalendarsService {
       if (event.type !== 'VEVENT' || !event.start || !event.end) return false;
       const eventStart = new Date(event.start);
       const eventEnd = new Date(event.end);
-      return eventStart < new Date(end) && eventEnd > new Date(start);
+      return eventStart < new Date(endedAt) && eventEnd > new Date(startedAt);
     });
 
-    return filteredEvents.map((event) => ({
-      id: event.uid || '',
-      summary: event.summary || '',
-      description: event.description || '',
-      location: event.location || '',
-      start: event.start.toISOString(),
-      end: event.end.toISOString(),
-      allDay: event.dateOnly || false,
-    }));
+    return filteredEvents.map(
+      (event): CalendarEventDto => ({
+        id: event.uid || '',
+        summary: event.summary || '',
+        description: event.description || '',
+        location: event.location || '',
+        startedAt: event.start.toISOString(),
+        endedAt: event.end.toISOString(),
+        allDay: event.dateOnly || false,
+      })
+    );
   }
 }

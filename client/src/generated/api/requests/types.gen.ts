@@ -567,15 +567,23 @@ export type CalendarsControllerGetEventsData = {
     /**
      * End timestamp in ISO format
      */
-    end: string;
+    endedAt: string;
     id: string;
     /**
      * Start timestamp in ISO format
      */
-    start: string;
+    startedAt: string;
 };
 
-export type CalendarsControllerGetEventsResponse = unknown;
+export type CalendarsControllerGetEventsResponse = Array<{
+    id?: string;
+    summary?: string;
+    description?: string;
+    location?: string;
+    startedAt?: string;
+    endedAt?: string;
+    allDay?: boolean;
+}>;
 
 export type $OpenApiTs = {
     '/api/status': {
@@ -997,18 +1005,26 @@ export type $OpenApiTs = {
                 /**
                  * End timestamp in ISO format
                  */
-                end: string;
+                endedAt: string;
                 id: string;
                 /**
                  * Start timestamp in ISO format
                  */
-                start: string;
+                startedAt: string;
             };
             res: {
                 /**
                  * Get events from a calendar for a given time range
                  */
-                200: unknown;
+                200: Array<{
+                    id?: string;
+                    summary?: string;
+                    description?: string;
+                    location?: string;
+                    startedAt?: string;
+                    endedAt?: string;
+                    allDay?: boolean;
+                }>;
             };
         };
     };

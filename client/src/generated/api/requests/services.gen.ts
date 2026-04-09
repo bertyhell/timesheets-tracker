@@ -671,8 +671,8 @@ export class CalendarsService {
     /**
      * @param data The data for the request.
      * @param data.id
-     * @param data.start Start timestamp in ISO format
-     * @param data.end End timestamp in ISO format
+     * @param data.startedAt Start timestamp in ISO format
+     * @param data.endedAt End timestamp in ISO format
      * @returns unknown Get events from a calendar for a given time range
      * @throws ApiError
      */
@@ -684,8 +684,8 @@ export class CalendarsService {
                 id: data.id
             },
             query: {
-                start: data.start,
-                end: data.end
+                startedAt: data.startedAt,
+                endedAt: data.endedAt
             }
         });
     }

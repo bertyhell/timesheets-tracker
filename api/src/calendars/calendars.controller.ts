@@ -4,7 +4,8 @@ import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { CreateCalendarDto } from './dto/create-calendar.dto';
 import { UpdateCalendarDto } from './dto/update-calendar.dto';
 import { CalendarDto } from './dto/response-calendar.dto';
-import type { Calendar } from '../types/types';
+import { CalendarEventDto } from './dto/calendar-event.dto';
+import type { Calendar, CalendarEvent } from '../types/types';
 
 @ApiTags('calendars')
 @Controller('api/calendars')
@@ -55,24 +56,29 @@ export class CalendarsController {
 
   @ApiOkResponse({
     description: 'Get events from a calendar for a given time range',
+    type: CalendarEventDto,
     isArray: true,
   })
   @Get(':id/events')
   @ApiQuery({
     type: 'string',
-    name: 'start',
+    name: 'startedAt',
     required: true,
     description: 'Start timestamp in ISO format',
     example: '2026-04-01T00:00:00.000Z',
   })
   @ApiQuery({
     type: 'string',
-    name: 'end',
+    name: 'endedAt',
     required: true,
     description: 'End timestamp in ISO format',
     example: '2026-04-30T23:59:59.999Z',
   })
-  getEvents(@Param('id') id: string, @Query('start') start: string, @Query('end') end: string) {
-    return this.calendarsService.getEvents(id, start, end);
+  getEvents(
+    @Param('id') id: string,
+    @Query('startedAt') startedAt: string,
+    @Query('endedAt') endedAt: string
+  ): Promise<CalendarEventDto[]> {
+    return this.calendarsService.getEvents(id, startedAt, endedAt);
   }
 }

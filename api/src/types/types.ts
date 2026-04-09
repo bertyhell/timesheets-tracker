@@ -36,6 +36,16 @@ export interface TagName {
   color: string;
 }
 
+export interface CalendarEvent {
+  id: string;
+  summary: string;
+  description: string;
+  location: string;
+  startedAt: string;
+  endedAt: string;
+  allDay: boolean;
+}
+
 export interface AutoNote {
   id: string;
   title: string;

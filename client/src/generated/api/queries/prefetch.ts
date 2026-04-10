@@ -12,7 +12,7 @@ export const prefetchUseStatusServiceAppControllerStatus = (queryClient: QueryCl
 * @param data The data for the request.
 * @param data.startedAt
 * @param data.endedAt
-* @returns unknown
+* @returns ResponseActivityDto Get a list of all activities
 * @throws ApiError
 */
 export const prefetchUseActivitiesServiceActivitiesControllerFindAll = (queryClient: QueryClient, { endedAt, startedAt }: {
@@ -32,7 +32,7 @@ export const prefetchUseActivitiesServiceActivitiesControllerFindOne = (queryCli
 * @param data The data for the request.
 * @param data.startedAt
 * @param data.endedAt
-* @returns unknown
+* @returns ResponseActiveStateDto Get a list of all active states
 * @throws ApiError
 */
 export const prefetchUseActiveStatesServiceActiveStatesControllerFindAll = (queryClient: QueryClient, { endedAt, startedAt }: {
@@ -118,7 +118,7 @@ export const prefetchUseAutoTagsServiceAutoTagsControllerFindOne = (queryClient:
 * @param data The data for the request.
 * @param data.startedAt
 * @param data.endedAt
-* @returns unknown
+* @returns ResponseWebsiteDto Get a list of all websites
 * @throws ApiError
 */
 export const prefetchUseWebsitesServiceWebsitesControllerFindAll = (queryClient: QueryClient, { endedAt, startedAt }: {
@@ -176,7 +176,7 @@ export const prefetchUseCalendarsServiceCalendarsControllerFindOne = (queryClien
 * @param data.id
 * @param data.startedAt Start timestamp in ISO format
 * @param data.endedAt End timestamp in ISO format
-* @returns unknown Get events from a calendar for a given time range
+* @returns CalendarEventDto Get events from a calendar for a given time range
 * @throws ApiError
 */
 export const prefetchUseCalendarsServiceCalendarsControllerGetEvents = (queryClient: QueryClient, { endedAt, id, startedAt }: {

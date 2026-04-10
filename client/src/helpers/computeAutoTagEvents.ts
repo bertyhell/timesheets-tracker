@@ -1,19 +1,20 @@
 import { type TimelineEvent, TimelineType } from '../components/Timeline/Timeline.types';
-import { type Activity, BooleanOperator, ConditionVariable } from '../../../types/types';
-import {
-  type AutoTag,
-  type AutoTagCondition,
-  ConditionOperator,
-  type Website,
-} from '../types/types';
+import { BooleanOperator, ConditionVariable } from '../../../types/types';
+import { ConditionOperator } from '../types/types';
 import { compact } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
+import {
+  AutoTagConditionDto,
+  AutoTagDto,
+  ResponseActivityDto,
+  ResponseWebsiteDto,
+} from '../generated/api/requests';
 
 const COMBINE_TAGS_THRESHOLD = 5 * 60 * 1000;
 
-function splitConditionsOnOrOperators(conditions: AutoTagCondition[]): AutoTagCondition[][] {
-  const groupedConditions: AutoTagCondition[][] = [];
-  let currentGroup: AutoTagCondition[] = [];
+function splitConditionsOnOrOperators(conditions: AutoTagConditionDto[]): AutoTagConditionDto[][] {
+  const groupedConditions: AutoTagConditionDto[][] = [];
+  let currentGroup: AutoTagConditionDto[] = [];
 
   let currentIndex = 0;
   do {
@@ -30,14 +31,14 @@ function splitConditionsOnOrOperators(conditions: AutoTagCondition[]): AutoTagCo
 }
 
 function doesConditionMatchActivity(
-  activity: Activity | Website,
-  condition: AutoTagCondition
+  activity: ResponseActivityDto | ResponseWebsiteDto,
+  condition: AutoTagConditionDto
 ): boolean {
   if (!condition.variable) {
     return false;
   }
 
-  if (condition.variable === ConditionVariable.anyVariable) {
+  if (condition.variable === 'anyVariable') {
     // Check all variables except for the anyVariable
     return !!Object.values(ConditionVariable)
       .filter((conditionVariable) => conditionVariable !== ConditionVariable.anyVariable)
@@ -46,13 +47,17 @@ function doesConditionMatchActivity(
       });
   } else {
     // Check one variable
-    return doesConditionValueMatchActivity(activity, condition, condition.variable);
+    return doesConditionValueMatchActivity(
+      activity,
+      condition,
+      condition.variable as ConditionVariable
+    );
   }
 }
 
 function doesConditionValueMatchActivity(
-  activity: Activity | Website,
-  condition: AutoTagCondition,
+  activity: ResponseActivityDto | ResponseWebsiteDto,
+  condition: AutoTagConditionDto,
   variable: ConditionVariable
 ): boolean {
   const toCheckValue: string = (activity as any)[variable];
@@ -75,7 +80,7 @@ function doesConditionValueMatchActivity(
   }
 }
 
-function doesAutoTagMatch(autoTag: AutoTag, activity: Activity): boolean {
+function doesAutoTagMatch(autoTag: AutoTagDto, activity: ResponseActivityDto): boolean {
   const groupedConditions = splitConditionsOnOrOperators(autoTag.conditions);
   const matchedGroup = groupedConditions.find((groupedCondition) => {
     return groupedCondition.every((condition) => doesConditionMatchActivity(activity, condition));
@@ -84,8 +89,8 @@ function doesAutoTagMatch(autoTag: AutoTag, activity: Activity): boolean {
 }
 
 export function calculateAutoTagEvents(
-  programEvents: Activity[],
-  autoTags: AutoTag[]
+  programEvents: ResponseActivityDto[],
+  autoTags: AutoTagDto[]
 ): TimelineEvent[] {
   const validAutoTags = autoTags.filter(
     (autoTag) => !!autoTag.tagName && autoTag.conditions?.length

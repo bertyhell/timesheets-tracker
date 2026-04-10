@@ -22,7 +22,9 @@ function TagSelectMulti({ className, selectedValues, onChange }: TagSelectProps)
       className={'c-tag-select ' + className}
       value={selectedValues}
       loadOptions={(searchTerm) =>
-        TagNamesService.tagNamesControllerFindAll(searchTerm || '') as Promise<TagName[]>
+        TagNamesService.tagNamesControllerFindAll({
+          term: searchTerm || '',
+        }) as Promise<TagName[]>
       }
       defaultOptions
       autoFocus={true}

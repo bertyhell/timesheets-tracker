@@ -9,7 +9,7 @@ import {
 import React, { type ReactNode, useEffect, useState } from 'react';
 import { ROUTE_PARTS } from '../../App';
 import { toast } from 'react-toastify';
-import { useAtom } from 'jotai/index';
+import { useAtom } from 'jotai';
 import { orderBy } from 'lodash-es';
 import { headerActionsAtom } from '../../store/store';
 
@@ -25,7 +25,9 @@ function TagNamesPage() {
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
   const toggleSort = () => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
-  const sortIndicator = <span style={{ fontSize: '0.7em', color: 'black' }}>{sortDir === 'asc' ? ' ▲' : ' ▼'}</span>;
+  const sortIndicator = (
+    <span style={{ fontSize: '0.7em', color: 'black' }}>{sortDir === 'asc' ? ' ▲' : ' ▼'}</span>
+  );
 
   const { data: tagNames, refetch: refetchTagNames } = useTagNamesServiceTagNamesControllerFindAll(
     {
@@ -67,7 +69,9 @@ function TagNamesPage() {
         <thead>
           <tr className="h-10 bg-white">
             <th className="w-px"></th>
-            <th className="text-left pl-3 cursor-pointer select-none" onClick={toggleSort}>Title{sortIndicator}</th>
+            <th className="text-left pl-3 cursor-pointer select-none" onClick={toggleSort}>
+              Title{sortIndicator}
+            </th>
             <th className="w-px whitespace-nowrap"></th>
             <th className="w-px whitespace-nowrap"></th>
           </tr>
@@ -75,7 +79,12 @@ function TagNamesPage() {
         <tbody>
           {orderBy(tagNames || [], (t) => t.title?.toLowerCase(), sortDir).map(
             (tagName): ReactNode => (
-              <tr key={'tag-name-' + tagName.id} onClick={() => navigate('/' + ROUTE_PARTS.tagNames + '/' + tagName.id + '/' + ROUTE_PARTS.edit)}>
+              <tr
+                key={'tag-name-' + tagName.id}
+                onClick={() =>
+                  navigate('/' + ROUTE_PARTS.tagNames + '/' + tagName.id + '/' + ROUTE_PARTS.edit)
+                }
+              >
                 <td className="w-px py-1 pl-2">
                   <span
                     className="block h-16 w-16"
@@ -89,7 +98,9 @@ function TagNamesPage() {
                     onClick={(e) => {
                       e.stopPropagation();
                       setSelectedTagName(tagName as unknown as TagName);
-                      navigate('/' + ROUTE_PARTS.tagNames + '/' + tagName.id + '/' + ROUTE_PARTS.edit);
+                      navigate(
+                        '/' + ROUTE_PARTS.tagNames + '/' + tagName.id + '/' + ROUTE_PARTS.edit
+                      );
                     }}
                   >
                     EDIT
@@ -107,7 +118,9 @@ function TagNamesPage() {
                         await refetchTagNames();
                         toast('Tag name has been deleted', { type: 'success' });
                       } else {
-                        toast('Tag name could not be deleted, no id has been set', { type: 'warning' });
+                        toast('Tag name could not be deleted, no id has been set', {
+                          type: 'warning',
+                        });
                       }
                     }}
                   >

@@ -23,7 +23,7 @@ import {
   useTagsServiceTagsControllerRemove,
   useWebsitesServiceWebsitesControllerFindAll,
 } from '../../generated/api/queries';
-import type { ActiveState, Activity, AutoTag, Tag, TagName, Website } from '../../types/types';
+import type { ActiveState, Activity, Tag, TagName } from '../../types/types';
 import { COLOR_LIST } from './TimelinesPage.consts';
 import { clamp, maxBy, minBy } from 'lodash-es';
 import { calculateAutoTagEvents } from '../../helpers/computeAutoTagEvents';
@@ -31,7 +31,12 @@ import { useAtom } from 'jotai';
 import { viewDateAtom } from '../../store/store';
 import { stringToColorIndex } from '../../helpers/string-to-color-index';
 import EventsTable from '../../components/EventsTable/EventsTable';
-import { type CalendarDto } from '../../generated/api/requests/types.gen';
+import {
+  AutoTagDto,
+  type CalendarDto,
+  ResponseActivityDto,
+  ResponseWebsiteDto,
+} from '../../generated/api/requests/types.gen';
 import { CalendarsService } from '../../generated/api/requests/services.gen';
 import { useQueries } from '@tanstack/react-query';
 
@@ -76,24 +81,8 @@ function TimelinesPage() {
     })),
   });
 
-  const getEventsForCalendar = (calendarId: string): TimelineEvent[] => {
-    const index = calendarList.findIndex((c) => c.id === calendarId);
-    const calendar = calendarList[index];
-    const rawEvents = (calendarEventResults[index]?.data as any[]) || [];
-    const events = rawEvents.map((event) => {
-      return {
-        id: event.id,
-        info: {
-          ...(event.summary ? { summary: event.summary } : {}),
-          ...(event.location ? { location: event.location } : {}),
-        },
-        color: calendar.color,
-        startedAt: event.allDay ? startOfDay(viewDate) : new Date(event.start),
-        endedAt: event.allDay ? endOfDay(viewDate) : new Date(event.end),
-        type: TimelineType.Calendar,
-      };
-    });
-    return events;
+  const getColorFromString = (text: string): string => {
+    return COLOR_LIST[stringToColorIndex(text, COLOR_LIST.length)];
   };
 
   const { data: activeStates, isLoading: isLoadingActiveStates } =
@@ -118,27 +107,30 @@ function TimelinesPage() {
       type: TimelineType.Tag,
     };
   });
-  const programEvents = (programs || []).map((program: Activity): TimelineEvent => {
+  const programEvents = (programs || []).map((program: ResponseActivityDto): TimelineEvent => {
+    const programName = program.programName || 'unknown';
+    const windowTitle = program.windowTitle || 'unknown';
     return {
       id: program.id,
       info: {
-        programName: program.programName,
-        windowTitle: program.windowTitle,
+        programName,
+        windowTitle,
       },
-      color: COLOR_LIST[stringToColorIndex(program.programName, COLOR_LIST.length)],
+      color: getColorFromString(programName),
       startedAt: new Date(program.startedAt),
       endedAt: new Date(program.endedAt),
       type: TimelineType.Program,
     };
   });
-  const websiteEvents = (websites || []).map((website: Website): TimelineEvent => {
+  const websiteEvents = (websites || []).map((website: ResponseWebsiteDto): TimelineEvent => {
+    const domain = website.websiteUrl ? new URL(website.websiteUrl).host : 'unknown';
     return {
       id: website.id,
       info: {
         websiteTitle: website.websiteTitle,
         websiteUrl: website.websiteUrl,
       },
-      color: COLOR_LIST[stringToColorIndex(new URL(website.websiteUrl).host, COLOR_LIST.length)],
+      color: getColorFromString(domain),
       startedAt: new Date(website.startedAt),
       endedAt: new Date(website.endedAt as string),
       type: TimelineType.Program,
@@ -165,11 +157,45 @@ function TimelinesPage() {
   const [selectionMovePercent, setSelectionMovePercent] = useState<number | null>(null);
   const [selectionEndPercent, setSelectionEndPercent] = useState<number | null>(null);
   const [activeSelectionTimeline, setActiveSelectionTimeline] = useState<string | null>(null);
-
-  const [selectedTimeline, setSelectedTimeline] = useState<TimelineType>(TimelineType.Program);
+  const [selectedTimelineId, setSelectedTimelineId] = useState<string>('timeline--programs');
   const [selectedEvent, setSelectedEvent] = useState<TimelineEvent | null>(null);
 
-  const allEvents = [...programEvents, ...websiteEvents];
+  const getCalendarEventsForCalendarId = (calendarId: string) => {
+    const calendarIndex = calendarList.findIndex((calendar) => calendar.id === calendarId);
+    return (calendarEventResults[calendarIndex].data || []).map((rawEvent): TimelineEvent => {
+      return {
+        id: rawEvent.id,
+        info: {
+          summary: rawEvent.summary,
+          description: rawEvent.description,
+          location: rawEvent.location,
+        },
+        startedAt: new Date(rawEvent.startedAt),
+        endedAt: new Date(rawEvent.endedAt),
+        type: TimelineType.Calendar,
+        color: getColorFromString(calendarId),
+      };
+    });
+  };
+
+  // TODO make this whole timeline list dynamic and stored in the database
+  const timelineEventsByTimelineId: Record<string, TimelineEvent[]> = {
+    [TimelineType.Tag]: tagEvents,
+    [TimelineType.AutoTag]: autoTagEvents,
+    [TimelineType.Active]: activeStateEvents,
+    [TimelineType.Program]: programEvents,
+    [TimelineType.Website]: websiteEvents,
+    [`timeline--calendar--]${calendarList[0].id}`]: getCalendarEventsForCalendarId(
+      calendarList[0].id
+    ),
+    [`timeline--calendar--]${calendarList[1].id}`]: getCalendarEventsForCalendarId(
+      calendarList[1].id
+    ),
+  };
+
+  const allEvents = Object.values(timelineEventsByTimelineId).flatMap(
+    (timelineEvents) => timelineEvents
+  );
   const minTime = subHours(
     minBy(allEvents, (event: TimelineEvent) => event.startedAt.getTime())?.startedAt ||
       startOfDay(new Date()),
@@ -180,6 +206,7 @@ function TimelinesPage() {
       endOfDay(new Date()),
     1
   );
+
   const windowInMilliseconds = differenceInMilliseconds(maxTime, minTime);
   const selectionStartTime = addMilliseconds(
     minTime,
@@ -189,18 +216,6 @@ function TimelinesPage() {
     minTime,
     (windowInMilliseconds / 100) * (selectionEndPercent || 0)
   );
-
-  const timelineEvents: Record<TimelineType, (id?: string) => TimelineEvent[]> = {
-    [TimelineType.Tag]: () => tagEvents,
-    [TimelineType.AutoTag]: () => autoTagEvents,
-    [TimelineType.Active]: () => activeStateEvents,
-    [TimelineType.Program]: () => programEvents,
-    [TimelineType.Website]: () => websiteEvents,
-    [TimelineType.Calendar]: (calendarId: string) => {
-      const calendarIndex = calendarList.findIndex((calendar) => calendar.id === calendarId);
-      return calendarEventResults[calendarIndex].data;
-    },
-  };
 
   useEffect(() => {
     document.addEventListener('keyup', handleKeyUpEvent);
@@ -221,7 +236,7 @@ function TimelinesPage() {
       !!activeStates &&
       !!websites
     ) {
-      setAutoTagEvents(calculateAutoTagEvents(programs as Activity[], allAutoTags as AutoTag[]));
+      setAutoTagEvents(calculateAutoTagEvents(programs as Activity[], allAutoTags as AutoTagDto[]));
     }
   }, [
     isLoadingPrograms,
@@ -305,9 +320,9 @@ function TimelinesPage() {
     await Promise.all([refetchTags(), refetchTagNamesCount()]);
   };
 
-  const setSelectedEventAndTimeline = (event: TimelineEvent) => {
+  const setSelectedEventAndTimeline = (event: TimelineEvent, timelineId: string) => {
     setSelectedEvent(event);
-    setSelectedTimeline(event.type);
+    setSelectedTimelineId(timelineId);
   };
 
   if (isLoadingPrograms) {
@@ -334,6 +349,7 @@ function TimelinesPage() {
     <div className="c-app">
       <div>
         <Timeline
+          id="timeline--tags"
           name="Tags"
           events={tagEvents}
           minTime={minTime}
@@ -348,6 +364,7 @@ function TimelinesPage() {
           setSelectedEvent={setSelectedEventAndTimeline}
         ></Timeline>
         <Timeline
+          id="timeline--auto-tags"
           name="Auto tags"
           events={autoTagEvents}
           minTime={minTime}
@@ -362,6 +379,7 @@ function TimelinesPage() {
           setSelectedEvent={setSelectedEventAndTimeline}
         ></Timeline>
         <Timeline
+          id="timeline--active-states"
           name="Active"
           events={activeStateEvents}
           minTime={minTime}
@@ -376,6 +394,7 @@ function TimelinesPage() {
           setSelectedEvent={setSelectedEventAndTimeline}
         ></Timeline>
         <Timeline
+          id="timeline--programs"
           name="Programs"
           events={programEvents}
           minTime={minTime}
@@ -390,6 +409,7 @@ function TimelinesPage() {
           setSelectedEvent={setSelectedEventAndTimeline}
         ></Timeline>
         <Timeline
+          id="timeline--websites"
           name="Websites"
           events={websiteEvents}
           minTime={minTime}
@@ -405,9 +425,10 @@ function TimelinesPage() {
         ></Timeline>
         {calendarList.map((calendar) => (
           <Timeline
+            id={`timeline--calendar--]${calendar.id}`}
             key={'calendar-timeline-' + calendar.id}
             name={calendar.title}
-            events={getEventsForCalendar(calendar.id)}
+            events={timelineEventsByTimelineId[`timeline--calendar--]${calendar.id}`]}
             minTime={minTime}
             maxTime={maxTime}
             onMouseDown={(posX: number) => handleMouseDown(TimelineType.Calendar, posX)}
@@ -423,7 +444,7 @@ function TimelinesPage() {
           />
         ))}
       </div>
-      <EventsTable events={timelineEvents[selectedTimeline]} />
+      <EventsTable events={timelineEventsByTimelineId[selectedTimelineId]} />
     </div>
   );
 }

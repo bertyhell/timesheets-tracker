@@ -5,7 +5,7 @@ import { CreateCalendarDto } from './dto/create-calendar.dto';
 import { UpdateCalendarDto } from './dto/update-calendar.dto';
 import { CalendarDto } from './dto/response-calendar.dto';
 import { CalendarEventDto } from './dto/calendar-event.dto';
-import type { Calendar, CalendarEvent } from '../types/types';
+import type { Calendar } from '../types/types';
 
 @ApiTags('calendars')
 @Controller('api/calendars')

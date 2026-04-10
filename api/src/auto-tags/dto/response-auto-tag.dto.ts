@@ -1,6 +1,6 @@
 import { IsArray, IsEnum, IsNumber, IsObject, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import {
   type AutoTag,
   type AutoTagCondition,
@@ -14,40 +14,37 @@ import { TagNameDto } from '../../tag-names/dto/response-tag-name.dto';
 export class AutoTagConditionDto implements AutoTagCondition {
   @IsString()
   @Type(() => String)
-  @ApiPropertyOptional({
+  @ApiProperty({
     type: String,
     description: 'Conditions for the auto tag',
-    default: '[]',
   })
   booleanOperator: BooleanOperator;
 
   @IsEnum(ConditionVariable)
   @Type(() => String)
-  @ApiPropertyOptional({
+  @ApiProperty({
     type: ConditionVariable,
     description: 'Variable to check',
     default: ConditionVariable.programName,
     enum: ConditionVariable,
     enumName: 'ConditionVariable',
-    nullable: true,
   })
-  variable: ConditionVariable | null;
+  variable: ConditionVariable;
 
   @IsEnum(ConditionOperator)
   @Type(() => String)
-  @ApiPropertyOptional({
+  @ApiProperty({
     type: ConditionOperator,
     description: 'Operator of the condition',
     default: 'OR',
     enum: ConditionOperator,
     enumName: 'ConditionOperator',
-    nullable: true,
   })
-  operator: ConditionOperator | null;
+  operator: ConditionOperator;
 
   @IsString()
   @Type(() => String)
-  @ApiPropertyOptional({
+  @ApiProperty({
     type: String,
     description: 'Piece of text that the variable has to contain',
   })
@@ -57,44 +54,40 @@ export class AutoTagConditionDto implements AutoTagCondition {
 export class AutoTagDto implements AutoTag {
   @IsString()
   @Type(() => String)
-  @ApiPropertyOptional({
+  @ApiProperty({
     type: String,
     description: 'Id of the auto tag',
-    default: undefined,
   })
   id: string;
 
   @IsString()
   @Type(() => String)
-  @ApiPropertyOptional({
+  @ApiProperty({
     type: String,
     description: 'Id of the tagName',
-    default: undefined,
   })
   tagNameId: string;
 
   @IsString()
   @Type(() => String)
-  @ApiPropertyOptional({
+  @ApiProperty({
     type: String,
     description: 'Name of the tagName',
-    default: undefined,
   })
   title: string;
 
   @IsNumber()
   @Type(() => Number)
-  @ApiPropertyOptional({
+  @ApiProperty({
     type: Number,
     description:
       'Priority order in which the auto tags are checked. 0 is checked first, 1 second, ...',
-    default: 0,
   })
   priority: number;
 
   @IsArray()
   @Type(() => String)
-  @ApiPropertyOptional({
+  @ApiProperty({
     type: AutoTagConditionDto,
     isArray: true,
     description: 'Conditions for the auto tag',
@@ -104,10 +97,9 @@ export class AutoTagDto implements AutoTag {
 
   @IsObject()
   @Type(() => TagNameDto)
-  @ApiPropertyOptional({
-    type: String,
-    description: 'The tag name linked to this auto tag',
-    default: undefined,
+  @ApiProperty({
+    type: TagNameDto,
+    description: 'The tag name object linked to this auto tag',
   })
   tagName: TagName;
 }
@@ -115,7 +107,7 @@ export class AutoTagDto implements AutoTag {
 export class AutoTagCountDto {
   @IsNumber()
   @Type(() => Number)
-  @ApiPropertyOptional({
+  @ApiProperty({
     type: Number,
     description: 'Number of auto tags that exist',
   })

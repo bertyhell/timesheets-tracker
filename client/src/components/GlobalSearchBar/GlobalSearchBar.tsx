@@ -1,7 +1,7 @@
 import React from 'react';
 
 import './GlobalSearchBar.scss';
-import { useAtom } from 'jotai/index';
+import { useAtom } from 'jotai';
 
 import { searchTermAtom } from '../../store/store';
 

@@ -6,7 +6,7 @@ import DateSelect from './components/DateSelect/DateSelect';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import GlobalSearchBar from './components/GlobalSearchBar/GlobalSearchBar';
-import { useAtom } from 'jotai/index';
+import { useAtom } from 'jotai';
 import { headerActionsAtom } from './store/store';
 
 export enum ROUTE_PARTS {
@@ -34,7 +34,11 @@ function App() {
           <NavLink to={'/' + ROUTE_PARTS.notes}>auto notes</NavLink>
           <NavLink to={'/' + ROUTE_PARTS.calendars}>calendars</NavLink>
         </div>
-        {headerActions && <div className="m-header-actions" style={{ marginLeft: 'auto' }}>{headerActions}</div>}
+        {headerActions && (
+          <div className="m-header-actions" style={{ marginLeft: 'auto' }}>
+            {headerActions}
+          </div>
+        )}
         {isTimelinesTab && <GlobalSearchBar />}
         {isTimelinesTab && <DateSelect />}
       </nav>

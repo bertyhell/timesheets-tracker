@@ -19,7 +19,9 @@ function TagSelectSingle({ className, value, onChange, autoFocus }: TagSelectPro
       value={value}
       getOptionValue={(value) => value.id}
       loadOptions={(searchTerm) =>
-        TagNamesService.tagNamesControllerFindAll(searchTerm) as Promise<TagName[]>
+        TagNamesService.tagNamesControllerFindAll({
+          term: searchTerm,
+        }) as Promise<TagName[]>
       }
       autoFocus={autoFocus ?? false}
       formatOptionLabel={(option: TagName) => option.title}

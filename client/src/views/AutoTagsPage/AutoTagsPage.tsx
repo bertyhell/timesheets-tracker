@@ -12,8 +12,8 @@ import { toast } from 'react-toastify';
 import { type AutoTag } from '../../types/types';
 import copy from 'copy-to-clipboard';
 import { mapLimit } from 'blend-promise-utils';
-import { AutoTagConditionDto } from '../../generated/api/requests';
-import { useAtom } from 'jotai/index';
+import { AutoTagConditionDto, AutoTagDto } from '../../generated/api/requests';
+import { useAtom } from 'jotai';
 import { headerActionsAtom } from '../../store/store';
 
 const AUTOTAGS_PROPERTY_NAME = 'timesheetTrackerAutoTags';
@@ -37,15 +37,17 @@ function AutoTagsPage() {
   };
 
   const sortIndicator = (col: 'title' | 'priority') =>
-    sortCol === col
-      ? <span style={{ fontSize: '0.7em', color: 'black' }}>{sortDir === 'asc' ? ' ▲' : ' ▼'}</span>
-      : <span style={{ fontSize: '0.7em', color: '#aaa' }}> ▲▼</span>;
+    sortCol === col ? (
+      <span style={{ fontSize: '0.7em', color: 'black' }}>{sortDir === 'asc' ? ' ▲' : ' ▼'}</span>
+    ) : (
+      <span style={{ fontSize: '0.7em', color: '#aaa' }}> ▲▼</span>
+    );
   const { data: autoTagItems, refetch: refetchAutoTags } =
     useAutoTagsServiceAutoTagsControllerFindAll({
       term: '',
     });
   const { mutateAsync: insertAutoTag } = useAutoTagsServiceAutoTagsControllerCreate();
-  const autoTags = autoTagItems as AutoTag[];
+  const autoTags = autoTagItems as AutoTagDto[];
   const { mutateAsync: deleteAutoTag } = useAutoTagsServiceAutoTagsControllerDelete();
 
   useEffect(() => {
@@ -67,24 +69,21 @@ function AutoTagsPage() {
     toast(pastedAutoTags.length + ' auto tags were added');
   };
 
-  const onPasteContent = useCallback(
-    async (evt: ClipboardEvent) => {
-      try {
-        if (evt.clipboardData && evt.clipboardData.getData) {
-          const pastedText = evt.clipboardData.getData('text/plain');
+  const onPasteContent = useCallback(async (evt: ClipboardEvent) => {
+    try {
+      if (evt.clipboardData && evt.clipboardData.getData) {
+        const pastedText = evt.clipboardData.getData('text/plain');
 
-          if (pastedText.includes(AUTOTAGS_PROPERTY_NAME)) {
-            await handlePasteAutoTags(JSON.parse(pastedText)[AUTOTAGS_PROPERTY_NAME]);
-          } else {
-            toast("The pasted text doesn't contain any valid auto tags", { type: 'error' });
-          }
+        if (pastedText.includes(AUTOTAGS_PROPERTY_NAME)) {
+          await handlePasteAutoTags(JSON.parse(pastedText)[AUTOTAGS_PROPERTY_NAME]);
+        } else {
+          toast("The pasted text doesn't contain any valid auto tags", { type: 'error' });
         }
-      } catch {
-        toast("The pasted text doesn't contain any valid auto tags", { type: 'error' });
       }
-    },
-    [handlePasteAutoTags]
-  );
+    } catch {
+      toast("The pasted text doesn't contain any valid auto tags", { type: 'error' });
+    }
+  }, []);
 
   useEffect(() => {
     document.body.addEventListener('paste', onPasteContent);
@@ -102,7 +101,10 @@ function AutoTagsPage() {
   useEffect(() => {
     setHeaderActions(
       <>
-        <NavLink className="c-button" to={'/' + ROUTE_PARTS.autoTagRules + '/' + ROUTE_PARTS.create}>
+        <NavLink
+          className="c-button"
+          to={'/' + ROUTE_PARTS.autoTagRules + '/' + ROUTE_PARTS.create}
+        >
           Add auto tag
         </NavLink>
         <button className="c-button" onClick={copyAutoTagsToClipboard}>
@@ -119,16 +121,37 @@ function AutoTagsPage() {
         <thead>
           <tr className="h-10 bg-white">
             <th className="w-px"></th>
-            <th className="text-left pl-3 cursor-pointer select-none" onClick={() => toggleSort('title')}>Title{sortIndicator('title')}</th>
-            <th className="text-left pl-3 cursor-pointer select-none" onClick={() => toggleSort('priority')}>Priority{sortIndicator('priority')}</th>
+            <th
+              className="text-left pl-3 cursor-pointer select-none"
+              onClick={() => toggleSort('title')}
+            >
+              Title{sortIndicator('title')}
+            </th>
+            <th
+              className="text-left pl-3 cursor-pointer select-none"
+              onClick={() => toggleSort('priority')}
+            >
+              Priority{sortIndicator('priority')}
+            </th>
             <th className="w-px whitespace-nowrap"></th>
             <th className="w-px whitespace-nowrap"></th>
           </tr>
         </thead>
         <tbody>
-          {orderBy(autoTags || [], (autoTag) => sortCol === 'title' ? autoTag.title?.toLowerCase() : autoTag.priority, sortDir).map(
+          {orderBy(
+            autoTags || [],
+            (autoTag) => (sortCol === 'title' ? autoTag.title?.toLowerCase() : autoTag.priority),
+            sortDir
+          ).map(
             (autoTag): ReactNode => (
-              <tr key={'auto-tag-' + autoTag.id} onClick={() => navigate('/' + ROUTE_PARTS.autoTagRules + '/' + autoTag.id + '/' + ROUTE_PARTS.edit)}>
+              <tr
+                key={'auto-tag-' + autoTag.id}
+                onClick={() =>
+                  navigate(
+                    '/' + ROUTE_PARTS.autoTagRules + '/' + autoTag.id + '/' + ROUTE_PARTS.edit
+                  )
+                }
+              >
                 <td className="w-px py-1 pl-2">
                   <span
                     className="block w-16 h-16"

@@ -1,3 +1,5 @@
+import { AutoTagConditionDto } from '../client/src/generated/api/requests';
+
 export interface Activity {
   id: string;
   programName: string;

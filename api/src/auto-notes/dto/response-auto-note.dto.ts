@@ -1,4 +1,4 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsArray, IsOptional, IsString } from 'class-validator';
 import { type ConditionVariable, type AutoNote } from '../../types/types';
@@ -6,16 +6,15 @@ import { type ConditionVariable, type AutoNote } from '../../types/types';
 export class AutoNoteDto implements AutoNote {
   @IsString()
   @Type(() => String)
-  @ApiPropertyOptional({
+  @ApiProperty({
     type: String,
     description: 'Id of the autoNote rule',
-    default: undefined,
   })
   id: string;
 
   @IsString()
   @Type(() => String)
-  @ApiPropertyOptional({
+  @ApiProperty({
     type: String,
     description: 'Name of the autoNote',
   })
@@ -24,18 +23,17 @@ export class AutoNoteDto implements AutoNote {
   @IsString()
   @Type(() => String)
   @IsArray()
-  @ApiPropertyOptional({
+  @ApiProperty({
     type: String,
     isArray: true,
     description:
       'ids of the tags this autoNote is linked to. Value is semicolon separated. null for all tags',
-    default: undefined,
   })
   tagNameIds: string[] | null;
 
   @IsString()
   @Type(() => String)
-  @ApiPropertyOptional({
+  @ApiProperty({
     type: String,
     description:
       'What the content of the autoNote should be equal to. eg: programName, ProgramTitle, websiteTitle, websiteUrl',

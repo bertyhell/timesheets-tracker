@@ -8,7 +8,7 @@ import React, { type ReactNode, useEffect } from 'react';
 import { ROUTE_PARTS } from '../../App';
 import { toast } from 'react-toastify';
 import { type CalendarDto } from '../../generated/api/requests/types.gen';
-import { useAtom } from 'jotai/index';
+import { useAtom } from 'jotai';
 import { headerActionsAtom } from '../../store/store';
 
 function maskCalendarUrl(url: string): string {
@@ -56,7 +56,7 @@ function CalendarsPage() {
           </tr>
         </thead>
         <tbody>
-          {(calendars as CalendarDto[] || []).map(
+          {((calendars as CalendarDto[]) || []).map(
             (calendar): ReactNode => (
               <tr
                 key={'calendar-' + calendar.id}

@@ -9,7 +9,7 @@ import {
   useAutoNotesServiceAutoNotesControllerRemove,
 } from '../../generated/api/queries';
 import type { AutoNote } from '../../types/types';
-import { useAtom } from 'jotai/index';
+import { useAtom } from 'jotai';
 import { headerActionsAtom } from '../../store/store';
 import { orderBy } from 'lodash-es';
 
@@ -24,7 +24,9 @@ function NotesPage() {
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
   const toggleSort = () => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
-  const sortIndicator = <span style={{ fontSize: '0.7em', color: 'black' }}>{sortDir === 'asc' ? ' ▲' : ' ▼'}</span>;
+  const sortIndicator = (
+    <span style={{ fontSize: '0.7em', color: 'black' }}>{sortDir === 'asc' ? ' ▲' : ' ▼'}</span>
+  );
 
   const { data: notes, refetch: refetchNotes } = useAutoNotesServiceAutoNotesControllerFindAll({
     term: '',
@@ -55,7 +57,9 @@ function NotesPage() {
       <table className="w-full">
         <thead>
           <tr className="h-10 bg-white">
-            <th className="text-left pl-3 cursor-pointer select-none" onClick={toggleSort}>Title{sortIndicator}</th>
+            <th className="text-left pl-3 cursor-pointer select-none" onClick={toggleSort}>
+              Title{sortIndicator}
+            </th>
             <th className="w-px whitespace-nowrap"></th>
             <th className="w-px whitespace-nowrap"></th>
           </tr>
@@ -63,7 +67,12 @@ function NotesPage() {
         <tbody>
           {orderBy(notes || [], (n) => n.title?.toLowerCase(), sortDir).map(
             (note): ReactNode => (
-              <tr key={'note-' + note.id} onClick={() => navigate('/' + ROUTE_PARTS.notes + '/' + note.id + '/' + ROUTE_PARTS.edit)}>
+              <tr
+                key={'note-' + note.id}
+                onClick={() =>
+                  navigate('/' + ROUTE_PARTS.notes + '/' + note.id + '/' + ROUTE_PARTS.edit)
+                }
+              >
                 <td className="pl-3">{note.title}</td>
                 <td className="w-px whitespace-nowrap">
                   <button

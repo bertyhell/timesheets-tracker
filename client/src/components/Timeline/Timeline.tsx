@@ -21,6 +21,7 @@ import { type ActionMeta, type MultiValue, type OnChangeValue } from 'react-sele
 import TagSelectMulti from '../TagSelect/TagSelectMulti';
 
 interface TimelineProps {
+  id: string;
   name: string;
   events: TimelineEvent[];
   minTime: Date;
@@ -32,10 +33,11 @@ interface TimelineProps {
   onCreateTagName: (name: string) => Promise<TagName>;
   onCreateTag: (tagNameId: string) => Promise<void>;
   selectedEvent: TimelineEvent | null;
-  setSelectedEvent: (event: TimelineEvent) => void;
+  setSelectedEvent: (event: TimelineEvent, timelineId: string) => void;
 }
 
 function Timeline({
+  id,
   name,
   events,
   minTime,
@@ -251,7 +253,7 @@ function Timeline({
                   backgroundColor: event.color,
                 }}
                 onClick={() => {
-                  setSelectedEvent(event);
+                  setSelectedEvent(event, id);
                 }}
               ></div>
             </Tippy>

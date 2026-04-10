@@ -29,7 +29,7 @@ import AutoTagConditionInput from '../AutoTagCondition/AutoTagConditionInput';
 import TagSelectSingle from '../TagSelect/TagSelectSingle';
 import ToggleButton from '../ToggleButton/ToggleButton';
 
-const NEW_CONDITION = {
+const NEW_CONDITION: AutoTagCondition = {
   booleanOperator: BooleanOperator.OR,
   variable: ConditionVariable.anyVariable,
   operator: ConditionOperator.contains,

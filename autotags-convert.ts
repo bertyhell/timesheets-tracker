@@ -38,7 +38,7 @@ const sql = autoTags.autoTags.map((autoTag) => {
         condition.value = rule.title;
         condition.booleanOperator = BooleanOperator.OR;
         condition.operator = ConditionOperator.contains;
-        condition.variable = ConditionVariable.anyVariable;
+        condition.variable = 'anyVariable';
         return condition;
       })
     ) +

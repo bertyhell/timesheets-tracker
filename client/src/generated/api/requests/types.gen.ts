@@ -432,6 +432,92 @@ export type CalendarEventDto = {
     allDay: boolean;
 };
 
+export type ActiveStateEventInfoDto = {
+    /**
+     * Whether the user was active during this period
+     */
+    isActive: boolean;
+};
+
+export type ProgramEventInfoDto = {
+    /**
+     * Name of the program that was active
+     */
+    programName: string;
+    /**
+     * Title of the active window within the program
+     */
+    windowTitle: string;
+};
+
+export type CalendarEventInfoDto = {
+    /**
+     * Summary / title of the calendar event
+     */
+    summary: string;
+    /**
+     * Description of the calendar event
+     */
+    description: string;
+    /**
+     * Location of the calendar event
+     */
+    location: string;
+    /**
+     * Whether this is an all-day event
+     */
+    allDay: boolean;
+};
+
+export type WebsiteEventInfoDto = {
+    /**
+     * URL of the website that was visited
+     */
+    websiteUrl: string;
+    /**
+     * Title of the website that was visited
+     */
+    websiteTitle: string;
+};
+
+export type TagEventInfoDto = {
+    /**
+     * Id of the tag name associated with this tag event
+     */
+    tagNameId: string;
+    /**
+     * Display name of the tag
+     */
+    tagNameName: string;
+    /**
+     * Color of the tag
+     */
+    tagNameColor: string;
+    /**
+     * Optional short code for the tag
+     */
+    tagNameCode?: string | null;
+};
+
+export type AutoTagEventInfoDto = {
+    /**
+     * Id of the tag name associated with this tag event
+     */
+    tagNameId: string;
+    /**
+     * Display name of the tag
+     */
+    tagNameName: string;
+    /**
+     * Color of the tag
+     */
+    tagNameColor: string;
+    /**
+     * Optional short code for the tag
+     */
+    tagNameCode?: string | null;
+};
+
 /**
  * Type of the timeline
  */
@@ -495,11 +581,9 @@ export type TimelineEventDto = {
      */
     id: string;
     /**
-     * type specific info for this event. eg: summary of a calendar event or programName of a program event
+     * Type-specific info for this event. Varies based on the timeline type.
      */
-    info: {
-        [key: string]: (string | number | boolean);
-    };
+    info: ActiveStateEventInfoDto | ProgramEventInfoDto | CalendarEventInfoDto | WebsiteEventInfoDto | TagEventInfoDto | AutoTagEventInfoDto;
     /**
      * Start time in iso format
      */

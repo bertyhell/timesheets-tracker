@@ -2,7 +2,6 @@ import './Timeline.scss';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import React, { type MouseEvent } from 'react';
-import { type TimelineEvent } from './Timeline.types';
 import {
   addHours,
   addMilliseconds,
@@ -13,17 +12,19 @@ import {
   format,
   isAfter,
   isBefore,
+  parseISO,
   roundToNearestMinutes,
 } from 'date-fns';
 import { formatDuration } from '../../helpers/format-duration';
 import type { TagName } from '../../types/types';
 import { type ActionMeta, type MultiValue, type OnChangeValue } from 'react-select';
 import TagSelectMulti from '../TagSelect/TagSelectMulti';
+import { TimelineDto, TimelineEventDto } from '../../generated/api/requests';
+import { getColorForEvent } from './helpers/getColorForEvent';
 
 interface TimelineProps {
-  id: string;
-  name: string;
-  events: TimelineEvent[];
+  timelineInfo: TimelineDto;
+  events: TimelineEventDto[];
   minTime: Date;
   maxTime: Date;
   onMouseDown: (posX: number) => void;
@@ -32,13 +33,12 @@ interface TimelineProps {
   selectionPercentages: { start: number; end: number } | null;
   onCreateTagName: (name: string) => Promise<TagName>;
   onCreateTag: (tagNameId: string) => Promise<void>;
-  selectedEvent: TimelineEvent | null;
-  setSelectedEvent: (event: TimelineEvent, timelineId: string) => void;
+  selectedEvent: TimelineEventDto | null;
+  setSelectedEvent: (event: TimelineEventDto, timeline: TimelineDto) => void;
 }
 
 function Timeline({
-  id,
-  name,
+  timelineInfo,
   events,
   minTime,
   maxTime,
@@ -160,7 +160,7 @@ function Timeline({
       onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
     >
-      <div className="c-timeline__title">{name}</div>
+      <div className="c-timeline__title">{timelineInfo.title}</div>
       <div className="c-timeline__track">
         {/* Hour and quarter ticks */}
         {quarterTicks.map((quarterTick) => (
@@ -187,7 +187,7 @@ function Timeline({
         {/* Current time tick */}
         {isAfter(new Date(), minTime) && isBefore(new Date(), maxTime) && (
           <div
-            key={'c-timeline__current-time-' + name}
+            key={'c-timeline__current-time-' + timelineInfo.title}
             className="c-timeline__current-time"
             style={{
               left:
@@ -199,40 +199,42 @@ function Timeline({
         {/* Events */}
         {events.map((event) => {
           const width =
-            (differenceInMilliseconds(event.endedAt, event.startedAt) / windowInMilliseconds) *
+            (differenceInMilliseconds(parseISO(event.endedAt), parseISO(event.startedAt)) /
+              windowInMilliseconds) *
               100 +
             '%';
 
+          const eventInfo = event.info as Record<string, string | number | boolean>;
           return (
             <Tippy
-              key={'c-timeline__' + name + '__event__tippy__' + event.startedAt.toISOString()}
+              key={'c-timeline__' + timelineInfo.title + '__event__tippy__' + event.startedAt}
               visible={!!selectedEvent?.id && selectedEvent.id === event.id}
               interactive
               content={
                 <ul
                   className="c-timeline__event__tooltip"
                   key={
-                    'c-timeline__' + name + '__event__tippy__ul__' + event.startedAt.toISOString()
+                    'c-timeline__' + timelineInfo.title + '__event__tippy__ul__' + event.startedAt
                   }
                 >
                   <li>
-                    <b>Date:</b> {format(event.startedAt, 'HH:mm:ss')} -{' '}
-                    {format(event.endedAt, 'HH:mm:ss')}
+                    <b>Date:</b> {format(parseISO(event.startedAt), 'HH:mm:ss')} -{' '}
+                    {format(parseISO(event.endedAt), 'HH:mm:ss')}
                   </li>
-                  {Object.keys(event.info).map((key) => (
+                  {Object.keys(eventInfo).map((key) => (
                     <li
                       key={
                         'c-timeline__' +
-                        name +
+                        timelineInfo.title +
                         '__event__' +
-                        event.startedAt.toISOString() +
+                        event.startedAt +
                         '__info__' +
                         key +
                         '__' +
-                        event.info[key]
+                        eventInfo[key]
                       }
                     >
-                      <b>{key}</b>: {event.info[key]}
+                      <b>{key}</b>: {eventInfo[key]}
                     </li>
                   ))}
                 </ul>
@@ -243,17 +245,18 @@ function Timeline({
                   'c-timeline__event' +
                   (selectedEvent?.id === event.id ? ' c-timeline__event--selected' : '')
                 }
-                key={'c-timeline__' + name + '__event__div__' + event.startedAt.toISOString()}
+                key={'c-timeline__' + timelineInfo.title + '__event__div__' + event.startedAt}
                 style={{
                   left:
-                    (differenceInMilliseconds(event.startedAt, minTime) / windowInMilliseconds) *
+                    (differenceInMilliseconds(parseISO(event.startedAt), minTime) /
+                      windowInMilliseconds) *
                       100 +
                     '%',
                   width,
-                  backgroundColor: event.color,
+                  backgroundColor: getColorForEvent(timelineInfo, event),
                 }}
                 onClick={() => {
-                  setSelectedEvent(event, id);
+                  setSelectedEvent(event, timelineInfo);
                 }}
               ></div>
             </Tippy>
@@ -263,7 +266,7 @@ function Timeline({
         {/* Selection */}
         {selectionPercentages && (
           <Tippy
-            key={'c-timeline__' + name + '__selection__tippy'}
+            key={'c-timeline__' + timelineInfo.title + '__selection__tippy'}
             className="c-timeline__selection__tooltip--ended"
             interactive
             content={
@@ -271,7 +274,7 @@ function Timeline({
                 onMouseMove={(evt) => evt.stopPropagation()}
                 onMouseDown={(evt) => evt.stopPropagation()}
                 onMouseUp={(evt) => evt.stopPropagation()}
-                key={'c-timeline__' + name + '__selection__tippy__ul'}
+                key={'c-timeline__' + timelineInfo.title + '__selection__tippy__ul'}
               >
                 <li>
                   {format(selectionStartTime, 'HH:mm:ss')} - {format(selectionEndTime, 'HH:mm:ss')}
@@ -285,7 +288,7 @@ function Timeline({
           >
             <div
               className="c-timeline__selection"
-              key={'c-timeline__' + name + '__selection'}
+              key={'c-timeline__' + timelineInfo.title + '__selection'}
               style={{
                 left: selectionPercentages.start + '%',
                 right: 100 - selectionPercentages.end + '%',

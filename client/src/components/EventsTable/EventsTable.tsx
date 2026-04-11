@@ -51,11 +51,12 @@ function EventsTable({ events, className }: EventsTableProps) {
           [
             (event) => {
               switch (sortDescriptor?.column) {
+                // TODO switch rendering of columns based on selected timeline
                 case 'program':
-                  return event.info[Object.keys(event.info)[0]];
+                  return (event.info as any)[Object.keys(event.info as any)[0] as any] as any;
 
                 case 'title':
-                  return event.info[Object.keys(event.info)[1]];
+                  return (event.info as any)[Object.keys(event.info as any)[1] as any] as any;
 
                 case 'startedAt':
                   return event.startedAt;
@@ -115,8 +116,12 @@ function EventsTable({ events, className }: EventsTableProps) {
             {tableEvents.items.map((event: TimelineEventDto) => {
               return (
                 <Row key={event.id}>
-                  <Cell>{event.info[Object.keys(event.info)[0]]}</Cell>
-                  <Cell>{event.info[Object.keys(event.info)[1]]}</Cell>
+                  <Cell>
+                    {(event.info as any)[Object.keys(event.info as any)[0] as any] as any}
+                  </Cell>
+                  <Cell>
+                    {(event.info as any)[Object.keys(event.info as any)[1] as any] as any}
+                  </Cell>
                   <Cell>{format(parseISO(event.startedAt), 'HH:mm:ss')}</Cell>
                   <Cell>{format(parseISO(event.endedAt), 'HH:mm:ss')}</Cell>
                   <Cell>

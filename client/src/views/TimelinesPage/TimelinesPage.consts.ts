@@ -16,3 +16,6 @@ export const COLOR_LIST = [
   '#ff1493',
   '#98fb98',
 ];
+
+export const ACTIVE_COLOR = '#4caf50';
+export const INACTIVE_COLOR = '#f44336';

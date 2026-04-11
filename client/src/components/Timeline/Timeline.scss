@@ -11,6 +11,9 @@ $timelineHeight: 5rem;
   .c-timeline__title {
     line-height: $timelineHeight;
     width: 5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .c-timeline__track {

@@ -1,12 +1,28 @@
 import { Controller, Get, Post, Body, Query, Param, Patch, Delete } from '@nestjs/common';
 import { CreateTimelineDto } from './dto/create-timeline.dto';
-import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiExtraModels, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { TimelinesService } from './timelines.service';
 import { TimelineCountDto, TimelineDto } from './dto/response-timeline.dto';
 import { type Timeline } from '../types/types';
 import { UpdateTimelineDto } from './dto/update-timeline.dto';
-import { TimelineWithEventsDto } from './dto/response-timeline-events.dto';
+import {
+  ActiveStateEventInfoDto,
+  AutoTagEventInfoDto,
+  CalendarEventInfoDto,
+  ProgramEventInfoDto,
+  TagEventInfoDto,
+  TimelineWithEventsDto,
+  WebsiteEventInfoDto,
+} from './dto/response-timeline-events.dto';
 
+@ApiExtraModels(
+  ActiveStateEventInfoDto,
+  ProgramEventInfoDto,
+  CalendarEventInfoDto,
+  WebsiteEventInfoDto,
+  TagEventInfoDto,
+  AutoTagEventInfoDto
+)
 @ApiTags('timelines')
 @Controller('api/timelines')
 export class TimelinesController {

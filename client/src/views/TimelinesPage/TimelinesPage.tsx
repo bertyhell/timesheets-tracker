@@ -19,7 +19,11 @@ import { useAtom } from 'jotai';
 import { viewDateAtom } from '../../store/store';
 import { stringToColorIndex } from '../../helpers/string-to-color-index';
 import EventsTable from '../../components/EventsTable/EventsTable';
-import { TimelineEventDto } from '../../generated/api/requests/types.gen';
+import {
+  TimelineDto,
+  TimelineEventDto,
+  TimelineWithEventsDto,
+} from '../../generated/api/requests/types.gen';
 import {
   useTagNamesServiceTagNamesControllerCount,
   useTagNamesServiceTagNamesControllerCreate,
@@ -56,10 +60,6 @@ function TimelinesPage() {
     }
   );
 
-  const getColorFromString = (text: string): string => {
-    return COLOR_LIST[stringToColorIndex(text, COLOR_LIST.length)];
-  };
-
   const { data: tagNamesCount, refetch: refetchTagNamesCount } =
     useTagNamesServiceTagNamesControllerCount();
   const { mutateAsync: deleteTag } = useTagsServiceTagsControllerRemove();
@@ -71,11 +71,21 @@ function TimelinesPage() {
   const [selectionMovePercent, setSelectionMovePercent] = useState<number | null>(null);
   const [selectionEndPercent, setSelectionEndPercent] = useState<number | null>(null);
   const [activeSelectionTimeline, setActiveSelectionTimeline] = useState<string | null>(null);
-  const [selectedTimelineId, setSelectedTimelineId] = useState<string>('timeline--programs');
-  const selectedTimeline = timelinesWithEvents?.find(
-    (timelinesWithEvent) => timelinesWithEvent.id === selectedTimelineId
-  );
-  const [selectedEvent, setSelectedEvent] = useState<TimelineEvent | null>(null);
+  const [selectedTimelineAndEvent, setSelectedTimelineAndEvent] = useState<{
+    selectedTimelineId: string | null;
+    selectedEventId: string | null;
+  }>({
+    selectedTimelineId: null,
+    selectedEventId: null,
+  });
+  const selectedTimeline: TimelineWithEventsDto | null =
+    timelinesWithEvents?.find(
+      (timelinesWithEvent) => timelinesWithEvent.id === selectedTimelineAndEvent.selectedTimelineId
+    ) || null;
+  const selectedEvent: TimelineEventDto | null =
+    selectedTimeline?.events?.find(
+      (event) => event.id === selectedTimelineAndEvent.selectedEventId
+    ) || null;
 
   const allEvents = timelinesWithEvents?.flatMap((timelineWithEvents) => timelineWithEvents.events);
   const firstEvent = minBy(allEvents || [], (event: TimelineEventDto) =>
@@ -84,8 +94,10 @@ function TimelinesPage() {
   const lastEvent = maxBy(allEvents || [], (event: TimelineEventDto) =>
     new Date(event.endedAt).getTime()
   );
-  const minTime = firstEvent ? subHours(parseISO(firstEvent.startedAt), 1) : startOfDay(new Date());
-  const maxTime = lastEvent ? addHours(parseISO(lastEvent.endedAt), 1) : endOfDay(viewDate);
+  const minTime: Date = firstEvent
+    ? subHours(parseISO(firstEvent.startedAt), 1)
+    : startOfDay(new Date());
+  const maxTime: Date = lastEvent ? addHours(parseISO(lastEvent.endedAt), 1) : endOfDay(viewDate);
 
   const windowInMilliseconds = differenceInMilliseconds(maxTime, minTime);
   const selectionStartTime = addMilliseconds(
@@ -131,13 +143,13 @@ function TimelinesPage() {
 
   const handleKeyUpEvent = async (evt: KeyboardEvent) => {
     // Use state setter function to get latest state, since this event handler happens outside the react
-    setSelectedEvent((oldSelectedEvent) => {
+    setSelectedTimelineAndEvent(() => {
       if (evt.key === 'Delete') {
         // Delete selected event
-        if (oldSelectedEvent?.id && oldSelectedEvent?.type === TimelineType.Tag) {
+        if (selectedEvent?.id && selectedTimeline?.type === TimelineType.Tag) {
           (async () => {
             await deleteTag({
-              id: oldSelectedEvent.id as string,
+              id: selectedEvent?.id as string,
             });
             await refetchTimelinesWithEvents();
             toast('Tag was deleted', { type: 'success' });
@@ -146,7 +158,10 @@ function TimelinesPage() {
           toast('No tag was selected', { type: 'warning' });
         }
       }
-      return null;
+      return {
+        selectedTimelineId: selectedTimeline?.id || null,
+        selectedEventId: null,
+      };
     });
   };
 
@@ -174,7 +189,10 @@ function TimelinesPage() {
       setSelectionStartPercent(null);
       setSelectionEndPercent(null);
       setActiveSelectionTimeline(null);
-      setSelectedEvent(null);
+      setSelectedTimelineAndEvent({
+        selectedTimelineId: timelineId,
+        selectedEventId: null,
+      });
     } else {
       setSelectionEndPercent(clamp(posX, 0, 100));
     }
@@ -198,11 +216,6 @@ function TimelinesPage() {
       },
     });
     await Promise.all([refetchTimelinesWithEvents(), refetchTagNamesCount()]);
-  };
-
-  const setSelectedEventAndTimeline = (event: TimelineEvent, timelineId: string) => {
-    setSelectedEvent(event);
-    setSelectedTimelineId(timelineId);
   };
 
   if (isLoadingTimelineEvents) {
@@ -229,8 +242,7 @@ function TimelinesPage() {
     return (timelineInfos || []).map((timelineInfo) => {
       return (
         <Timeline
-          id={timelineInfo.id}
-          name={timelineInfo.title}
+          timelineInfo={timelineInfo}
           events={
             timelinesWithEvents?.find((timelineWithEvents) => {
               return timelineWithEvents.id === timelineInfo.id;
@@ -245,7 +257,12 @@ function TimelinesPage() {
           onCreateTagName={handleCreateTagName}
           onCreateTag={handleCreateTag}
           selectedEvent={selectedEvent}
-          setSelectedEvent={setSelectedEventAndTimeline}
+          setSelectedEvent={(event, timeline) =>
+            setSelectedTimelineAndEvent({
+              selectedTimelineId: timeline.id,
+              selectedEventId: event.id,
+            })
+          }
         ></Timeline>
       );
     });

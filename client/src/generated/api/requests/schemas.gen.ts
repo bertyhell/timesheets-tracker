@@ -549,6 +549,135 @@ export const $CalendarEventDto = {
     required: ['id', 'summary', 'description', 'location', 'startedAt', 'endedAt', 'allDay']
 } as const;
 
+export const $ActiveStateEventInfoDto = {
+    type: 'object',
+    properties: {
+        isActive: {
+            type: 'boolean',
+            description: 'Whether the user was active during this period',
+            example: true
+        }
+    },
+    required: ['isActive']
+} as const;
+
+export const $ProgramEventInfoDto = {
+    type: 'object',
+    properties: {
+        programName: {
+            type: 'string',
+            description: 'Name of the program that was active',
+            example: 'Visual Studio Code'
+        },
+        windowTitle: {
+            type: 'string',
+            description: 'Title of the active window within the program',
+            example: 'Visual Studio Code: file.js'
+        }
+    },
+    required: ['programName', 'windowTitle']
+} as const;
+
+export const $CalendarEventInfoDto = {
+    type: 'object',
+    properties: {
+        summary: {
+            type: 'string',
+            description: 'Summary / title of the calendar event',
+            example: 'Team standup'
+        },
+        description: {
+            type: 'string',
+            description: 'Description of the calendar event',
+            example: 'Daily sync with the team'
+        },
+        location: {
+            type: 'string',
+            description: 'Location of the calendar event',
+            example: 'Conference room A'
+        },
+        allDay: {
+            type: 'boolean',
+            description: 'Whether this is an all-day event',
+            example: false
+        }
+    },
+    required: ['summary', 'description', 'location', 'allDay']
+} as const;
+
+export const $WebsiteEventInfoDto = {
+    type: 'object',
+    properties: {
+        websiteUrl: {
+            type: 'string',
+            description: 'URL of the website that was visited',
+            example: 'https://www.google.com'
+        },
+        websiteTitle: {
+            type: 'string',
+            description: 'Title of the website that was visited',
+            example: 'Google'
+        }
+    },
+    required: ['websiteUrl', 'websiteTitle']
+} as const;
+
+export const $TagEventInfoDto = {
+    type: 'object',
+    properties: {
+        tagNameId: {
+            type: 'string',
+            description: 'Id of the tag name associated with this tag event',
+            example: '550e8400-e29b-41d4-a716-446655440000'
+        },
+        tagNameName: {
+            type: 'string',
+            description: 'Display name of the tag',
+            example: 'Development'
+        },
+        tagNameColor: {
+            type: 'string',
+            description: 'Color of the tag',
+            example: '#FF5733'
+        },
+        tagNameCode: {
+            type: 'string',
+            description: 'Optional short code for the tag',
+            example: 'DEV',
+            nullable: true
+        }
+    },
+    required: ['tagNameId', 'tagNameName', 'tagNameColor']
+} as const;
+
+export const $AutoTagEventInfoDto = {
+    type: 'object',
+    properties: {
+        tagNameId: {
+            type: 'string',
+            description: 'Id of the tag name associated with this tag event',
+            example: '550e8400-e29b-41d4-a716-446655440000'
+        },
+        tagNameName: {
+            type: 'string',
+            description: 'Display name of the tag',
+            example: 'Development'
+        },
+        tagNameColor: {
+            type: 'string',
+            description: 'Color of the tag',
+            example: '#FF5733'
+        },
+        tagNameCode: {
+            type: 'string',
+            description: 'Optional short code for the tag',
+            example: 'DEV',
+            nullable: true
+        }
+    },
+    required: ['tagNameId', 'tagNameName', 'tagNameColor']
+} as const;
+
 export const $TimelineType = {
     type: 'string',
     enum: ['Program', 'Website', 'Tag', 'AutoTag', 'Calendar', 'ActiveState'],
@@ -631,28 +760,25 @@ export const $TimelineEventDto = {
             example: '550e8400-e29b-41d4-a716-446655440000'
         },
         info: {
-            type: 'object',
-            additionalProperties: {
-                oneOf: [
-                    {
-                        type: 'string'
-                    },
-                    {
-                        type: 'number'
-                    },
-                    {
-                        type: 'boolean'
-                    }
-                ]
-            },
-            description: 'type specific info for this event. eg: summary of a calendar event or programName of a program event',
-            examples: [
+            description: 'Type-specific info for this event. Varies based on the timeline type.',
+            oneOf: [
                 {
-                    programName: 'Visual Studio Code',
-                    windowName: 'Visual Studio Code: file.js'
+                    '$ref': '#/components/schemas/ActiveStateEventInfoDto'
                 },
                 {
-                    isActive: true
+                    '$ref': '#/components/schemas/ProgramEventInfoDto'
+                },
+                {
+                    '$ref': '#/components/schemas/CalendarEventInfoDto'
+                },
+                {
+                    '$ref': '#/components/schemas/WebsiteEventInfoDto'
+                },
+                {
+                    '$ref': '#/components/schemas/TagEventInfoDto'
+                },
+                {
+                    '$ref': '#/components/schemas/AutoTagEventInfoDto'
                 }
             ]
         },

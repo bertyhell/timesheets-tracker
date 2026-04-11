@@ -3,7 +3,7 @@
 import type { CancelablePromise } from './core/CancelablePromise';
 import { OpenAPI } from './core/OpenAPI';
 import { request as __request } from './core/request';
-import type { AppControllerStatusResponse, ActivitiesControllerCreateResponse, ActivitiesControllerFindAllData, ActivitiesControllerFindAllResponse, ActivitiesControllerDeleteData, ActivitiesControllerDeleteResponse, ActivitiesControllerFindOneData, ActivitiesControllerFindOneResponse, ActiveStatesControllerCreateResponse, ActiveStatesControllerFindAllData, ActiveStatesControllerFindAllResponse, ActiveStatesControllerDeleteData, ActiveStatesControllerDeleteResponse, ActiveStatesControllerFindOneData, ActiveStatesControllerFindOneResponse, TagsControllerCreateData, TagsControllerCreateResponse, TagsControllerFindAllData, TagsControllerFindAllResponse, TagsControllerFindOneData, TagsControllerFindOneResponse, TagsControllerUpdateData, TagsControllerUpdateResponse, TagsControllerRemoveData, TagsControllerRemoveResponse, TagNamesControllerCreateData, TagNamesControllerCreateResponse, TagNamesControllerFindAllData, TagNamesControllerFindAllResponse, TagNamesControllerCountResponse, TagNamesControllerFindOneData, TagNamesControllerFindOneResponse, TagNamesControllerUpdateData, TagNamesControllerUpdateResponse, TagNamesControllerRemoveData, TagNamesControllerRemoveResponse, AutoTagsControllerCreateData, AutoTagsControllerCreateResponse, AutoTagsControllerFindAllData, AutoTagsControllerFindAllResponse, AutoTagsControllerCountResponse, AutoTagsControllerFindOneData, AutoTagsControllerFindOneResponse, AutoTagsControllerUpdateData, AutoTagsControllerUpdateResponse, AutoTagsControllerDeleteData, AutoTagsControllerDeleteResponse, WebsitesControllerCreateData, WebsitesControllerCreateResponse, WebsitesControllerFindAllData, WebsitesControllerFindAllResponse, WebsitesControllerDeleteData, WebsitesControllerDeleteResponse, WebsitesControllerFindOneData, WebsitesControllerFindOneResponse, AutoNotesControllerCreateData, AutoNotesControllerCreateResponse, AutoNotesControllerFindAllData, AutoNotesControllerFindAllResponse, AutoNotesControllerCountResponse, AutoNotesControllerFindOneData, AutoNotesControllerFindOneResponse, AutoNotesControllerUpdateData, AutoNotesControllerUpdateResponse, AutoNotesControllerRemoveData, AutoNotesControllerRemoveResponse, CalendarsControllerCreateData, CalendarsControllerCreateResponse, CalendarsControllerFindAllResponse, CalendarsControllerFindOneData, CalendarsControllerFindOneResponse, CalendarsControllerUpdateData, CalendarsControllerUpdateResponse, CalendarsControllerDeleteData, CalendarsControllerDeleteResponse, CalendarsControllerGetEventsData, CalendarsControllerGetEventsResponse } from './types.gen';
+import type { AppControllerStatusResponse, ProgramsControllerCreateResponse, ProgramsControllerFindAllData, ProgramsControllerFindAllResponse, ProgramsControllerDeleteData, ProgramsControllerDeleteResponse, ProgramsControllerFindOneData, ProgramsControllerFindOneResponse, ActiveStatesControllerCreateResponse, ActiveStatesControllerFindAllData, ActiveStatesControllerFindAllResponse, ActiveStatesControllerDeleteData, ActiveStatesControllerDeleteResponse, ActiveStatesControllerFindOneData, ActiveStatesControllerFindOneResponse, TagsControllerCreateData, TagsControllerCreateResponse, TagsControllerFindAllData, TagsControllerFindAllResponse, TagsControllerFindOneData, TagsControllerFindOneResponse, TagsControllerUpdateData, TagsControllerUpdateResponse, TagsControllerRemoveData, TagsControllerRemoveResponse, TagNamesControllerCreateData, TagNamesControllerCreateResponse, TagNamesControllerFindAllData, TagNamesControllerFindAllResponse, TagNamesControllerCountResponse, TagNamesControllerFindOneData, TagNamesControllerFindOneResponse, TagNamesControllerUpdateData, TagNamesControllerUpdateResponse, TagNamesControllerRemoveData, TagNamesControllerRemoveResponse, AutoTagsControllerCreateData, AutoTagsControllerCreateResponse, AutoTagsControllerFindAllData, AutoTagsControllerFindAllResponse, AutoTagsControllerCountResponse, AutoTagsControllerFindOneData, AutoTagsControllerFindOneResponse, AutoTagsControllerUpdateData, AutoTagsControllerUpdateResponse, AutoTagsControllerDeleteData, AutoTagsControllerDeleteResponse, WebsitesControllerCreateData, WebsitesControllerCreateResponse, WebsitesControllerFindAllData, WebsitesControllerFindAllResponse, WebsitesControllerDeleteData, WebsitesControllerDeleteResponse, WebsitesControllerFindOneData, WebsitesControllerFindOneResponse, AutoNotesControllerCreateData, AutoNotesControllerCreateResponse, AutoNotesControllerFindAllData, AutoNotesControllerFindAllResponse, AutoNotesControllerCountResponse, AutoNotesControllerFindOneData, AutoNotesControllerFindOneResponse, AutoNotesControllerUpdateData, AutoNotesControllerUpdateResponse, AutoNotesControllerRemoveData, AutoNotesControllerRemoveResponse, CalendarsControllerCreateData, CalendarsControllerCreateResponse, CalendarsControllerFindAllResponse, CalendarsControllerFindOneData, CalendarsControllerFindOneResponse, CalendarsControllerUpdateData, CalendarsControllerUpdateResponse, CalendarsControllerDeleteData, CalendarsControllerDeleteResponse, CalendarsControllerGetEventsData, CalendarsControllerGetEventsResponse, TimelinesControllerCreateData, TimelinesControllerCreateResponse, TimelinesControllerFindAllData, TimelinesControllerFindAllResponse, TimelinesControllerFindAllEventsData, TimelinesControllerFindAllEventsResponse, TimelinesControllerCountResponse, TimelinesControllerFindOneData, TimelinesControllerFindOneResponse, TimelinesControllerUpdateData, TimelinesControllerUpdateResponse, TimelinesControllerDeleteData, TimelinesControllerDeleteResponse } from './types.gen';
 
 export class StatusService {
     /**
@@ -19,15 +19,15 @@ export class StatusService {
     
 }
 
-export class ActivitiesService {
+export class ProgramsService {
     /**
      * @returns unknown
      * @throws ApiError
      */
-    public static activitiesControllerCreate(): CancelablePromise<ActivitiesControllerCreateResponse> {
+    public static programsControllerCreate(): CancelablePromise<ProgramsControllerCreateResponse> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/activities'
+            url: '/api/programs'
         });
     }
     
@@ -35,13 +35,13 @@ export class ActivitiesService {
      * @param data The data for the request.
      * @param data.startedAt
      * @param data.endedAt
-     * @returns ResponseActivityDto Get a list of all activities
+     * @returns ResponseProgramDto Get a list of all programs
      * @throws ApiError
      */
-    public static activitiesControllerFindAll(data: ActivitiesControllerFindAllData): CancelablePromise<ActivitiesControllerFindAllResponse> {
+    public static programsControllerFindAll(data: ProgramsControllerFindAllData): CancelablePromise<ProgramsControllerFindAllResponse> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/activities',
+            url: '/api/programs',
             query: {
                 startedAt: data.startedAt,
                 endedAt: data.endedAt
@@ -55,10 +55,10 @@ export class ActivitiesService {
      * @returns unknown
      * @throws ApiError
      */
-    public static activitiesControllerDelete(data: ActivitiesControllerDeleteData): CancelablePromise<ActivitiesControllerDeleteResponse> {
+    public static programsControllerDelete(data: ProgramsControllerDeleteData): CancelablePromise<ProgramsControllerDeleteResponse> {
         return __request(OpenAPI, {
             method: 'DELETE',
-            url: '/api/activities',
+            url: '/api/programs',
             path: {
                 id: data.id
             }
@@ -71,10 +71,10 @@ export class ActivitiesService {
      * @returns unknown
      * @throws ApiError
      */
-    public static activitiesControllerFindOne(data: ActivitiesControllerFindOneData): CancelablePromise<ActivitiesControllerFindOneResponse> {
+    public static programsControllerFindOne(data: ProgramsControllerFindOneData): CancelablePromise<ProgramsControllerFindOneResponse> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/activities/{id}',
+            url: '/api/programs/{id}',
             path: {
                 id: data.id
             }
@@ -686,6 +686,124 @@ export class CalendarsService {
             query: {
                 startedAt: data.startedAt,
                 endedAt: data.endedAt
+            }
+        });
+    }
+    
+}
+
+export class TimelinesService {
+    /**
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @returns TimelineDto Create a timeline that displays events from a specific event provider
+     * @throws ApiError
+     */
+    public static timelinesControllerCreate(data: TimelinesControllerCreateData): CancelablePromise<TimelinesControllerCreateResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/timelines',
+            body: data.requestBody,
+            mediaType: 'application/json'
+        });
+    }
+    
+    /**
+     * @param data The data for the request.
+     * @param data.term
+     * @returns TimelineDto Get a list of timelines optionally filtered by a term that should occur in the title of the timeline
+     * @throws ApiError
+     */
+    public static timelinesControllerFindAll(data: TimelinesControllerFindAllData = {}): CancelablePromise<TimelinesControllerFindAllResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/timelines',
+            query: {
+                term: data.term
+            }
+        });
+    }
+    
+    /**
+     * @param data The data for the request.
+     * @param data.startedAt
+     * @param data.endedAt
+     * @param data.term
+     * @param data.timelineIds
+     * @returns TimelineWithEventsDto Get a list of timelines with their events that happened within the specified time interval for all timelines that exist or one specific one
+     * @throws ApiError
+     */
+    public static timelinesControllerFindAllEvents(data: TimelinesControllerFindAllEventsData): CancelablePromise<TimelinesControllerFindAllEventsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/timelines/events',
+            query: {
+                startedAt: data.startedAt,
+                endedAt: data.endedAt,
+                term: data.term,
+                timelineIds: data.timelineIds
+            }
+        });
+    }
+    
+    /**
+     * @returns TimelineCountDto Returns the number of timelines that exist
+     * @throws ApiError
+     */
+    public static timelinesControllerCount(): CancelablePromise<TimelinesControllerCountResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/timelines/count'
+        });
+    }
+    
+    /**
+     * @param data The data for the request.
+     * @param data.id
+     * @returns TimelineDto Return a single timeline by id
+     * @throws ApiError
+     */
+    public static timelinesControllerFindOne(data: TimelinesControllerFindOneData): CancelablePromise<TimelinesControllerFindOneResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/timelines/{id}',
+            path: {
+                id: data.id
+            }
+        });
+    }
+    
+    /**
+     * @param data The data for the request.
+     * @param data.id
+     * @param data.requestBody
+     * @returns unknown
+     * @throws ApiError
+     */
+    public static timelinesControllerUpdate(data: TimelinesControllerUpdateData): CancelablePromise<TimelinesControllerUpdateResponse> {
+        return __request(OpenAPI, {
+            method: 'PATCH',
+            url: '/api/timelines/{id}',
+            path: {
+                id: data.id
+            },
+            body: data.requestBody,
+            mediaType: 'application/json'
+        });
+    }
+    
+    /**
+     * @param data The data for the request.
+     * @param data.id
+     * @returns unknown
+     * @throws ApiError
+     */
+    public static timelinesControllerDelete(data: TimelinesControllerDeleteData): CancelablePromise<TimelinesControllerDeleteResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/timelines/{id}',
+            path: {
+                id: data.id
             }
         });
     }

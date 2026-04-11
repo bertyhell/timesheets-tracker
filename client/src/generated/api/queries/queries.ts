@@ -1,8 +1,8 @@
 // generated with @7nohe/openapi-react-query-codegen@1.3.0 
 
 import { UseMutationOptions, UseQueryOptions, useMutation, useQuery } from "@tanstack/react-query";
-import { ActiveStatesService, ActivitiesService, AutoNotesService, AutoTagsService, CalendarsService, StatusService, TagNamesService, TagsService, WebsitesService } from "../requests/services.gen";
-import { CreateAutoNoteDto, CreateAutoTagDto, CreateCalendarDto, CreateTagDto, CreateTagNameDto, CreateWebsiteDto, UpdateAutoNoteDto, UpdateAutoTagsDto, UpdateCalendarDto, UpdateTagDto, UpdateTagNameDto } from "../requests/types.gen";
+import { ActiveStatesService, AutoNotesService, AutoTagsService, CalendarsService, ProgramsService, StatusService, TagNamesService, TagsService, TimelinesService, WebsitesService } from "../requests/services.gen";
+import { CreateAutoNoteDto, CreateAutoTagDto, CreateCalendarDto, CreateTagDto, CreateTagNameDto, CreateTimelineDto, CreateWebsiteDto, UpdateAutoNoteDto, UpdateAutoTagsDto, UpdateCalendarDto, UpdateTagDto, UpdateTagNameDto, UpdateTimelineDto } from "../requests/types.gen";
 import * as Common from "./common";
 /**
 * @returns unknown
@@ -13,22 +13,22 @@ export const useStatusServiceAppControllerStatus = <TData = Common.StatusService
 * @param data The data for the request.
 * @param data.startedAt
 * @param data.endedAt
-* @returns ResponseActivityDto Get a list of all activities
+* @returns ResponseProgramDto Get a list of all programs
 * @throws ApiError
 */
-export const useActivitiesServiceActivitiesControllerFindAll = <TData = Common.ActivitiesServiceActivitiesControllerFindAllDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>({ endedAt, startedAt }: {
+export const useProgramsServiceProgramsControllerFindAll = <TData = Common.ProgramsServiceProgramsControllerFindAllDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>({ endedAt, startedAt }: {
   endedAt: string;
   startedAt: string;
-}, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useQuery<TData, TError>({ queryKey: Common.UseActivitiesServiceActivitiesControllerFindAllKeyFn({ endedAt, startedAt }, queryKey), queryFn: () => ActivitiesService.activitiesControllerFindAll({ endedAt, startedAt }) as TData, ...options });
+}, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useQuery<TData, TError>({ queryKey: Common.UseProgramsServiceProgramsControllerFindAllKeyFn({ endedAt, startedAt }, queryKey), queryFn: () => ProgramsService.programsControllerFindAll({ endedAt, startedAt }) as TData, ...options });
 /**
 * @param data The data for the request.
 * @param data.id
 * @returns unknown
 * @throws ApiError
 */
-export const useActivitiesServiceActivitiesControllerFindOne = <TData = Common.ActivitiesServiceActivitiesControllerFindOneDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>({ id }: {
+export const useProgramsServiceProgramsControllerFindOne = <TData = Common.ProgramsServiceProgramsControllerFindOneDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>({ id }: {
   id: string;
-}, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useQuery<TData, TError>({ queryKey: Common.UseActivitiesServiceActivitiesControllerFindOneKeyFn({ id }, queryKey), queryFn: () => ActivitiesService.activitiesControllerFindOne({ id }) as TData, ...options });
+}, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useQuery<TData, TError>({ queryKey: Common.UseProgramsServiceProgramsControllerFindOneKeyFn({ id }, queryKey), queryFn: () => ProgramsService.programsControllerFindOne({ id }) as TData, ...options });
 /**
 * @param data The data for the request.
 * @param data.startedAt
@@ -186,10 +186,48 @@ export const useCalendarsServiceCalendarsControllerGetEvents = <TData = Common.C
   startedAt: string;
 }, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useQuery<TData, TError>({ queryKey: Common.UseCalendarsServiceCalendarsControllerGetEventsKeyFn({ endedAt, id, startedAt }, queryKey), queryFn: () => CalendarsService.calendarsControllerGetEvents({ endedAt, id, startedAt }) as TData, ...options });
 /**
+* @param data The data for the request.
+* @param data.term
+* @returns TimelineDto Get a list of timelines optionally filtered by a term that should occur in the title of the timeline
+* @throws ApiError
+*/
+export const useTimelinesServiceTimelinesControllerFindAll = <TData = Common.TimelinesServiceTimelinesControllerFindAllDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>({ term }: {
+  term?: string;
+} = {}, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useQuery<TData, TError>({ queryKey: Common.UseTimelinesServiceTimelinesControllerFindAllKeyFn({ term }, queryKey), queryFn: () => TimelinesService.timelinesControllerFindAll({ term }) as TData, ...options });
+/**
+* @param data The data for the request.
+* @param data.startedAt
+* @param data.endedAt
+* @param data.term
+* @param data.timelineIds
+* @returns TimelineWithEventsDto Get a list of timelines with their events that happened within the specified time interval for all timelines that exist or one specific one
+* @throws ApiError
+*/
+export const useTimelinesServiceTimelinesControllerFindAllEvents = <TData = Common.TimelinesServiceTimelinesControllerFindAllEventsDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>({ endedAt, startedAt, term, timelineIds }: {
+  endedAt: string;
+  startedAt: string;
+  term?: string;
+  timelineIds?: string[];
+}, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useQuery<TData, TError>({ queryKey: Common.UseTimelinesServiceTimelinesControllerFindAllEventsKeyFn({ endedAt, startedAt, term, timelineIds }, queryKey), queryFn: () => TimelinesService.timelinesControllerFindAllEvents({ endedAt, startedAt, term, timelineIds }) as TData, ...options });
+/**
+* @returns TimelineCountDto Returns the number of timelines that exist
+* @throws ApiError
+*/
+export const useTimelinesServiceTimelinesControllerCount = <TData = Common.TimelinesServiceTimelinesControllerCountDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>(queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useQuery<TData, TError>({ queryKey: Common.UseTimelinesServiceTimelinesControllerCountKeyFn(), queryFn: () => TimelinesService.timelinesControllerCount() as TData, ...options });
+/**
+* @param data The data for the request.
+* @param data.id
+* @returns TimelineDto Return a single timeline by id
+* @throws ApiError
+*/
+export const useTimelinesServiceTimelinesControllerFindOne = <TData = Common.TimelinesServiceTimelinesControllerFindOneDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>({ id }: {
+  id: string;
+}, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useQuery<TData, TError>({ queryKey: Common.UseTimelinesServiceTimelinesControllerFindOneKeyFn({ id }, queryKey), queryFn: () => TimelinesService.timelinesControllerFindOne({ id }) as TData, ...options });
+/**
 * @returns unknown
 * @throws ApiError
 */
-export const useActivitiesServiceActivitiesControllerCreate = <TData = Common.ActivitiesServiceActivitiesControllerCreateMutationResult, TError = unknown, TContext = unknown>(options?: Omit<UseMutationOptions<TData, TError, void, TContext>, "mutationFn">) => useMutation<TData, TError, void, TContext>({ mutationFn: () => ActivitiesService.activitiesControllerCreate() as unknown as Promise<TData>, ...options });
+export const useProgramsServiceProgramsControllerCreate = <TData = Common.ProgramsServiceProgramsControllerCreateMutationResult, TError = unknown, TContext = unknown>(options?: Omit<UseMutationOptions<TData, TError, void, TContext>, "mutationFn">) => useMutation<TData, TError, void, TContext>({ mutationFn: () => ProgramsService.programsControllerCreate() as unknown as Promise<TData>, ...options });
 /**
 * @returns unknown
 * @throws ApiError
@@ -263,6 +301,17 @@ export const useCalendarsServiceCalendarsControllerCreate = <TData = Common.Cale
 }, TContext>({ mutationFn: ({ requestBody }) => CalendarsService.calendarsControllerCreate({ requestBody }) as unknown as Promise<TData>, ...options });
 /**
 * @param data The data for the request.
+* @param data.requestBody
+* @returns TimelineDto Create a timeline that displays events from a specific event provider
+* @throws ApiError
+*/
+export const useTimelinesServiceTimelinesControllerCreate = <TData = Common.TimelinesServiceTimelinesControllerCreateMutationResult, TError = unknown, TContext = unknown>(options?: Omit<UseMutationOptions<TData, TError, {
+  requestBody: CreateTimelineDto;
+}, TContext>, "mutationFn">) => useMutation<TData, TError, {
+  requestBody: CreateTimelineDto;
+}, TContext>({ mutationFn: ({ requestBody }) => TimelinesService.timelinesControllerCreate({ requestBody }) as unknown as Promise<TData>, ...options });
+/**
+* @param data The data for the request.
 * @param data.id
 * @param data.requestBody
 * @returns unknown
@@ -334,14 +383,28 @@ export const useCalendarsServiceCalendarsControllerUpdate = <TData = Common.Cale
 /**
 * @param data The data for the request.
 * @param data.id
+* @param data.requestBody
 * @returns unknown
 * @throws ApiError
 */
-export const useActivitiesServiceActivitiesControllerDelete = <TData = Common.ActivitiesServiceActivitiesControllerDeleteMutationResult, TError = unknown, TContext = unknown>(options?: Omit<UseMutationOptions<TData, TError, {
+export const useTimelinesServiceTimelinesControllerUpdate = <TData = Common.TimelinesServiceTimelinesControllerUpdateMutationResult, TError = unknown, TContext = unknown>(options?: Omit<UseMutationOptions<TData, TError, {
+  id: string;
+  requestBody: UpdateTimelineDto;
+}, TContext>, "mutationFn">) => useMutation<TData, TError, {
+  id: string;
+  requestBody: UpdateTimelineDto;
+}, TContext>({ mutationFn: ({ id, requestBody }) => TimelinesService.timelinesControllerUpdate({ id, requestBody }) as unknown as Promise<TData>, ...options });
+/**
+* @param data The data for the request.
+* @param data.id
+* @returns unknown
+* @throws ApiError
+*/
+export const useProgramsServiceProgramsControllerDelete = <TData = Common.ProgramsServiceProgramsControllerDeleteMutationResult, TError = unknown, TContext = unknown>(options?: Omit<UseMutationOptions<TData, TError, {
   id: string;
 }, TContext>, "mutationFn">) => useMutation<TData, TError, {
   id: string;
-}, TContext>({ mutationFn: ({ id }) => ActivitiesService.activitiesControllerDelete({ id }) as unknown as Promise<TData>, ...options });
+}, TContext>({ mutationFn: ({ id }) => ProgramsService.programsControllerDelete({ id }) as unknown as Promise<TData>, ...options });
 /**
 * @param data The data for the request.
 * @param data.id
@@ -419,3 +482,14 @@ export const useCalendarsServiceCalendarsControllerDelete = <TData = Common.Cale
 }, TContext>, "mutationFn">) => useMutation<TData, TError, {
   id: string;
 }, TContext>({ mutationFn: ({ id }) => CalendarsService.calendarsControllerDelete({ id }) as unknown as Promise<TData>, ...options });
+/**
+* @param data The data for the request.
+* @param data.id
+* @returns unknown
+* @throws ApiError
+*/
+export const useTimelinesServiceTimelinesControllerDelete = <TData = Common.TimelinesServiceTimelinesControllerDeleteMutationResult, TError = unknown, TContext = unknown>(options?: Omit<UseMutationOptions<TData, TError, {
+  id: string;
+}, TContext>, "mutationFn">) => useMutation<TData, TError, {
+  id: string;
+}, TContext>({ mutationFn: ({ id }) => TimelinesService.timelinesControllerDelete({ id }) as unknown as Promise<TData>, ...options });

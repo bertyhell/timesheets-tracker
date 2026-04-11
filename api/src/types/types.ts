@@ -1,4 +1,4 @@
-export interface Activity {
+export interface Program {
   id: string;
   programName: string;
   windowTitle: string;
@@ -41,9 +41,9 @@ export interface CalendarEvent {
   summary: string;
   description: string;
   location: string;
+  allDay: boolean;
   startedAt: string;
   endedAt: string;
-  allDay: boolean;
 }
 
 export interface AutoNote {
@@ -98,4 +98,23 @@ export interface Calendar {
   title: string;
   url: string;
   color: string;
+}
+
+export enum TimelineType {
+  Program = 'Program',
+  Website = 'Website',
+  Tag = 'Tag',
+  AutoTag = 'AutoTag',
+  Calendar = 'Calendar',
+  ActiveState = 'ActiveState',
+}
+
+export interface Timeline {
+  id: string;
+  title: string;
+  timelineType: TimelineType;
+  eventProviderInfo: Record<string, string>;
+  createdAt: string;
+  updatedAt: string;
+  order: number;
 }

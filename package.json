@@ -1,7 +1,7 @@
 {
   "name": "timesheets-tracker",
   "version": "1.0.0",
-  "description": "Track active window and tag activities to easily track timesheets",
+  "description": "Track active window and tag programs to easily track timesheets",
   "license": "MIT",
   "author": "Bert Verhelst",
   "main": "index.js",

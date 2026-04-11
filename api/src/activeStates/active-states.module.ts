@@ -8,5 +8,6 @@ import { ActiveStatesListener } from './active-states.listener';
   imports: [DatabaseModule],
   controllers: [ActiveStatesController],
   providers: [ActiveStatesService, ActiveStatesListener],
+  exports: [ActiveStatesService],
 })
 export class ActiveStatesModule {}

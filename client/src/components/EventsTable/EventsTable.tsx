@@ -20,9 +20,10 @@ import { searchTermAtom } from '../../store/store';
 
 interface EventsTableProps {
   events: TimelineEvent[];
+  className?: string;
 }
 
-function EventsTable({ events }: EventsTableProps) {
+function EventsTable({ events, className }: EventsTableProps) {
   const [searchTerm] = useAtom(searchTermAtom);
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([0]));
 
@@ -80,7 +81,7 @@ function EventsTable({ events }: EventsTableProps) {
   }, [events, searchTerm]);
 
   return (
-    <div>
+    <div className={className}>
       <Provider theme={defaultTheme} colorScheme="light">
         <TableView
           aria-label="Example table with static contents"

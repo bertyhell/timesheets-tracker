@@ -15,7 +15,7 @@ export async function bootstrap() {
   logger.info('setting up swagger');
   const config = new DocumentBuilder()
     .setTitle(APP_TITLE)
-    .setDescription('API for manipulating activities and tagging them')
+    .setDescription('API for manipulating programs and tagging them')
     .setVersion(pkg.version)
     .addServer('http://localhost:' + APP_PORT)
     .build();

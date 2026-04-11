@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ActivitiesModule } from './activities/activities.module';
+import { ProgramsModule } from './programs/programs.module';
 import { DatabaseModule } from './database/database.module';
 import { TagsModule } from './tags/tags.module';
 import { TagNamesModule } from './tag-names/tag-names.module';
@@ -15,6 +15,7 @@ import fs from 'fs';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { logger } from './shared/logger';
 import { CalendarsModule } from './calendars/calendars.module';
+import { TimelinesModule } from './timelines/timelines.module';
 
 let clientDistFolder: string;
 if (fs.existsSync(resolve('./client/index.html'))) {
@@ -32,7 +33,7 @@ logger.info('client folder: ' + clientDistFolder);
       rootPath: clientDistFolder,
     }),
     ScheduleModule.forRoot(),
-    ActivitiesModule,
+    ProgramsModule,
     ActiveStatesModule,
     DatabaseModule,
     TagsModule,
@@ -41,6 +42,7 @@ logger.info('client folder: ' + clientDistFolder);
     WebsitesModule,
     AutoNotesModule,
     CalendarsModule,
+    TimelinesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

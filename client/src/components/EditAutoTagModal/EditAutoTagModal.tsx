@@ -150,7 +150,7 @@ function EditAutoTagModal() {
     >
       <h3>Add auto tag</h3>
 
-      <label>Activity Tag</label>
+      <label>Program Tag</label>
       <ToggleButton
         optionTwoSelected={false}
         onChange={setShowCreateNewTagControls}

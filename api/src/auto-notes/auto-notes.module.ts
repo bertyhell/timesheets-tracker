@@ -7,5 +7,6 @@ import { DatabaseModule } from '../database/database.module';
   imports: [DatabaseModule],
   controllers: [AutoNotesController],
   providers: [AutoNotesService],
+  exports: [AutoNotesService],
 })
 export class AutoNotesModule {}

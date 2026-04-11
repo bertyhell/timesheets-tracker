@@ -30,7 +30,7 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       await Promise.all([
         this.seedService.seedTags(this.db),
         this.seedService.seedAutoTags(this.db),
-        this.seedService.seedActivities(this.db),
+        this.seedService.seedPrograms(this.db),
       ]);
       this.logger.log('Seeders completed successfully');
     }

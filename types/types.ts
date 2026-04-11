@@ -1,6 +1,7 @@
 import { AutoTagConditionDto } from '../client/src/generated/api/requests';
+import { TimelineType } from '../client/src/components/Timeline/Timeline.types';
 
-export interface Activity {
+export interface Program {
   id: string;
   programName: string;
   windowTitle: string;
@@ -83,4 +84,13 @@ export enum ConditionOperator {
   isNotExact = 'isNotExact',
   matchesRegex = 'matchesRegex',
   doesNotMatchRegex = 'doesNotMatchRegex',
+}
+
+export interface TimelineEvent {
+  id?: string;
+  info: Record<string, string>;
+  color: string;
+  startedAt: Date;
+  endedAt: Date;
+  type: TimelineType;
 }

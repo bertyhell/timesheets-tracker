@@ -1,19 +1,19 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { CancelablePromise } from "../core/CancelablePromise";
-import { OpenAPI } from "../core/OpenAPI";
-import { request as __request } from "../core/request";
+import type { CancelablePromise } from '../core/CancelablePromise';
+import { OpenAPI } from '../core/OpenAPI';
+import { request as __request } from '../core/request';
 
-export class ActivitiesService {
+export class ProgramsService {
   /**
    * @returns any
    * @throws ApiError
    */
-  public static activitiesControllerCreate(): CancelablePromise<any> {
+  public static programsControllerCreate(): CancelablePromise<any> {
     return __request(OpenAPI, {
-      method: "POST",
-      url: "/api/activities",
+      method: 'POST',
+      url: '/api/programs',
     });
   }
 
@@ -23,13 +23,13 @@ export class ActivitiesService {
    * @returns any
    * @throws ApiError
    */
-  public static activitiesControllerFindAll(
+  public static programsControllerFindAll(
     startedAt: string,
-    endedAt: string,
+    endedAt: string
   ): CancelablePromise<any> {
     return __request(OpenAPI, {
-      method: "GET",
-      url: "/api/activities",
+      method: 'GET',
+      url: '/api/programs',
       query: {
         startedAt: startedAt,
         endedAt: endedAt,
@@ -42,10 +42,10 @@ export class ActivitiesService {
    * @returns any
    * @throws ApiError
    */
-  public static activitiesControllerDelete(id: string): CancelablePromise<any> {
+  public static programsControllerDelete(id: string): CancelablePromise<any> {
     return __request(OpenAPI, {
-      method: "DELETE",
-      url: "/api/activities",
+      method: 'DELETE',
+      url: '/api/programs',
       path: {
         id: id,
       },
@@ -57,10 +57,10 @@ export class ActivitiesService {
    * @returns any
    * @throws ApiError
    */
-  public static activitiesControllerFindOne(id: string): CancelablePromise<any> {
+  public static programsControllerFindOne(id: string): CancelablePromise<any> {
     return __request(OpenAPI, {
-      method: "GET",
-      url: "/api/activities/{id}",
+      method: 'GET',
+      url: '/api/programs/{id}',
       path: {
         id: id,
       },

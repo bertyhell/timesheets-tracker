@@ -1,7 +1,7 @@
 // generated with @7nohe/openapi-react-query-codegen@1.3.0 
 
 import { type QueryClient } from "@tanstack/react-query";
-import { ActiveStatesService, ActivitiesService, AutoNotesService, AutoTagsService, CalendarsService, StatusService, TagNamesService, TagsService, WebsitesService } from "../requests/services.gen";
+import { ActiveStatesService, AutoNotesService, AutoTagsService, CalendarsService, ProgramsService, StatusService, TagNamesService, TagsService, TimelinesService, WebsitesService } from "../requests/services.gen";
 import * as Common from "./common";
 /**
 * @returns unknown
@@ -12,22 +12,22 @@ export const prefetchUseStatusServiceAppControllerStatus = (queryClient: QueryCl
 * @param data The data for the request.
 * @param data.startedAt
 * @param data.endedAt
-* @returns ResponseActivityDto Get a list of all activities
+* @returns ResponseProgramDto Get a list of all programs
 * @throws ApiError
 */
-export const prefetchUseActivitiesServiceActivitiesControllerFindAll = (queryClient: QueryClient, { endedAt, startedAt }: {
+export const prefetchUseProgramsServiceProgramsControllerFindAll = (queryClient: QueryClient, { endedAt, startedAt }: {
   endedAt: string;
   startedAt: string;
-}) => queryClient.prefetchQuery({ queryKey: [Common.useActivitiesServiceActivitiesControllerFindAllKey, [{ endedAt, startedAt }]], queryFn: () => ActivitiesService.activitiesControllerFindAll({ endedAt, startedAt }) });
+}) => queryClient.prefetchQuery({ queryKey: [Common.useProgramsServiceProgramsControllerFindAllKey, [{ endedAt, startedAt }]], queryFn: () => ProgramsService.programsControllerFindAll({ endedAt, startedAt }) });
 /**
 * @param data The data for the request.
 * @param data.id
 * @returns unknown
 * @throws ApiError
 */
-export const prefetchUseActivitiesServiceActivitiesControllerFindOne = (queryClient: QueryClient, { id }: {
+export const prefetchUseProgramsServiceProgramsControllerFindOne = (queryClient: QueryClient, { id }: {
   id: string;
-}) => queryClient.prefetchQuery({ queryKey: [Common.useActivitiesServiceActivitiesControllerFindOneKey, [{ id }]], queryFn: () => ActivitiesService.activitiesControllerFindOne({ id }) });
+}) => queryClient.prefetchQuery({ queryKey: [Common.useProgramsServiceProgramsControllerFindOneKey, [{ id }]], queryFn: () => ProgramsService.programsControllerFindOne({ id }) });
 /**
 * @param data The data for the request.
 * @param data.startedAt
@@ -184,3 +184,41 @@ export const prefetchUseCalendarsServiceCalendarsControllerGetEvents = (queryCli
   id: string;
   startedAt: string;
 }) => queryClient.prefetchQuery({ queryKey: [Common.useCalendarsServiceCalendarsControllerGetEventsKey, [{ endedAt, id, startedAt }]], queryFn: () => CalendarsService.calendarsControllerGetEvents({ endedAt, id, startedAt }) });
+/**
+* @param data The data for the request.
+* @param data.term
+* @returns TimelineDto Get a list of timelines optionally filtered by a term that should occur in the title of the timeline
+* @throws ApiError
+*/
+export const prefetchUseTimelinesServiceTimelinesControllerFindAll = (queryClient: QueryClient, { term }: {
+  term?: string;
+} = {}) => queryClient.prefetchQuery({ queryKey: [Common.useTimelinesServiceTimelinesControllerFindAllKey, [{ term }]], queryFn: () => TimelinesService.timelinesControllerFindAll({ term }) });
+/**
+* @param data The data for the request.
+* @param data.startedAt
+* @param data.endedAt
+* @param data.term
+* @param data.timelineIds
+* @returns TimelineWithEventsDto Get a list of timelines with their events that happened within the specified time interval for all timelines that exist or one specific one
+* @throws ApiError
+*/
+export const prefetchUseTimelinesServiceTimelinesControllerFindAllEvents = (queryClient: QueryClient, { endedAt, startedAt, term, timelineIds }: {
+  endedAt: string;
+  startedAt: string;
+  term?: string;
+  timelineIds?: string[];
+}) => queryClient.prefetchQuery({ queryKey: [Common.useTimelinesServiceTimelinesControllerFindAllEventsKey, [{ endedAt, startedAt, term, timelineIds }]], queryFn: () => TimelinesService.timelinesControllerFindAllEvents({ endedAt, startedAt, term, timelineIds }) });
+/**
+* @returns TimelineCountDto Returns the number of timelines that exist
+* @throws ApiError
+*/
+export const prefetchUseTimelinesServiceTimelinesControllerCount = (queryClient: QueryClient) => queryClient.prefetchQuery({ queryKey: [Common.useTimelinesServiceTimelinesControllerCountKey, []], queryFn: () => TimelinesService.timelinesControllerCount() });
+/**
+* @param data The data for the request.
+* @param data.id
+* @returns TimelineDto Return a single timeline by id
+* @throws ApiError
+*/
+export const prefetchUseTimelinesServiceTimelinesControllerFindOne = (queryClient: QueryClient, { id }: {
+  id: string;
+}) => queryClient.prefetchQuery({ queryKey: [Common.useTimelinesServiceTimelinesControllerFindOneKey, [{ id }]], queryFn: () => TimelinesService.timelinesControllerFindOne({ id }) });

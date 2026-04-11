@@ -2,7 +2,7 @@ import { Test, type TestingModule } from '@nestjs/testing';
 import { ActiveStatesController } from './active-states.controller';
 import { ActiveStatesService } from './active-states.service';
 
-describe('ActivitiesController', () => {
+describe('ProgramsController', () => {
   let controller: ActiveStatesController;
 
   beforeEach(async () => {

@@ -63,18 +63,18 @@ export class SeedService {
     }
   }
 
-  async seedActivities(db: Database): Promise<void> {
+  async seedPrograms(db: Database): Promise<void> {
     let sqlFilePath: string | null = null;
     try {
-      const count = this.countEntries(db, './src/activities/queries/countActivities.sql');
+      const count = this.countEntries(db, './src/programs/queries/countPrograms.sql');
 
       if (count > 0) {
         return;
       }
 
-      await this.seedFile(db, './src/seed/activities.seed.sql');
+      await this.seedFile(db, './src/seed/programs.seed.sql');
     } catch (err) {
-      throw new CustomError('Failed to seed activities', err, {
+      throw new CustomError('Failed to seed programs', err, {
         sqlFilePath,
       });
     }

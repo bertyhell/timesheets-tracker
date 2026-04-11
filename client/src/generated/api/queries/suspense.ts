@@ -1,7 +1,7 @@
 // generated with @7nohe/openapi-react-query-codegen@1.3.0 
 
 import { UseQueryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { ActiveStatesService, ActivitiesService, AutoNotesService, AutoTagsService, CalendarsService, StatusService, TagNamesService, TagsService, WebsitesService } from "../requests/services.gen";
+import { ActiveStatesService, AutoNotesService, AutoTagsService, CalendarsService, ProgramsService, StatusService, TagNamesService, TagsService, TimelinesService, WebsitesService } from "../requests/services.gen";
 import * as Common from "./common";
 /**
 * @returns unknown
@@ -12,22 +12,22 @@ export const useStatusServiceAppControllerStatusSuspense = <TData = Common.Statu
 * @param data The data for the request.
 * @param data.startedAt
 * @param data.endedAt
-* @returns ResponseActivityDto Get a list of all activities
+* @returns ResponseProgramDto Get a list of all programs
 * @throws ApiError
 */
-export const useActivitiesServiceActivitiesControllerFindAllSuspense = <TData = Common.ActivitiesServiceActivitiesControllerFindAllDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>({ endedAt, startedAt }: {
+export const useProgramsServiceProgramsControllerFindAllSuspense = <TData = Common.ProgramsServiceProgramsControllerFindAllDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>({ endedAt, startedAt }: {
   endedAt: string;
   startedAt: string;
-}, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useSuspenseQuery<TData, TError>({ queryKey: Common.UseActivitiesServiceActivitiesControllerFindAllKeyFn({ endedAt, startedAt }, queryKey), queryFn: () => ActivitiesService.activitiesControllerFindAll({ endedAt, startedAt }) as TData, ...options });
+}, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useSuspenseQuery<TData, TError>({ queryKey: Common.UseProgramsServiceProgramsControllerFindAllKeyFn({ endedAt, startedAt }, queryKey), queryFn: () => ProgramsService.programsControllerFindAll({ endedAt, startedAt }) as TData, ...options });
 /**
 * @param data The data for the request.
 * @param data.id
 * @returns unknown
 * @throws ApiError
 */
-export const useActivitiesServiceActivitiesControllerFindOneSuspense = <TData = Common.ActivitiesServiceActivitiesControllerFindOneDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>({ id }: {
+export const useProgramsServiceProgramsControllerFindOneSuspense = <TData = Common.ProgramsServiceProgramsControllerFindOneDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>({ id }: {
   id: string;
-}, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useSuspenseQuery<TData, TError>({ queryKey: Common.UseActivitiesServiceActivitiesControllerFindOneKeyFn({ id }, queryKey), queryFn: () => ActivitiesService.activitiesControllerFindOne({ id }) as TData, ...options });
+}, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useSuspenseQuery<TData, TError>({ queryKey: Common.UseProgramsServiceProgramsControllerFindOneKeyFn({ id }, queryKey), queryFn: () => ProgramsService.programsControllerFindOne({ id }) as TData, ...options });
 /**
 * @param data The data for the request.
 * @param data.startedAt
@@ -184,3 +184,41 @@ export const useCalendarsServiceCalendarsControllerGetEventsSuspense = <TData = 
   id: string;
   startedAt: string;
 }, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useSuspenseQuery<TData, TError>({ queryKey: Common.UseCalendarsServiceCalendarsControllerGetEventsKeyFn({ endedAt, id, startedAt }, queryKey), queryFn: () => CalendarsService.calendarsControllerGetEvents({ endedAt, id, startedAt }) as TData, ...options });
+/**
+* @param data The data for the request.
+* @param data.term
+* @returns TimelineDto Get a list of timelines optionally filtered by a term that should occur in the title of the timeline
+* @throws ApiError
+*/
+export const useTimelinesServiceTimelinesControllerFindAllSuspense = <TData = Common.TimelinesServiceTimelinesControllerFindAllDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>({ term }: {
+  term?: string;
+} = {}, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useSuspenseQuery<TData, TError>({ queryKey: Common.UseTimelinesServiceTimelinesControllerFindAllKeyFn({ term }, queryKey), queryFn: () => TimelinesService.timelinesControllerFindAll({ term }) as TData, ...options });
+/**
+* @param data The data for the request.
+* @param data.startedAt
+* @param data.endedAt
+* @param data.term
+* @param data.timelineIds
+* @returns TimelineWithEventsDto Get a list of timelines with their events that happened within the specified time interval for all timelines that exist or one specific one
+* @throws ApiError
+*/
+export const useTimelinesServiceTimelinesControllerFindAllEventsSuspense = <TData = Common.TimelinesServiceTimelinesControllerFindAllEventsDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>({ endedAt, startedAt, term, timelineIds }: {
+  endedAt: string;
+  startedAt: string;
+  term?: string;
+  timelineIds?: string[];
+}, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useSuspenseQuery<TData, TError>({ queryKey: Common.UseTimelinesServiceTimelinesControllerFindAllEventsKeyFn({ endedAt, startedAt, term, timelineIds }, queryKey), queryFn: () => TimelinesService.timelinesControllerFindAllEvents({ endedAt, startedAt, term, timelineIds }) as TData, ...options });
+/**
+* @returns TimelineCountDto Returns the number of timelines that exist
+* @throws ApiError
+*/
+export const useTimelinesServiceTimelinesControllerCountSuspense = <TData = Common.TimelinesServiceTimelinesControllerCountDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>(queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useSuspenseQuery<TData, TError>({ queryKey: Common.UseTimelinesServiceTimelinesControllerCountKeyFn(), queryFn: () => TimelinesService.timelinesControllerCount() as TData, ...options });
+/**
+* @param data The data for the request.
+* @param data.id
+* @returns TimelineDto Return a single timeline by id
+* @throws ApiError
+*/
+export const useTimelinesServiceTimelinesControllerFindOneSuspense = <TData = Common.TimelinesServiceTimelinesControllerFindOneDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>({ id }: {
+  id: string;
+}, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useSuspenseQuery<TData, TError>({ queryKey: Common.UseTimelinesServiceTimelinesControllerFindOneKeyFn({ id }, queryKey), queryFn: () => TimelinesService.timelinesControllerFindOne({ id }) as TData, ...options });

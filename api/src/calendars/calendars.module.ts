@@ -7,5 +7,6 @@ import { DatabaseModule } from '../database/database.module';
   imports: [DatabaseModule],
   controllers: [CalendarsController],
   providers: [CalendarsService],
+  exports: [CalendarsService],
 })
 export class CalendarsModule {}

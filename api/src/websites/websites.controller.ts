@@ -14,7 +14,7 @@ import { ApiBody, ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swa
 import { endOfDay, startOfDay } from 'date-fns';
 import { CreateWebsiteDto } from './dto/create-website.dto';
 import { ResponseWebsiteDto } from './dto/response-website.dto';
-import { ActivitiesService } from '../activities/activities.service';
+import { ProgramsService } from '../programs/programs.service';
 import { compact, uniqBy } from 'lodash';
 import { logger } from '../shared/logger';
 
@@ -23,7 +23,7 @@ import { logger } from '../shared/logger';
 export class WebsitesController {
   constructor(
     private readonly websitesService: WebsitesService,
-    private readonly activitiesService: ActivitiesService
+    private readonly programsService: ProgramsService
   ) {}
 
   @Post()
@@ -65,7 +65,7 @@ export class WebsitesController {
   ): Promise<Website[]> {
     // Set endedAt to the startedAt of the next program entry
     const websites = await this.websitesService.findAll(startedAt, endedAt);
-    const programs = await this.activitiesService.findAll(startedAt, endedAt);
+    const programs = await this.programsService.findAll(startedAt, endedAt);
     return compact(
       uniqBy(
         websites.map((website) => {
@@ -91,7 +91,7 @@ export class WebsitesController {
   })
   async findOne(@Param('id') id: string): Promise<Website> {
     const website = await this.websitesService.findOne(id);
-    const nextProgram = await this.activitiesService.findByNextStartedAt(website.startedAt);
+    const nextProgram = await this.programsService.findByNextStartedAt(website.startedAt);
     if (!nextProgram) {
       throw new NotFoundException("Couldn't determine the endedAt date of this website");
     }

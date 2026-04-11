@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS activities
+CREATE TABLE IF NOT EXISTS programs
 (
     "id"            text NOT NULL PRIMARY KEY,
     "programName"   text,
@@ -74,4 +74,16 @@ CREATE TABLE IF NOT EXISTS autoNotes
     "variable"                  text NOT NULL,
     "extractRegex"              text,
     "extractRegexReplacement"   text
+);
+
+
+CREATE TABLE IF NOT EXISTS timelines
+(
+    "id"                text NOT NULL PRIMARY KEY,
+    "title"             text NOT NULL,
+    "timelineType"      text NOT NULL,
+    "eventProviderInfo" text,
+    "createdAt"         text NOT NULL,
+    "updatedAt"         text NOT NULL,
+    "visualOrder"       int NOT NULL
 );

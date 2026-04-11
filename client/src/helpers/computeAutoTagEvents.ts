@@ -6,7 +6,7 @@ import { v4 as uuid } from 'uuid';
 import {
   AutoTagConditionDto,
   AutoTagDto,
-  ResponseActivityDto,
+  ResponseProgramDto,
   ResponseWebsiteDto,
 } from '../generated/api/requests';
 
@@ -30,8 +30,8 @@ function splitConditionsOnOrOperators(conditions: AutoTagConditionDto[]): AutoTa
   return groupedConditions;
 }
 
-function doesConditionMatchActivity(
-  activity: ResponseActivityDto | ResponseWebsiteDto,
+function doesConditionMatchProgram(
+  activity: ResponseProgramDto | ResponseWebsiteDto,
   condition: AutoTagConditionDto
 ): boolean {
   if (!condition.variable) {
@@ -43,11 +43,11 @@ function doesConditionMatchActivity(
     return !!Object.values(ConditionVariable)
       .filter((conditionVariable) => conditionVariable !== ConditionVariable.anyVariable)
       .find((conditionVariable) => {
-        return doesConditionValueMatchActivity(activity, condition, conditionVariable);
+        return doesConditionValueMatchProgram(activity, condition, conditionVariable);
       });
   } else {
     // Check one variable
-    return doesConditionValueMatchActivity(
+    return doesConditionValueMatchProgram(
       activity,
       condition,
       condition.variable as ConditionVariable
@@ -55,8 +55,8 @@ function doesConditionMatchActivity(
   }
 }
 
-function doesConditionValueMatchActivity(
-  activity: ResponseActivityDto | ResponseWebsiteDto,
+function doesConditionValueMatchProgram(
+  activity: ResponseProgramDto | ResponseWebsiteDto,
   condition: AutoTagConditionDto,
   variable: ConditionVariable
 ): boolean {
@@ -80,16 +80,16 @@ function doesConditionValueMatchActivity(
   }
 }
 
-function doesAutoTagMatch(autoTag: AutoTagDto, activity: ResponseActivityDto): boolean {
+function doesAutoTagMatch(autoTag: AutoTagDto, activity: ResponseProgramDto): boolean {
   const groupedConditions = splitConditionsOnOrOperators(autoTag.conditions);
   const matchedGroup = groupedConditions.find((groupedCondition) => {
-    return groupedCondition.every((condition) => doesConditionMatchActivity(activity, condition));
+    return groupedCondition.every((condition) => doesConditionMatchProgram(activity, condition));
   });
   return !!matchedGroup;
 }
 
 export function calculateAutoTagEvents(
-  programEvents: ResponseActivityDto[],
+  programEvents: ResponseProgramDto[],
   autoTags: AutoTagDto[]
 ): TimelineEvent[] {
   const validAutoTags = autoTags.filter(

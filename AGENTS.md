@@ -11,17 +11,17 @@
 
 - Backend starts in `api/src/main.ts` and mounts modules in `api/src/app.module.ts`.
 - Static frontend is served by backend via `ServeStaticModule` (`api/src/app.module.ts`), so packaged app can run from one service.
-- Activity ingestion is event-driven:
-  - `api/src/activities/activities.listener.ts` subscribes to active-window changes and writes activity segments.
+- Program ingestion is event-driven:
+  - `api/src/programs/programs.listener.ts` subscribes to active-window changes and writes activity segments.
   - `api/src/activeStates/active-states.listener.ts` polls idle state every 2 minutes and updates/rotates active-state rows.
   - `chrome-extension/src/background/background.js` sends `POST /api/websites` on tab updates/activation.
-- Timeline view composes multiple streams (`activities`, `websites`, `activeStates`, `tags`, `autoTags`) in `client/src/views/TimelinesPage/TimelinesPage.tsx`.
+- Timeline view composes multiple streams (`programs`, `websites`, `activeStates`, `tags`, `autoTags`) in `client/src/views/TimelinesPage/TimelinesPage.tsx`.
 
 ## Data and persistence patterns
 
 - SQLite access is centralized in `api/src/database/database.service.ts` using `bun:sqlite`.
-- Each feature module follows `controller + service + dto + queries/*.sql` (example: `api/src/activities/*`).
-- Services execute SQL files by path (example: `./src/activities/queries/findAllActivities.sql`) and map flat SQL aliases like `"tagName.name"` via `unflatten`.
+- Each feature module follows `controller + service + dto + queries/*.sql` (example: `api/src/programs/*`).
+- Services execute SQL files by path (example: `./src/programs/queries/findAllPrograms.sql`) and map flat SQL aliases like `"tagName.name"` via `unflatten`.
 - Schema is created from `api/src/database/queries/create-database-tables.sql` on startup; optional seeding via `SEED_AT_STARTUP=true` in `DatabaseService`.
 
 ## API/client contract workflow

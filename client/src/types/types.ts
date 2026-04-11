@@ -1,4 +1,4 @@
-export interface Activity {
+export interface Program {
   id: string;
   programName: string;
   windowTitle: string;

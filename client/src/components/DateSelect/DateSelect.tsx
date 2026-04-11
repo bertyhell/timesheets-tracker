@@ -8,11 +8,11 @@ import { viewDateAtom } from '../../store/store';
 
 // interface DateSelectProps {}
 
-function DateSelect() {
+function DateSelect({ className }: { className?: string }) {
   const [viewDate, setViewDate] = useAtom(viewDateAtom);
 
   return (
-    <div className="c-date-select">
+    <div className={'c-date-select' + (className ? ' ' + className : '')}>
       <button className="c-button" onClick={() => setViewDate(new Date())}>
         TODAY
       </button>

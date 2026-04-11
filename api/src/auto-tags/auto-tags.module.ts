@@ -7,5 +7,6 @@ import { DatabaseModule } from '../database/database.module';
   imports: [DatabaseModule],
   controllers: [AutoTagsController],
   providers: [AutoTagsService],
+  exports: [AutoTagsService],
 })
 export class AutoTagsModule {}

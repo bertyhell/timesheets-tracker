@@ -40,7 +40,7 @@ function App() {
           </div>
         )}
         {isTimelinesTab && <GlobalSearchBar />}
-        {isTimelinesTab && <DateSelect />}
+        {isTimelinesTab && <DateSelect className="c-view-date" />}
       </nav>
       <div className={isTimelinesTab ? undefined : 'm-page-content'}>
         <Outlet />

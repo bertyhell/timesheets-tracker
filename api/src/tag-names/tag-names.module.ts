@@ -7,5 +7,6 @@ import { DatabaseModule } from '../database/database.module';
   imports: [DatabaseModule],
   controllers: [TagNamesController],
   providers: [TagNamesService],
+  exports: [TagNamesService],
 })
 export class TagNamesModule {}

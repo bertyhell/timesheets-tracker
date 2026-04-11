@@ -1,6 +1,6 @@
 import './TimelinesPage.scss';
 import { toast } from 'react-toastify';
-import React, { useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import Timeline from '../../components/Timeline/Timeline';
 import {
   addHours,
@@ -12,25 +12,18 @@ import {
   subHours,
 } from 'date-fns';
 import { TimelineType } from '../../components/Timeline/Timeline.types';
-import type { ActiveState, Tag, TagName } from '../../types/types';
+import type { TagName } from '../../types/types';
 import { COLOR_LIST } from './TimelinesPage.consts';
 import { clamp, maxBy, minBy } from 'lodash-es';
 import { useAtom } from 'jotai';
 import { viewDateAtom } from '../../store/store';
 import { stringToColorIndex } from '../../helpers/string-to-color-index';
 import EventsTable from '../../components/EventsTable/EventsTable';
+import { TimelineEventDto } from '../../generated/api/requests/types.gen';
 import {
-  ResponseProgramDto,
-  ResponseWebsiteDto,
-  TimelineEventDto,
-} from '../../generated/api/requests/types.gen';
-import {
-  useActiveStatesServiceActiveStatesControllerFindAll,
-  useAutoTagsServiceAutoTagsControllerFindAll,
   useTagNamesServiceTagNamesControllerCount,
   useTagNamesServiceTagNamesControllerCreate,
   useTagsServiceTagsControllerCreate,
-  useTagsServiceTagsControllerFindAll,
   useTagsServiceTagsControllerRemove,
   useTimelinesServiceTimelinesControllerFindAll,
   useTimelinesServiceTimelinesControllerFindAllEvents,
@@ -69,10 +62,7 @@ function TimelinesPage() {
 
   const { data: tagNamesCount, refetch: refetchTagNamesCount } =
     useTagNamesServiceTagNamesControllerCount();
-  const { data: allAutoTags, isLoading: isLoadingAllAutoTags } =
-    useAutoTagsServiceAutoTagsControllerFindAll({ term: undefined });
   const { mutateAsync: deleteTag } = useTagsServiceTagsControllerRemove();
-  const [autoTagEvents, setAutoTagEvents] = useState<TimelineEvent[]>([]);
 
   const { mutateAsync: createTagName } = useTagNamesServiceTagNamesControllerCreate();
   const { mutateAsync: createTag } = useTagsServiceTagsControllerCreate();
@@ -82,6 +72,9 @@ function TimelinesPage() {
   const [selectionEndPercent, setSelectionEndPercent] = useState<number | null>(null);
   const [activeSelectionTimeline, setActiveSelectionTimeline] = useState<string | null>(null);
   const [selectedTimelineId, setSelectedTimelineId] = useState<string>('timeline--programs');
+  const selectedTimeline = timelinesWithEvents?.find(
+    (timelinesWithEvent) => timelinesWithEvent.id === selectedTimelineId
+  );
   const [selectedEvent, setSelectedEvent] = useState<TimelineEvent | null>(null);
 
   const allEvents = timelinesWithEvents?.flatMap((timelineWithEvents) => timelineWithEvents.events);
@@ -229,43 +222,63 @@ function TimelinesPage() {
         }
       : null;
 
-  return (
-    <div className="c-app">
-      <div className="c-timelines">
-        {(timelineInfos || []).map((timelineInfo) => {
-          return (
-            <Timeline
-              id={timelineInfo.id}
-              name={timelineInfo.title}
-              events={
-                timelinesWithEvents?.find((timelineWithEvents) => {
-                  return timelineWithEvents.id === timelineInfo.id;
-                })?.events || ([] as TimelineEventDto[])
-              }
-              minTime={minTime}
-              maxTime={maxTime}
-              onMouseDown={(posX: number) => handleMouseDown(TimelineType.Tag, posX)}
-              onMouseMove={(posX: number) => handleMouseMove(TimelineType.Tag, posX)}
-              onMouseUp={(posX: number) => handleMouseUp(TimelineType.Tag, posX)}
-              selectionPercentages={activeSelectionTimeline === TimelineType.Tag ? selection : null}
-              onCreateTagName={handleCreateTagName}
-              onCreateTag={handleCreateTag}
-              selectedEvent={selectedEvent}
-              setSelectedEvent={setSelectedEventAndTimeline}
-            ></Timeline>
-          );
-        })}
+  const renderTimelines = (): ReactNode | ReactNode[] => {
+    if (timelineInfos?.length === 0) {
+      return <div className="u-center">No timelines</div>;
+    }
+    return (timelineInfos || []).map((timelineInfo) => {
+      return (
+        <Timeline
+          id={timelineInfo.id}
+          name={timelineInfo.title}
+          events={
+            timelinesWithEvents?.find((timelineWithEvents) => {
+              return timelineWithEvents.id === timelineInfo.id;
+            })?.events || ([] as TimelineEventDto[])
+          }
+          minTime={minTime}
+          maxTime={maxTime}
+          onMouseDown={(posX: number) => handleMouseDown(TimelineType.Tag, posX)}
+          onMouseMove={(posX: number) => handleMouseMove(TimelineType.Tag, posX)}
+          onMouseUp={(posX: number) => handleMouseUp(TimelineType.Tag, posX)}
+          selectionPercentages={activeSelectionTimeline === TimelineType.Tag ? selection : null}
+          onCreateTagName={handleCreateTagName}
+          onCreateTag={handleCreateTag}
+          selectedEvent={selectedEvent}
+          setSelectedEvent={setSelectedEventAndTimeline}
+        ></Timeline>
+      );
+    });
+  };
+
+  const renderSelectedTimelineEvents = () => {
+    if (!selectedTimeline?.events?.length) {
+      return <div className="u-center">No events</div>;
+    }
+    return <EventsTable events={selectedTimeline?.events || []} />;
+  };
+
+  const renderTimelinesAndEvents = () => {
+    return (
+      <div className="p-timelines-page">
+        <div className="c-timelines">{renderTimelines()}</div>
+        <div className="c-timeline-events-list">{renderSelectedTimelineEvents()}</div>
       </div>
-      <EventsTable
-        className="c-timeline-events-list"
-        events={
-          timelinesWithEvents?.find(
-            (timelinesWithEvent) => timelinesWithEvent.id === selectedTimelineId
-          )?.events || []
-        }
-      />
-    </div>
-  );
+    );
+  };
+
+  const renderPageContent = () => {
+    if (isLoadingTimelineInfos) {
+      return <>Loading timelines...</>;
+    }
+    if (isLoadingTimelineEvents) {
+      return <>Loading timeline events...</>;
+    }
+
+    return renderTimelinesAndEvents();
+  };
+
+  return renderPageContent();
 }
 
 export default TimelinesPage;

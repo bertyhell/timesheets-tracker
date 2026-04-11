@@ -12,14 +12,14 @@ import {
   type Selection,
   type AsyncListData,
 } from '@adobe/react-spectrum';
-import { type TimelineEvent } from '../Timeline/Timeline.types';
 import { orderBy } from 'lodash-es';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { useAtom } from 'jotai';
 import { searchTermAtom } from '../../store/store';
+import { TimelineEventDto } from '../../generated/api/requests';
 
 interface EventsTableProps {
-  events: TimelineEvent[];
+  events: TimelineEventDto[];
   className?: string;
 }
 
@@ -27,7 +27,7 @@ function EventsTable({ events, className }: EventsTableProps) {
   const [searchTerm] = useAtom(searchTermAtom);
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([0]));
 
-  const tableEvents = useAsyncList<TimelineEvent>({
+  const tableEvents = useAsyncList<TimelineEventDto>({
     initialSortDescriptor: {
       column: 'startedAt',
       direction: 'ascending',
@@ -42,8 +42,8 @@ function EventsTable({ events, className }: EventsTableProps) {
       items,
       sortDescriptor,
     }: {
-      items: TimelineEvent[];
-      sortDescriptor: AsyncListData<TimelineEvent>['sortDescriptor'];
+      items: TimelineEventDto[];
+      sortDescriptor: AsyncListData<TimelineEventDto>['sortDescriptor'];
     }) {
       return {
         items: orderBy(
@@ -64,7 +64,7 @@ function EventsTable({ events, className }: EventsTableProps) {
                   return event.endedAt;
 
                 case 'duration':
-                  return event.endedAt.getTime() - event.startedAt.getTime();
+                  return parseISO(event.endedAt).getTime() - parseISO(event.startedAt).getTime();
               }
             },
           ],
@@ -112,15 +112,18 @@ function EventsTable({ events, className }: EventsTableProps) {
             </Column>
           </TableHeader>
           <TableBody items={tableEvents.items} loadingState={tableEvents.loadingState}>
-            {tableEvents.items.map((event: TimelineEvent) => {
+            {tableEvents.items.map((event: TimelineEventDto) => {
               return (
                 <Row key={event.id}>
                   <Cell>{event.info[Object.keys(event.info)[0]]}</Cell>
                   <Cell>{event.info[Object.keys(event.info)[1]]}</Cell>
-                  <Cell>{format(event.startedAt, 'HH:mm:ss')}</Cell>
-                  <Cell>{format(event.endedAt, 'HH:mm:ss')}</Cell>
+                  <Cell>{format(parseISO(event.startedAt), 'HH:mm:ss')}</Cell>
+                  <Cell>{format(parseISO(event.endedAt), 'HH:mm:ss')}</Cell>
                   <Cell>
-                    {format(event.endedAt.getTime() - event.startedAt.getTime(), 'HH:mm:ss')}
+                    {format(
+                      parseISO(event.endedAt).getTime() - parseISO(event.startedAt).getTime(),
+                      'HH:mm:ss'
+                    )}
                   </Cell>
                 </Row>
               );

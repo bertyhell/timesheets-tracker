@@ -1,0 +1,7 @@
+@use "../../styles/variables" as variables;
+
+.p-timelines-page {
+  .c-timelines {
+    min-height: calc(50vh - #{variables.$header-height});
+  }
+}

@@ -498,7 +498,7 @@ export type TimelineEventDto = {
      * type specific info for this event. eg: summary of a calendar event or programName of a program event
      */
     info: {
-        [key: string]: unknown;
+        [key: string]: (string | number | boolean);
     };
     /**
      * Start time in iso format

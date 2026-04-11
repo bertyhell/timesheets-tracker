@@ -17,14 +17,21 @@ export class TimelineEventDto {
   @IsObject()
   @Type(() => Object)
   @ApiProperty({
-    type: Object,
+    type: 'object',
+    additionalProperties: {
+      oneOf: [{ type: 'string' }, { type: 'number' }, { type: 'boolean' }],
+    },
     description:
       'type specific info for this event. eg: summary of a calendar event or programName of a program event',
-    example: {
-      programName: 'Visual Studio Code',
-      windowName: 'Visual Studio Code: file.js',
-    },
-    required: true,
+    examples: [
+      {
+        programName: 'Visual Studio Code',
+        windowName: 'Visual Studio Code: file.js',
+      },
+      {
+        isActive: true,
+      },
+    ],
   })
   info: Record<string, string | number | boolean>;
 

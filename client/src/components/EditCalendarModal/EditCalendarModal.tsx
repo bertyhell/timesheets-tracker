@@ -41,7 +41,7 @@ function EditCalendarModal() {
     }
   }, [calendar]);
 
-  const handleClose = () => navigate('/' + ROUTE_PARTS.calendars);
+  const handleClose = () => navigate('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.calendars);
 
   const handleSave = async () => {
     if (id) {

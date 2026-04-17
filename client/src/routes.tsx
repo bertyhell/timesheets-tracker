@@ -12,6 +12,7 @@ import CalendarsPage from './views/CalendarsPage/CalendarsPage';
 import EditCalendarModal from './components/EditCalendarModal/EditCalendarModal';
 import TimelinesPage from './views/Timelines/TimelinesPage';
 import EditTimelineModal from './components/EditTimelineModal/EditTimelineModal';
+import SettingsPage from './views/SettingsPage/SettingsPage';
 
 export const routes: RouteObject[] = [
   {
@@ -20,79 +21,89 @@ export const routes: RouteObject[] = [
     children: [
       {
         index: true,
-        loader: () => redirect('/' + ROUTE_PARTS.timelines),
+        loader: () => redirect('/' + ROUTE_PARTS.timelinesAndEvents),
       },
       {
         path: ROUTE_PARTS.timelinesAndEvents,
         element: <TimelinesAndEventsPage />,
       },
       {
-        path: ROUTE_PARTS.timelines,
-        element: <TimelinesPage />,
+        path: ROUTE_PARTS.settings,
+        element: <SettingsPage />,
         children: [
           {
-            path: ROUTE_PARTS.create,
-            element: <EditTimelineModal />,
+            index: true,
+            loader: () => redirect('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.timelines),
           },
           {
-            path: ':id/' + ROUTE_PARTS.edit,
-            element: <EditTimelineModal />,
-          },
-        ],
-      },
-      {
-        path: ROUTE_PARTS.autoTagRules,
-        element: <AutoTagsPage />,
-        children: [
-          {
-            path: ROUTE_PARTS.create,
-            element: <EditAutoTagModal />,
-          },
-          {
-            path: ':id/' + ROUTE_PARTS.edit,
-            element: <EditAutoTagModal />,
-          },
-        ],
-      },
-      {
-        path: ROUTE_PARTS.tagNames,
-        element: <TagNamesPage />,
-        children: [
-          {
-            path: ROUTE_PARTS.create,
-            element: <EditTagNameModal />,
+            path: ROUTE_PARTS.timelines,
+            element: <TimelinesPage />,
+            children: [
+              {
+                path: ROUTE_PARTS.create,
+                element: <EditTimelineModal />,
+              },
+              {
+                path: ':id/' + ROUTE_PARTS.edit,
+                element: <EditTimelineModal />,
+              },
+            ],
           },
           {
-            path: ':id/' + ROUTE_PARTS.edit,
-            element: <EditTagNameModal />,
-          },
-        ],
-      },
-      {
-        path: ROUTE_PARTS.notes,
-        element: <NotesPage />,
-        children: [
-          {
-            path: ROUTE_PARTS.create,
-            element: <EditAutoNoteModal />,
-          },
-          {
-            path: ':id/' + ROUTE_PARTS.edit,
-            element: <EditAutoNoteModal />,
-          },
-        ],
-      },
-      {
-        path: ROUTE_PARTS.calendars,
-        element: <CalendarsPage />,
-        children: [
-          {
-            path: ROUTE_PARTS.create,
-            element: <EditCalendarModal />,
+            path: ROUTE_PARTS.autoTagRules,
+            element: <AutoTagsPage />,
+            children: [
+              {
+                path: ROUTE_PARTS.create,
+                element: <EditAutoTagModal />,
+              },
+              {
+                path: ':id/' + ROUTE_PARTS.edit,
+                element: <EditAutoTagModal />,
+              },
+            ],
           },
           {
-            path: ':id/' + ROUTE_PARTS.edit,
-            element: <EditCalendarModal />,
+            path: ROUTE_PARTS.tagNames,
+            element: <TagNamesPage />,
+            children: [
+              {
+                path: ROUTE_PARTS.create,
+                element: <EditTagNameModal />,
+              },
+              {
+                path: ':id/' + ROUTE_PARTS.edit,
+                element: <EditTagNameModal />,
+              },
+            ],
+          },
+          {
+            path: ROUTE_PARTS.notes,
+            element: <NotesPage />,
+            children: [
+              {
+                path: ROUTE_PARTS.create,
+                element: <EditAutoNoteModal />,
+              },
+              {
+                path: ':id/' + ROUTE_PARTS.edit,
+                element: <EditAutoNoteModal />,
+              },
+            ],
+          },
+          {
+            path: ROUTE_PARTS.calendars,
+            element: <CalendarsPage />,
+            children: [
+              {
+                path: ROUTE_PARTS.create,
+                element: <EditCalendarModal />,
+              },
+              {
+                path: ':id/' + ROUTE_PARTS.edit,
+                element: <EditCalendarModal />,
+              },
+            ],
           },
         ],
       },

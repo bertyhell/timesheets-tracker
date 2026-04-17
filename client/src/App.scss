@@ -1,22 +1,36 @@
 @use './styles/variables' as *;
 
-.m-main-navigation {
+$nav-width: 13rem;
+
+.m-app {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  background-color: #ccc;
+  min-height: 100vh;
+}
 
-  .c-tabs {
-    display: block;
-    background-color: #ccc;
+.m-main-navigation {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: $nav-width;
+  flex-shrink: 0;
+  background-color: #ccc;
+  min-height: 100vh;
+
+  .m-nav-links {
+    display: flex;
+    flex-direction: column;
+    padding-top: 0.5rem;
 
     > a {
-      display: inline-block;
-      padding: 1rem;
+      display: block;
+      padding: 0.75rem 1.25rem;
+      text-decoration: none;
+      color: inherit;
       cursor: pointer;
 
       &:hover {
-        background-color: #ddd;
+        background-color: #bbb;
       }
 
       &.active {
@@ -25,34 +39,91 @@
     }
   }
 
-  .c-global-search-bar {
-    flex-grow: 1;
+  .m-settings-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.75rem 1.25rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: inherit;
+    font-family: inherit;
+    text-align: left;
+    color: inherit;
 
-    input {
-      padding-left: 1rem;
-      height: $header-height;
-      box-sizing: border-box;
+    &:hover {
+      background-color: #bbb;
+    }
+
+    &.active {
+      font-weight: 600;
+    }
+
+    .m-gear-icon {
+      flex-shrink: 0;
+    }
+
+    .m-chevron-icon {
+      margin-left: auto;
+      flex-shrink: 0;
+      transition: transform 0.2s ease;
+
+      &.expanded {
+        transform: rotate(180deg);
+      }
     }
   }
 
-  .c-date-select {
-    flex-shrink: 1;
-    height: $header-height;
-  }
+  .m-settings-sub-nav {
+    display: flex;
+    flex-direction: column;
 
-  .m-header-actions {
-    .c-button {
-      margin: 0;
+    > a {
+      display: block;
+      padding: 0.6rem 1.25rem 0.6rem 2.5rem;
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+      font-size: 0.9rem;
+      border-left: 3px solid transparent;
 
-      + .c-button {
-        margin-left: 0.5rem;
+      &:hover {
+        background-color: #bbb;
+      }
+
+      &.active {
+        background-color: white;
+        border-left-color: $focus-color;
       }
     }
   }
 }
 
 .m-page-content {
-  padding-top: 1.5rem;
+  flex: 1;
+  padding: 1.5rem;
+  overflow: auto;
 
+  &--full {
+    padding: 0;
+  }
+}
 
+.m-page-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+  flex-wrap: wrap;
+}
+
+.m-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
 }

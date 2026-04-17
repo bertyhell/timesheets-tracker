@@ -57,7 +57,7 @@ function EditAutoNoteModal() {
     }
   }, [autoNote]);
 
-  const handleClose = () => navigate('/' + ROUTE_PARTS.notes);
+  const handleClose = () => navigate('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.notes);
 
   const handleSave = async (autoNote: Omit<AutoNote, 'id'>) => {
     if (id) {

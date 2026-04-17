@@ -8,14 +8,11 @@ import {
 import React, { type ReactNode, useEffect, useState } from 'react';
 import { ROUTE_PARTS } from '../../App';
 import { toast } from 'react-toastify';
-import { useAtom } from 'jotai';
 import { orderBy } from 'lodash-es';
-import { headerActionsAtom } from '../../store/store';
 
 function TimelinesPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [, setHeaderActions] = useAtom(headerActionsAtom);
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
   const toggleSort = () => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
@@ -35,20 +32,17 @@ function TimelinesPage() {
     refetchTimelines();
   }, [location]);
 
-  useEffect(() => {
-    setHeaderActions(
-      <button
-        className="c-button"
-        onClick={() => navigate('/' + ROUTE_PARTS.timelines + '/' + ROUTE_PARTS.create)}
-      >
-        Add timeline
-      </button>
-    );
-    return () => setHeaderActions(null);
-  }, [navigate]);
-
   return (
     <div className="p-timelines">
+      <div className="m-page-header">
+        <h2>Timelines</h2>
+        <button
+          className="c-button"
+          onClick={() => navigate('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.timelines + '/' + ROUTE_PARTS.create)}
+        >
+          Add timeline
+        </button>
+      </div>
       <table className="w-full">
         <thead>
           <tr className="h-10 bg-white">
@@ -68,7 +62,7 @@ function TimelinesPage() {
                 key={'timeline-' + timeline.id}
                 onClick={() =>
                   navigate(
-                    '/' + ROUTE_PARTS.timelines + '/' + timeline.id + '/' + ROUTE_PARTS.edit
+                    '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.timelines + '/' + timeline.id + '/' + ROUTE_PARTS.edit
                   )
                 }
               >
@@ -81,7 +75,7 @@ function TimelinesPage() {
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate(
-                        '/' + ROUTE_PARTS.timelines + '/' + timeline.id + '/' + ROUTE_PARTS.edit
+                        '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.timelines + '/' + timeline.id + '/' + ROUTE_PARTS.edit
                       );
                     }}
                   >

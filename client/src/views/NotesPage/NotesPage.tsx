@@ -9,8 +9,6 @@ import {
   useAutoNotesServiceAutoNotesControllerRemove,
 } from '../../generated/api/queries';
 import type { AutoNote } from '../../types/types';
-import { useAtom } from 'jotai';
-import { headerActionsAtom } from '../../store/store';
 import { orderBy } from 'lodash-es';
 
 // interface NotesPageProps {}
@@ -20,7 +18,6 @@ function NotesPage() {
   const params = useParams();
   const id = params.id;
   const [_selectedNote, setSelectedNote] = useState<AutoNote | null>(null);
-  const [, setHeaderActions] = useAtom(headerActionsAtom);
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
   const toggleSort = () => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
@@ -40,20 +37,17 @@ function NotesPage() {
     }
   }, [id, notes]);
 
-  useEffect(() => {
-    setHeaderActions(
-      <button
-        className="c-button"
-        onClick={() => navigate('/' + ROUTE_PARTS.notes + '/' + ROUTE_PARTS.create)}
-      >
-        Add auto note
-      </button>
-    );
-    return () => setHeaderActions(null);
-  }, [navigate]);
-
   return (
     <div className="p-tag-names">
+      <div className="m-page-header">
+        <h2>Auto notes</h2>
+        <button
+          className="c-button"
+          onClick={() => navigate('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.notes + '/' + ROUTE_PARTS.create)}
+        >
+          Add auto note
+        </button>
+      </div>
       <table className="w-full">
         <thead>
           <tr className="h-10 bg-white">
@@ -70,7 +64,7 @@ function NotesPage() {
               <tr
                 key={'note-' + note.id}
                 onClick={() =>
-                  navigate('/' + ROUTE_PARTS.notes + '/' + note.id + '/' + ROUTE_PARTS.edit)
+                  navigate('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.notes + '/' + note.id + '/' + ROUTE_PARTS.edit)
                 }
               >
                 <td className="pl-3">{note.title}</td>
@@ -80,7 +74,7 @@ function NotesPage() {
                     onClick={(e) => {
                       e.stopPropagation();
                       setSelectedNote(note as unknown as AutoNote);
-                      navigate('/' + ROUTE_PARTS.notes + '/' + note.id + '/' + ROUTE_PARTS.edit);
+                      navigate('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.notes + '/' + note.id + '/' + ROUTE_PARTS.edit);
                     }}
                   >
                     EDIT

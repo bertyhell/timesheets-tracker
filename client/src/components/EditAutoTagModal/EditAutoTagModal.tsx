@@ -102,7 +102,7 @@ function EditAutoTagModal() {
     setConditions(newConditions);
   };
 
-  const handleClose = () => navigate('/' + ROUTE_PARTS.autoTagRules);
+  const handleClose = () => navigate('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.autoTagRules);
 
   const handleSave = async () => {
     // TODO add validation

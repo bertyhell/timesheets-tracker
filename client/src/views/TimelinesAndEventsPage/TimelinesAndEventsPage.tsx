@@ -28,6 +28,8 @@ import {
   useTimelinesServiceTimelinesControllerFindAllEventsKey,
 } from '../../generated/api/queries';
 import { COLOR_LIST } from '../../components/Timeline/helpers/getColorForEvent';
+import GlobalSearchBar from '../../components/GlobalSearchBar/GlobalSearchBar';
+import DateSelect from '../../components/DateSelect/DateSelect';
 
 function TimelinesAndEventsPage() {
   const [viewDate] = useAtom(viewDateAtom);
@@ -214,8 +216,7 @@ function TimelinesAndEventsPage() {
 
   if (isLoadingTimelineEvents) {
     return <>Loading timelines and events...</>;
-  }
-  const selection =
+  }  const selection =
     selectionStartPercent && (selectionEndPercent || selectionMovePercent)
       ? {
           start: Math.min(
@@ -289,7 +290,15 @@ function TimelinesAndEventsPage() {
     return renderTimelinesAndEvents();
   };
 
-  return renderPageContent();
+  return (
+    <div>
+      <div className="m-page-toolbar">
+        <GlobalSearchBar />
+        <DateSelect />
+      </div>
+      {renderPageContent()}
+    </div>
+  );
 }
 
 export default TimelinesAndEventsPage;

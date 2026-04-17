@@ -9,9 +9,7 @@ import {
 import React, { type ReactNode, useEffect, useState } from 'react';
 import { ROUTE_PARTS } from '../../App';
 import { toast } from 'react-toastify';
-import { useAtom } from 'jotai';
 import { orderBy } from 'lodash-es';
-import { headerActionsAtom } from '../../store/store';
 
 // interface TagNamesPageProps {}
 
@@ -21,7 +19,6 @@ function TagNamesPage() {
   const params = useParams();
   const id = params.id;
   const [_selectedTagName, setSelectedTagName] = useState<TagName | null>(null);
-  const [, setHeaderActions] = useAtom(headerActionsAtom);
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
   const toggleSort = () => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
@@ -51,20 +48,17 @@ function TagNamesPage() {
     }
   }, [id, tagNames]);
 
-  useEffect(() => {
-    setHeaderActions(
-      <button
-        className="c-button"
-        onClick={() => navigate('/' + ROUTE_PARTS.tagNames + '/' + ROUTE_PARTS.create)}
-      >
-        Add tag name
-      </button>
-    );
-    return () => setHeaderActions(null);
-  }, [navigate]);
-
   return (
     <div className="p-tag-names">
+      <div className="m-page-header">
+        <h2>Tag names</h2>
+        <button
+          className="c-button"
+          onClick={() => navigate('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.tagNames + '/' + ROUTE_PARTS.create)}
+        >
+          Add tag name
+        </button>
+      </div>
       <table className="w-full">
         <thead>
           <tr className="h-10 bg-white">
@@ -82,7 +76,7 @@ function TagNamesPage() {
               <tr
                 key={'tag-name-' + tagName.id}
                 onClick={() =>
-                  navigate('/' + ROUTE_PARTS.tagNames + '/' + tagName.id + '/' + ROUTE_PARTS.edit)
+                  navigate('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.tagNames + '/' + tagName.id + '/' + ROUTE_PARTS.edit)
                 }
               >
                 <td className="w-px py-1 pl-2">
@@ -99,7 +93,7 @@ function TagNamesPage() {
                       e.stopPropagation();
                       setSelectedTagName(tagName as unknown as TagName);
                       navigate(
-                        '/' + ROUTE_PARTS.tagNames + '/' + tagName.id + '/' + ROUTE_PARTS.edit
+                        '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.tagNames + '/' + tagName.id + '/' + ROUTE_PARTS.edit
                       );
                     }}
                   >

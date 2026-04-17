@@ -8,8 +8,6 @@ import React, { type ReactNode, useEffect } from 'react';
 import { ROUTE_PARTS } from '../../App';
 import { toast } from 'react-toastify';
 import { type CalendarDto } from '../../generated/api/requests/types.gen';
-import { useAtom } from 'jotai';
-import { headerActionsAtom } from '../../store/store';
 
 function maskCalendarUrl(url: string): string {
   try {
@@ -23,7 +21,6 @@ function maskCalendarUrl(url: string): string {
 function CalendarsPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [, setHeaderActions] = useAtom(headerActionsAtom);
 
   const { data: calendars, refetch: refetchCalendars } =
     useCalendarsServiceCalendarsControllerFindAll();
@@ -34,17 +31,14 @@ function CalendarsPage() {
     refetchCalendars();
   }, [location]);
 
-  useEffect(() => {
-    setHeaderActions(
-      <NavLink className="c-button" to={'/' + ROUTE_PARTS.calendars + '/' + ROUTE_PARTS.create}>
-        Add calendar
-      </NavLink>
-    );
-    return () => setHeaderActions(null);
-  }, []);
-
   return (
     <div>
+      <div className="m-page-header">
+        <h2>Calendars</h2>
+        <NavLink className="c-button" to={'/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.calendars + '/' + ROUTE_PARTS.create}>
+          Add calendar
+        </NavLink>
+      </div>
       <table className="w-full">
         <thead>
           <tr className="h-10 bg-white">
@@ -61,7 +55,7 @@ function CalendarsPage() {
               <tr
                 key={'calendar-' + calendar.id}
                 onClick={() =>
-                  navigate('/' + ROUTE_PARTS.calendars + '/' + calendar.id + '/' + ROUTE_PARTS.edit)
+                  navigate('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.calendars + '/' + calendar.id + '/' + ROUTE_PARTS.edit)
                 }
               >
                 <td className="w-px py-1 pl-2">
@@ -75,7 +69,7 @@ function CalendarsPage() {
                 <td className="w-px whitespace-nowrap">
                   <NavLink
                     className="c-button"
-                    to={'/' + ROUTE_PARTS.calendars + '/' + calendar.id + '/' + ROUTE_PARTS.edit}
+                    to={'/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.calendars + '/' + calendar.id + '/' + ROUTE_PARTS.edit}
                     onClick={(e) => e.stopPropagation()}
                   >
                     EDIT

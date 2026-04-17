@@ -13,8 +13,6 @@ import { type AutoTag } from '../../types/types';
 import copy from 'copy-to-clipboard';
 import { mapLimit } from 'blend-promise-utils';
 import { AutoTagConditionDto, AutoTagDto } from '../../generated/api/requests';
-import { useAtom } from 'jotai';
-import { headerActionsAtom } from '../../store/store';
 
 const AUTOTAGS_PROPERTY_NAME = 'timesheetTrackerAutoTags';
 
@@ -23,7 +21,6 @@ const AUTOTAGS_PROPERTY_NAME = 'timesheetTrackerAutoTags';
 function AutoTagsPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [, setHeaderActions] = useAtom(headerActionsAtom);
   const [sortCol, setSortCol] = useState<'title' | 'priority'>('priority');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
@@ -98,25 +95,22 @@ function AutoTagsPage() {
     toast('Auto tag copied to clipboard', { type: 'success' });
   };
 
-  useEffect(() => {
-    setHeaderActions(
-      <>
-        <NavLink
-          className="c-button"
-          to={'/' + ROUTE_PARTS.autoTagRules + '/' + ROUTE_PARTS.create}
-        >
-          Add auto tag
-        </NavLink>
-        <button className="c-button" onClick={copyAutoTagsToClipboard}>
-          Copy autotags
-        </button>
-      </>
-    );
-    return () => setHeaderActions(null);
-  }, [copyAutoTagsToClipboard]);
-
   return (
     <div>
+      <div className="m-page-header">
+        <h2>Auto tag rules</h2>
+        <div>
+          <NavLink
+            className="c-button"
+            to={'/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.autoTagRules + '/' + ROUTE_PARTS.create}
+          >
+            Add auto tag
+          </NavLink>
+          <button className="c-button" onClick={copyAutoTagsToClipboard}>
+            Copy autotags
+          </button>
+        </div>
+      </div>
       <table className="w-full">
         <thead>
           <tr className="h-10 bg-white">
@@ -148,7 +142,7 @@ function AutoTagsPage() {
                 key={'auto-tag-' + autoTag.id}
                 onClick={() =>
                   navigate(
-                    '/' + ROUTE_PARTS.autoTagRules + '/' + autoTag.id + '/' + ROUTE_PARTS.edit
+                    '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.autoTagRules + '/' + autoTag.id + '/' + ROUTE_PARTS.edit
                   )
                 }
               >
@@ -163,7 +157,7 @@ function AutoTagsPage() {
                 <td className="w-px whitespace-nowrap">
                   <NavLink
                     className="c-button"
-                    to={'/' + ROUTE_PARTS.autoTagRules + '/' + autoTag.id + '/' + ROUTE_PARTS.edit}
+                    to={'/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.autoTagRules + '/' + autoTag.id + '/' + ROUTE_PARTS.edit}
                     onClick={(e) => e.stopPropagation()}
                   >
                     EDIT

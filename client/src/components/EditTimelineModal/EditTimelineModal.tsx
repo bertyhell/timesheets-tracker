@@ -47,7 +47,7 @@ function EditTimelineModal() {
     }
   }, [timelineResponse]);
 
-  const handleClose = () => navigate('/' + ROUTE_PARTS.timelines);
+  const handleClose = () => navigate('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.timelines);
 
   const handleSave = async () => {
     if (id) {

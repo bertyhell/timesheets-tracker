@@ -2,7 +2,6 @@ import './EditTagNameModal.scss';
 
 import React, { type ChangeEvent, useEffect, useState } from 'react';
 import { Modal } from 'react-responsive-modal';
-import { COLOR_LIST } from '../../views/TimelinesPage/TimelinesPage.consts';
 import { type TagName } from '../../types/types';
 import { ROUTE_PARTS } from '../../App';
 import {
@@ -14,6 +13,7 @@ import {
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { ColorInput } from '../ColorInput/ColorInput';
+import { COLOR_LIST } from '../Timeline/helpers/getColorForEvent';
 
 function EditTagNameModal() {
   const { id } = useParams();

@@ -1,4 +1,4 @@
-import './TimelinesPage.scss';
+import './TimelinesAndEventsPage.scss';
 import { toast } from 'react-toastify';
 import React, { ReactNode, useEffect, useState } from 'react';
 import Timeline from '../../components/Timeline/Timeline';
@@ -13,17 +13,11 @@ import {
 } from 'date-fns';
 import { TimelineType } from '../../components/Timeline/Timeline.types';
 import type { TagName } from '../../types/types';
-import { COLOR_LIST } from './TimelinesPage.consts';
 import { clamp, maxBy, minBy } from 'lodash-es';
 import { useAtom } from 'jotai';
 import { viewDateAtom } from '../../store/store';
-import { stringToColorIndex } from '../../helpers/string-to-color-index';
 import EventsTable from '../../components/EventsTable/EventsTable';
-import {
-  TimelineDto,
-  TimelineEventDto,
-  TimelineWithEventsDto,
-} from '../../generated/api/requests/types.gen';
+import { TimelineEventDto, TimelineWithEventsDto } from '../../generated/api/requests/types.gen';
 import {
   useTagNamesServiceTagNamesControllerCount,
   useTagNamesServiceTagNamesControllerCreate,
@@ -33,9 +27,9 @@ import {
   useTimelinesServiceTimelinesControllerFindAllEvents,
   useTimelinesServiceTimelinesControllerFindAllEventsKey,
 } from '../../generated/api/queries';
-import { TimelineEvent } from '../../../../types/types';
+import { COLOR_LIST } from '../../components/Timeline/helpers/getColorForEvent';
 
-function TimelinesPage() {
+function TimelinesAndEventsPage() {
   const [viewDate] = useAtom(viewDateAtom);
 
   const { data: timelineInfos, isLoading: isLoadingTimelineInfos } =
@@ -298,4 +292,4 @@ function TimelinesPage() {
   return renderPageContent();
 }
 
-export default TimelinesPage;
+export default TimelinesAndEventsPage;

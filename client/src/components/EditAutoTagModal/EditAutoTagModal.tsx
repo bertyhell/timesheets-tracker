@@ -24,10 +24,10 @@ import {
   ConditionVariable,
   type TagName,
 } from '../../types/types';
-import { COLOR_LIST } from '../../views/TimelinesPage/TimelinesPage.consts';
 import AutoTagConditionInput from '../AutoTagCondition/AutoTagConditionInput';
 import TagSelectSingle from '../TagSelect/TagSelectSingle';
 import ToggleButton from '../ToggleButton/ToggleButton';
+import { COLOR_LIST } from '../Timeline/helpers/getColorForEvent';
 
 const NEW_CONDITION: AutoTagCondition = {
   booleanOperator: BooleanOperator.OR,

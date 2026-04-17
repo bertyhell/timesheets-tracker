@@ -1,5 +1,5 @@
 import App, { ROUTE_PARTS } from './App';
-import TimelinesPage from './views/TimelinesPage/TimelinesPage';
+import TimelinesAndEventsPage from './views/TimelinesAndEventsPage/TimelinesAndEventsPage';
 import AutoTagsPage from './views/AutoTagsPage/AutoTagsPage';
 import EditAutoTagModal from './components/EditAutoTagModal/EditAutoTagModal';
 import TagNamesPage from './views/TagNamesPage/TagNamesPage';
@@ -10,6 +10,8 @@ import NotesPage from './views/NotesPage/NotesPage';
 import EditAutoNoteModal from './components/EditNoteModal/EditAutoNoteModal';
 import CalendarsPage from './views/CalendarsPage/CalendarsPage';
 import EditCalendarModal from './components/EditCalendarModal/EditCalendarModal';
+import TimelinesPage from './views/Timelines/TimelinesPage';
+import EditTimelineModal from './components/EditTimelineModal/EditTimelineModal';
 
 export const routes: RouteObject[] = [
   {
@@ -21,8 +23,22 @@ export const routes: RouteObject[] = [
         loader: () => redirect('/' + ROUTE_PARTS.timelines),
       },
       {
+        path: ROUTE_PARTS.timelinesAndEvents,
+        element: <TimelinesAndEventsPage />,
+      },
+      {
         path: ROUTE_PARTS.timelines,
         element: <TimelinesPage />,
+        children: [
+          {
+            path: ROUTE_PARTS.create,
+            element: <EditTimelineModal />,
+          },
+          {
+            path: ':id/' + ROUTE_PARTS.edit,
+            element: <EditTimelineModal />,
+          },
+        ],
       },
       {
         path: ROUTE_PARTS.autoTagRules,

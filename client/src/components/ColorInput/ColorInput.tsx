@@ -1,6 +1,6 @@
 import React from 'react';
 import { HexColorPicker } from 'react-colorful';
-import { COLOR_LIST } from '../../views/TimelinesPage/TimelinesPage.consts';
+import { COLOR_LIST } from '../Timeline/helpers/getColorForEvent';
 
 import './ColorInput.scss';
 

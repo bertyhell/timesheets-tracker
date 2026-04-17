@@ -23,9 +23,9 @@ export class CreateTimelineDto {
   timelineType: TimelineType;
 
   @IsString()
-  @Type(() => String)
+  @Type(() => Object)
   @ApiProperty({
-    type: String,
+    type: Object,
     description:
       'The information that is needed for this timeline to fetch events. eg: calendar needs a url to ics file, github needs a link to the git folder, ...',
   })
@@ -35,8 +35,8 @@ export class CreateTimelineDto {
   @Type(() => Number)
   @ApiProperty({
     type: Number,
-    description: 'Order in which the timelines are displayed',
-    default: 0,
+    description: 'Order in which the timelines are displayed (lower is first)',
+    examples: [0, 5, 200],
   })
-  order: number;
+  visualOrder: number;
 }

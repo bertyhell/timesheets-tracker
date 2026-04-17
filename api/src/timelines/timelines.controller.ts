@@ -2,7 +2,11 @@ import { Controller, Get, Post, Body, Query, Param, Patch, Delete } from '@nestj
 import { CreateTimelineDto } from './dto/create-timeline.dto';
 import { ApiExtraModels, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { TimelinesService } from './timelines.service';
-import { TimelineCountDto, TimelineDto } from './dto/response-timeline.dto';
+import {
+  CalendarEventProviderInfoDto,
+  TimelineCountDto,
+  TimelineDto,
+} from './dto/response-timeline.dto';
 import { type Timeline } from '../types/types';
 import { UpdateTimelineDto } from './dto/update-timeline.dto';
 import {
@@ -21,7 +25,8 @@ import {
   CalendarEventInfoDto,
   WebsiteEventInfoDto,
   TagEventInfoDto,
-  AutoTagEventInfoDto
+  AutoTagEventInfoDto,
+  CalendarEventProviderInfoDto
 )
 @ApiTags('timelines')
 @Controller('api/timelines')

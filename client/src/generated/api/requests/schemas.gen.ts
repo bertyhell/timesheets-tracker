@@ -678,6 +678,17 @@ export const $AutoTagEventInfoDto = {
     required: ['tagNameId', 'tagNameName', 'tagNameColor']
 } as const;
 
+export const $CalendarEventProviderInfoDto = {
+    type: 'object',
+    properties: {
+        icsUrl: {
+            type: 'string',
+            description: 'A url pointing to the ICS file of the calendar used for fetching events from the calendar'
+        }
+    },
+    required: ['icsUrl']
+} as const;
+
 export const $TimelineType = {
     type: 'string',
     enum: ['Program', 'Website', 'Tag', 'AutoTag', 'Calendar', 'ActiveState'],
@@ -700,16 +711,16 @@ export const $CreateTimelineDto = {
             ]
         },
         eventProviderInfo: {
-            type: 'string',
+            type: 'object',
             description: 'The information that is needed for this timeline to fetch events. eg: calendar needs a url to ics file, github needs a link to the git folder, ...'
         },
-        order: {
+        visualOrder: {
             type: 'number',
-            description: 'Order in which the timelines are displayed',
-            default: 0
+            description: 'Order in which the timelines are displayed (lower is first)',
+            examples: [0, 5, 200]
         }
     },
-    required: ['title', 'timelineType', 'eventProviderInfo', 'order']
+    required: ['title', 'timelineType', 'eventProviderInfo', 'visualOrder']
 } as const;
 
 export const $TimelineDto = {
@@ -732,8 +743,18 @@ export const $TimelineDto = {
             ]
         },
         eventProviderInfo: {
-            type: 'object',
-            description: 'Specific info for getting events for this timeline type. eg: calendar needs a url to ics file, github needs a link to the git folder, ...'
+            description: 'Specific info for getting events for this timeline type. eg: calendar needs a url to ics file, github needs a link to the git folder, ...',
+            oneOf: [
+                {
+                    '$ref': '#/components/schemas/CalendarEventProviderInfoDto'
+                }
+            ],
+            nullable: true,
+            allOf: [
+                {
+                    '$ref': '#/components/schemas/CalendarEventProviderInfoDto'
+                }
+            ]
         },
         createdAt: {
             type: 'string',
@@ -743,12 +764,12 @@ export const $TimelineDto = {
             type: 'string',
             description: 'ISO timestamp at which the timeline was last updated'
         },
-        order: {
+        visualOrder: {
             type: 'number',
-            description: 'Order in which the timelines are displayed'
+            description: 'Visual order in which the timelines are displayed'
         }
     },
-    required: ['id', 'title', 'timelineType', 'eventProviderInfo', 'createdAt', 'updatedAt', 'order']
+    required: ['id', 'title', 'timelineType', 'eventProviderInfo', 'createdAt', 'updatedAt', 'visualOrder']
 } as const;
 
 export const $TimelineEventDto = {
@@ -850,13 +871,13 @@ export const $UpdateTimelineDto = {
             ]
         },
         eventProviderInfo: {
-            type: 'string',
+            type: 'object',
             description: 'The information that is needed for this timeline to fetch events. eg: calendar needs a url to ics file, github needs a link to the git folder, ...'
         },
-        order: {
+        visualOrder: {
             type: 'number',
-            description: 'Order in which the timelines are displayed',
-            default: 0
+            description: 'Order in which the timelines are displayed (lower is first)',
+            examples: [0, 5, 200]
         }
     }
 } as const;

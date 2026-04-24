@@ -5,6 +5,8 @@ import { Modal } from 'react-responsive-modal';
 import { ROUTE_PARTS } from '../../App';
 import {
   useTimelinesServiceTimelinesControllerCreate,
+  useTimelinesServiceTimelinesControllerFindAll,
+  useTimelinesServiceTimelinesControllerFindAllKey,
   useTimelinesServiceTimelinesControllerFindOne,
   useTimelinesServiceTimelinesControllerFindOneKey,
   useTimelinesServiceTimelinesControllerUpdate,
@@ -14,12 +16,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 const TIMELINE_TYPES: TimelineType[] = [
-  'Program',
-  'Website',
-  'Tag',
+  'ActiveState',
   'AutoTag',
   'Calendar',
-  'ActiveState',
+  'Program',
+  'Tag',
+  'Website',
 ];
 
 function EditTimelineModal() {
@@ -27,11 +29,16 @@ function EditTimelineModal() {
   const navigate = useNavigate();
   const [title, setTitle] = useState<string>('');
   const [timelineType, setTimelineType] = useState<TimelineType>('Program');
-  const [eventProviderInfo, setEventProviderInfo] = useState<string>('');
-  const [order, setOrder] = useState<number>(0);
+  const [icsUrl, setIcsUrl] = useState<string>('');
+  const [visualOrder, setVisualOrder] = useState<number>(0);
 
   const { mutateAsync: createTimeline } = useTimelinesServiceTimelinesControllerCreate();
   const { mutateAsync: updateTimeline } = useTimelinesServiceTimelinesControllerUpdate();
+  const { data: allTimelines } = useTimelinesServiceTimelinesControllerFindAll(
+    { term: '' },
+    [useTimelinesServiceTimelinesControllerFindAllKey],
+    { enabled: !id }
+  );
   const { data: timelineResponse } = useTimelinesServiceTimelinesControllerFindOne(
     { id: id as string },
     [useTimelinesServiceTimelinesControllerFindOneKey, id as string],
@@ -42,10 +49,18 @@ function EditTimelineModal() {
     if (timelineResponse) {
       setTitle(timelineResponse.title);
       setTimelineType(timelineResponse.timelineType);
-      setEventProviderInfo(JSON.stringify(timelineResponse.eventProviderInfo));
-      setOrder(timelineResponse.order);
+      const info = timelineResponse.eventProviderInfo as Record<string, string> | null;
+      setIcsUrl(timelineResponse.timelineType === 'Calendar' ? (info?.icsUrl ?? '') : '');
+      setVisualOrder(timelineResponse.visualOrder);
     }
   }, [timelineResponse]);
+
+  useEffect(() => {
+    if (!id && allTimelines) {
+      const maxOrder = allTimelines.reduce((max, t) => Math.max(max, t.visualOrder ?? 0), -1);
+      setVisualOrder(maxOrder + 1);
+    }
+  }, [id, allTimelines]);
 
   const handleClose = () => navigate('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.timelines);
 
@@ -56,8 +71,8 @@ function EditTimelineModal() {
         requestBody: {
           title,
           timelineType,
-          eventProviderInfo,
-          order,
+          eventProviderInfo: timelineType === 'Calendar' ? { icsUrl } : {},
+          visualOrder,
         },
       });
       toast('Timeline has been updated', { type: 'success' });
@@ -66,8 +81,8 @@ function EditTimelineModal() {
         requestBody: {
           title,
           timelineType,
-          eventProviderInfo,
-          order,
+          eventProviderInfo: timelineType === 'Calendar' ? { icsUrl } : {},
+          visualOrder,
         },
       });
       toast('Timeline has been created', { type: 'success' });
@@ -84,20 +99,15 @@ function EditTimelineModal() {
     >
       <h3>{id ? 'Update timeline' : 'Add timeline'}</h3>
 
-      <h4 className="mt-4">Title</h4>
-      <input
-        className="c-input"
-        value={title}
-        onChange={(evt: ChangeEvent<HTMLInputElement>) => setTitle(evt.target.value)}
-      />
-
       <h4 className="mt-4">Type</h4>
       <select
         className="c-input"
         value={timelineType}
-        onChange={(evt: ChangeEvent<HTMLSelectElement>) =>
-          setTimelineType(evt.target.value as TimelineType)
-        }
+        onChange={(evt: ChangeEvent<HTMLSelectElement>) => {
+          const newType = evt.target.value as TimelineType;
+          setTimelineType(newType);
+          if (newType !== 'Calendar') setIcsUrl('');
+        }}
       >
         {TIMELINE_TYPES.map((type) => (
           <option key={type} value={type}>
@@ -106,31 +116,38 @@ function EditTimelineModal() {
         ))}
       </select>
 
-      <h4 className="mt-4">Event provider info</h4>
+      <h4 className="mt-4">Title</h4>
       <input
         className="c-input"
-        value={eventProviderInfo}
-        onChange={(evt: ChangeEvent<HTMLInputElement>) => setEventProviderInfo(evt.target.value)}
-        placeholder="e.g. a URL or identifier"
+        value={title}
+        onChange={(evt: ChangeEvent<HTMLInputElement>) => setTitle(evt.target.value)}
       />
 
-      <h4 className="mt-4">Order</h4>
+      {timelineType === 'Calendar' && (
+        <>
+          <h4 className="mt-4">Calendar ICS link</h4>
+          <input
+            className="c-input"
+            value={icsUrl}
+            onChange={(evt: ChangeEvent<HTMLInputElement>) => setIcsUrl(evt.target.value)}
+            placeholder="e.g. https://calendar.example.com/feed.ics"
+          />
+        </>
+      )}
+
+      <h4 className="mt-4">Visual ordering index</h4>
       <input
         className="c-input"
         type="number"
-        value={order}
-        onChange={(evt: ChangeEvent<HTMLInputElement>) => setOrder(Number(evt.target.value))}
+        value={visualOrder}
+        onChange={(evt: ChangeEvent<HTMLInputElement>) => setVisualOrder(Number(evt.target.value))}
       />
 
       <div className="flex flex-row justify-end gap-2 mt-8">
         <button className="c-button" onClick={handleClose}>
           Cancel
         </button>
-        <button
-          className="c-button"
-          disabled={!title}
-          onClick={handleSave}
-        >
+        <button className="c-button" disabled={!title} onClick={handleSave}>
           Save
         </button>
       </div>

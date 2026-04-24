@@ -13,12 +13,22 @@ import { orderBy } from 'lodash-es';
 function TimelinesPage() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [sortCol, setSortCol] = useState<'title' | 'timelineType' | 'visualOrder'>('visualOrder');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
-  const toggleSort = () => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
-  const sortIndicator = (
-    <span style={{ fontSize: '0.7em', color: 'black' }}>{sortDir === 'asc' ? ' ▲' : ' ▼'}</span>
-  );
+  const handleSort = (col: 'title' | 'timelineType' | 'visualOrder') => {
+    if (sortCol === col) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortCol(col);
+      setSortDir('asc');
+    }
+  };
+
+  const indicator = (col: 'title' | 'timelineType' | 'visualOrder') =>
+    sortCol === col ? (
+      <span style={{ fontSize: '0.7em', color: 'black' }}>{sortDir === 'asc' ? ' ▲' : ' ▼'}</span>
+    ) : null;
 
   const { data: timelines, refetch: refetchTimelines } =
     useTimelinesServiceTimelinesControllerFindAll(
@@ -38,7 +48,11 @@ function TimelinesPage() {
         <h2>Timelines</h2>
         <button
           className="c-button"
-          onClick={() => navigate('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.timelines + '/' + ROUTE_PARTS.create)}
+          onClick={() =>
+            navigate(
+              '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.timelines + '/' + ROUTE_PARTS.create
+            )
+          }
         >
           Add timeline
         </button>
@@ -46,36 +60,54 @@ function TimelinesPage() {
       <table className="w-full">
         <thead>
           <tr className="h-10 bg-white">
-            <th className="text-left pl-3 cursor-pointer select-none" onClick={toggleSort}>
-              Title{sortIndicator}
+            <th className="text-left pl-3 cursor-pointer select-none" onClick={() => handleSort('title')}>
+              Title{indicator('title')}
             </th>
-            <th className="text-left pl-3">Type</th>
-            <th className="text-left pl-3">Order</th>
+            <th className="text-left pl-3 cursor-pointer select-none" onClick={() => handleSort('timelineType')}>
+              Type{indicator('timelineType')}
+            </th>
+            <th className="text-left pl-3 cursor-pointer select-none" onClick={() => handleSort('visualOrder')}>
+              Order{indicator('visualOrder')}
+            </th>
             <th className="w-px whitespace-nowrap"></th>
             <th className="w-px whitespace-nowrap"></th>
           </tr>
         </thead>
         <tbody>
-          {orderBy(timelines || [], (t) => t.title?.toLowerCase(), sortDir).map(
+          {orderBy(timelines || [], (t) => sortCol === 'title' ? t.title?.toLowerCase() : t[sortCol], sortDir).map(
             (timeline): ReactNode => (
               <tr
                 key={'timeline-' + timeline.id}
                 onClick={() =>
                   navigate(
-                    '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.timelines + '/' + timeline.id + '/' + ROUTE_PARTS.edit
+                    '/' +
+                      ROUTE_PARTS.settings +
+                      '/' +
+                      ROUTE_PARTS.timelines +
+                      '/' +
+                      timeline.id +
+                      '/' +
+                      ROUTE_PARTS.edit
                   )
                 }
               >
                 <td className="pl-3">{timeline.title}</td>
                 <td className="pl-3">{timeline.timelineType}</td>
-                <td className="pl-3">{timeline.order}</td>
+                <td className="pl-3">{timeline.visualOrder}</td>
                 <td className="w-px whitespace-nowrap">
                   <button
                     className="c-button"
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate(
-                        '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.timelines + '/' + timeline.id + '/' + ROUTE_PARTS.edit
+                        '/' +
+                          ROUTE_PARTS.settings +
+                          '/' +
+                          ROUTE_PARTS.timelines +
+                          '/' +
+                          timeline.id +
+                          '/' +
+                          ROUTE_PARTS.edit
                       );
                     }}
                   >

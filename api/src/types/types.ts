@@ -1,4 +1,4 @@
-import { CalendarEventProviderInfo } from '../timelines/dto/response-timeline.dto';
+import { CalendarEventProviderInfoDto } from '../timelines/dto/response-timeline.dto';
 
 export interface Program {
   id: string;
@@ -115,8 +115,8 @@ export interface Timeline {
   id: string;
   title: string;
   timelineType: TimelineType;
-  eventProviderInfo: null | CalendarEventProviderInfo;
+  eventProviderInfo: CalendarEventProviderInfoDto | null;
   createdAt: string;
   updatedAt: string;
-  order: number;
+  visualOrder: number;
 }

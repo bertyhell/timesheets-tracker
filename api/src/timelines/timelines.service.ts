@@ -50,7 +50,7 @@ export class TimelinesService {
         : null,
       createdAt: rawTimeline.createdAt,
       updatedAt: rawTimeline.updatedAt,
-      order: rawTimeline.order,
+      visualOrder: rawTimeline.visualOrder,
     };
   }
 
@@ -91,7 +91,7 @@ export class TimelinesService {
         : null,
       createdAt: now,
       updatedAt: now,
-      visualOrder: timeline.order,
+      visualOrder: timeline.visualOrder,
     });
 
     return this.findOne(id);
@@ -108,7 +108,7 @@ export class TimelinesService {
         timelineType: (updateTimelineDto.timelineType ?? existing.timelineType) as TimelineType,
         eventProviderInfo: eventProviderInfo ? JSON.stringify(eventProviderInfo) : null,
         updatedAt: new Date().toISOString(),
-        visualOrder: updateTimelineDto.order ?? existing.order,
+        visualOrder: updateTimelineDto.visualOrder ?? existing.visualOrder,
       },
       { id }
     );

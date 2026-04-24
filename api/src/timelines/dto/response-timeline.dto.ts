@@ -70,9 +70,9 @@ export class TimelineDto implements Timeline {
   @Type(() => Number)
   @ApiProperty({
     type: Number,
-    description: 'Order in which the timelines are displayed',
+    description: 'Visual order in which the timelines are displayed',
   })
-  order: number;
+  visualOrder: number;
 }
 
 export class TimelineCountDto {

@@ -518,6 +518,13 @@ export type AutoTagEventInfoDto = {
     tagNameCode?: string | null;
 };
 
+export type CalendarEventProviderInfoDto = {
+    /**
+     * A url pointing to the ICS file of the calendar used for fetching events from the calendar
+     */
+    icsUrl: string;
+};
+
 /**
  * Type of the timeline
  */
@@ -535,11 +542,13 @@ export type CreateTimelineDto = {
     /**
      * The information that is needed for this timeline to fetch events. eg: calendar needs a url to ics file, github needs a link to the git folder, ...
      */
-    eventProviderInfo: string;
+    eventProviderInfo: {
+        [key: string]: unknown;
+    };
     /**
-     * Order in which the timelines are displayed
+     * Order in which the timelines are displayed (lower is first)
      */
-    order: number;
+    visualOrder: number;
 };
 
 export type TimelineDto = {
@@ -558,9 +567,7 @@ export type TimelineDto = {
     /**
      * Specific info for getting events for this timeline type. eg: calendar needs a url to ics file, github needs a link to the git folder, ...
      */
-    eventProviderInfo: {
-        [key: string]: unknown;
-    };
+    eventProviderInfo: (CalendarEventProviderInfoDto) | null;
     /**
      * ISO timestamp at which the timeline was created
      */
@@ -570,9 +577,9 @@ export type TimelineDto = {
      */
     updatedAt: string;
     /**
-     * Order in which the timelines are displayed
+     * Visual order in which the timelines are displayed
      */
-    order: number;
+    visualOrder: number;
 };
 
 export type TimelineEventDto = {
@@ -628,11 +635,13 @@ export type UpdateTimelineDto = {
     /**
      * The information that is needed for this timeline to fetch events. eg: calendar needs a url to ics file, github needs a link to the git folder, ...
      */
-    eventProviderInfo?: string;
+    eventProviderInfo?: {
+        [key: string]: unknown;
+    };
     /**
-     * Order in which the timelines are displayed
+     * Order in which the timelines are displayed (lower is first)
      */
-    order?: number;
+    visualOrder?: number;
 };
 
 export type AppControllerStatusResponse = unknown;

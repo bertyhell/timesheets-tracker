@@ -214,9 +214,7 @@ function TimelinesAndEventsPage() {
     await Promise.all([refetchTimelinesWithEvents(), refetchTagNamesCount()]);
   };
 
-  if (isLoadingTimelineEvents) {
-    return <>Loading timelines and events...</>;
-  }  const selection =
+  const selection =
     selectionStartPercent && (selectionEndPercent || selectionMovePercent)
       ? {
           start: Math.min(
@@ -245,10 +243,10 @@ function TimelinesAndEventsPage() {
           }
           minTime={minTime}
           maxTime={maxTime}
-          onMouseDown={(posX: number) => handleMouseDown(TimelineType.Tag, posX)}
-          onMouseMove={(posX: number) => handleMouseMove(TimelineType.Tag, posX)}
-          onMouseUp={(posX: number) => handleMouseUp(TimelineType.Tag, posX)}
-          selectionPercentages={activeSelectionTimeline === TimelineType.Tag ? selection : null}
+          onMouseDown={(posX: number) => handleMouseDown(timelineInfo.id, posX)}
+          onMouseMove={(posX: number) => handleMouseMove(timelineInfo.id, posX)}
+          onMouseUp={(posX: number) => handleMouseUp(timelineInfo.id, posX)}
+          selectionPercentages={activeSelectionTimeline === timelineInfo.id ? selection : null}
           onCreateTagName={handleCreateTagName}
           onCreateTag={handleCreateTag}
           selectedEvent={selectedEvent}
@@ -258,6 +256,7 @@ function TimelinesAndEventsPage() {
               selectedEventId: event.id,
             })
           }
+          isActive={selectedTimeline?.id === timelineInfo.id}
         ></Timeline>
       );
     });
@@ -280,11 +279,8 @@ function TimelinesAndEventsPage() {
   };
 
   const renderPageContent = () => {
-    if (isLoadingTimelineInfos) {
+    if (isLoadingTimelineInfos && !timelineInfos) {
       return <>Loading timelines...</>;
-    }
-    if (isLoadingTimelineEvents) {
-      return <>Loading timeline events...</>;
     }
 
     return renderTimelinesAndEvents();
@@ -295,6 +291,7 @@ function TimelinesAndEventsPage() {
       <div className="m-page-toolbar">
         <GlobalSearchBar />
         <DateSelect />
+        {isLoadingTimelineEvents && <div>Loading...</div>}
       </div>
       {renderPageContent()}
     </div>

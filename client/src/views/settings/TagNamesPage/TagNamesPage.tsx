@@ -1,13 +1,13 @@
 import './TagNamesPage.scss';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
-import type { TagName } from '../../types/types';
+import type { TagName } from '../../../types/types';
 import {
   useTagNamesServiceTagNamesControllerFindAll,
   useTagNamesServiceTagNamesControllerFindAllKey,
   useTagNamesServiceTagNamesControllerRemove,
-} from '../../generated/api/queries';
+} from '../../../generated/api/queries';
 import React, { type ReactNode, useEffect, useState } from 'react';
-import { ROUTE_PARTS } from '../../App';
+import { ROUTE_PARTS } from '../../../App';
 import { toast } from 'react-toastify';
 import { orderBy } from 'lodash-es';
 
@@ -54,7 +54,11 @@ function TagNamesPage() {
         <h2>Tag names</h2>
         <button
           className="c-button"
-          onClick={() => navigate('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.tagNames + '/' + ROUTE_PARTS.create)}
+          onClick={() =>
+            navigate(
+              '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.tagNames + '/' + ROUTE_PARTS.create
+            )
+          }
         >
           Add tag name
         </button>
@@ -76,7 +80,16 @@ function TagNamesPage() {
               <tr
                 key={'tag-name-' + tagName.id}
                 onClick={() =>
-                  navigate('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.tagNames + '/' + tagName.id + '/' + ROUTE_PARTS.edit)
+                  navigate(
+                    '/' +
+                      ROUTE_PARTS.settings +
+                      '/' +
+                      ROUTE_PARTS.tagNames +
+                      '/' +
+                      tagName.id +
+                      '/' +
+                      ROUTE_PARTS.edit
+                  )
                 }
               >
                 <td className="w-px py-1 pl-2">
@@ -93,7 +106,14 @@ function TagNamesPage() {
                       e.stopPropagation();
                       setSelectedTagName(tagName as unknown as TagName);
                       navigate(
-                        '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.tagNames + '/' + tagName.id + '/' + ROUTE_PARTS.edit
+                        '/' +
+                          ROUTE_PARTS.settings +
+                          '/' +
+                          ROUTE_PARTS.tagNames +
+                          '/' +
+                          tagName.id +
+                          '/' +
+                          ROUTE_PARTS.edit
                       );
                     }}
                   >

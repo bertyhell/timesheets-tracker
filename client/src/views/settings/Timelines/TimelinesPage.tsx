@@ -4,9 +4,9 @@ import {
   useTimelinesServiceTimelinesControllerDelete,
   useTimelinesServiceTimelinesControllerFindAll,
   useTimelinesServiceTimelinesControllerFindAllKey,
-} from '../../generated/api/queries';
+} from '../../../generated/api/queries';
 import React, { type ReactNode, useEffect, useState } from 'react';
-import { ROUTE_PARTS } from '../../App';
+import { ROUTE_PARTS } from '../../../App';
 import { toast } from 'react-toastify';
 import { orderBy } from 'lodash-es';
 
@@ -60,13 +60,22 @@ function TimelinesPage() {
       <table className="w-full">
         <thead>
           <tr className="h-10 bg-white">
-            <th className="text-left pl-3 cursor-pointer select-none" onClick={() => handleSort('title')}>
+            <th
+              className="text-left pl-3 cursor-pointer select-none"
+              onClick={() => handleSort('title')}
+            >
               Title{indicator('title')}
             </th>
-            <th className="text-left pl-3 cursor-pointer select-none" onClick={() => handleSort('timelineType')}>
+            <th
+              className="text-left pl-3 cursor-pointer select-none"
+              onClick={() => handleSort('timelineType')}
+            >
               Type{indicator('timelineType')}
             </th>
-            <th className="text-left pl-3 cursor-pointer select-none" onClick={() => handleSort('visualOrder')}>
+            <th
+              className="text-left pl-3 cursor-pointer select-none"
+              onClick={() => handleSort('visualOrder')}
+            >
               Order{indicator('visualOrder')}
             </th>
             <th className="w-px whitespace-nowrap"></th>
@@ -74,7 +83,11 @@ function TimelinesPage() {
           </tr>
         </thead>
         <tbody>
-          {orderBy(timelines || [], (t) => sortCol === 'title' ? t.title?.toLowerCase() : t[sortCol], sortDir).map(
+          {orderBy(
+            timelines || [],
+            (t) => (sortCol === 'title' ? t.title?.toLowerCase() : t[sortCol]),
+            sortDir
+          ).map(
             (timeline): ReactNode => (
               <tr
                 key={'timeline-' + timeline.id}

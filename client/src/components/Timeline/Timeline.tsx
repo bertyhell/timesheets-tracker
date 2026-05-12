@@ -35,6 +35,7 @@ interface TimelineProps {
   onCreateTag: (tagNameId: string) => Promise<void>;
   selectedEvent: TimelineEventDto | null;
   setSelectedEvent: (event: TimelineEventDto, timeline: TimelineDto) => void;
+  isActive: boolean;
 }
 
 function Timeline({
@@ -50,6 +51,7 @@ function Timeline({
   onCreateTag,
   selectedEvent,
   setSelectedEvent,
+  isActive,
 }: TimelineProps) {
   const windowInMilliseconds = differenceInMilliseconds(maxTime, minTime);
 
@@ -155,7 +157,7 @@ function Timeline({
   const quarterTicks = getTicks(minTime, maxTime, 15);
   return (
     <div
-      className="c-timeline"
+      className={'c-timeline ' + (isActive ? 'c-timeline--active' : '')}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}

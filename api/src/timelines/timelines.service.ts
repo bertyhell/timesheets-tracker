@@ -216,7 +216,7 @@ export class TimelinesService {
           case TimelineType.Calendar:
             return (async () => {
               const calendarEvents = await this.calendarsService.getEvents(
-                timelineInfo.id,
+                timelineInfo.eventProviderInfo.icsUrl,
                 startedAt,
                 endedAt
               );

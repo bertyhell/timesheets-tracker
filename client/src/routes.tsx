@@ -1,18 +1,18 @@
 import App, { ROUTE_PARTS } from './App';
 import TimelinesAndEventsPage from './views/TimelinesAndEventsPage/TimelinesAndEventsPage';
-import AutoTagsPage from './views/AutoTagsPage/AutoTagsPage';
+import AutoTagsPage from './views/settings/AutoTagsPage/AutoTagsPage';
 import EditAutoTagModal from './components/EditAutoTagModal/EditAutoTagModal';
-import TagNamesPage from './views/TagNamesPage/TagNamesPage';
+import TagNamesPage from './views/settings/TagNamesPage/TagNamesPage';
 import EditTagNameModal from './components/EditTagNameModal/EditTagNameModal';
 import React from 'react';
 import { redirect, type RouteObject } from 'react-router-dom';
-import NotesPage from './views/NotesPage/NotesPage';
+import NotesPage from './views/settings/NotesPage/NotesPage';
 import EditAutoNoteModal from './components/EditNoteModal/EditAutoNoteModal';
-import CalendarsPage from './views/CalendarsPage/CalendarsPage';
+import CalendarsPage from './views/settings/CalendarsPage/CalendarsPage';
 import EditCalendarModal from './components/EditCalendarModal/EditCalendarModal';
-import TimelinesPage from './views/Timelines/TimelinesPage';
+import TimelinesPage from './views/settings/Timelines/TimelinesPage';
 import EditTimelineModal from './components/EditTimelineModal/EditTimelineModal';
-import SettingsPage from './views/SettingsPage/SettingsPage';
+import SettingsPage from './views/settings/SettingsPage/SettingsPage';
 
 export const routes: RouteObject[] = [
   {

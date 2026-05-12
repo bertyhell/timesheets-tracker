@@ -3,12 +3,12 @@ import React, { type ReactNode, useEffect, useState } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-import { ROUTE_PARTS } from '../../App';
+import { ROUTE_PARTS } from '../../../App';
 import {
   useAutoNotesServiceAutoNotesControllerFindAll,
   useAutoNotesServiceAutoNotesControllerRemove,
-} from '../../generated/api/queries';
-import type { AutoNote } from '../../types/types';
+} from '../../../generated/api/queries';
+import type { AutoNote } from '../../../types/types';
 import { orderBy } from 'lodash-es';
 
 // interface NotesPageProps {}
@@ -43,7 +43,11 @@ function NotesPage() {
         <h2>Auto notes</h2>
         <button
           className="c-button"
-          onClick={() => navigate('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.notes + '/' + ROUTE_PARTS.create)}
+          onClick={() =>
+            navigate(
+              '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.notes + '/' + ROUTE_PARTS.create
+            )
+          }
         >
           Add auto note
         </button>
@@ -64,7 +68,16 @@ function NotesPage() {
               <tr
                 key={'note-' + note.id}
                 onClick={() =>
-                  navigate('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.notes + '/' + note.id + '/' + ROUTE_PARTS.edit)
+                  navigate(
+                    '/' +
+                      ROUTE_PARTS.settings +
+                      '/' +
+                      ROUTE_PARTS.notes +
+                      '/' +
+                      note.id +
+                      '/' +
+                      ROUTE_PARTS.edit
+                  )
                 }
               >
                 <td className="pl-3">{note.title}</td>
@@ -74,7 +87,16 @@ function NotesPage() {
                     onClick={(e) => {
                       e.stopPropagation();
                       setSelectedNote(note as unknown as AutoNote);
-                      navigate('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.notes + '/' + note.id + '/' + ROUTE_PARTS.edit);
+                      navigate(
+                        '/' +
+                          ROUTE_PARTS.settings +
+                          '/' +
+                          ROUTE_PARTS.notes +
+                          '/' +
+                          note.id +
+                          '/' +
+                          ROUTE_PARTS.edit
+                      );
                     }}
                   >
                     EDIT

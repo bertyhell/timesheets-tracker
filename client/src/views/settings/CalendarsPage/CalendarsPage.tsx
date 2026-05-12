@@ -3,11 +3,11 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   useCalendarsServiceCalendarsControllerDelete,
   useCalendarsServiceCalendarsControllerFindAll,
-} from '../../generated/api/queries';
+} from '../../../generated/api/queries';
 import React, { type ReactNode, useEffect } from 'react';
-import { ROUTE_PARTS } from '../../App';
+import { ROUTE_PARTS } from '../../../App';
 import { toast } from 'react-toastify';
-import { type CalendarDto } from '../../generated/api/requests/types.gen';
+import { type CalendarDto } from '../../../generated/api/requests/types.gen';
 
 function maskCalendarUrl(url: string): string {
   try {
@@ -35,7 +35,10 @@ function CalendarsPage() {
     <div>
       <div className="m-page-header">
         <h2>Calendars</h2>
-        <NavLink className="c-button" to={'/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.calendars + '/' + ROUTE_PARTS.create}>
+        <NavLink
+          className="c-button"
+          to={'/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.calendars + '/' + ROUTE_PARTS.create}
+        >
           Add calendar
         </NavLink>
       </div>
@@ -55,7 +58,16 @@ function CalendarsPage() {
               <tr
                 key={'calendar-' + calendar.id}
                 onClick={() =>
-                  navigate('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.calendars + '/' + calendar.id + '/' + ROUTE_PARTS.edit)
+                  navigate(
+                    '/' +
+                      ROUTE_PARTS.settings +
+                      '/' +
+                      ROUTE_PARTS.calendars +
+                      '/' +
+                      calendar.id +
+                      '/' +
+                      ROUTE_PARTS.edit
+                  )
                 }
               >
                 <td className="w-px py-1 pl-2">
@@ -69,7 +81,16 @@ function CalendarsPage() {
                 <td className="w-px whitespace-nowrap">
                   <NavLink
                     className="c-button"
-                    to={'/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.calendars + '/' + calendar.id + '/' + ROUTE_PARTS.edit}
+                    to={
+                      '/' +
+                      ROUTE_PARTS.settings +
+                      '/' +
+                      ROUTE_PARTS.calendars +
+                      '/' +
+                      calendar.id +
+                      '/' +
+                      ROUTE_PARTS.edit
+                    }
                     onClick={(e) => e.stopPropagation()}
                   >
                     EDIT

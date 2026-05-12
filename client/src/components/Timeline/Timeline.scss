@@ -8,7 +8,14 @@ $timelineHeight: 5rem;
   flex-direction: row;
   border-bottom: 1px solid #666;
 
+  &--active {
+    .c-timeline__title {
+      background-color: lighten($primary, 30%);
+    }
+  }
+
   .c-timeline__title {
+    padding-left: 0.5rem;
     line-height: $timelineHeight;
     width: 5rem;
     white-space: nowrap;

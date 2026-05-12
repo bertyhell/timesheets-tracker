@@ -13,3 +13,6 @@ api/manic-time-export.csv
 
 .claude/
 ManicTime_*
+
+.env*
+!.env.template

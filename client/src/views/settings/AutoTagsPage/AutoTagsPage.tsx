@@ -4,15 +4,15 @@ import {
   useAutoTagsServiceAutoTagsControllerCreate,
   useAutoTagsServiceAutoTagsControllerDelete,
   useAutoTagsServiceAutoTagsControllerFindAll,
-} from '../../generated/api/queries';
+} from '../../../generated/api/queries';
 import React, { type ReactNode, useCallback, useEffect, useState } from 'react';
 import { orderBy } from 'lodash-es';
-import { ROUTE_PARTS } from '../../App';
+import { ROUTE_PARTS } from '../../../App';
 import { toast } from 'react-toastify';
-import { type AutoTag } from '../../types/types';
+import { type AutoTag } from '../../../types/types';
 import copy from 'copy-to-clipboard';
 import { mapLimit } from 'blend-promise-utils';
-import { AutoTagConditionDto, AutoTagDto } from '../../generated/api/requests';
+import { AutoTagConditionDto, AutoTagDto } from '../../../generated/api/requests';
 
 const AUTOTAGS_PROPERTY_NAME = 'timesheetTrackerAutoTags';
 
@@ -102,7 +102,9 @@ function AutoTagsPage() {
         <div>
           <NavLink
             className="c-button"
-            to={'/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.autoTagRules + '/' + ROUTE_PARTS.create}
+            to={
+              '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.autoTagRules + '/' + ROUTE_PARTS.create
+            }
           >
             Add auto tag
           </NavLink>
@@ -142,7 +144,14 @@ function AutoTagsPage() {
                 key={'auto-tag-' + autoTag.id}
                 onClick={() =>
                   navigate(
-                    '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.autoTagRules + '/' + autoTag.id + '/' + ROUTE_PARTS.edit
+                    '/' +
+                      ROUTE_PARTS.settings +
+                      '/' +
+                      ROUTE_PARTS.autoTagRules +
+                      '/' +
+                      autoTag.id +
+                      '/' +
+                      ROUTE_PARTS.edit
                   )
                 }
               >
@@ -157,7 +166,16 @@ function AutoTagsPage() {
                 <td className="w-px whitespace-nowrap">
                   <NavLink
                     className="c-button"
-                    to={'/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.autoTagRules + '/' + autoTag.id + '/' + ROUTE_PARTS.edit}
+                    to={
+                      '/' +
+                      ROUTE_PARTS.settings +
+                      '/' +
+                      ROUTE_PARTS.autoTagRules +
+                      '/' +
+                      autoTag.id +
+                      '/' +
+                      ROUTE_PARTS.edit
+                    }
                     onClick={(e) => e.stopPropagation()}
                   >
                     EDIT

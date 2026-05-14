@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { parseISO } from 'date-fns';
 import { orderBy } from 'lodash-es';
 import { useAtom } from 'jotai';
@@ -23,6 +23,7 @@ import {
   TableHeader,
   TableView,
 } from '@adobe/react-spectrum';
+import type { SortDescriptor } from '@react-types/shared';
 
 interface EventsTotalsTableProps {
   events: TimelineEventDto[];
@@ -39,7 +40,7 @@ interface TotalRow {
 
 const COLUMNS = [
   { key: 'category', title: 'Category', allowsSorting: true },
-  { key: 'duration', title: 'Duration', allowsSorting: true, width: 100 },
+  { key: 'duration', title: 'Duration', width: 100, allowsSorting: true },
 ];
 
 function getCategoryLabel(event: TimelineEventDto, timelineType: TimelineType): string {
@@ -72,8 +73,12 @@ function formatDuration(ms: number): string {
 
 export function EventsTotalsTable({ events, timelineType, className }: EventsTotalsTableProps) {
   const [searchTerm] = useAtom(searchTermAtom);
+  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+    column: 'duration',
+    direction: 'descending',
+  });
 
-  const totals: TotalRow[] = useMemo(() => {
+  const sortedTotals: TotalRow[] = useMemo(() => {
     const filtered = events.filter((e) => JSON.stringify(e).toLowerCase().includes(searchTerm));
 
     const map = new Map<string, number>();
@@ -83,19 +88,19 @@ export function EventsTotalsTable({ events, timelineType, className }: EventsTot
       map.set(category, (map.get(category) ?? 0) + durationMs);
     }
 
+    const rows: TotalRow[] = Array.from(map.entries()).map(([category, durationMs]) => ({
+      id: category,
+      category,
+      durationMs,
+      duration: formatDuration(durationMs),
+    }));
+
     return orderBy(
-      Array.from(map.entries()).map(
-        ([category, durationMs]): TotalRow => ({
-          id: category,
-          category,
-          durationMs,
-          duration: formatDuration(durationMs),
-        })
-      ),
-      (row) => row.durationMs,
-      'desc'
+      rows,
+      [(row) => (sortDescriptor.column === 'duration' ? row.durationMs : row.category)],
+      [sortDescriptor.direction === 'descending' ? 'desc' : 'asc']
     );
-  }, [events, timelineType, searchTerm]);
+  }, [events, timelineType, searchTerm, sortDescriptor]);
 
   return (
     <div className={className}>
@@ -103,16 +108,18 @@ export function EventsTotalsTable({ events, timelineType, className }: EventsTot
         <TableView
           aria-label="Timeline event totals"
           density="compact"
+          sortDescriptor={sortDescriptor}
+          onSortChange={setSortDescriptor}
           renderEmptyState={() => <>No events</>}
         >
           <TableHeader columns={COLUMNS}>
             {(column) => (
-              <Column key={column.key} width={column.width}>
+              <Column key={column.key} width={column.width} allowsSorting={column.allowsSorting}>
                 {column.title}
               </Column>
             )}
           </TableHeader>
-          <TableBody items={totals}>
+          <TableBody items={sortedTotals}>
             {(row) => (
               <Row key={row.id}>
                 {(columnKey) => <Cell>{String(row[columnKey as keyof TotalRow] ?? '')}</Cell>}

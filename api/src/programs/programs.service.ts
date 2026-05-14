@@ -53,6 +53,7 @@ export class ProgramsService {
       windowTitle: activity.windowTitle,
       startedAt: min([new Date(activity.startedAt), new Date(activity.endedAt)]).toISOString(),
       endedAt: max([new Date(activity.startedAt), new Date(activity.endedAt)]).toISOString(),
+      iconColor: activity.iconColor ?? null,
     });
 
     return this.findOne(id);

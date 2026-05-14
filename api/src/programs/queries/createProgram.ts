@@ -6,6 +6,7 @@ export type CreateProgramParams = {
 	windowTitle: string | null;
 	startedAt: string;
 	endedAt: string;
+	iconColor: string | null;
 }
 
 export type CreateProgramResult = {
@@ -16,9 +17,9 @@ export type CreateProgramResult = {
 export function createProgram(db: Database, params: CreateProgramParams): CreateProgramResult {
 	const sql = `
 	INSERT INTO programs
-	(id, programName, windowTitle, startedAt, endedAt)
-	VALUES (?, ?, ?, ?, ?)
+	(id, programName, windowTitle, startedAt, endedAt, iconColor)
+	VALUES (?, ?, ?, ?, ?, ?)
 	`
 	return db.prepare(sql)
-		.run(params.id, params.programName, params.windowTitle, params.startedAt, params.endedAt) as CreateProgramResult;
+		.run(params.id, params.programName, params.windowTitle, params.startedAt, params.endedAt, params.iconColor) as CreateProgramResult;
 }

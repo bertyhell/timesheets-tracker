@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { type Program } from '../../types/types';
@@ -44,4 +44,14 @@ export class ResponseProgramDto implements Program {
     description: 'End time in ISO format',
   })
   endedAt: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    required: false,
+    description: 'Primary color of the program icon as a CSS hex string',
+  })
+  iconColor?: string;
 }

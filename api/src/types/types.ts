@@ -6,6 +6,7 @@ export interface Program {
   windowTitle: string;
   startedAt: string;
   endedAt: string;
+  iconColor?: string;
 }
 
 export interface Website {

@@ -5,6 +5,7 @@ import { logger } from '../shared/logger';
 
 import { ProgramsService } from './programs.service';
 import { CreateProgramDto } from './dto/create-activity.dto';
+import { extractIconColor } from './helpers/extract-icon-color';
 
 @Injectable()
 export class ProgramsListener implements OnApplicationBootstrap {
@@ -60,17 +61,19 @@ export class ProgramsListener implements OnApplicationBootstrap {
           // ignore entry since it's the same activity as this.lastProgram
         } else {
           // Program changes, write last activity to database
-          const { icon: _icon, ...info } = windowInfo;
+          const { icon, ...info } = windowInfo;
           logger.info(
             'changed application or title: ',
             new Date().toISOString(),
             JSON.stringify(info)
           );
+          const iconColor = icon ? await extractIconColor(this.lastProgram.programName, icon) : null;
           await this.programsService.create({
             programName: this.lastProgram.programName,
             windowTitle: this.lastProgram.windowTitle,
             startedAt: this.lastProgram.startedAt,
             endedAt: currentProgram.startedAt,
+            iconColor: iconColor ?? undefined,
           });
           this.lastProgram = currentProgram;
         }

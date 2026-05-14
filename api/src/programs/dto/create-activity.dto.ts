@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -38,4 +38,14 @@ export class CreateProgramDto {
     default: undefined,
   })
   endedAt: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Primary color of the program icon as a CSS hex string',
+    default: undefined,
+  })
+  iconColor?: string;
 }

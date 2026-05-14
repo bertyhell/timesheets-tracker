@@ -1,5 +1,6 @@
 import { Injectable, type OnModuleInit, Logger, OnModuleDestroy } from '@nestjs/common';
 import * as path from 'path';
+import * as fs from 'fs';
 import * as fsPromise from 'fs/promises';
 import { Database, Statement, Changes } from 'bun:sqlite';
 import { CustomError } from '../shared/CustomError';
@@ -75,6 +76,43 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
    */
   async createTables(): Promise<void> {
     await this.mutate('./src/database/queries/create-database-tables.sql');
+    this.runMigrations();
+  }
+
+  /**
+   * Runs all pending SQL migration files from the migrations folder.
+   * Tracks executed migrations in an `executed_migrations` table so each file runs exactly once.
+   */
+  private runMigrations(): void {
+    const db = this.db;
+
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS executed_migrations (
+        filename TEXT PRIMARY KEY NOT NULL,
+        executed_at TEXT NOT NULL DEFAULT (datetime('now'))
+      )
+    `);
+
+    const migrationsDir = resolveProjectPath('./src/database/queries/migrations');
+    const files = fs
+      .readdirSync(migrationsDir)
+      .filter((f) => f.endsWith('.sql'))
+      .sort();
+
+    const executed = new Set(
+      (db.prepare('SELECT filename FROM executed_migrations').all() as { filename: string }[]).map(
+        (row) => row.filename,
+      ),
+    );
+
+    for (const file of files) {
+      if (executed.has(file)) continue;
+
+      const sql = fs.readFileSync(path.join(migrationsDir, file), 'utf-8');
+      db.exec(sql);
+      db.prepare('INSERT INTO executed_migrations (filename) VALUES (?)').run(file);
+      this.logger.log(`Migration applied: ${file}`);
+    }
   }
 
   public getDb(): Database {

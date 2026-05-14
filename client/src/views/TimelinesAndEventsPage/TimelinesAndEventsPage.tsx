@@ -1,4 +1,4 @@
-import './TimelinesAndEventsPage.scss';
+import './TimelinesAndEventsPage.css';
 import { toast } from 'react-toastify';
 import React, { ReactNode, useEffect, useState } from 'react';
 import Timeline from '../../components/Timeline/Timeline';

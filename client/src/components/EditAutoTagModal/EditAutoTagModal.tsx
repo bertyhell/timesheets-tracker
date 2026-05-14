@@ -1,4 +1,4 @@
-import './EditAutoTagModal.scss';
+import './EditAutoTagModal.css';
 
 import { cloneDeep } from 'lodash-es';
 import React, { type ChangeEvent, useEffect, useState } from 'react';

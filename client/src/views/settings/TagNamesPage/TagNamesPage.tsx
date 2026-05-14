@@ -1,6 +1,6 @@
-import './TagNamesPage.scss';
+import './TagNamesPage.css';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
-import PageHeader from '../../../components/PageHeader/PageHeader';
+import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import type { TagName } from '../../../types/types';
 import {
   useTagNamesServiceTagNamesControllerFindAll,
@@ -66,7 +66,7 @@ export function TagNamesPage() {
           Add tag name
         </button>
       </PageHeader>
-      <table className="w-full">
+      <table className="c-table w-full">
         <thead>
           <tr className="h-10 bg-white">
             <th className="w-px"></th>

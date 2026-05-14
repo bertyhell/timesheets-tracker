@@ -1,4 +1,4 @@
-import './DateSelect.scss';
+import './DateSelect.css';
 
 import { addDays, format, parseISO } from 'date-fns';
 import { useAtom } from 'jotai';

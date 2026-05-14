@@ -1,4 +1,4 @@
-import './Timeline.scss';
+import './Timeline.css';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import React, { type MouseEvent } from 'react';

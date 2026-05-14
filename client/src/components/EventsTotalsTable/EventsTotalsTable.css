@@ -1,8 +1,8 @@
 .c-events-totals-table {
   overflow-x: hidden;
+}
 
-  // Target the S2 TableView scrollable body container
-  [role='rowgroup'] {
-    overflow-x: hidden !important;
-  }
+/* Target the S2 TableView scrollable body container */
+.c-events-totals-table [role='rowgroup'] {
+  overflow-x: hidden !important;
 }

@@ -1,0 +1,16 @@
+.c-spectrum-table {
+  [role='rowgroup'] {
+    overflow-y: hidden;
+  }
+}
+
+.c-table.w-full {
+  th:first-child,
+  td:first-child {
+    padding-left: 1.5rem;
+  }
+  th:last-child,
+  td:last-child {
+    padding-right: 1.5rem;
+  }
+}

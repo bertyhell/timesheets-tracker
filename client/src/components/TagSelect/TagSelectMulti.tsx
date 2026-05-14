@@ -1,4 +1,4 @@
-import './TagSelect.scss';
+import './TagSelect.css';
 
 import React from 'react';
 import { type ActionMeta, type OnChangeValue } from 'react-select';

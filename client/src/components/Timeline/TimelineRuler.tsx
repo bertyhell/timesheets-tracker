@@ -1,4 +1,4 @@
-import './TimelineRuler.scss';
+import './TimelineRuler.css';
 import React from 'react';
 import { differenceInMilliseconds, format } from 'date-fns';
 import { getTicks } from './helpers/getTicks';

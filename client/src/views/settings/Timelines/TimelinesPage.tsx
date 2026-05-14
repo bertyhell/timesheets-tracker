@@ -1,6 +1,5 @@
-import './TimelinesPage.scss';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import PageHeader from '../../../components/PageHeader/PageHeader';
+import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import {
   useTimelinesServiceTimelinesControllerDelete,
   useTimelinesServiceTimelinesControllerFindAll,
@@ -10,6 +9,7 @@ import React, { type ReactNode, useEffect, useState } from 'react';
 import { ROUTE_PARTS } from '../../../App';
 import { toast } from 'react-toastify';
 import { orderBy } from 'lodash-es';
+import './TimelinesPage.css';
 
 export function TimelinesPage() {
   const location = useLocation();
@@ -60,7 +60,7 @@ export function TimelinesPage() {
           Add timeline
         </button>
       </PageHeader>
-      <table className="w-full">
+      <table className="c-table w-full">
         <thead>
           <tr className="h-10 bg-white">
             <th

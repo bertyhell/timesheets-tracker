@@ -106,7 +106,7 @@ export function EventsTotalsTable({ events, timelineType, className }: EventsTot
   }, [events, timelineType, searchTerm, sortDescriptor.column, sortDescriptor.direction]);
 
   return (
-    <div className={`c-table c-events-totals-table${className ? ` ${className}` : ''}`}>
+    <div className={`c-spectrum-table c-events-totals-table${className ? ` ${className}` : ''}`}>
       <Provider colorScheme="light">
         <TableView
           key={columns.map((c) => c.key).join(',')}

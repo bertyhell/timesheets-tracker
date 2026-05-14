@@ -1,6 +1,6 @@
-import './AutoTagsPage.scss';
+import './AutoTagsPage.css';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import PageHeader from '../../../components/PageHeader/PageHeader';
+import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import {
   useAutoTagsServiceAutoTagsControllerCreate,
   useAutoTagsServiceAutoTagsControllerDelete,
@@ -156,7 +156,7 @@ export function AutoTagsPage() {
 
   const renderAutoTagsTable = () => {
     return (
-      <table className="w-full">
+      <table className="c-table w-full">
         <thead>
           <tr className="h-10 bg-white">
             <th className="w-px"></th>

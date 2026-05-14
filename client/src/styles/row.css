@@ -1,5 +1,3 @@
-@use './variables' as *;
-
 .c-row {
   display: flex;
   align-items: center;
@@ -7,16 +5,16 @@
   flex-direction: row;
 
   &:nth-child(odd) {
-    background-color: $bg-alternative;
+    background-color: var(--bg-alternative);
   }
 
   &:hover {
-    background-color: $hover-highlight;
+    background-color: var(--hover-highlight);
   }
 
-  //> span:first-child {
+  /* > span:first-child {
   //  flex-grow: 1;
-  //}
+  // } */
 
   span {
     padding: 0.5rem 2rem;

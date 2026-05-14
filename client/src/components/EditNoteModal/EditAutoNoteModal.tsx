@@ -1,4 +1,4 @@
-import './EditAutoNoteModal.scss';
+import './EditAutoNoteModal.css';
 
 import React, { type ChangeEvent, useEffect, useState } from 'react';
 import { Modal } from 'react-responsive-modal';

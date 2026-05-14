@@ -155,7 +155,7 @@ export function EventsTable({ timeline, events, className }: EventsTableProps) {
   }, [timeline?.id, events, searchTerm]);
 
   return (
-    <div className={'c-table ' + className}>
+    <div className={'c-spectrum-table ' + className}>
       <Provider colorScheme="light">
         <TableView
           key={columns.map((c) => c.key).join(',')}

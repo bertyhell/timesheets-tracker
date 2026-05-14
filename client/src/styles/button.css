@@ -1,8 +1,6 @@
-@use './variables' as *;
-
 .c-button {
   padding: 1rem;
-  background-color: $primary;
+  background-color: var(--primary);
   color: white;
   text-transform: uppercase;
   border: 0;
@@ -12,11 +10,11 @@
   display: inline-block;
 
   &:hover {
-    background-color: lighten($primary, 20%);
+    background-color: #558f8f; /* lighten(darkslategray, 20%) */
   }
 
   &:focus {
-    background-color: $focus-color;
+    background-color: var(--focus-color);
   }
 
   &--small {

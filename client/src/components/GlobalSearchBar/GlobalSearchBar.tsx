@@ -1,6 +1,6 @@
 import React from 'react';
 
-import './GlobalSearchBar.scss';
+import './GlobalSearchBar.css';
 import { useAtom } from 'jotai';
 
 import { searchTermAtom } from '../../store/store';

@@ -1,39 +1,36 @@
-@use '../../styles/variables' as *;
-
-$timelineHeight: 5rem;
-
 .c-timeline {
-  height: $timelineHeight;
+  --timeline-height: 5rem;
+  height: var(--timeline-height);
   display: flex;
   flex-direction: row;
   border-bottom: 1px solid #666;
 
   &--active {
     .c-timeline__title {
-      background-color: lighten($primary, 30%);
+      background-color: #6ea9a9; /* lighten(darkslategray, 30%) */
     }
   }
 
   .c-timeline__title {
     padding-left: 0.5rem;
-    line-height: $timelineHeight;
+    line-height: var(--timeline-height);
     width: 5rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 
     &:hover {
-      background-color: lighten($primary, 40%);
+      background-color: #8ebcbc; /* lighten(darkslategray, 40%) */
     }
   }
 
   .c-timeline__track {
     position: relative;
-    height: $timelineHeight;
+    height: var(--timeline-height);
     flex-grow: 1;
 
     .c-timeline__selection {
-      height: $timelineHeight;
+      height: var(--timeline-height);
       background-color: #99999955;
       position: absolute;
       pointer-events: none;
@@ -46,7 +43,7 @@ $timelineHeight: 5rem;
   .c-timeline__event {
     position: absolute;
     top: 0;
-    height: $timelineHeight;
+    height: var(--timeline-height);
   }
 
   .c-timeline__hour-tick {
@@ -70,11 +67,11 @@ $timelineHeight: 5rem;
 }
 
 .tippy-arrow {
-  color: $primary;
+  color: var(--primary);
 }
 
 .tippy-content {
-  background-color: $primary;
+  background-color: var(--primary);
 
   ul {
     padding: 0 1rem;

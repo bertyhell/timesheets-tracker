@@ -1,4 +1,4 @@
-import './App.scss';
+import './App.css';
 
 import React, { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';

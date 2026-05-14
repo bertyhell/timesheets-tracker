@@ -1,6 +1,6 @@
-import './NotesPage.scss';
+import './NotesPage.css';
 import React, { type ReactNode, useEffect, useState } from 'react';
-import PageHeader from '../../../components/PageHeader/PageHeader';
+import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -55,7 +55,7 @@ export function NotesPage() {
           Add auto note
         </button>
       </PageHeader>
-      <table className="w-full">
+      <table className="c-table w-full">
         <thead>
           <tr className="h-10 bg-white">
             <th className="text-left pl-3 cursor-pointer select-none" onClick={toggleSort}>

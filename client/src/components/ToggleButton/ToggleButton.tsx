@@ -1,4 +1,4 @@
-import './ToggleButton.scss';
+import './ToggleButton.css';
 
 import React, { type FC } from 'react';
 

@@ -1,12 +1,18 @@
 import React, { type FC, type ReactNode } from 'react';
 
+import './PageHeader.css';
+
 interface PageHeaderProps {
   title: string;
   description?: string;
   children?: ReactNode;
 }
 
-const PageHeader: FC<PageHeaderProps> = ({ title, description, children }: PageHeaderProps) => {
+export const PageHeader: FC<PageHeaderProps> = ({
+  title,
+  description,
+  children,
+}: PageHeaderProps) => {
   return (
     <div className="m-page-header">
       <div className="flex flex-col max-w-screen-md">
@@ -21,5 +27,3 @@ const PageHeader: FC<PageHeaderProps> = ({ title, description, children }: PageH
     </div>
   );
 };
-
-export default PageHeader;

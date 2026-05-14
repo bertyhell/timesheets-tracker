@@ -1,5 +1,3 @@
-@use '../../styles/variables' as variables;
-
 .p-timelines-and-events-page {
   display: flex;
   flex-direction: column;
@@ -33,20 +31,20 @@
   background-color: #ddd;
   transition: background-color 0.15s ease;
   flex-shrink: 0;
+}
 
-  &:hover,
-  &[data-resize-handle-active] {
-    background-color: #a0a0ff;
-  }
+.c-resize-handle:hover,
+.c-resize-handle[data-resize-handle-active] {
+  background-color: #a0a0ff;
+}
 
-  &--horizontal {
-    height: 5px;
-    cursor: row-resize;
-    width: 100%;
-  }
+.c-resize-handle--horizontal {
+  height: 5px;
+  cursor: row-resize;
+  width: 100%;
+}
 
-  &--vertical {
-    width: 5px;
-    cursor: col-resize;
-  }
+.c-resize-handle--vertical {
+  width: 5px;
+  cursor: col-resize;
 }

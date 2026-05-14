@@ -1,9 +1,7 @@
-@use '../../styles/variables' as *;
-
 .m-settings-page {
   display: flex;
   flex-direction: row;
-  min-height: calc(100vh - #{$header-height});
+  min-height: calc(100vh - var(--header-height));
 
   .m-settings-sidebar {
     display: flex;
@@ -28,7 +26,7 @@
 
       &.active {
         background-color: white;
-        border-left-color: $focus-color;
+        border-left-color: var(--focus-color);
         font-weight: 600;
       }
     }

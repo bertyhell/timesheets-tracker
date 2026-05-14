@@ -1,4 +1,4 @@
-import './TagSelect.scss';
+import './TagSelect.css';
 
 import React from 'react';
 import AsyncCreatableSelect from 'react-select/async-creatable';

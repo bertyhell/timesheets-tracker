@@ -1,6 +1,4 @@
-@use './variables' as *;
-
 #root .Toastify .Toastify__toast {
   border-radius: 0;
-  background: $primary;
+  background: var(--primary);
 }

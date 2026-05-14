@@ -1,4 +1,4 @@
-import './EditTagNameModal.scss';
+import './EditTagNameModal.css';
 
 import React, { type ChangeEvent, useEffect, useState } from 'react';
 import { Modal } from 'react-responsive-modal';

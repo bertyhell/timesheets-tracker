@@ -1,7 +1,3 @@
-@use './styles/variables' as *;
-
-$nav-width: 13rem;
-
 .m-app {
   display: flex;
   flex-direction: row;
@@ -12,7 +8,7 @@ $nav-width: 13rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  width: $nav-width;
+  width: 13rem;
   flex-shrink: 0;
   background-color: #ccc;
   height: 100vh;
@@ -103,7 +99,7 @@ $nav-width: 13rem;
 
       &.active {
         background-color: white;
-        border-left-color: $focus-color;
+        border-left-color: var(--focus-color);
       }
     }
   }
@@ -111,14 +107,12 @@ $nav-width: 13rem;
 
 .m-page-content {
   flex: 1;
-  padding: 1.5rem;
   overflow: auto;
   min-height: 0;
+}
 
-  &--full {
-    padding: 0;
-    overflow: hidden;
-  }
+.m-page-content--full {
+  overflow: hidden;
 }
 
 .m-page-toolbar {

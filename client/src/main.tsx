@@ -1,4 +1,4 @@
-import './main.scss';
+import './main.css';
 import '@react-spectrum/s2/page.css';
 
 import React from 'react';

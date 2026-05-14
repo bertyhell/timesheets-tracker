@@ -1,0 +1,7 @@
+:root {
+  --focus-color: #2684ff;
+  --bg-alternative: #f1f1f1;
+  --hover-highlight: #f2f8ff; /* lighten(#2684ff, 40%) */
+  --primary: darkslategray;
+  --header-height: 3.5rem;
+}

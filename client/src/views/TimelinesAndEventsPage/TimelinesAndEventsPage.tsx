@@ -152,6 +152,9 @@ export function TimelinesAndEventsPage() {
   // ]);
 
   const handleKeyUpEvent = async (evt: KeyboardEvent) => {
+    if (!(evt.target as Element)?.closest('.c-timelines')) {
+      return;
+    }
     // Use state setter function to get latest state, since this event handler happens outside the react
     setSelectedTimelineAndEvent(() => {
       if (evt.key === 'Delete') {

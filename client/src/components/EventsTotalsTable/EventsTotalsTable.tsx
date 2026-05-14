@@ -13,6 +13,16 @@ import {
   TimelineType,
   WebsiteEventInfoDto,
 } from '../../generated/api/requests';
+import {
+  Cell,
+  Column,
+  defaultTheme,
+  Provider,
+  Row,
+  TableBody,
+  TableHeader,
+  TableView,
+} from '@adobe/react-spectrum';
 
 interface EventsTotalsTableProps {
   events: TimelineEventDto[];
@@ -21,9 +31,16 @@ interface EventsTotalsTableProps {
 }
 
 interface TotalRow {
+  id: string;
   category: string;
   durationMs: number;
+  duration: string;
 }
+
+const COLUMNS = [
+  { key: 'category', title: 'Category', allowsSorting: true },
+  { key: 'duration', title: 'Duration', allowsSorting: true, width: 100 },
+];
 
 function getCategoryLabel(event: TimelineEventDto, timelineType: TimelineType): string {
   const info = event.info;
@@ -56,7 +73,7 @@ function formatDuration(ms: number): string {
 export function EventsTotalsTable({ events, timelineType, className }: EventsTotalsTableProps) {
   const [searchTerm] = useAtom(searchTermAtom);
 
-  const totals = useMemo(() => {
+  const totals: TotalRow[] = useMemo(() => {
     const filtered = events.filter((e) => JSON.stringify(e).toLowerCase().includes(searchTerm));
 
     const map = new Map<string, number>();
@@ -68,7 +85,12 @@ export function EventsTotalsTable({ events, timelineType, className }: EventsTot
 
     return orderBy(
       Array.from(map.entries()).map(
-        ([category, durationMs]): TotalRow => ({ category, durationMs })
+        ([category, durationMs]): TotalRow => ({
+          id: category,
+          category,
+          durationMs,
+          duration: formatDuration(durationMs),
+        })
       ),
       (row) => row.durationMs,
       'desc'
@@ -77,30 +99,28 @@ export function EventsTotalsTable({ events, timelineType, className }: EventsTot
 
   return (
     <div className={className}>
-      <table className="w-full">
-        <thead>
-          <tr className="h-10 bg-white">
-            <th className="text-left pl-3">Category</th>
-            <th className="text-right pr-3 w-24">Duration</th>
-          </tr>
-        </thead>
-        <tbody>
-          {totals.length === 0 ? (
-            <tr>
-              <td colSpan={2} className="text-center py-4 text-gray-400">
-                No events
-              </td>
-            </tr>
-          ) : (
-            totals.map((row) => (
-              <tr key={row.category}>
-                <td className="pl-3">{row.category}</td>
-                <td className="pr-3 text-right tabular-nums">{formatDuration(row.durationMs)}</td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+      <Provider theme={defaultTheme} colorScheme="light">
+        <TableView
+          aria-label="Timeline event totals"
+          density="compact"
+          renderEmptyState={() => <>No events</>}
+        >
+          <TableHeader columns={COLUMNS}>
+            {(column) => (
+              <Column key={column.key} width={column.width}>
+                {column.title}
+              </Column>
+            )}
+          </TableHeader>
+          <TableBody items={totals}>
+            {(row) => (
+              <Row key={row.id}>
+                {(columnKey) => <Cell>{String(row[columnKey as keyof TotalRow] ?? '')}</Cell>}
+              </Row>
+            )}
+          </TableBody>
+        </TableView>
+      </Provider>
     </div>
   );
 }

@@ -19,13 +19,7 @@ import { useAtom } from 'jotai';
 import { searchTermAtom } from '../../store/store';
 import { TimelineEventDto, TimelineWithEventsDto } from '../../generated/api/requests';
 import { TimelineType } from '../Timeline/Timeline.types';
-
-interface ColumnDef {
-  key: string;
-  title: string;
-  width?: number;
-  allowsSorting?: boolean;
-}
+import { ColumnDef } from './Table.types';
 
 const FIXED_COLUMNS: ColumnDef[] = [
   { key: 'startedAt', title: 'Start', width: 100, allowsSorting: true },
@@ -37,24 +31,24 @@ function getDynamicColumns(timelineType: string | undefined): ColumnDef[] {
   switch (timelineType) {
     case TimelineType.Program:
       return [
-        { key: 'program', title: 'Program', width: 200, allowsSorting: true },
+        { key: 'program', title: 'Program', allowsSorting: true, width: 200 },
         { key: 'title', title: 'Title', allowsSorting: true },
       ];
 
     case TimelineType.ActiveState:
-      return [{ key: 'isActive', title: 'Active', width: 200, allowsSorting: true }];
+      return [{ key: 'isActive', title: 'Active', allowsSorting: true }];
 
     case TimelineType.Tag:
-      return [{ key: 'tagName', title: 'Tag', width: 200, allowsSorting: true }];
+      return [{ key: 'tagName', title: 'Tag', allowsSorting: true }];
 
     case TimelineType.AutoTag:
-      return [{ key: 'tagName', title: 'Tag', width: 200, allowsSorting: true }];
+      return [{ key: 'tagName', title: 'Tag', allowsSorting: true }];
 
     case TimelineType.Website:
-      return [{ key: 'websiteName', title: 'Website', width: 200, allowsSorting: true }];
+      return [{ key: 'websiteName', title: 'Website', allowsSorting: true }];
 
     case TimelineType.Calendar:
-      return [{ key: 'summary', title: 'Summary', width: 200, allowsSorting: true }];
+      return [{ key: 'summary', title: 'Summary', allowsSorting: true }];
 
     default:
       return [];

@@ -3,17 +3,13 @@ import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import React, { type MouseEvent } from 'react';
 import {
-  addHours,
   addMilliseconds,
-  addMinutes,
   differenceInMilliseconds,
   differenceInSeconds,
-  endOfHour,
   format,
   isAfter,
   isBefore,
   parseISO,
-  roundToNearestMinutes,
 } from 'date-fns';
 import { formatDuration } from '../../helpers/format-duration';
 import type { TagName } from '../../types/types';
@@ -21,6 +17,7 @@ import { type ActionMeta, type MultiValue, type OnChangeValue } from 'react-sele
 import TagSelectMulti from '../TagSelect/TagSelectMulti';
 import { TimelineDto, TimelineEventDto } from '../../generated/api/requests';
 import { getColorForEvent } from './helpers/getColorForEvent';
+import { getTicks } from './helpers/getTicks';
 
 interface TimelineProps {
   timelineInfo: TimelineDto;
@@ -63,39 +60,6 @@ function Timeline({
     minTime,
     (windowInMilliseconds / 100) * (selectionPercentages?.end || 0)
   );
-
-  /**
-   * Returns all dates to place lines at. eg: every 60 minutes or every 15 minutes
-   * @param minTime
-   * @param maxTime
-   * @param interval 30 or 15 or 5
-   */
-  const getTicks = (minTime: Date, maxTime: Date, interval: number) => {
-    const ticks: Date[] = [];
-    if (interval === 60) {
-      let nextTick = endOfHour(minTime);
-
-      while (isBefore(nextTick, maxTime)) {
-        ticks.push(nextTick);
-        nextTick = addHours(nextTick, 1);
-      }
-    } else {
-      let nextTick = roundToNearestMinutes(minTime, {
-        nearestTo: interval,
-        roundingMethod: 'ceil',
-      });
-
-      while (isBefore(nextTick, maxTime)) {
-        ticks.push(nextTick);
-        nextTick = roundToNearestMinutes(addMinutes(nextTick, 1), {
-          nearestTo: interval,
-          roundingMethod: 'ceil',
-        });
-      }
-    }
-
-    return ticks;
-  };
 
   const getMousePositionXPercent = (evt: MouseEvent) => {
     return (

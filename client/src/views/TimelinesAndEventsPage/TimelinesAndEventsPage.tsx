@@ -18,6 +18,7 @@ import { useAtom } from 'jotai';
 import { viewDateAtom } from '../../store/store';
 import EventsTable from '../../components/EventsTable/EventsTable';
 import EventsTotalsTable from '../../components/EventsTotalsTable/EventsTotalsTable';
+import TimelineRuler from '../../components/Timeline/TimelineRuler';
 import { TimelineEventDto, TimelineWithEventsDto } from '../../generated/api/requests/types.gen';
 import {
   useTagNamesServiceTagNamesControllerCount,
@@ -294,7 +295,10 @@ export function TimelinesAndEventsPage() {
   const renderTimelinesAndEvents = () => {
     return (
       <div className="p-timelines-page">
-        <div className="c-timelines">{renderTimelines()}</div>
+        <div className="c-timelines">
+          <TimelineRuler minTime={minTime} maxTime={maxTime} />
+          {renderTimelines()}
+        </div>
         <div className="c-timeline-events-list">{renderSelectedTimelineEvents()}</div>
       </div>
     );

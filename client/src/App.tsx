@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useAtom } from 'jotai';
+import { sidebarCollapsedAtom } from './store/store';
 
 export enum ROUTE_PARTS {
   timelinesAndEvents = 'timelines-and-events',

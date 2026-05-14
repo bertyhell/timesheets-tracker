@@ -2,6 +2,11 @@
   [role='rowgroup'] {
     overflow-y: hidden;
   }
+
+  [role='grid'] {
+    border-radius: 0 !important;
+    overflow-x: hidden;
+  }
 }
 
 .c-table.w-full {

@@ -1,11 +1,12 @@
 .c-timeline {
-  --timeline-height: 5rem;
+  --timeline-height: 4rem;
   height: var(--timeline-height);
+  min-height: 3rem;
   display: flex;
   flex-direction: row;
   border-bottom: 1px solid #666;
 
-  &--active {
+  .c-timeline--active {
     .c-timeline__title {
       background-color: #6ea9a9; /* lighten(darkslategray, 30%) */
     }

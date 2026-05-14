@@ -28,7 +28,7 @@
 }
 
 .c-resize-handle {
-  background-color: #ddd;
+  background-color: #eee;
   transition: background-color 0.15s ease;
   flex-shrink: 0;
 }

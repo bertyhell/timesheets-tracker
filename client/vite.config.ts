@@ -14,7 +14,6 @@ export default defineConfig({
   resolve: {
     preserveSymlinks: true,
   },
-  root: '/',
   build: {
     target: ['es2022'],
     cssMinify: 'lightningcss',

@@ -32,6 +32,7 @@ import {
 import { COLOR_LIST } from '../../components/Timeline/helpers/getColorForEvent';
 import GlobalSearchBar from '../../components/GlobalSearchBar/GlobalSearchBar';
 import DateSelect from '../../components/DateSelect/DateSelect';
+import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from 'react-resizable-panels';
 
 export function TimelinesAndEventsPage() {
   const [viewDate] = useAtom(viewDateAtom);
@@ -275,36 +276,46 @@ export function TimelinesAndEventsPage() {
     });
   };
 
-  const renderSelectedTimelineEvents = () => {
-    if (!selectedTimeline?.events?.length) {
-      return <div className="u-center">No events</div>;
-    }
-    console.log('rendering table with ', selectedTimeline);
-    return (
-      <>
-        <EventsTable
-          className="c-events-table"
-          timeline={selectedTimeline}
-          events={selectedTimeline.events}
-        />
-        <EventsTotalsTable
-          className="c-events-totals-table"
-          events={selectedTimeline.events}
-          timelineType={selectedTimeline.type}
-        />
-      </>
-    );
-  };
-
   const renderTimelinesAndEvents = () => {
     return (
-      <div className="p-timelines-page">
-        <div className="c-timelines">
-          <TimelineRuler minTime={minTime} maxTime={maxTime} />
-          {renderTimelines()}
-        </div>
-        <div className="c-timeline-events-list">{renderSelectedTimelineEvents()}</div>
-      </div>
+      <PanelGroup orientation="vertical" className="p-timelines-page">
+        <Panel defaultSize="50%" minSize="15%" className="c-timelines-panel">
+          <div className="c-timelines">
+            <TimelineRuler minTime={minTime} maxTime={maxTime} />
+            {renderTimelines()}
+          </div>
+        </Panel>
+
+        <PanelResizeHandle className="c-resize-handle c-resize-handle--horizontal" />
+
+        <Panel minSize="10%" className="c-timeline-events-list">
+          <PanelGroup orientation="horizontal">
+            <Panel minSize="15%">
+              {!selectedTimeline?.events?.length ? (
+                <div className="u-center">No events</div>
+              ) : (
+                <EventsTable
+                  className="c-events-table"
+                  timeline={selectedTimeline}
+                  events={selectedTimeline.events}
+                />
+              )}
+            </Panel>
+
+            <PanelResizeHandle className="c-resize-handle c-resize-handle--vertical" />
+
+            <Panel minSize="15%">
+              {!selectedTimeline?.events?.length ? null : (
+                <EventsTotalsTable
+                  className="c-events-totals-table"
+                  events={selectedTimeline.events}
+                  timelineType={selectedTimeline.type}
+                />
+              )}
+            </Panel>
+          </PanelGroup>
+        </Panel>
+      </PanelGroup>
     );
   };
 

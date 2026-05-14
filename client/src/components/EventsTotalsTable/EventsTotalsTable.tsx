@@ -40,7 +40,7 @@ interface TotalRow {
 
 const COLUMNS = [
   { key: 'category', title: 'Category', allowsSorting: true },
-  { key: 'duration', title: 'Duration', width: 100, allowsSorting: true },
+  { key: 'duration', title: 'Duration', width: 120, allowsSorting: true },
 ];
 
 function getCategoryLabel(event: TimelineEventDto, timelineType: TimelineType): string {

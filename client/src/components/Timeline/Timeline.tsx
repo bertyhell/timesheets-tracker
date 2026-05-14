@@ -126,7 +126,7 @@ function Timeline({
       onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
     >
-      <div className="c-timeline__title">{timelineInfo.title}</div>
+      <div className="c-timeline__title cursor-pointer">{timelineInfo.title}</div>
       <div className="c-timeline__track">
         {/* Hour and quarter ticks */}
         {quarterTicks.map((quarterTick) => (

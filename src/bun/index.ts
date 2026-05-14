@@ -71,29 +71,21 @@ console.log('Waiting for NestJS server to start…');
 await waitForServer(APP_URL);
 console.log('NestJS server is ready');
 
-// ── Native application menu (enables clipboard shortcuts) ───────────────────
+// ── Native application menu ──────────────────────────────────────────────────
 ApplicationMenu.setApplicationMenu([
   {
     submenu: [{ label: 'Quit Timesheets Tracker', role: 'quit' }],
   },
   {
-    label: 'Edit',
-    submenu: [
-      { role: 'undo' },
-      { role: 'redo' },
-      { type: 'separator' },
-      { role: 'cut' },
-      { role: 'copy' },
-      { role: 'paste' },
-      { role: 'selectAll' },
-    ],
-  },
-  {
-    label: 'View',
+    label: 'Debug',
     submenu: [
       {
         label: 'Toggle Developer Tools',
         action: 'toggle-devtools',
+      },
+      {
+        label: 'Open Installation Dir',
+        action: 'open-install-dir',
       },
     ],
   },
@@ -112,10 +104,12 @@ const win = new BrowserWindow({
   titleBarStyle: 'default',
 });
 
-// ── DevTools ──────────────────────────────────────────────────────────────────
+// ── DevTools & debug actions ──────────────────────────────────────────────────
 Electrobun.events.on('application-menu-clicked', (e) => {
   if (e.data.action === 'toggle-devtools') {
     win.webview.toggleDevTools();
+  } else if (e.data.action === 'open-install-dir') {
+    Bun.spawn(['explorer', __PROJECT_ROOT__], { cwd: __PROJECT_ROOT__ });
   }
 });
 

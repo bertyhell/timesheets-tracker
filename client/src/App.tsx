@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useAtom } from 'jotai';
 import { sidebarCollapsedAtom } from './store/store';
 
+
 export enum ROUTE_PARTS {
   timelinesAndEvents = 'timelines-and-events',
   settings = 'settings',
@@ -31,6 +32,7 @@ function App() {
   const isFullLayoutPage = location.pathname.startsWith('/' + ROUTE_PARTS.timelinesAndEvents);
   const isSettingsPage = location.pathname.startsWith('/' + ROUTE_PARTS.settings);
   const [settingsExpanded, setSettingsExpanded] = useState(isSettingsPage);
+  const [sidebarCollapsed] = useAtom(sidebarCollapsedAtom);
 
   useEffect(() => {
     if (isSettingsPage) {
@@ -40,7 +42,7 @@ function App() {
 
   return (
     <div className="m-app">
-      <nav className="m-main-navigation">
+      {!sidebarCollapsed && <nav className="m-main-navigation">
         <div className="m-nav-links">
           <NavLink to={'/' + ROUTE_PARTS.timelinesAndEvents}>timeline and events</NavLink>
         </div>
@@ -95,7 +97,7 @@ function App() {
             </svg>
           </button>
         </div>
-      </nav>
+      </nav>}
 
       <div className={`m-page-content${isFullLayoutPage ? ' m-page-content--full' : ''}`}>
         <Outlet />

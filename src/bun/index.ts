@@ -87,6 +87,10 @@ ApplicationMenu.setApplicationMenu([
         label: 'Open Installation Dir',
         action: 'open-install-dir',
       },
+      {
+        label: 'Open Database Folder',
+        action: 'open-db-dir',
+      },
     ],
   },
 ]);
@@ -110,6 +114,8 @@ Electrobun.events.on('application-menu-clicked', (e) => {
     win.webview.toggleDevTools();
   } else if (e.data.action === 'open-install-dir') {
     Bun.spawn(['explorer', __PROJECT_ROOT__], { cwd: __PROJECT_ROOT__ });
+  } else if (e.data.action === 'open-db-dir') {
+    Bun.spawn(['explorer', API_DIR], { cwd: API_DIR });
   }
 });
 

@@ -16,14 +16,13 @@ import {
 import {
   Cell,
   Column,
-  defaultTheme,
   Provider,
   Row,
   TableBody,
   TableHeader,
   TableView,
-} from '@adobe/react-spectrum';
-import type { SortDescriptor } from '@react-types/shared';
+  type SortDescriptor,
+} from '@react-spectrum/s2';
 
 interface EventsTotalsTableProps {
   events: TimelineEventDto[];
@@ -104,25 +103,29 @@ export function EventsTotalsTable({ events, timelineType, className }: EventsTot
 
   return (
     <div className={className}>
-      <Provider theme={defaultTheme} colorScheme="light">
+      <Provider colorScheme="light">
         <TableView
           aria-label="Timeline event totals"
           density="compact"
           sortDescriptor={sortDescriptor}
           onSortChange={setSortDescriptor}
-          renderEmptyState={() => <>No events</>}
         >
           <TableHeader columns={COLUMNS}>
             {(column) => (
-              <Column key={column.key} width={column.width} allowsSorting={column.allowsSorting}>
+              <Column
+                id={column.key}
+                isRowHeader={true}
+                width={column.width}
+                allowsSorting={column.allowsSorting}
+              >
                 {column.title}
               </Column>
             )}
           </TableHeader>
-          <TableBody items={sortedTotals}>
+          <TableBody items={sortedTotals} renderEmptyState={() => <>No events</>}>
             {(row) => (
-              <Row key={row.id}>
-                {(columnKey) => <Cell>{String(row[columnKey as keyof TotalRow] ?? '')}</Cell>}
+              <Row id={row.id} columns={COLUMNS}>
+                {(column) => <Cell>{String(row[column.key as keyof TotalRow] ?? '')}</Cell>}
               </Row>
             )}
           </TableBody>

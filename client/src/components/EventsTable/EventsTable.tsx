@@ -2,17 +2,16 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   Cell,
   Column,
-  defaultTheme,
   Provider,
   Row,
   TableBody,
   TableHeader,
   TableView,
   useAsyncList,
+  type AsyncListData,
   type Key,
   type Selection,
-  type AsyncListData,
-} from '@adobe/react-spectrum';
+} from '@react-spectrum/s2';
 import { orderBy } from 'lodash-es';
 import { format, parseISO } from 'date-fns';
 import { useAtom } from 'jotai';
@@ -157,29 +156,29 @@ export function EventsTable({ timeline, events, className }: EventsTableProps) {
 
   return (
     <div className={className}>
-      <Provider theme={defaultTheme} colorScheme="light">
+      <Provider colorScheme="light">
         <TableView
+          key={columns.map((c) => c.key).join(',')}
           aria-label="Timeline events"
           selectionMode="multiple"
-          selectionStyle="highlight"
           selectedKeys={selectedKeys}
           onSelectionChange={setSelectedKeys}
           sortDescriptor={tableEvents.sortDescriptor}
           onSortChange={tableEvents.sort}
           density="compact"
-          renderEmptyState={() => <>No events</>}
+          loadingState={tableEvents.loadingState}
         >
           <TableHeader columns={columns}>
             {(column) => (
-              <Column key={column.key} allowsSorting={column.allowsSorting} width={column.width}>
+              <Column id={column.key} isRowHeader={column.key === columns[0]?.key} allowsSorting={column.allowsSorting} width={column.width}>
                 {column.title}
               </Column>
             )}
           </TableHeader>
-          <TableBody items={tableEvents.items} loadingState={tableEvents.loadingState}>
+          <TableBody items={tableEvents.items} renderEmptyState={() => <>No events</>}>
             {(event) => (
-              <Row key={event.id}>
-                {(columnKey) => <Cell>{getCellValue(event, columnKey)}</Cell>}
+              <Row id={event.id} columns={columns}>
+                {(column) => <Cell>{getCellValue(event, column.key)}</Cell>}
               </Row>
             )}
           </TableBody>

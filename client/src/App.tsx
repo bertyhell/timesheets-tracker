@@ -6,7 +6,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 export enum ROUTE_PARTS {
-  timelinesAndEvents = 'timelinesAndEvents',
+  timelinesAndEvents = 'timelines-and-events',
   settings = 'settings',
   timelines = 'timelines',
   autoTagRules = 'auto-tag-rules',

@@ -106,6 +106,15 @@ export function TimelinesAndEventsPage() {
   );
 
   useEffect(() => {
+    if (!timelineInfos?.length || selectedTimelineAndEvent.selectedTimelineId !== null) {
+      return;
+    }
+    const programsTimeline = timelineInfos.find((t) => t.timelineType === TimelineType.Program);
+    const defaultTimeline = programsTimeline ?? timelineInfos[0];
+    setSelectedTimelineAndEvent({ selectedTimelineId: defaultTimeline.id, selectedEventId: null });
+  }, [timelineInfos]);
+
+  useEffect(() => {
     document.addEventListener('keyup', handleKeyUpEvent);
 
     return () => {

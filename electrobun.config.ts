@@ -31,11 +31,13 @@ export default {
     copy: {
       'icon/icon128.ico': 'views/assets/icon128.ico',
       'icon/ico.ico': 'views/assets/icon.ico',
+      'icon/icon.png': 'views/assets/icon.png',
     },
     win: {
       // Use the system WebView2 (Edge) renderer — no extra download required.
       bundleCEF: false,
       defaultRenderer: 'native',
+      icon: 'icon/ico.ico',
     },
   },
   release: {

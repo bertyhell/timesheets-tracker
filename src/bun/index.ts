@@ -18,7 +18,7 @@ import { resolve } from 'path';
 import { APP_PORT } from '../../api/src/app.const';
 
 const APP_URL = `http://localhost:${APP_PORT}`;
-const ICON_PATH = 'views://assets/icon128.ico';
+const ICON_PATH = 'views://assets/icon.png';
 
 // __PROJECT_ROOT__ is injected at build time by electrobun.config.ts define.
 // It resolves to the repo root so we can locate api/ regardless of where

@@ -155,7 +155,7 @@ export function EventsTable({ timeline, events, className }: EventsTableProps) {
   }, [timeline?.id, events, searchTerm]);
 
   return (
-    <div className={className}>
+    <div className={'c-table ' + className}>
       <Provider colorScheme="light">
         <TableView
           key={columns.map((c) => c.key).join(',')}
@@ -170,7 +170,12 @@ export function EventsTable({ timeline, events, className }: EventsTableProps) {
         >
           <TableHeader columns={columns}>
             {(column) => (
-              <Column id={column.key} isRowHeader={column.key === columns[0]?.key} allowsSorting={column.allowsSorting} width={column.width}>
+              <Column
+                id={column.key}
+                isRowHeader={column.key === columns[0]?.key}
+                allowsSorting={column.allowsSorting}
+                width={column.width}
+              >
                 {column.title}
               </Column>
             )}

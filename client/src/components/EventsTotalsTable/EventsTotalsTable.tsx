@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import './EventsTotalsTable.scss';
 import { parseISO } from 'date-fns';
 import { orderBy } from 'lodash-es';
 import { useAtom } from 'jotai';
@@ -40,7 +41,7 @@ interface TotalRow {
 
 const columns = [
   { key: 'category', title: 'Category', allowsSorting: true },
-  { key: 'duration', title: 'Duration', width: 120, allowsSorting: true },
+  { key: 'duration', title: 'Duration', width: 130, allowsSorting: true },
 ];
 
 function getCategoryLabel(event: TimelineEventDto, timelineType: TimelineType): string {
@@ -105,7 +106,7 @@ export function EventsTotalsTable({ events, timelineType, className }: EventsTot
   }, [events, timelineType, searchTerm, sortDescriptor.column, sortDescriptor.direction]);
 
   return (
-    <div className={className}>
+    <div className={`c-table c-events-totals-table${className ? ` ${className}` : ''}`}>
       <Provider colorScheme="light">
         <TableView
           key={columns.map((c) => c.key).join(',')}

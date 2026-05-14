@@ -173,4 +173,9 @@ tray.on('tray-clicked', (e) => {
 });
 
 // Ensure NestJS is cleaned up when the Electrobun process exits
-process.on('exit', () => serverProcess.kill());
+const cleanup = () => {
+  try { serverProcess.kill(); } catch {}
+};
+process.on('exit', cleanup);
+process.on('SIGTERM', () => { cleanup(); process.exit(0); });
+process.on('SIGINT', () => { cleanup(); process.exit(0); });

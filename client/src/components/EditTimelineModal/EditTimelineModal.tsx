@@ -99,49 +99,53 @@ export function EditTimelineModal() {
     >
       <h3>{id ? 'Update timeline' : 'Add timeline'}</h3>
 
-      <h4 className="mt-4">Type</h4>
-      <select
-        className="c-input"
-        value={timelineType}
-        onChange={(evt: ChangeEvent<HTMLSelectElement>) => {
-          const newType = evt.target.value as TimelineType;
-          setTimelineType(newType);
-          if (newType !== 'Calendar') setIcsUrl('');
-        }}
-      >
-        {TIMELINE_TYPES.map((type) => (
-          <option key={type} value={type}>
-            {type}
-          </option>
-        ))}
-      </select>
+      <div className="c-form">
+        <h4 className="mt-4">Type</h4>
+        <select
+          className="c-input"
+          value={timelineType}
+          onChange={(evt: ChangeEvent<HTMLSelectElement>) => {
+            const newType = evt.target.value as TimelineType;
+            setTimelineType(newType);
+            if (newType !== 'Calendar') setIcsUrl('');
+          }}
+        >
+          {TIMELINE_TYPES.map((type) => (
+            <option key={type} value={type}>
+              {type}
+            </option>
+          ))}
+        </select>
 
-      <h4 className="mt-4">Title</h4>
-      <input
-        className="c-input"
-        value={title}
-        onChange={(evt: ChangeEvent<HTMLInputElement>) => setTitle(evt.target.value)}
-      />
+        <h4 className="mt-4">Title</h4>
+        <input
+          className="c-input"
+          value={title}
+          onChange={(evt: ChangeEvent<HTMLInputElement>) => setTitle(evt.target.value)}
+        />
 
-      {timelineType === 'Calendar' && (
-        <>
-          <h4 className="mt-4">Calendar ICS link</h4>
-          <input
-            className="c-input"
-            value={icsUrl}
-            onChange={(evt: ChangeEvent<HTMLInputElement>) => setIcsUrl(evt.target.value)}
-            placeholder="e.g. https://calendar.example.com/feed.ics"
-          />
-        </>
-      )}
+        {timelineType === 'Calendar' && (
+          <>
+            <h4 className="mt-4">Calendar ICS link</h4>
+            <input
+              className="c-input"
+              value={icsUrl}
+              onChange={(evt: ChangeEvent<HTMLInputElement>) => setIcsUrl(evt.target.value)}
+              placeholder="e.g. https://calendar.example.com/feed.ics"
+            />
+          </>
+        )}
 
-      <h4 className="mt-4">Visual ordering index</h4>
-      <input
-        className="c-input"
-        type="number"
-        value={visualOrder}
-        onChange={(evt: ChangeEvent<HTMLInputElement>) => setVisualOrder(Number(evt.target.value))}
-      />
+        <h4 className="mt-4">Visual ordering index</h4>
+        <input
+          className="c-input"
+          type="number"
+          value={visualOrder}
+          onChange={(evt: ChangeEvent<HTMLInputElement>) =>
+            setVisualOrder(Number(evt.target.value))
+          }
+        />
+      </div>
 
       <div className="flex flex-row justify-end gap-2 mt-8">
         <button className="c-button" onClick={handleClose}>

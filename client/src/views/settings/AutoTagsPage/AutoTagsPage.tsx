@@ -218,7 +218,10 @@ export function AutoTagsPage() {
 
   return (
     <div>
-      <PageHeader title="Auto tag rules">
+      <PageHeader
+        title="Auto tag rules"
+        description="Auto tag rules allow you to automatically tag time on a timeline using rules. You can create rules based on other timeline events to automatically tag time. For example, you can create a rule that tags time for a specific customer when a specific program is open or when you have a calendar meeting with a certain person."
+      >
         <div className="flex flex-row gap-2" style={{ flexWrap: 'wrap' }}>
           {renderAddAutoTagButton()}
           <button className="c-button" onClick={copyAutoTagsToClipboard}>

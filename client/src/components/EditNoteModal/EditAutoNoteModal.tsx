@@ -136,43 +136,46 @@ export function EditAutoNoteModal() {
       </p>
 
       <h4 className="mt-4">Name</h4>
-      <input
-        className="c-input"
-        value={name}
-        onChange={(evt: ChangeEvent<HTMLInputElement>) => setName(evt.target?.value)}
-      />
 
-      <h4 className="mt-4">Tag</h4>
-      <TagSelectMulti selectedValues={tagNames} onChange={handleTagNameChange} />
+      <div className="c-form">
+        <input
+          className="c-input"
+          value={name}
+          onChange={(evt: ChangeEvent<HTMLInputElement>) => setName(evt.target?.value)}
+        />
 
-      <h4 className="mt-4">Note text</h4>
-      <Select<SelectOption<types.ConditionVariable>>
-        className="c-edit-note__variable-select"
-        value={variable ? { label: variable, value: variable } : null}
-        options={variableOptions}
-        onChange={(selectedOption) => {
-          if (selectedOption) {
-            setVariable(selectedOption?.value);
-          }
-        }}
-        isMulti={false}
-      ></Select>
+        <h4 className="mt-4">Tag</h4>
+        <TagSelectMulti selectedValues={tagNames} onChange={handleTagNameChange} />
 
-      <h4 className="mt-4">Note text must match regex.</h4>
-      <span>eg: jira.com/issues/(ABC-[0-9]+)</span>
-      <input
-        className="c-input c-edit-note__regex-input"
-        value={extractRegex}
-        onChange={(evt) => setExtractRegex(evt.target.value)}
-      />
+        <h4 className="mt-4">Note text</h4>
+        <Select<SelectOption<types.ConditionVariable>>
+          className="c-edit-note__variable-select"
+          value={variable ? { label: variable, value: variable } : null}
+          options={variableOptions}
+          onChange={(selectedOption: any) => {
+            if (selectedOption) {
+              setVariable(selectedOption?.value);
+            }
+          }}
+          isMulti={false}
+        ></Select>
 
-      <h4 className="mt-4">Note text extract part of regex as note.</h4>
-      <span>eg: $1</span>
-      <input
-        className="c-input c-edit-note__regex-replacement-input"
-        value={extractRegexReplacement}
-        onChange={(evt) => setExtractRegexReplacement(evt.target.value)}
-      />
+        <h4 className="mt-4">Note text must match regex.</h4>
+        <span>eg: jira.com/issues/(ABC-[0-9]+)</span>
+        <input
+          className="c-input c-edit-note__regex-input"
+          value={extractRegex}
+          onChange={(evt) => setExtractRegex(evt.target.value)}
+        />
+
+        <h4 className="mt-4">Note text extract part of regex as note.</h4>
+        <span>eg: $1</span>
+        <input
+          className="c-input c-edit-note__regex-replacement-input"
+          value={extractRegexReplacement}
+          onChange={(evt) => setExtractRegexReplacement(evt.target.value)}
+        />
+      </div>
 
       <div className="flex flex-row justify-end gap-2 mt-48">
         <button className="c-button" onClick={handleClose}>

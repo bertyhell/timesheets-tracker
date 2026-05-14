@@ -82,21 +82,23 @@ export function EditTagNameModal() {
       <h3>{id ? 'Update tag name' : 'Add tag name'}</h3>
 
       <h4 className="mt-4">Name</h4>
-      <input
-        className="c-input"
-        value={name}
-        onChange={(evt: ChangeEvent<HTMLInputElement>) => setName(evt.target?.value)}
-      />
+      <div className="c-form">
+        <input
+          className="c-input"
+          value={name}
+          onChange={(evt: ChangeEvent<HTMLInputElement>) => setName(evt.target?.value)}
+        />
 
-      <h4 className="mt-4">Code</h4>
-      <input
-        className="c-input"
-        value={code}
-        onChange={(evt: ChangeEvent<HTMLInputElement>) => setCode(evt.target?.value)}
-      />
+        <h4 className="mt-4">Code</h4>
+        <input
+          className="c-input"
+          value={code}
+          onChange={(evt: ChangeEvent<HTMLInputElement>) => setCode(evt.target?.value)}
+        />
 
-      <h4 className="mt-4">Color</h4>
-      <ColorInput color={color} onChange={setColor} />
+        <h4 className="mt-4">Color</h4>
+        <ColorInput color={color} onChange={setColor} />
+      </div>
 
       <div className="flex flex-row justify-end gap-2 mt-48">
         <button className="c-button" onClick={handleClose}>

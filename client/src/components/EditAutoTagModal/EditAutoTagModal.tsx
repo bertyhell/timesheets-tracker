@@ -150,59 +150,61 @@ export function EditAutoTagModal() {
     >
       <h3>Add auto tag</h3>
 
-      <label>Program Tag</label>
-      <ToggleButton
-        optionTwoSelected={false}
-        onChange={setShowCreateNewTagControls}
-        label1="Existing tag"
-        label2="Create new tag"
-      ></ToggleButton>
-      {!showCreateNewTagControls && (
-        <TagSelectSingle
-          value={selectedTagName || null}
-          onChange={(newTagName) => {
-            setSelectedTagName(newTagName);
-            if (!name) {
-              setName(newTagName?.title || '');
-            }
-          }}
-          autoFocus={true}
-        />
-      )}
-      {showCreateNewTagControls && (
-        <div>
-          <input
-            className="c-input"
-            value={newTagName}
-            onChange={(evt) => setNewTagName(evt.target.value)}
-            placeholder={'Name of the tag that should be created'}
-          />
-        </div>
-      )}
-
-      <label>Auto tag Name</label>
-      <input
-        className="c-input"
-        value={name}
-        onChange={(evt: ChangeEvent<HTMLInputElement>) => setName(evt.target?.value)}
-      />
-
-      <label>Conditions</label>
-      <div>
-        {!!conditions &&
-          conditions.map((condition, i) => (
-            <AutoTagConditionInput
-              key={'auto-tag-condition__' + i}
-              index={i}
-              showBooleanOperator={i !== 0}
-              {...conditions[i]}
-              onChange={(booleanOperator, variable, operator, value) =>
-                handleChangeCondition(i, booleanOperator, variable, operator, value)
+      <div className="c-form">
+        <label>Program Tag</label>
+        <ToggleButton
+          optionTwoSelected={false}
+          onChange={setShowCreateNewTagControls}
+          label1="Existing tag"
+          label2="Create new tag"
+        ></ToggleButton>
+        {!showCreateNewTagControls && (
+          <TagSelectSingle
+            value={selectedTagName || null}
+            onChange={(newTagName) => {
+              setSelectedTagName(newTagName);
+              if (!name) {
+                setName(newTagName?.title || '');
               }
-              onDelete={handleDeleteCondition}
-              showDelete={conditions.length > 1}
-            ></AutoTagConditionInput>
-          ))}
+            }}
+            autoFocus={true}
+          />
+        )}
+        {showCreateNewTagControls && (
+          <div>
+            <input
+              className="c-input"
+              value={newTagName}
+              onChange={(evt) => setNewTagName(evt.target.value)}
+              placeholder={'Name of the tag that should be created'}
+            />
+          </div>
+        )}
+
+        <label>Auto tag Name</label>
+        <input
+          className="c-input"
+          value={name}
+          onChange={(evt: ChangeEvent<HTMLInputElement>) => setName(evt.target?.value)}
+        />
+
+        <label>Conditions</label>
+        <div>
+          {!!conditions &&
+            conditions.map((condition, i) => (
+              <AutoTagConditionInput
+                key={'auto-tag-condition__' + i}
+                index={i}
+                showBooleanOperator={i !== 0}
+                {...conditions[i]}
+                onChange={(booleanOperator, variable, operator, value) =>
+                  handleChangeCondition(i, booleanOperator, variable, operator, value)
+                }
+                onDelete={handleDeleteCondition}
+                showDelete={conditions.length > 1}
+              ></AutoTagConditionInput>
+            ))}
+        </div>
       </div>
       <div className="flex flex-row justify-end gap-2 mt-48">
         <button className="c-button" onClick={handleClose}>

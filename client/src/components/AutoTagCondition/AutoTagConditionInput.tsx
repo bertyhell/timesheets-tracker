@@ -69,7 +69,7 @@ function AutoTagConditionInput({
         className="c-auto-tag-condition__variable-select"
         value={variable ? { label: variable, value: variable } : null}
         options={variableOptions}
-        onChange={(selectedOption) =>
+        onChange={(selectedOption: any) =>
           onChange(booleanOperator, selectedOption?.value ?? null, operator, value)
         }
         isMulti={false}
@@ -78,7 +78,7 @@ function AutoTagConditionInput({
         className="c-auto-tag-condition__operator-select"
         value={operator ? { label: operator, value: operator } : null}
         options={operatorOptions}
-        onChange={(selectedOption) =>
+        onChange={(selectedOption: any) =>
           onChange(booleanOperator, variable, selectedOption?.value ?? null, value)
         }
         isMulti={false}

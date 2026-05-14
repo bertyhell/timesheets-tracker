@@ -22,6 +22,7 @@ import {
   TableHeader,
   TableView,
   type SortDescriptor,
+  type Selection,
 } from '@react-spectrum/s2';
 
 interface EventsTotalsTableProps {
@@ -37,7 +38,7 @@ interface TotalRow {
   duration: string;
 }
 
-const COLUMNS = [
+const columns = [
   { key: 'category', title: 'Category', allowsSorting: true },
   { key: 'duration', title: 'Duration', width: 120, allowsSorting: true },
 ];
@@ -72,6 +73,8 @@ function formatDuration(ms: number): string {
 
 export function EventsTotalsTable({ events, timelineType, className }: EventsTotalsTableProps) {
   const [searchTerm] = useAtom(searchTermAtom);
+  const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([0]));
+
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: 'duration',
     direction: 'descending',
@@ -99,18 +102,22 @@ export function EventsTotalsTable({ events, timelineType, className }: EventsTot
       [(row) => (sortDescriptor.column === 'duration' ? row.durationMs : row.category)],
       [sortDescriptor.direction === 'descending' ? 'desc' : 'asc']
     );
-  }, [events, timelineType, searchTerm, sortDescriptor]);
+  }, [events, timelineType, searchTerm, sortDescriptor.column, sortDescriptor.direction]);
 
   return (
     <div className={className}>
       <Provider colorScheme="light">
         <TableView
+          key={columns.map((c) => c.key).join(',')}
           aria-label="Timeline event totals"
-          density="compact"
+          selectionMode="multiple"
+          selectedKeys={selectedKeys}
+          onSelectionChange={setSelectedKeys}
           sortDescriptor={sortDescriptor}
           onSortChange={setSortDescriptor}
+          density="compact"
         >
-          <TableHeader columns={COLUMNS}>
+          <TableHeader columns={columns}>
             {(column) => (
               <Column
                 id={column.key}
@@ -124,7 +131,7 @@ export function EventsTotalsTable({ events, timelineType, className }: EventsTot
           </TableHeader>
           <TableBody items={sortedTotals} renderEmptyState={() => <>No events</>}>
             {(row) => (
-              <Row id={row.id} columns={COLUMNS}>
+              <Row id={row.id} columns={columns}>
                 {(column) => <Cell>{String(row[column.key as keyof TotalRow] ?? '')}</Cell>}
               </Row>
             )}

@@ -1,19 +1,22 @@
 @use './variables' as *;
 
-label {
-  display: block;
-  margin-top: 1rem;
-}
-.c-input {
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  outline: 0 !important;
-  display: block;
-  width: 100%;
+.c-form {
+  label {
+    display: block;
+    margin-top: 1rem;
+  }
 
-  &:focus {
-    border: 1px solid $focus-color;
-    box-shadow: 0 0 0 1px $focus-color;
+  .c-input {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: 0 !important;
+    display: block;
+    width: 100%;
+
+    &:focus {
+      border: 1px solid $focus-color;
+      box-shadow: 0 0 0 1px $focus-color;
+    }
   }
 }

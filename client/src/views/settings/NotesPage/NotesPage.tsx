@@ -40,7 +40,10 @@ export function NotesPage() {
 
   return (
     <div className="p-tag-names">
-      <PageHeader title="Auto notes">
+      <PageHeader
+        title="Auto notes"
+        description="This allows you to define what should be added to the notes of an auto tag. You can copy the name of the program or maybe some commit messages. or even use a regex to extract some info from one of the available variables (wip)."
+      >
         <button
           className="c-button"
           onClick={() =>

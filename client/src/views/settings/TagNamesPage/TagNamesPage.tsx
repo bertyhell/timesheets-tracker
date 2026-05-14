@@ -1,5 +1,6 @@
 import './TagNamesPage.scss';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
+import PageHeader from '../../../components/PageHeader/PageHeader';
 import type { TagName } from '../../../types/types';
 import {
   useTagNamesServiceTagNamesControllerFindAll,
@@ -13,7 +14,7 @@ import { orderBy } from 'lodash-es';
 
 // interface TagNamesPageProps {}
 
-function TagNamesPage() {
+export function TagNamesPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const params = useParams();
@@ -50,8 +51,10 @@ function TagNamesPage() {
 
   return (
     <div className="p-tag-names">
-      <div className="m-page-header">
-        <h2>Tag names</h2>
+      <PageHeader
+        title="Tag names"
+        description="Tag names allow you to tag time with a certain label and code and color. They can be used to identify which customer you worked for, or which timesheet code you want the time to billed on."
+      >
         <button
           className="c-button"
           onClick={() =>
@@ -62,7 +65,7 @@ function TagNamesPage() {
         >
           Add tag name
         </button>
-      </div>
+      </PageHeader>
       <table className="w-full">
         <thead>
           <tr className="h-10 bg-white">
@@ -151,5 +154,3 @@ function TagNamesPage() {
     </div>
   );
 }
-
-export default TagNamesPage;

@@ -19,7 +19,7 @@ import { type SelectOption } from '../../helpers/select-option.types';
 import { type AutoNote, ConditionVariable, type TagName } from '../../types/types';
 import TagSelectMulti from '../TagSelect/TagSelectMulti';
 
-function EditAutoNoteModal() {
+export function EditAutoNoteModal() {
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -197,5 +197,3 @@ function EditAutoNoteModal() {
     </Modal>
   );
 }
-
-export default EditAutoNoteModal;

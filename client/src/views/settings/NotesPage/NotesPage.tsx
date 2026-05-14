@@ -1,5 +1,6 @@
 import './NotesPage.scss';
 import React, { type ReactNode, useEffect, useState } from 'react';
+import PageHeader from '../../../components/PageHeader/PageHeader';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -13,7 +14,7 @@ import { orderBy } from 'lodash-es';
 
 // interface NotesPageProps {}
 
-function NotesPage() {
+export function NotesPage() {
   const navigate = useNavigate();
   const params = useParams();
   const id = params.id;
@@ -39,8 +40,7 @@ function NotesPage() {
 
   return (
     <div className="p-tag-names">
-      <div className="m-page-header">
-        <h2>Auto notes</h2>
+      <PageHeader title="Auto notes">
         <button
           className="c-button"
           onClick={() =>
@@ -51,7 +51,7 @@ function NotesPage() {
         >
           Add auto note
         </button>
-      </div>
+      </PageHeader>
       <table className="w-full">
         <thead>
           <tr className="h-10 bg-white">
@@ -131,5 +131,3 @@ function NotesPage() {
     </div>
   );
 }
-
-export default NotesPage;

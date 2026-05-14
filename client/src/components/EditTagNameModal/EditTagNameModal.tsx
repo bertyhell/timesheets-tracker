@@ -15,7 +15,7 @@ import { toast } from 'react-toastify';
 import { ColorInput } from '../ColorInput/ColorInput';
 import { COLOR_LIST } from '../Timeline/helpers/getColorForEvent';
 
-function EditTagNameModal() {
+export function EditTagNameModal() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [name, setName] = useState<string>('');
@@ -119,5 +119,3 @@ function EditTagNameModal() {
     </Modal>
   );
 }
-
-export default EditTagNameModal;

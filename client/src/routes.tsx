@@ -1,18 +1,16 @@
 import App, { ROUTE_PARTS } from './App';
-import TimelinesAndEventsPage from './views/TimelinesAndEventsPage/TimelinesAndEventsPage';
-import AutoTagsPage from './views/settings/AutoTagsPage/AutoTagsPage';
-import EditAutoTagModal from './components/EditAutoTagModal/EditAutoTagModal';
-import TagNamesPage from './views/settings/TagNamesPage/TagNamesPage';
-import EditTagNameModal from './components/EditTagNameModal/EditTagNameModal';
+import { TimelinesAndEventsPage } from './views/TimelinesAndEventsPage/TimelinesAndEventsPage';
+import { AutoTagsPage } from './views/settings/AutoTagsPage/AutoTagsPage';
+import { EditAutoTagModal } from './components/EditAutoTagModal/EditAutoTagModal';
+import { TagNamesPage } from './views/settings/TagNamesPage/TagNamesPage';
+import { EditTagNameModal } from './components/EditTagNameModal/EditTagNameModal';
 import React from 'react';
 import { redirect, type RouteObject } from 'react-router-dom';
-import NotesPage from './views/settings/NotesPage/NotesPage';
-import EditAutoNoteModal from './components/EditNoteModal/EditAutoNoteModal';
-import CalendarsPage from './views/settings/CalendarsPage/CalendarsPage';
-import EditCalendarModal from './components/EditCalendarModal/EditCalendarModal';
-import TimelinesPage from './views/settings/Timelines/TimelinesPage';
-import EditTimelineModal from './components/EditTimelineModal/EditTimelineModal';
-import SettingsPage from './views/settings/SettingsPage/SettingsPage';
+import { NotesPage } from './views/settings/NotesPage/NotesPage';
+import { EditAutoNoteModal } from './components/EditNoteModal/EditAutoNoteModal';
+import { TimelinesPage } from './views/settings/Timelines/TimelinesPage';
+import { EditTimelineModal } from './components/EditTimelineModal/EditTimelineModal';
+import { SettingsPage } from './views/settings/SettingsPage/SettingsPage';
 
 export const routes: RouteObject[] = [
   {
@@ -88,20 +86,6 @@ export const routes: RouteObject[] = [
               {
                 path: ':id/' + ROUTE_PARTS.edit,
                 element: <EditAutoNoteModal />,
-              },
-            ],
-          },
-          {
-            path: ROUTE_PARTS.calendars,
-            element: <CalendarsPage />,
-            children: [
-              {
-                path: ROUTE_PARTS.create,
-                element: <EditCalendarModal />,
-              },
-              {
-                path: ':id/' + ROUTE_PARTS.edit,
-                element: <EditCalendarModal />,
               },
             ],
           },

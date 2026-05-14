@@ -36,7 +36,7 @@ const NEW_CONDITION: AutoTagCondition = {
   value: '',
 };
 
-function EditAutoTagModal() {
+export function EditAutoTagModal() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [name, setName] = useState<string>('');
@@ -215,5 +215,3 @@ function EditAutoTagModal() {
     </Modal>
   );
 }
-
-export default EditAutoTagModal;

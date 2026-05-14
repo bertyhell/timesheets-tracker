@@ -24,7 +24,7 @@ const TIMELINE_TYPES: TimelineType[] = [
   'Website',
 ];
 
-function EditTimelineModal() {
+export function EditTimelineModal() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [title, setTitle] = useState<string>('');
@@ -154,5 +154,3 @@ function EditTimelineModal() {
     </Modal>
   );
 }
-
-export default EditTimelineModal;

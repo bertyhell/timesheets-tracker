@@ -1,5 +1,6 @@
 import './AutoTagsPage.scss';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import PageHeader from '../../../components/PageHeader/PageHeader';
 import {
   useAutoTagsServiceAutoTagsControllerCreate,
   useAutoTagsServiceAutoTagsControllerDelete,
@@ -18,7 +19,7 @@ const AUTOTAGS_PROPERTY_NAME = 'timesheetTrackerAutoTags';
 
 // interface AutoTagsPageProps {}
 
-function AutoTagsPage() {
+export function AutoTagsPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const [sortCol, setSortCol] = useState<'title' | 'priority'>('priority');
@@ -97,8 +98,7 @@ function AutoTagsPage() {
 
   return (
     <div>
-      <div className="m-page-header">
-        <h2>Auto tag rules</h2>
+      <PageHeader title="Auto tag rules">
         <div>
           <NavLink
             className="c-button"
@@ -112,7 +112,7 @@ function AutoTagsPage() {
             Copy autotags
           </button>
         </div>
-      </div>
+      </PageHeader>
       <table className="w-full">
         <thead>
           <tr className="h-10 bg-white">
@@ -212,5 +212,3 @@ function AutoTagsPage() {
     </div>
   );
 }
-
-export default AutoTagsPage;

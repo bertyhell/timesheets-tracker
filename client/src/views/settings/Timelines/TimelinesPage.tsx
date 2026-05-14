@@ -1,5 +1,6 @@
 import './TimelinesPage.scss';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import PageHeader from '../../../components/PageHeader/PageHeader';
 import {
   useTimelinesServiceTimelinesControllerDelete,
   useTimelinesServiceTimelinesControllerFindAll,
@@ -10,7 +11,7 @@ import { ROUTE_PARTS } from '../../../App';
 import { toast } from 'react-toastify';
 import { orderBy } from 'lodash-es';
 
-function TimelinesPage() {
+export function TimelinesPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const [sortCol, setSortCol] = useState<'title' | 'timelineType' | 'visualOrder'>('visualOrder');
@@ -44,8 +45,10 @@ function TimelinesPage() {
 
   return (
     <div className="p-timelines">
-      <div className="m-page-header">
-        <h2>Timelines</h2>
+      <PageHeader
+        title="Timelines"
+        description="Manages the lanes you see on the main timeline overview page. Timelines show you what events or programs were open at what time. You can also configure a timeline for tagging time and even an auto tagging timeline that uses rules to auto tag time."
+      >
         <button
           className="c-button"
           onClick={() =>
@@ -56,7 +59,7 @@ function TimelinesPage() {
         >
           Add timeline
         </button>
-      </div>
+      </PageHeader>
       <table className="w-full">
         <thead>
           <tr className="h-10 bg-white">
@@ -156,5 +159,3 @@ function TimelinesPage() {
     </div>
   );
 }
-
-export default TimelinesPage;

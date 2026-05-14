@@ -31,7 +31,7 @@ import { COLOR_LIST } from '../../components/Timeline/helpers/getColorForEvent';
 import GlobalSearchBar from '../../components/GlobalSearchBar/GlobalSearchBar';
 import DateSelect from '../../components/DateSelect/DateSelect';
 
-function TimelinesAndEventsPage() {
+export function TimelinesAndEventsPage() {
   const [viewDate] = useAtom(viewDateAtom);
 
   const { data: timelineInfos, isLoading: isLoadingTimelineInfos } =
@@ -297,5 +297,3 @@ function TimelinesAndEventsPage() {
     </div>
   );
 }
-
-export default TimelinesAndEventsPage;

@@ -15,7 +15,7 @@ import copy from 'copy-to-clipboard';
 import { mapLimit } from 'blend-promise-utils';
 import { AutoTagConditionDto, AutoTagDto } from '../../../generated/api/requests';
 
-const AUTOTAGS_PROPERTY_NAME = 'timesheetTrackerAutoTags';
+const AUTOTAGS_PROPERTY_NAME_FOR_PASTE_DETECTION = 'timesheetTrackerAutoTags';
 
 // interface AutoTagsPageProps {}
 
@@ -72,8 +72,10 @@ export function AutoTagsPage() {
       if (evt.clipboardData && evt.clipboardData.getData) {
         const pastedText = evt.clipboardData.getData('text/plain');
 
-        if (pastedText.includes(AUTOTAGS_PROPERTY_NAME)) {
-          await handlePasteAutoTags(JSON.parse(pastedText)[AUTOTAGS_PROPERTY_NAME]);
+        if (pastedText.includes(AUTOTAGS_PROPERTY_NAME_FOR_PASTE_DETECTION)) {
+          await handlePasteAutoTags(
+            JSON.parse(pastedText)[AUTOTAGS_PROPERTY_NAME_FOR_PASTE_DETECTION]
+          );
         } else {
           toast("The pasted text doesn't contain any valid auto tags", { type: 'error' });
         }
@@ -92,27 +94,68 @@ export function AutoTagsPage() {
   }, [onPasteContent]);
 
   const copyAutoTagsToClipboard = () => {
-    copy(JSON.stringify({ [AUTOTAGS_PROPERTY_NAME]: autoTagItems }, null, 2));
+    copy(JSON.stringify({ [AUTOTAGS_PROPERTY_NAME_FOR_PASTE_DETECTION]: autoTagItems }, null, 2));
     toast('Auto tag copied to clipboard', { type: 'success' });
   };
 
-  return (
-    <div>
-      <PageHeader title="Auto tag rules">
-        <div>
-          <NavLink
-            className="c-button"
-            to={
-              '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.autoTagRules + '/' + ROUTE_PARTS.create
-            }
-          >
-            Add auto tag
-          </NavLink>
-          <button className="c-button" onClick={copyAutoTagsToClipboard}>
-            Copy autotags
-          </button>
-        </div>
-      </PageHeader>
+  const renderAddAutoTagButton = () => {
+    return (
+      <NavLink
+        className="c-button"
+        to={'/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.autoTagRules + '/' + ROUTE_PARTS.create}
+      >
+        Add auto tag
+      </NavLink>
+    );
+  };
+
+  const renderEditButton = (autoTag: AutoTagDto) => {
+    return (
+      <NavLink
+        className="c-button"
+        to={
+          '/' +
+          ROUTE_PARTS.settings +
+          '/' +
+          ROUTE_PARTS.autoTagRules +
+          '/' +
+          autoTag.id +
+          '/' +
+          ROUTE_PARTS.edit
+        }
+        onClick={(e) => e.stopPropagation()}
+      >
+        EDIT
+      </NavLink>
+    );
+  };
+
+  const renderDeleteButton = (autoTag: AutoTagDto) => {
+    return (
+      <button
+        className="c-button"
+        onClick={async (e) => {
+          e.stopPropagation();
+          if (autoTag.id) {
+            await deleteAutoTag({
+              id: autoTag.id,
+            });
+            await refetchAutoTags();
+            toast('Auto tag has been deleted', { type: 'success' });
+          } else {
+            toast("Cannot delete an auto tag since it doesn't have an id", {
+              type: 'error',
+            });
+          }
+        }}
+      >
+        DELETE
+      </button>
+    );
+  };
+
+  const renderAutoTagsTable = () => {
+    return (
       <table className="w-full">
         <thead>
           <tr className="h-10 bg-white">
@@ -139,7 +182,7 @@ export function AutoTagsPage() {
             (autoTag) => (sortCol === 'title' ? autoTag.title?.toLowerCase() : autoTag.priority),
             sortDir
           ).map(
-            (autoTag): ReactNode => (
+            (autoTag: AutoTagDto): ReactNode => (
               <tr
                 key={'auto-tag-' + autoTag.id}
                 onClick={() =>
@@ -163,51 +206,27 @@ export function AutoTagsPage() {
                 </td>
                 <td className="pl-3">{autoTag.title}</td>
                 <td className="pl-3">{autoTag.priority}</td>
-                <td className="w-px whitespace-nowrap">
-                  <NavLink
-                    className="c-button"
-                    to={
-                      '/' +
-                      ROUTE_PARTS.settings +
-                      '/' +
-                      ROUTE_PARTS.autoTagRules +
-                      '/' +
-                      autoTag.id +
-                      '/' +
-                      ROUTE_PARTS.edit
-                    }
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    EDIT
-                  </NavLink>
-                </td>
-                <td className="w-px whitespace-nowrap">
-                  <button
-                    className="c-button"
-                    onClick={async (e) => {
-                      e.stopPropagation();
-                      if (autoTag.id) {
-                        await deleteAutoTag({
-                          id: autoTag.id,
-                        });
-                        await refetchAutoTags();
-                        toast('Auto tag has been deleted', { type: 'success' });
-                      } else {
-                        toast("Cannot delete an auto tag since it doesn't have an id", {
-                          type: 'error',
-                        });
-                      }
-                    }}
-                  >
-                    DELETE
-                  </button>
-                </td>
+                <td className="w-px whitespace-nowrap">{renderEditButton(autoTag)}</td>
+                <td className="w-px whitespace-nowrap">{renderDeleteButton(autoTag)}</td>
               </tr>
             )
           )}
         </tbody>
       </table>
+    );
+  };
 
+  return (
+    <div>
+      <PageHeader title="Auto tag rules">
+        <div className="flex flex-row gap-2" style={{ flexWrap: 'wrap' }}>
+          {renderAddAutoTagButton()}
+          <button className="c-button" onClick={copyAutoTagsToClipboard}>
+            Copy autotags
+          </button>
+        </div>
+      </PageHeader>
+      {renderAutoTagsTable()}
       <Outlet />
     </div>
   );

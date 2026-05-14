@@ -87,7 +87,7 @@ function App() {
               strokeLinecap="round"
               strokeLinejoin="round"
               aria-hidden="true"
-              className={`m-chevron-icon${settingsExpanded ? ' expanded' : ''}`}
+              className={`m-chevron-icon${settingsExpanded ? '' : ' expanded'}`}
             >
               <polyline points="6 9 12 15 18 9" />
             </svg>

@@ -20,7 +20,21 @@
 
   .c-timeline-events-list {
     flex: 1;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
     min-height: 0;
+
+    .c-events-table,
+    .c-events-totals-table {
+      flex: 1;
+      width: 50%;
+      overflow-y: auto;
+      min-height: 0;
+    }
+
+    .c-events-table {
+      border-right: 1px solid #ddd;
+    }
   }
 }

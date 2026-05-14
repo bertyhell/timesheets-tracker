@@ -17,6 +17,7 @@ import { clamp, maxBy, minBy } from 'lodash-es';
 import { useAtom } from 'jotai';
 import { viewDateAtom } from '../../store/store';
 import EventsTable from '../../components/EventsTable/EventsTable';
+import EventsTotalsTable from '../../components/EventsTotalsTable/EventsTotalsTable';
 import { TimelineEventDto, TimelineWithEventsDto } from '../../generated/api/requests/types.gen';
 import {
   useTagNamesServiceTagNamesControllerCount,
@@ -275,7 +276,19 @@ export function TimelinesAndEventsPage() {
     if (!selectedTimeline?.events?.length) {
       return <div className="u-center">No events</div>;
     }
-    return <EventsTable events={selectedTimeline?.events || []} />;
+    return (
+      <>
+        <EventsTable
+          className="c-events-table"
+          events={selectedTimeline.events}
+        />
+        <EventsTotalsTable
+          className="c-events-totals-table"
+          events={selectedTimeline.events}
+          timelineType={selectedTimeline.type}
+        />
+      </>
+    );
   };
 
   const renderTimelinesAndEvents = () => {

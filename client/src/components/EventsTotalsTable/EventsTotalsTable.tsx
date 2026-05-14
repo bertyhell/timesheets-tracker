@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import './EventsTotalsTable.scss';
+import './EventsTotalsTable.css';
 import { parseISO } from 'date-fns';
 import { orderBy } from 'lodash-es';
 import { useAtom } from 'jotai';

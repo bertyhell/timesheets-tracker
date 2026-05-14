@@ -41,6 +41,18 @@ function App() {
       <nav className="m-main-navigation">
         <div className="m-nav-links">
           <NavLink to={'/' + ROUTE_PARTS.timelinesAndEvents}>timeline and events</NavLink>
+        </div>
+
+        <div className="m-nav-bottom">
+          {settingsExpanded && (
+            <div className="m-settings-sub-nav">
+              {SETTINGS_TABS.map(({ to, label }) => (
+                <NavLink key={to} to={'/' + ROUTE_PARTS.settings + '/' + to}>
+                  {label}
+                </NavLink>
+              ))}
+            </div>
+          )}
 
           <button
             className={`m-settings-toggle${isSettingsPage ? ' active' : ''}`}
@@ -80,16 +92,6 @@ function App() {
               <polyline points="6 9 12 15 18 9" />
             </svg>
           </button>
-
-          {settingsExpanded && (
-            <div className="m-settings-sub-nav">
-              {SETTINGS_TABS.map(({ to, label }) => (
-                <NavLink key={to} to={'/' + ROUTE_PARTS.settings + '/' + to}>
-                  {label}
-                </NavLink>
-              ))}
-            </div>
-          )}
         </div>
       </nav>
 

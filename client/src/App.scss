@@ -5,7 +5,7 @@ $nav-width: 13rem;
 .m-app {
   display: flex;
   flex-direction: row;
-  min-height: 100vh;
+  height: 100vh;
 }
 
 .m-main-navigation {
@@ -15,7 +15,8 @@ $nav-width: 13rem;
   width: $nav-width;
   flex-shrink: 0;
   background-color: #ccc;
-  min-height: 100vh;
+  height: 100vh;
+  overflow-y: auto;
 
   .m-nav-links {
     display: flex;
@@ -37,6 +38,12 @@ $nav-width: 13rem;
         background-color: white;
       }
     }
+  }
+
+  .m-nav-bottom {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
   }
 
   .m-settings-toggle {
@@ -69,9 +76,10 @@ $nav-width: 13rem;
       margin-left: auto;
       flex-shrink: 0;
       transition: transform 0.2s ease;
+      transform: rotate(180deg);
 
       &.expanded {
-        transform: rotate(180deg);
+        transform: rotate(0deg);
       }
     }
   }
@@ -105,9 +113,11 @@ $nav-width: 13rem;
   flex: 1;
   padding: 1.5rem;
   overflow: auto;
+  min-height: 0;
 
   &--full {
     padding: 0;
+    overflow: hidden;
   }
 }
 

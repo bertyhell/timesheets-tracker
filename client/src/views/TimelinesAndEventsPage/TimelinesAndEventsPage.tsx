@@ -296,7 +296,7 @@ export function TimelinesAndEventsPage() {
   };
 
   return (
-    <div>
+    <div className="p-timelines-and-events-page">
       <div className="m-page-toolbar">
         <GlobalSearchBar />
         <DateSelect />

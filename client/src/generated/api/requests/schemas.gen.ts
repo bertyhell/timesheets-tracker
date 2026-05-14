@@ -22,6 +22,10 @@ export const $ResponseProgramDto = {
         endedAt: {
             type: 'string',
             description: 'End time in ISO format'
+        },
+        iconColor: {
+            type: 'string',
+            description: 'Primary color of the program icon as a CSS hex string'
         }
     },
     required: ['id', 'programName', 'windowTitle', 'startedAt', 'endedAt']
@@ -452,66 +456,6 @@ export const $UpdateAutoNoteDto = {
     }
 } as const;
 
-export const $CreateCalendarDto = {
-    type: 'object',
-    properties: {
-        title: {
-            type: 'string',
-            description: 'Title of the calendar'
-        },
-        url: {
-            type: 'string',
-            description: 'URL to the iCalendar (.ics) file'
-        },
-        color: {
-            type: 'string',
-            description: 'Color used to display the calendar'
-        }
-    },
-    required: ['title', 'url', 'color']
-} as const;
-
-export const $CalendarDto = {
-    type: 'object',
-    properties: {
-        id: {
-            type: 'string',
-            description: 'Id of the calendar'
-        },
-        title: {
-            type: 'string',
-            description: 'Title of the calendar'
-        },
-        url: {
-            type: 'string',
-            description: 'URL to the iCalendar (.ics) file'
-        },
-        color: {
-            type: 'string',
-            description: 'Color used to display the calendar'
-        }
-    },
-    required: ['id', 'title', 'url', 'color']
-} as const;
-
-export const $UpdateCalendarDto = {
-    type: 'object',
-    properties: {
-        title: {
-            type: 'string',
-            description: 'Title of the calendar'
-        },
-        url: {
-            type: 'string',
-            description: 'URL to the iCalendar (.ics) file'
-        },
-        color: {
-            type: 'string',
-            description: 'Color used to display the calendar'
-        }
-    }
-} as const;
-
 export const $CalendarEventDto = {
     type: 'object',
     properties: {
@@ -777,7 +721,7 @@ export const $TimelineEventDto = {
     properties: {
         id: {
             type: 'string',
-            description: 'Uuid of the timeline',
+            description: 'Uuid of the event',
             example: '550e8400-e29b-41d4-a716-446655440000'
         },
         info: {
@@ -812,6 +756,11 @@ export const $TimelineEventDto = {
             type: 'string',
             description: 'End time in ISO format',
             example: '2023-01-01T14:00:00.000Z'
+        },
+        timelineId: {
+            type: 'string',
+            description: 'Uuid of the timeline',
+            example: '550e8400-e29b-41d4-a716-446655440000'
         }
     },
     required: ['id', 'info', 'startedAt', 'endedAt']

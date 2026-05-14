@@ -158,20 +158,6 @@ export const useAutoNotesServiceAutoNotesControllerFindOneSuspense = <TData = Co
   id: string;
 }, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useSuspenseQuery<TData, TError>({ queryKey: Common.UseAutoNotesServiceAutoNotesControllerFindOneKeyFn({ id }, queryKey), queryFn: () => AutoNotesService.autoNotesControllerFindOne({ id }) as TData, ...options });
 /**
-* @returns CalendarDto Get a list of all calendars
-* @throws ApiError
-*/
-export const useCalendarsServiceCalendarsControllerFindAllSuspense = <TData = Common.CalendarsServiceCalendarsControllerFindAllDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>(queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useSuspenseQuery<TData, TError>({ queryKey: Common.UseCalendarsServiceCalendarsControllerFindAllKeyFn(), queryFn: () => CalendarsService.calendarsControllerFindAll() as TData, ...options });
-/**
-* @param data The data for the request.
-* @param data.id
-* @returns CalendarDto Return a single calendar by id
-* @throws ApiError
-*/
-export const useCalendarsServiceCalendarsControllerFindOneSuspense = <TData = Common.CalendarsServiceCalendarsControllerFindOneDefaultResponse, TError = unknown, TQueryKey extends Array<unknown> = unknown[]>({ id }: {
-  id: string;
-}, queryKey?: TQueryKey, options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">) => useSuspenseQuery<TData, TError>({ queryKey: Common.UseCalendarsServiceCalendarsControllerFindOneKeyFn({ id }, queryKey), queryFn: () => CalendarsService.calendarsControllerFindOne({ id }) as TData, ...options });
-/**
 * @param data The data for the request.
 * @param data.id
 * @param data.startedAt Start timestamp in ISO format

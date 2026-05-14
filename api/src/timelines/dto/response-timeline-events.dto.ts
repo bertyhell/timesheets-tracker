@@ -192,7 +192,7 @@ export class TimelineEventDto {
   @Type(() => String)
   @ApiProperty({
     type: String,
-    description: 'Uuid of the timeline',
+    description: 'Uuid of the event',
     example: '550e8400-e29b-41d4-a716-446655440000',
     required: true,
   })
@@ -237,6 +237,16 @@ export class TimelineEventDto {
     required: true,
   })
   endedAt: string;
+
+  @IsString()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Uuid of the timeline',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+    required: false,
+  })
+  timelineId: string;
 }
 
 export class TimelineWithEventsDto {

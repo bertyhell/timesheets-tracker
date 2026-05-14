@@ -106,16 +106,6 @@ export const useAutoNotesServiceAutoNotesControllerFindOneKey = "AutoNotesServic
 export const UseAutoNotesServiceAutoNotesControllerFindOneKeyFn = ({ id }: {
   id: string;
 }, queryKey?: Array<unknown>) => [useAutoNotesServiceAutoNotesControllerFindOneKey, ...(queryKey ?? [{ id }])];
-export type CalendarsServiceCalendarsControllerFindAllDefaultResponse = Awaited<ReturnType<typeof CalendarsService.calendarsControllerFindAll>>;
-export type CalendarsServiceCalendarsControllerFindAllQueryResult<TData = CalendarsServiceCalendarsControllerFindAllDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
-export const useCalendarsServiceCalendarsControllerFindAllKey = "CalendarsServiceCalendarsControllerFindAll";
-export const UseCalendarsServiceCalendarsControllerFindAllKeyFn = () => [useCalendarsServiceCalendarsControllerFindAllKey];
-export type CalendarsServiceCalendarsControllerFindOneDefaultResponse = Awaited<ReturnType<typeof CalendarsService.calendarsControllerFindOne>>;
-export type CalendarsServiceCalendarsControllerFindOneQueryResult<TData = CalendarsServiceCalendarsControllerFindOneDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
-export const useCalendarsServiceCalendarsControllerFindOneKey = "CalendarsServiceCalendarsControllerFindOne";
-export const UseCalendarsServiceCalendarsControllerFindOneKeyFn = ({ id }: {
-  id: string;
-}, queryKey?: Array<unknown>) => [useCalendarsServiceCalendarsControllerFindOneKey, ...(queryKey ?? [{ id }])];
 export type CalendarsServiceCalendarsControllerGetEventsDefaultResponse = Awaited<ReturnType<typeof CalendarsService.calendarsControllerGetEvents>>;
 export type CalendarsServiceCalendarsControllerGetEventsQueryResult<TData = CalendarsServiceCalendarsControllerGetEventsDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
 export const useCalendarsServiceCalendarsControllerGetEventsKey = "CalendarsServiceCalendarsControllerGetEvents";
@@ -156,13 +146,11 @@ export type TagNamesServiceTagNamesControllerCreateMutationResult = Awaited<Retu
 export type AutoTagsServiceAutoTagsControllerCreateMutationResult = Awaited<ReturnType<typeof AutoTagsService.autoTagsControllerCreate>>;
 export type WebsitesServiceWebsitesControllerCreateMutationResult = Awaited<ReturnType<typeof WebsitesService.websitesControllerCreate>>;
 export type AutoNotesServiceAutoNotesControllerCreateMutationResult = Awaited<ReturnType<typeof AutoNotesService.autoNotesControllerCreate>>;
-export type CalendarsServiceCalendarsControllerCreateMutationResult = Awaited<ReturnType<typeof CalendarsService.calendarsControllerCreate>>;
 export type TimelinesServiceTimelinesControllerCreateMutationResult = Awaited<ReturnType<typeof TimelinesService.timelinesControllerCreate>>;
 export type TagsServiceTagsControllerUpdateMutationResult = Awaited<ReturnType<typeof TagsService.tagsControllerUpdate>>;
 export type TagNamesServiceTagNamesControllerUpdateMutationResult = Awaited<ReturnType<typeof TagNamesService.tagNamesControllerUpdate>>;
 export type AutoTagsServiceAutoTagsControllerUpdateMutationResult = Awaited<ReturnType<typeof AutoTagsService.autoTagsControllerUpdate>>;
 export type AutoNotesServiceAutoNotesControllerUpdateMutationResult = Awaited<ReturnType<typeof AutoNotesService.autoNotesControllerUpdate>>;
-export type CalendarsServiceCalendarsControllerUpdateMutationResult = Awaited<ReturnType<typeof CalendarsService.calendarsControllerUpdate>>;
 export type TimelinesServiceTimelinesControllerUpdateMutationResult = Awaited<ReturnType<typeof TimelinesService.timelinesControllerUpdate>>;
 export type ProgramsServiceProgramsControllerDeleteMutationResult = Awaited<ReturnType<typeof ProgramsService.programsControllerDelete>>;
 export type ActiveStatesServiceActiveStatesControllerDeleteMutationResult = Awaited<ReturnType<typeof ActiveStatesService.activeStatesControllerDelete>>;
@@ -171,5 +159,4 @@ export type TagNamesServiceTagNamesControllerRemoveMutationResult = Awaited<Retu
 export type AutoTagsServiceAutoTagsControllerDeleteMutationResult = Awaited<ReturnType<typeof AutoTagsService.autoTagsControllerDelete>>;
 export type WebsitesServiceWebsitesControllerDeleteMutationResult = Awaited<ReturnType<typeof WebsitesService.websitesControllerDelete>>;
 export type AutoNotesServiceAutoNotesControllerRemoveMutationResult = Awaited<ReturnType<typeof AutoNotesService.autoNotesControllerRemove>>;
-export type CalendarsServiceCalendarsControllerDeleteMutationResult = Awaited<ReturnType<typeof CalendarsService.calendarsControllerDelete>>;
 export type TimelinesServiceTimelinesControllerDeleteMutationResult = Awaited<ReturnType<typeof TimelinesService.timelinesControllerDelete>>;

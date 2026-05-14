@@ -158,20 +158,6 @@ export const prefetchUseAutoNotesServiceAutoNotesControllerFindOne = (queryClien
   id: string;
 }) => queryClient.prefetchQuery({ queryKey: [Common.useAutoNotesServiceAutoNotesControllerFindOneKey, [{ id }]], queryFn: () => AutoNotesService.autoNotesControllerFindOne({ id }) });
 /**
-* @returns CalendarDto Get a list of all calendars
-* @throws ApiError
-*/
-export const prefetchUseCalendarsServiceCalendarsControllerFindAll = (queryClient: QueryClient) => queryClient.prefetchQuery({ queryKey: [Common.useCalendarsServiceCalendarsControllerFindAllKey, []], queryFn: () => CalendarsService.calendarsControllerFindAll() });
-/**
-* @param data The data for the request.
-* @param data.id
-* @returns CalendarDto Return a single calendar by id
-* @throws ApiError
-*/
-export const prefetchUseCalendarsServiceCalendarsControllerFindOne = (queryClient: QueryClient, { id }: {
-  id: string;
-}) => queryClient.prefetchQuery({ queryKey: [Common.useCalendarsServiceCalendarsControllerFindOneKey, [{ id }]], queryFn: () => CalendarsService.calendarsControllerFindOne({ id }) });
-/**
 * @param data The data for the request.
 * @param data.id
 * @param data.startedAt Start timestamp in ISO format

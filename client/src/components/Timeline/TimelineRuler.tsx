@@ -8,7 +8,7 @@ interface TimelineRulerProps {
   maxTime: Date;
 }
 
-function TimelineRuler({ minTime, maxTime }: TimelineRulerProps) {
+export function TimelineRuler({ minTime, maxTime }: TimelineRulerProps) {
   const windowMs = differenceInMilliseconds(maxTime, minTime);
   const ticks = getTicks(minTime, maxTime);
 
@@ -32,5 +32,3 @@ function TimelineRuler({ minTime, maxTime }: TimelineRulerProps) {
     </div>
   );
 }
-
-export default TimelineRuler;

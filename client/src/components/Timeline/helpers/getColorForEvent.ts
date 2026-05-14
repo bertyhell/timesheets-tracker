@@ -32,7 +32,8 @@ export const COLOR_LIST = [
 export const ACTIVE_COLOR = '#4caf50';
 export const INACTIVE_COLOR = '#f44336';
 
-const getColorFromString = (text: string): string => {
+const getColorFromString = (text: string | undefined): string => {
+  if (!text) return '#ffffff';
   return COLOR_LIST[stringToColorIndex(text, COLOR_LIST.length)];
 };
 

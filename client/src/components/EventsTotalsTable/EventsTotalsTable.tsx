@@ -53,24 +53,23 @@ function formatDuration(ms: number): string {
   return [hours, minutes, seconds].map((v) => String(v).padStart(2, '0')).join(':');
 }
 
-function EventsTotalsTable({ events, timelineType, className }: EventsTotalsTableProps) {
+export function EventsTotalsTable({ events, timelineType, className }: EventsTotalsTableProps) {
   const [searchTerm] = useAtom(searchTermAtom);
 
   const totals = useMemo(() => {
-    const filtered = events.filter((e) =>
-      JSON.stringify(e).toLowerCase().includes(searchTerm)
-    );
+    const filtered = events.filter((e) => JSON.stringify(e).toLowerCase().includes(searchTerm));
 
     const map = new Map<string, number>();
     for (const event of filtered) {
       const category = getCategoryLabel(event, timelineType);
-      const durationMs =
-        parseISO(event.endedAt).getTime() - parseISO(event.startedAt).getTime();
+      const durationMs = parseISO(event.endedAt).getTime() - parseISO(event.startedAt).getTime();
       map.set(category, (map.get(category) ?? 0) + durationMs);
     }
 
     return orderBy(
-      Array.from(map.entries()).map(([category, durationMs]): TotalRow => ({ category, durationMs })),
+      Array.from(map.entries()).map(
+        ([category, durationMs]): TotalRow => ({ category, durationMs })
+      ),
       (row) => row.durationMs,
       'desc'
     );
@@ -105,5 +104,3 @@ function EventsTotalsTable({ events, timelineType, className }: EventsTotalsTabl
     </div>
   );
 }
-
-export default EventsTotalsTable;

@@ -153,6 +153,7 @@ export class TimelinesService {
                   info: {
                     isActive: activeState.isActive,
                   },
+                  timelineId: timelineInfo.id,
                 };
               });
             })();
@@ -177,6 +178,7 @@ export class TimelinesService {
                     tagNameColor: tag.tagName?.color,
                     tagNameCode: tag.tagName?.code,
                   },
+                  timelineId: timelineInfo.id,
                 };
               });
             })();
@@ -193,6 +195,7 @@ export class TimelinesService {
                     websiteUrl: website.websiteUrl,
                     websiteTitle: website.websiteTitle,
                   },
+                  timelineId: timelineInfo.id,
                 };
               });
             })();
@@ -209,6 +212,7 @@ export class TimelinesService {
                     programName: program.programName,
                     windowTitle: program.windowTitle,
                   },
+                  timelineId: timelineInfo.id,
                 };
               });
             })();
@@ -231,6 +235,7 @@ export class TimelinesService {
                     location: calendarEvent.location,
                     allDay: calendarEvent.allDay,
                   },
+                  timelineId: timelineInfo.id,
                 };
               });
             })();

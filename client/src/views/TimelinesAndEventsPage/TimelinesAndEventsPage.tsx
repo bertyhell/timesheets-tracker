@@ -16,9 +16,9 @@ import type { TagName } from '../../types/types';
 import { clamp, maxBy, minBy } from 'lodash-es';
 import { useAtom } from 'jotai';
 import { viewDateAtom } from '../../store/store';
-import EventsTable from '../../components/EventsTable/EventsTable';
-import EventsTotalsTable from '../../components/EventsTotalsTable/EventsTotalsTable';
-import TimelineRuler from '../../components/Timeline/TimelineRuler';
+import { EventsTable } from '../../components/EventsTable/EventsTable';
+import { EventsTotalsTable } from '../../components/EventsTotalsTable/EventsTotalsTable';
+import { TimelineRuler } from '../../components/Timeline/TimelineRuler';
 import { TimelineEventDto, TimelineWithEventsDto } from '../../generated/api/requests/types.gen';
 import {
   useTagNamesServiceTagNamesControllerCount,
@@ -80,6 +80,7 @@ export function TimelinesAndEventsPage() {
     timelinesWithEvents?.find(
       (timelinesWithEvent) => timelinesWithEvent.id === selectedTimelineAndEvent.selectedTimelineId
     ) || null;
+  console.log('selected timeline: ', selectedTimeline);
   const selectedEvent: TimelineEventDto | null =
     selectedTimeline?.events?.find(
       (event) => event.id === selectedTimelineAndEvent.selectedEventId
@@ -277,10 +278,12 @@ export function TimelinesAndEventsPage() {
     if (!selectedTimeline?.events?.length) {
       return <div className="u-center">No events</div>;
     }
+    console.log('rendering table with ', selectedTimeline);
     return (
       <>
         <EventsTable
           className="c-events-table"
+          timeline={selectedTimeline}
           events={selectedTimeline.events}
         />
         <EventsTotalsTable

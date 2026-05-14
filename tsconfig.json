@@ -18,8 +18,7 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "resolveJsonModule": true,
-    "composite": true,
-    "esModuleInterop": true
+    "composite": true
   },
   "files": [
     "install-timesheet-tracker-as-a-windows-service.ts",

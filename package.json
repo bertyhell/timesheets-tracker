@@ -7,9 +7,13 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "dev:desktop": "electrobun dev",
+    "dev:desktop:watch": "electrobun dev --watch",
+    "build:desktop:canary": "electrobun build --env=canary",
+    "build:desktop:stable": "electrobun build --env=stable",
     "bump": "npx bump-package-versions --part=patch --strategy=highest ./package.json ./api/package.json ./client/package.json",
-    "build-api": "cd api && npm run build && cp -r dist/* ../dist/api && symlink-dir ./node_modules ../dist/api/node_modules && cd ..",
-    "build-client": "cd client && npm run build && cp -r dist/* ../dist/client && cd ..",
+    "build-api": "cd api && npm run build && bunx shx cp -r dist/* ../dist/api && bunx shx symlink-dir ./node_modules ../dist/api/node_modules && cd ..",
+    "build-client": "cd client && npm run build && bunx shx mkdir -p ../dist/client && bunx shx cp -r dist/* ../dist/client",
     "copy-chrome-extension": "cp -r chrome-extension/* ./dist/chrome-extension && rm ./dist/chrome-extension/manifest.json && mv ./dist/chrome-extension/manifest-prd.json ./dist/chrome-extension/manifest.json",
     "build-service-script": "tsc -p tsconfig.json && symlink-dir ./node_modules ./dist/node_modules && rm -rf ./dist/daemon",
     "copy-database": "cp ./api/timesheets-tracker-database.sqlite3 ./dist/timesheets-tracker-database.sqlite3",
@@ -21,6 +25,7 @@
     "type-check": "tsc"
   },
   "dependencies": {
+    "electrobun": "^1.18.1",
     "node-windows": "^1.0.0-beta.8",
     "symlink-dir": "^5.2.1"
   },

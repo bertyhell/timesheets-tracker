@@ -17,3 +17,9 @@ ManicTime_*
 
 .env*
 !.env.template
+
+build/
+
+*.log
+
+artifacts/

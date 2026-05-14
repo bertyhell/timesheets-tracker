@@ -72,10 +72,14 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   }
 
   /**
-   * Create database tables if they do not exist yet
+   * Create database tables if they do not exist yet.
+   * Uses db.exec() (not db.query()) because the SQL file contains
+   * multiple statements and bun:sqlite's query() only prepares the first one.
    */
   async createTables(): Promise<void> {
-    await this.mutate('./src/database/queries/create-database-tables.sql');
+    const sqlFilePath = resolveProjectPath('./src/database/queries/create-database-tables.sql');
+    const sql = fs.readFileSync(sqlFilePath, 'utf-8');
+    this.db.exec(sql);
     this.runMigrations();
   }
 

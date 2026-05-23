@@ -45,7 +45,6 @@
 - Root packaging flow (from `README.md` + `package.json`): `npm run build-service-script`, `npm run copy-database`, `npm run build`.
 - Backend dev command in scripts is `npm run dev:api` from `api/` (README uses `npm run dev`, which is outdated).
 - Frontend dev command is `npm run dev:client` from `client/`.
-- Backend tests: `cd api && npm test` (mostly scaffold tests right now).
 
 ## Project-specific gotchas
 

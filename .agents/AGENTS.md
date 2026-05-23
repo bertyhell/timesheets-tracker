@@ -21,6 +21,11 @@
 
 - SQLite access is centralized in `api/src/database/database.service.ts` using `bun:sqlite`.
 - Each feature module follows `controller + service + dto + queries/*.sql` (example: `api/src/programs/*`).
+- TypeScript helpers and types for SQL queries are auto-generated from `.sql` files using TypeSQL. To generate them, run:
+  ```shell
+  cd api && npm run generate-database-types
+  ```
+  **CRITICAL**: These auto-generated TypeScript files should **never** be touched manually. Always regenerate them by running the command.
 - Services execute SQL files by path (example: `./src/programs/queries/findAllPrograms.sql`) and map flat SQL aliases like `"tagName.name"` via `unflatten`.
 - Schema is created from `api/src/database/queries/create-database-tables.sql` on startup; optional seeding via `SEED_AT_STARTUP=true` in `DatabaseService`.
 
@@ -28,6 +33,11 @@
 
 - Swagger UI is at `/docs` (`api/src/main.ts`); client codegen pulls from `/docs-yaml` (`client/package.json` script `generate-api-helpers`).
 - Generated hooks live under `client/src/generated/api/queries` and are used directly in views (see `TimelinesPage.tsx`).
+- To regenerate the React Query hooks from Swagger, run:
+  ```shell
+  cd client && npm run generate-api-helpers
+  ```
+  **CRITICAL**: These generated hook/type files under `client/src/generated/` should **never** be touched manually. They are always overwritten during regeneration.
 - After regeneration, `client/scripts/ignore-types-in-generated-files.ts` injects `@ts-nocheck` into generated query index.
 
 ## Commands that match current scripts

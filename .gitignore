@@ -12,7 +12,6 @@ tsconfig.tsbuildinfo
 api/manic-time-export.csv
 
 .claude/
-.agents/
 ManicTime_*
 
 .env*

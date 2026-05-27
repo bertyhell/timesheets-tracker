@@ -11,6 +11,7 @@ import { findOneTagName } from './queries/findOneTagName';
 import { createTagName } from './queries/createTagName';
 import { updateTagName } from './queries/updateTagName';
 import { deleteTagName } from './queries/deleteTagName';
+import { TagNameDto } from './dto/response-tag-name.dto';
 
 @Injectable()
 export class TagNamesService {
@@ -25,7 +26,7 @@ export class TagNamesService {
     };
   }
 
-  async findAll(searchTerm: string | undefined): Promise<TagName[]> {
+  async findAll(searchTerm: string | undefined): Promise<TagNameDto[]> {
     const db = this.databaseService.getDb();
     let rawTagNames;
     if (searchTerm) {

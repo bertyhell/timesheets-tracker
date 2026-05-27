@@ -1,6 +1,14 @@
 import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsArray, IsBoolean, IsEnum, IsObject, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsEnum,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { TimelineType } from '../../types/types';
 
 export class ActiveStateEventInfoDto {
@@ -158,11 +166,11 @@ export class AutoTagEventInfoDto {
   @Type(() => String)
   @ApiProperty({
     type: String,
-    description: 'Display name of the tag',
+    description: 'Display title of the tag',
     example: 'Development',
     required: true,
   })
-  tagNameName: string;
+  tagNameTitle: string;
 
   @IsString()
   @Type(() => String)
@@ -185,6 +193,16 @@ export class AutoTagEventInfoDto {
     nullable: true,
   })
   tagNameCode?: string;
+
+  @IsNumber()
+  @Type(() => Number)
+  @ApiProperty({
+    type: Number,
+    description: 'Priority of the auto tag that produced this event',
+    example: 10,
+    required: true,
+  })
+  priority: number;
 }
 
 export class TimelineEventDto {
@@ -217,6 +235,16 @@ export class TimelineEventDto {
     | WebsiteEventInfoDto
     | TagEventInfoDto
     | AutoTagEventInfoDto;
+
+  @IsString()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Color of the event',
+    example: '#FF5733',
+    required: false,
+  })
+  color?: string;
 
   @IsString()
   @Type(() => String)

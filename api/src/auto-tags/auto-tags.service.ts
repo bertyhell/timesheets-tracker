@@ -2,7 +2,7 @@ import { CreateAutoTagDto } from './dto/create-auto-tag.dto';
 import { Inject, Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { v4 as uuid } from 'uuid';
-import type { AutoTag } from '../types/types';
+import { AutoTag, TimelineType } from '../types/types';
 import { unflatten } from 'nested-objects-util';
 import { UpdateAutoTagsDto } from './dto/update-auto-tags.dto';
 import { findAllAutoTags } from './queries/findAllAutoTags';
@@ -12,6 +12,12 @@ import { findOneAutoTag } from './queries/findOneAutoTag';
 import { createAutoTag } from './queries/createAutoTag';
 import { updateAutoTag } from './queries/updateAutoTag';
 import { deleteAutoTag } from './queries/deleteAutoTag';
+import { TimelineDto } from '../timelines/dto/response-timeline.dto';
+import { calculateAutoTagEvents } from './helpers/auto-tags-analyzer';
+import { partition } from 'lodash';
+import { AutoTagDto } from './dto/response-auto-tag.dto';
+import { TagNameDto } from '../tag-names/dto/response-tag-name.dto';
+import { TimelineWithEventsDto } from '../timelines/dto/response-timeline-events.dto';
 
 @Injectable()
 export class AutoTagsService {
@@ -80,6 +86,21 @@ export class AutoTagsService {
 
   async delete(id: string) {
     const db = this.databaseService.getDb();
-    await deleteAutoTag(db, { id });
+    deleteAutoTag(db, { id });
+  }
+
+  public analyseEvents(
+    timelines: TimelineWithEventsDto[],
+    autoTags: AutoTagDto[],
+    allTagNames: TagNameDto[]
+  ): TimelineWithEventsDto[] {
+    const [autoTagTimelines, otherTimelines] = partition(
+      timelines,
+      (timeline) => timeline.type === TimelineType.AutoTag
+    );
+    autoTagTimelines.forEach((autoTagTimeline) => {
+      calculateAutoTagEvents(otherTimelines, autoTags, autoTagTimeline, allTagNames);
+    });
+    return timelines;
   }
 }

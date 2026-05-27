@@ -127,30 +127,6 @@ export function TimelinesAndEventsPage() {
     };
   }, []);
 
-  // useEffect(() => {
-  //   if (
-  //     !isLoadingPrograms &&
-  //     !isLoadingAllAutoTags &&
-  //     !isLoadingActiveStates &&
-  //     !isLoadingWebsites &&
-  //     !!programs &&
-  //     !!allAutoTags &&
-  //     !!activeStates &&
-  //     !!websites
-  //   ) {
-  //     setAutoTagEvents(calculateAutoTagEvents(programs as Program[], allAutoTags as AutoTagDto[]));
-  //   }
-  // }, [
-  //   isLoadingPrograms,
-  //   isLoadingAllAutoTags,
-  //   isLoadingActiveStates,
-  //   isLoadingWebsites,
-  //   allAutoTags,
-  //   programs,
-  //   activeStates,
-  //   websites,
-  // ]);
-
   const handleKeyUpEvent = async (evt: KeyboardEvent) => {
     if (!(evt.target as Element)?.closest('.c-timelines')) {
       return;

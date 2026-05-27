@@ -8,6 +8,7 @@ import { WebsitesModule } from '../websites/websites.module';
 import { TagsModule } from '../tags/tags.module';
 import { AutoTagsModule } from '../auto-tags/auto-tags.module';
 import { ActiveStatesModule } from '../activeStates/active-states.module';
+import { TagNamesModule } from '../tag-names/tag-names.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ActiveStatesModule } from '../activeStates/active-states.module';
     ProgramsModule,
     TagsModule,
     WebsitesModule,
+    TagNamesModule,
   ],
   controllers: [TimelinesController],
   providers: [TimelinesService],

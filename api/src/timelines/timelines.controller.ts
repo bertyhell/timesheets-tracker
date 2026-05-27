@@ -51,7 +51,7 @@ export class TimelinesController {
   @Get()
   @ApiQuery({ name: 'term', required: false, type: 'string' })
   findAll(@Query('term') term?: string) {
-    return this.timelinesService.findAll(term);
+    return this.timelinesService.findAllTimelines(term);
   }
 
   @ApiOkResponse({

@@ -5,29 +5,28 @@
   gap: 0.5rem;
   position: relative;
 
-  &--and {
-    margin-top: 0.2rem;
-  }
-
-  &--or {
-    margin-top: 0.5rem;
-  }
-
-  &__boolean-operator-button {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 3rem;
-    text-align: center;
-    transform: translateY(calc(-50% - 0.25rem));
-  }
-
-  &__variable-select,
-  &__operator-select {
-    width: 25rem;
-  }
-
   .c-button {
     margin: 0;
   }
+}
+.c-auto-tag-condition--and {
+  margin-top: 0.2rem;
+}
+
+.c-auto-tag-condition--or {
+  margin-top: 0.5rem;
+}
+
+.c-auto-tag-condition__boolean-operator-button {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3rem;
+  text-align: center;
+  transform: translateY(calc(-50% - 0.25rem));
+}
+
+.c-auto-tag-condition__variable-select,
+.c-auto-tag-condition__operator-select {
+  width: 25rem;
 }

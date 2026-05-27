@@ -27,6 +27,8 @@ import { WebsitesService } from '../websites/websites.service';
 import { TagsService } from '../tags/tags.service';
 import { AutoTagsService } from '../auto-tags/auto-tags.service';
 import { ActiveStatesService } from '../activeStates/active-states.service';
+import { AutoTagDto } from '../auto-tags/dto/response-auto-tag.dto';
+import { TagNamesService } from '../tag-names/tag-names.service';
 
 @Injectable()
 export class TimelinesService {
@@ -37,6 +39,7 @@ export class TimelinesService {
     @Inject(DatabaseService) private databaseService: DatabaseService,
     @Inject(ProgramsService) private programsService: ProgramsService,
     @Inject(TagsService) private tagsService: TagsService,
+    @Inject(TagNamesService) private tagNamesService: TagNamesService,
     @Inject(WebsitesService) private websitesService: WebsitesService
   ) {}
 
@@ -54,7 +57,7 @@ export class TimelinesService {
     };
   }
 
-  async findAll(searchTerm: string | undefined): Promise<Timeline[]> {
+  async findAllTimelines(searchTerm: string | undefined): Promise<Timeline[]> {
     const db = this.databaseService.getDb();
     let rawTimelines: Record<string, any>[];
     if (searchTerm) {
@@ -127,13 +130,14 @@ export class TimelinesService {
     term: string | undefined,
     timelineIds: string[] | undefined
   ): Promise<TimelineWithEventsDto[]> {
-    const timelines = await this.findAll(undefined);
+    const timelines = await this.findAllTimelines(undefined);
     let timelinesToFetch: TimelineDto[];
     if (timelineIds) {
       timelinesToFetch = timelines.filter((timeline) => timelineIds.includes(timeline.id));
     } else {
       timelinesToFetch = timelines;
     }
+
     if (term) {
       timelinesToFetch = timelinesToFetch.filter((timeline) =>
         timeline.title.toLowerCase().includes(term.toLowerCase())
@@ -159,8 +163,7 @@ export class TimelinesService {
             })();
 
           case TimelineType.AutoTag: {
-            const autoTags = this.autoTagsService.findAll(undefined);
-            // TODO resolve auto tags to events
+            // Resolve autotags after fetching all other events
             return Promise.resolve([]);
           }
 
@@ -243,12 +246,20 @@ export class TimelinesService {
       }
     );
     const events = await Promise.all(fetchEventPromises);
-    return timelinesToFetch.map((timeline, timelineIndex): TimelineWithEventsDto => {
-      return {
-        id: timeline.id,
-        type: timeline.timelineType,
-        events: events[timelineIndex],
-      };
-    });
+
+    const timelinesWithEvents = timelinesToFetch.map(
+      (timeline, timelineIndex): TimelineWithEventsDto => {
+        return {
+          id: timeline.id,
+          type: timeline.timelineType,
+          events: events[timelineIndex],
+        };
+      }
+    );
+
+    // Analyze auto-tags if an autotagTimeline is present
+    const tagNames = await this.tagNamesService.findAll(undefined);
+    const autoTags = (await this.autoTagsService.findAll(undefined)) as AutoTagDto[];
+    return this.autoTagsService.analyseEvents(timelinesWithEvents, autoTags, tagNames);
   }
 }

@@ -62,12 +62,10 @@ export class ProgramsListener implements OnApplicationBootstrap {
         } else {
           // Program changes, write last activity to database
           const { icon, ...info } = windowInfo;
-          logger.info(
-            'changed application or title: ',
-            new Date().toISOString(),
-            JSON.stringify(info)
-          );
-          const iconColor = icon ? await extractIconColor(this.lastProgram.programName, icon) : null;
+          logger.info(`changed application: ${info.title},,${info.application},,${info.path}`);
+          const iconColor = icon
+            ? await extractIconColor(this.lastProgram.programName, icon)
+            : null;
           await this.programsService.create({
             programName: this.lastProgram.programName,
             windowTitle: this.lastProgram.windowTitle,

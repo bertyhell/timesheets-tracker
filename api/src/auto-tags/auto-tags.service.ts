@@ -99,7 +99,13 @@ export class AutoTagsService {
       (timeline) => timeline.type === TimelineType.AutoTag
     );
     autoTagTimelines.forEach((autoTagTimeline) => {
-      calculateAutoTagEvents(otherTimelines, autoTags, autoTagTimeline, allTagNames);
+      const autoTagEvents = calculateAutoTagEvents(
+        otherTimelines,
+        autoTags,
+        autoTagTimeline,
+        allTagNames
+      );
+      autoTagTimeline.events = autoTagEvents;
     });
     return timelines;
   }

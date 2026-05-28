@@ -30,8 +30,8 @@ function getDynamicColumns(timelineType: string | undefined): ColumnDef[] {
   switch (timelineType) {
     case TimelineType.Program:
       return [
-        { key: 'program', title: 'Program', allowsSorting: true, width: 200 },
-        { key: 'title', title: 'Title', allowsSorting: true },
+        { key: 'program', title: 'Program', allowsSorting: true, width: 150 },
+        { key: 'title', title: 'Title', allowsSorting: true, width: 150 },
       ];
 
     case TimelineType.ActiveState:

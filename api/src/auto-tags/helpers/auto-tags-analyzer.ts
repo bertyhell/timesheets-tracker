@@ -6,7 +6,7 @@ import {
   TimelineWithEventsDto,
 } from '../../timelines/dto/response-timeline-events.dto';
 import { compact, uniq } from 'lodash';
-import { isAfter, isBefore, parseISO } from 'date-fns';
+import { isAfter, isBefore, isEqual, parseISO } from 'date-fns';
 import { TagNameDto } from '../../tag-names/dto/response-tag-name.dto';
 import { CustomError } from '../../shared/CustomError';
 import { isNil } from 'es-toolkit';
@@ -14,6 +14,11 @@ import { isNil } from 'es-toolkit';
 const COMBINE_TAGS_THRESHOLD = 5 * 60 * 1000;
 const DEFAULT_MAX_GROW_TIME_MINUTES = 5;
 
+/**
+ * Takes a list of conditions and splits them based on the OR operators
+ * Returns an array of arrays with all conditions inside a single array having the AND operator or being singular conditions
+ * @param conditions
+ */
 function splitConditionsOnOrOperators(conditions: AutoTagConditionDto[]): AutoTagConditionDto[][] {
   const groupedConditions: AutoTagConditionDto[][] = [];
   let currentGroup: AutoTagConditionDto[] = [];
@@ -29,6 +34,9 @@ function splitConditionsOnOrOperators(conditions: AutoTagConditionDto[]): AutoTa
     currentIndex++;
   } while (currentIndex < conditions.length);
 
+  if (currentGroup.length > 0) {
+    groupedConditions.push(currentGroup);
+  }
   return groupedConditions;
 }
 
@@ -55,10 +63,11 @@ function doesConditionValueMatchEvent(
   condition: AutoTagConditionDto,
   variable: ConditionVariable
 ): boolean {
-  const toCheckValue: string = String(event.info[variable]);
-  if (isNil(toCheckValue)) {
+  const rawValue = event.info[variable];
+  if (isNil(rawValue)) {
     return false;
   }
+  const toCheckValue: string = String(rawValue);
   switch (condition.operator) {
     case ConditionOperator.contains:
       return toCheckValue.toLowerCase().includes(condition.value.toLowerCase());
@@ -69,7 +78,7 @@ function doesConditionValueMatchEvent(
     case ConditionOperator.isNotExact:
       return toCheckValue.toLowerCase() !== condition.value.toLowerCase();
     case ConditionOperator.doesNotMatchRegex:
-      return new RegExp(condition.value, 'g').test(toCheckValue);
+      return !new RegExp(condition.value, 'g').test(toCheckValue);
     default:
       return false;
   }
@@ -83,13 +92,14 @@ function doesAutoTagMatch(autoTag: AutoTagDto, event: TimelineEventDto): boolean
   return !!matchedGroup;
 }
 
-function getEventsAtTimestamp(timelinesWithEvents: TimelineWithEventsDto[], timestamp: Date) {
+function getEventsAtTimestamp(timelinesWithEvents: TimelineWithEventsDto[], timestamp: string) {
+  const currentTimestamp = parseISO(timestamp);
   return compact(
     timelinesWithEvents.map((timeline) => {
       return timeline.events.find((event) => {
         return (
-          isAfter(timestamp, parseISO(event.startedAt)) &&
-          isBefore(timestamp, parseISO(event.endedAt))
+          (timestamp === event.startedAt || isAfter(currentTimestamp, parseISO(event.startedAt))) &&
+          (timestamp === event.endedAt || isBefore(currentTimestamp, parseISO(event.endedAt)))
         );
       });
     })
@@ -150,6 +160,33 @@ export function growAutoTagEvents(
   return sortedAutoTagEvents;
 }
 
+function combineAutoTagEvents(autoTagEvents: TimelineEventDto[]): TimelineEventDto[] {
+  const combinedAutoTagEvents = [autoTagEvents[0]]; // Start with first event
+  if (autoTagEvents.length >= 2) {
+    // Combine auto tags that evaluate to the same tag name
+    let index = 1;
+    do {
+      const lastCombinedAutoTagEvent = combinedAutoTagEvents.at(-1) as TimelineEventDto;
+      const currentAutoTagEvent = autoTagEvents[index];
+      if (
+        (lastCombinedAutoTagEvent.info as AutoTagEventInfoDto).tagNameId ===
+          (currentAutoTagEvent.info as AutoTagEventInfoDto).tagNameId &&
+        new Date(currentAutoTagEvent.startedAt).getTime() -
+          new Date(lastCombinedAutoTagEvent.endedAt).getTime() <
+          COMBINE_TAGS_THRESHOLD
+      ) {
+        // Combine events
+        lastCombinedAutoTagEvent.endedAt = currentAutoTagEvent.endedAt;
+      } else {
+        // Do not combine events
+        combinedAutoTagEvents.push(currentAutoTagEvent);
+      }
+      index++;
+    } while (index < autoTagEvents.length);
+  }
+  return combinedAutoTagEvents;
+}
+
 export function calculateAutoTagEvents(
   timelinesWithEvents: TimelineWithEventsDto[],
   autoTags: AutoTagDto[],
@@ -163,7 +200,7 @@ export function calculateAutoTagEvents(
   const allEventStartTimes = getAllEventStartTimes(timelinesWithEvents);
   const autoTagEvents: TimelineEventDto[] = [];
   allEventStartTimes.map((startTime) => {
-    const eventsAtTimestamp = getEventsAtTimestamp(timelinesWithEvents, parseISO(startTime));
+    const eventsAtTimestamp = getEventsAtTimestamp(timelinesWithEvents, startTime);
     eventsAtTimestamp.find((event) => {
       const autoTag = validAutoTags.find((autoTag) => doesAutoTagMatch(autoTag, event));
       if (!autoTag) {
@@ -200,29 +237,9 @@ export function calculateAutoTagEvents(
     return [];
   }
 
-  const combinedAutoTagEvents = [autoTagEvents[0]]; // Start with first event
-  if (autoTagEvents.length >= 2) {
-    // Combine auto tags that evaluate to the same tag name
-    let index = 1;
-    do {
-      const lastCombinedAutoTagEvent = combinedAutoTagEvents.at(-1) as TimelineEventDto;
-      const currentAutoTagEvent = autoTagEvents[index];
-      if (
-        (lastCombinedAutoTagEvent.info as AutoTagEventInfoDto).tagNameId ===
-          (currentAutoTagEvent.info as AutoTagEventInfoDto).tagNameId &&
-        new Date(currentAutoTagEvent.startedAt).getTime() -
-          new Date(lastCombinedAutoTagEvent.endedAt).getTime() <
-          COMBINE_TAGS_THRESHOLD
-      ) {
-        // Combine events
-        lastCombinedAutoTagEvent.endedAt = currentAutoTagEvent.endedAt;
-      } else {
-        // Do not combine events
-        combinedAutoTagEvents.push(currentAutoTagEvent);
-      }
-      index++;
-    } while (index < autoTagEvents.length);
-  }
+  const combinedAutoTagEvents = combineAutoTagEvents(autoTagEvents);
 
-  return growAutoTagEvents(combinedAutoTagEvents, maxGrowTimeMinutes);
+  const grownAutoTagEvents = growAutoTagEvents(combinedAutoTagEvents, maxGrowTimeMinutes);
+
+  return grownAutoTagEvents;
 }

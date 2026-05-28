@@ -33,6 +33,7 @@ import { COLOR_LIST } from '../../components/Timeline/helpers/getColorForEvent';
 import GlobalSearchBar from '../../components/GlobalSearchBar/GlobalSearchBar';
 import DateSelect from '../../components/DateSelect/DateSelect';
 import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from 'react-resizable-panels';
+import { isApproxEqual } from '../../helpers/is-approx-equal';
 
 export function TimelinesAndEventsPage() {
   const [viewDate] = useAtom(viewDateAtom);
@@ -174,7 +175,7 @@ export function TimelinesAndEventsPage() {
   };
 
   const handleMouseUp = (timelineId: string, posX: number) => {
-    if (posX === selectionStartPercent) {
+    if (isApproxEqual(posX, selectionStartPercent)) {
       setSelectionStartPercent(null);
       setSelectionEndPercent(null);
       setActiveSelectionTimeline(null);
@@ -269,7 +270,7 @@ export function TimelinesAndEventsPage() {
 
         <Panel minSize="10%" className="c-timeline-events-list">
           <PanelGroup orientation="horizontal">
-            <Panel minSize="15%">
+            <Panel minSize="15%" defaultSize="70%">
               {!selectedTimeline?.events?.length ? (
                 <div className="u-center">No events</div>
               ) : (
@@ -283,7 +284,7 @@ export function TimelinesAndEventsPage() {
 
             <PanelResizeHandle className="c-resize-handle c-resize-handle--vertical" />
 
-            <Panel minSize="15%">
+            <Panel minSize="15%" defaultSize="30%">
               {!selectedTimeline?.events?.length ? null : (
                 <EventsTotalsTable
                   className="c-events-totals-table"

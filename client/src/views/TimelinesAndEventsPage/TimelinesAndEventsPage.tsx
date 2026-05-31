@@ -19,16 +19,16 @@ import { viewDateAtom, sidebarCollapsedAtom } from '../../store/store';
 import { EventsTable } from '../../components/EventsTable/EventsTable';
 import { EventsTotalsTable } from '../../components/EventsTotalsTable/EventsTotalsTable';
 import { TimelineRuler } from '../../components/Timeline/TimelineRuler';
-import { TimelineEventDto, TimelineWithEventsDto } from '../../generated/api/requests/types.gen';
+import type { TimelineEventDto, TimelineWithEventsDto } from '../../generated/api/types.gen';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
-  useTagNamesServiceTagNamesControllerCount,
-  useTagNamesServiceTagNamesControllerCreate,
-  useTagsServiceTagsControllerCreate,
-  useTagsServiceTagsControllerRemove,
-  useTimelinesServiceTimelinesControllerFindAll,
-  useTimelinesServiceTimelinesControllerFindAllEvents,
-  useTimelinesServiceTimelinesControllerFindAllEventsKey,
-} from '../../generated/api/queries';
+  tagNamesControllerCountOptions,
+  tagNamesControllerCreateMutation,
+  tagsControllerCreateMutation,
+  tagsControllerRemoveMutation,
+  timelinesControllerFindAllEventsOptions,
+  timelinesControllerFindAllOptions,
+} from '../../generated/api/@tanstack/react-query.gen';
 import { COLOR_LIST } from '../../components/Timeline/helpers/getColorForEvent';
 import GlobalSearchBar from '../../components/GlobalSearchBar/GlobalSearchBar';
 import DateSelect from '../../components/DateSelect/DateSelect';
@@ -39,34 +39,31 @@ export function TimelinesAndEventsPage() {
   const [viewDate] = useAtom(viewDateAtom);
   const [sidebarCollapsed, setSidebarCollapsed] = useAtom(sidebarCollapsedAtom);
 
-  const { data: timelineInfos, isLoading: isLoadingTimelineInfos } =
-    useTimelinesServiceTimelinesControllerFindAll();
+  const { data: timelineInfos, isLoading: isLoadingTimelineInfos } = useQuery({
+    ...timelinesControllerFindAllOptions(),
+  });
 
   const {
     data: timelinesWithEvents,
     isLoading: isLoadingTimelineEvents,
     refetch: refetchTimelinesWithEvents,
-  } = useTimelinesServiceTimelinesControllerFindAllEvents(
-    {
-      startedAt: startOfDay(viewDate).toISOString(),
-      endedAt: endOfDay(viewDate).toISOString(),
-    },
-    [
-      useTimelinesServiceTimelinesControllerFindAllEventsKey,
-      startOfDay(viewDate).toISOString(),
-      endOfDay(viewDate).toISOString(),
-    ],
-    {
-      enabled: !!timelineInfos,
-    }
-  );
+  } = useQuery({
+    ...timelinesControllerFindAllEventsOptions({
+      query: {
+        startedAt: startOfDay(viewDate).toISOString(),
+        endedAt: endOfDay(viewDate).toISOString(),
+      },
+    }),
+    enabled: !!timelineInfos,
+  });
 
-  const { data: tagNamesCount, refetch: refetchTagNamesCount } =
-    useTagNamesServiceTagNamesControllerCount();
-  const { mutateAsync: deleteTag } = useTagsServiceTagsControllerRemove();
+  const { data: tagNamesCount, refetch: refetchTagNamesCount } = useQuery({
+    ...tagNamesControllerCountOptions(),
+  });
+  const { mutateAsync: deleteTag } = useMutation({ ...tagsControllerRemoveMutation() });
 
-  const { mutateAsync: createTagName } = useTagNamesServiceTagNamesControllerCreate();
-  const { mutateAsync: createTag } = useTagsServiceTagsControllerCreate();
+  const { mutateAsync: createTagName } = useMutation({ ...tagNamesControllerCreateMutation() });
+  const { mutateAsync: createTag } = useMutation({ ...tagsControllerCreateMutation() });
 
   const [selectionStartPercent, setSelectionStartPercent] = useState<number | null>(null);
   const [selectionMovePercent, setSelectionMovePercent] = useState<number | null>(null);
@@ -139,7 +136,7 @@ export function TimelinesAndEventsPage() {
         if (selectedEvent?.id && selectedTimeline?.type === TimelineType.Tag) {
           (async () => {
             await deleteTag({
-              id: selectedEvent?.id as string,
+              path: { id: selectedEvent?.id as string },
             });
             await refetchTimelinesWithEvents();
             toast('Tag was deleted', { type: 'success' });
@@ -194,16 +191,16 @@ export function TimelinesAndEventsPage() {
 
   const handleCreateTagName = async (title: string): Promise<TagName> => {
     return (await createTagName({
-      requestBody: {
+      body: {
         title,
         color: COLOR_LIST[(tagNamesCount || 0) % COLOR_LIST.length], // Get a new color that hasn't been recently used
       },
-    })) as Promise<TagName>;
+    })) as unknown as TagName;
   };
 
   const handleCreateTag = async (tagNameId: string): Promise<void> => {
     await createTag({
-      requestBody: {
+      body: {
         tagNameId,
         startedAt: selectionStartTime.toISOString(),
         endedAt: selectionEndTime.toISOString(),

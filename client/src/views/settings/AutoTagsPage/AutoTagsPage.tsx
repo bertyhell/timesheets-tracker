@@ -1,11 +1,12 @@
 import './AutoTagsPage.css';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { PageHeader } from '../../../components/PageHeader/PageHeader';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
-  useAutoTagsServiceAutoTagsControllerCreate,
-  useAutoTagsServiceAutoTagsControllerDelete,
-  useAutoTagsServiceAutoTagsControllerFindAll,
-} from '../../../generated/api/queries';
+  autoTagsControllerCreateMutation,
+  autoTagsControllerDeleteMutation,
+  autoTagsControllerFindAllOptions,
+} from '../../../generated/api/@tanstack/react-query.gen';
 import React, { type ReactNode, useCallback, useEffect, useState } from 'react';
 import { orderBy } from 'lodash-es';
 import { ROUTE_PARTS } from '../../../App';
@@ -13,7 +14,7 @@ import { toast } from 'react-toastify';
 import { type AutoTag } from '../../../types/types';
 import copy from 'copy-to-clipboard';
 import { mapLimit } from 'blend-promise-utils';
-import { AutoTagConditionDto, AutoTagDto } from '../../../generated/api/requests';
+import type { AutoTagConditionDto, AutoTagDto } from '../../../generated/api/types.gen';
 
 const AUTOTAGS_PROPERTY_NAME_FOR_PASTE_DETECTION = 'timesheetTrackerAutoTags';
 
@@ -40,13 +41,12 @@ export function AutoTagsPage() {
     ) : (
       <span style={{ fontSize: '0.7em', color: '#aaa' }}> ▲▼</span>
     );
-  const { data: autoTagItems, refetch: refetchAutoTags } =
-    useAutoTagsServiceAutoTagsControllerFindAll({
-      term: '',
-    });
-  const { mutateAsync: insertAutoTag } = useAutoTagsServiceAutoTagsControllerCreate();
+  const { data: autoTagItems, refetch: refetchAutoTags } = useQuery({
+    ...autoTagsControllerFindAllOptions({ query: { term: '' } }),
+  });
+  const { mutateAsync: insertAutoTag } = useMutation({ ...autoTagsControllerCreateMutation() });
   const autoTags = autoTagItems as AutoTagDto[];
-  const { mutateAsync: deleteAutoTag } = useAutoTagsServiceAutoTagsControllerDelete();
+  const { mutateAsync: deleteAutoTag } = useMutation({ ...autoTagsControllerDeleteMutation() });
 
   useEffect(() => {
     refetchAutoTags();
@@ -55,7 +55,7 @@ export function AutoTagsPage() {
   const handlePasteAutoTags = async (pastedAutoTags: AutoTag[]) => {
     await mapLimit(pastedAutoTags, 5, async (pastedAutoTag: AutoTag) => {
       return await insertAutoTag({
-        requestBody: {
+        body: {
           title: pastedAutoTag.title,
           priority: pastedAutoTag.priority,
           tagNameId: pastedAutoTag.tagNameId,
@@ -137,9 +137,7 @@ export function AutoTagsPage() {
         onClick={async (e) => {
           e.stopPropagation();
           if (autoTag.id) {
-            await deleteAutoTag({
-              id: autoTag.id,
-            });
+            await deleteAutoTag({ path: { id: autoTag.id } });
             await refetchAutoTags();
             toast('Auto tag has been deleted', { type: 'success' });
           } else {

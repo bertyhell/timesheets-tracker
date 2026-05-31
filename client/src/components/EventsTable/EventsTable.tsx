@@ -4,7 +4,7 @@ import { orderBy } from 'lodash-es';
 import { format, intervalToDuration, parseISO } from 'date-fns';
 import { useAtom } from 'jotai';
 import { searchTermAtom } from '../../store/store';
-import { TimelineEventDto, TimelineWithEventsDto } from '../../generated/api/requests';
+import type { TimelineEventDto, TimelineWithEventsDto } from '../../generated/api/types.gen';
 import { TimelineType } from '../Timeline/Timeline.types';
 import { ColumnDef } from './Table.types';
 

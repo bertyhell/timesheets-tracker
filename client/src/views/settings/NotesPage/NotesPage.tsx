@@ -5,10 +5,11 @@ import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import { ROUTE_PARTS } from '../../../App';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
-  useAutoNotesServiceAutoNotesControllerFindAll,
-  useAutoNotesServiceAutoNotesControllerRemove,
-} from '../../../generated/api/queries';
+  autoNotesControllerFindAllOptions,
+  autoNotesControllerRemoveMutation,
+} from '../../../generated/api/@tanstack/react-query.gen';
 import type { AutoNote } from '../../../types/types';
 import { orderBy } from 'lodash-es';
 
@@ -26,10 +27,10 @@ export function NotesPage() {
     <span style={{ fontSize: '0.7em', color: 'black' }}>{sortDir === 'asc' ? ' ▲' : ' ▼'}</span>
   );
 
-  const { data: notes, refetch: refetchNotes } = useAutoNotesServiceAutoNotesControllerFindAll({
-    term: '',
+  const { data: notes, refetch: refetchNotes } = useQuery({
+    ...autoNotesControllerFindAllOptions({ query: { term: '' } }),
   });
-  const { mutateAsync: deleteNote } = useAutoNotesServiceAutoNotesControllerRemove();
+  const { mutateAsync: deleteNote } = useMutation({ ...autoNotesControllerRemoveMutation() });
 
   useEffect(() => {
     if (notes) {
@@ -111,9 +112,7 @@ export function NotesPage() {
                     onClick={async (e) => {
                       e.stopPropagation();
                       if (note.id) {
-                        await deleteNote({
-                          id: note.id,
-                        });
+                        await deleteNote({ path: { id: note.id } });
                         await refetchNotes();
                         toast('Note has been deleted', { type: 'success' });
                       } else {

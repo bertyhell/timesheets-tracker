@@ -4,7 +4,7 @@ import React from 'react';
 import { type ActionMeta, type OnChangeValue } from 'react-select';
 import AsyncCreatableSelect from 'react-select/async-creatable';
 
-import { TagNamesService } from '../../generated/api/requests';
+import { tagNamesControllerFindAll } from '../../generated/api/sdk.gen';
 import type { TagName } from '../../types/types';
 
 interface TagSelectProps {
@@ -21,11 +21,10 @@ function TagSelectMulti({ className, selectedValues, onChange }: TagSelectProps)
     <AsyncCreatableSelect
       className={'c-tag-select ' + className}
       value={selectedValues}
-      loadOptions={(searchTerm) =>
-        TagNamesService.tagNamesControllerFindAll({
-          term: searchTerm || '',
-        }) as Promise<TagName[]>
-      }
+      loadOptions={async (searchTerm) => {
+        const { data } = await tagNamesControllerFindAll({ query: { term: searchTerm || '' } });
+        return (data || []) as TagName[];
+      }}
       defaultOptions
       autoFocus={true}
       formatOptionLabel={(option: TagName) => option.title}

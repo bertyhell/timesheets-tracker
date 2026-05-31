@@ -1,10 +1,10 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { PageHeader } from '../../../components/PageHeader/PageHeader';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
-  useTimelinesServiceTimelinesControllerDelete,
-  useTimelinesServiceTimelinesControllerFindAll,
-  useTimelinesServiceTimelinesControllerFindAllKey,
-} from '../../../generated/api/queries';
+  timelinesControllerDeleteMutation,
+  timelinesControllerFindAllOptions,
+} from '../../../generated/api/@tanstack/react-query.gen';
 import React, { type ReactNode, useEffect, useState } from 'react';
 import { ROUTE_PARTS } from '../../../App';
 import { toast } from 'react-toastify';
@@ -31,13 +31,11 @@ export function TimelinesPage() {
       <span style={{ fontSize: '0.7em', color: 'black' }}>{sortDir === 'asc' ? ' ▲' : ' ▼'}</span>
     ) : null;
 
-  const { data: timelines, refetch: refetchTimelines } =
-    useTimelinesServiceTimelinesControllerFindAll(
-      { term: '' },
-      [useTimelinesServiceTimelinesControllerFindAllKey],
-      { refetchOnMount: true }
-    );
-  const { mutateAsync: deleteTimeline } = useTimelinesServiceTimelinesControllerDelete();
+  const { data: timelines, refetch: refetchTimelines } = useQuery({
+    ...timelinesControllerFindAllOptions(),
+    refetchOnMount: true,
+  });
+  const { mutateAsync: deleteTimeline } = useMutation({ ...timelinesControllerDeleteMutation() });
 
   useEffect(() => {
     refetchTimelines();
@@ -136,7 +134,7 @@ export function TimelinesPage() {
                     onClick={async (e) => {
                       e.stopPropagation();
                       if (timeline.id) {
-                        await deleteTimeline({ id: timeline.id });
+                        await deleteTimeline({ path: { id: timeline.id } });
                         await refetchTimelines();
                         toast('Timeline has been deleted', { type: 'success' });
                       } else {

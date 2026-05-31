@@ -7,15 +7,15 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import { ROUTE_PARTS } from '../../App';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
-  useAutoTagsServiceAutoTagsControllerCount,
-  useAutoTagsServiceAutoTagsControllerCreate,
-  useAutoTagsServiceAutoTagsControllerFindOne,
-  useAutoTagsServiceAutoTagsControllerFindOneKey,
-  useAutoTagsServiceAutoTagsControllerUpdate,
-  useTagNamesServiceTagNamesControllerCreate,
-} from '../../generated/api/queries';
-import { CreateAutoTagDto, UpdateAutoTagsDto } from '../../generated/api/requests';
+  autoTagsControllerCountOptions,
+  autoTagsControllerCreateMutation,
+  autoTagsControllerFindOneOptions,
+  autoTagsControllerUpdateMutation,
+  tagNamesControllerCreateMutation,
+} from '../../generated/api/@tanstack/react-query.gen';
+import type { CreateAutoTagDto, UpdateAutoTagsDto } from '../../generated/api/types.gen';
 import {
   type AutoTag,
   type AutoTagCondition,
@@ -45,16 +45,15 @@ export function EditAutoTagModal() {
   const [conditions, setConditions] = useState<AutoTagCondition[]>([NEW_CONDITION, NEW_CONDITION]);
   const [showCreateNewTagControls, setShowCreateNewTagControls] = useState<boolean>(false);
   const [newTagName, setNewTagName] = useState<string>('');
-  const { data: autoTagsCount } = useAutoTagsServiceAutoTagsControllerCount();
-  const { data: autoTagResponse } = useAutoTagsServiceAutoTagsControllerFindOne(
-    { id: id as string },
-    [useAutoTagsServiceAutoTagsControllerFindOneKey, id as string],
-    { enabled: !!id }
-  );
+  const { data: autoTagsCount } = useQuery({ ...autoTagsControllerCountOptions() });
+  const { data: autoTagResponse } = useQuery({
+    ...autoTagsControllerFindOneOptions({ path: { id: id as string } }),
+    enabled: !!id,
+  });
   const autoTag = autoTagResponse as AutoTag;
-  const { mutateAsync: createAutoTag } = useAutoTagsServiceAutoTagsControllerCreate();
-  const { mutateAsync: updateAutoTag } = useAutoTagsServiceAutoTagsControllerUpdate();
-  const { mutateAsync: createTagName } = useTagNamesServiceTagNamesControllerCreate();
+  const { mutateAsync: createAutoTag } = useMutation({ ...autoTagsControllerCreateMutation() });
+  const { mutateAsync: updateAutoTag } = useMutation({ ...autoTagsControllerUpdateMutation() });
+  const { mutateAsync: createTagName } = useMutation({ ...tagNamesControllerCreateMutation() });
 
   useEffect(() => {
     if (autoTag) {
@@ -110,7 +109,7 @@ export function EditAutoTagModal() {
     if (showCreateNewTagControls) {
       // create tag and get its id
       const createdTagName = await createTagName({
-        requestBody: { title: newTagName, color: COLOR_LIST[0] },
+        body: { title: newTagName, color: COLOR_LIST[0] },
       });
       tagNameId = createdTagName.id as string;
     } else {
@@ -127,14 +126,14 @@ export function EditAutoTagModal() {
       // edit existing auto tag
       updatedAutoTag.id = autoTag.id;
       await updateAutoTag({
-        id: autoTag.id,
-        requestBody: updatedAutoTag as UpdateAutoTagsDto,
+        path: { id: autoTag.id },
+        body: updatedAutoTag as UpdateAutoTagsDto,
       });
       toast('Auto tag has been updated', { type: 'success' });
     } else {
       // create new auto tag
       await createAutoTag({
-        requestBody: updatedAutoTag as CreateAutoTagDto,
+        body: updatedAutoTag as CreateAutoTagDto,
       });
       toast('Auto tag has been created', { type: 'success' });
     }

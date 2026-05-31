@@ -2,7 +2,7 @@ import './TagSelect.css';
 
 import React from 'react';
 import AsyncCreatableSelect from 'react-select/async-creatable';
-import { TagNamesService } from '../../generated/api/requests';
+import { tagNamesControllerFindAll } from '../../generated/api/sdk.gen';
 import type { TagName } from '../../types/types';
 
 interface TagSelectProps {
@@ -18,11 +18,10 @@ function TagSelectSingle({ className, value, onChange, autoFocus }: TagSelectPro
       className={'c-tag-input ' + className}
       value={value}
       getOptionValue={(value) => value.id}
-      loadOptions={(searchTerm) =>
-        TagNamesService.tagNamesControllerFindAll({
-          term: searchTerm,
-        }) as Promise<TagName[]>
-      }
+      loadOptions={async (searchTerm) => {
+        const { data } = await tagNamesControllerFindAll({ query: { term: searchTerm || '' } });
+        return (data || []) as TagName[];
+      }}
       autoFocus={autoFocus ?? false}
       formatOptionLabel={(option: TagName) => option.title}
       placeholder="Tag selection..."

@@ -8,13 +8,13 @@ import { toast } from 'react-toastify';
 
 import * as types from '../../../../types/types';
 import { ROUTE_PARTS } from '../../App';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
-  useAutoNotesServiceAutoNotesControllerCreate,
-  useAutoNotesServiceAutoNotesControllerFindOne,
-  useAutoNotesServiceAutoNotesControllerFindOneKey,
-  useAutoNotesServiceAutoNotesControllerUpdate,
-  useTagNamesServiceTagNamesControllerFindAll,
-} from '../../generated/api/queries';
+  autoNotesControllerCreateMutation,
+  autoNotesControllerFindOneOptions,
+  autoNotesControllerUpdateMutation,
+  tagNamesControllerFindAllOptions,
+} from '../../generated/api/@tanstack/react-query.gen';
 import { type SelectOption } from '../../helpers/select-option.types';
 import { type AutoNote, ConditionVariable, type TagName } from '../../types/types';
 import TagSelectMulti from '../TagSelect/TagSelectMulti';
@@ -29,14 +29,13 @@ export function EditAutoNoteModal() {
   const [extractRegex, setExtractRegex] = useState<string>('(.*)');
   const [extractRegexReplacement, setExtractRegexReplacement] = useState<string>('$1');
 
-  const { data: tags } = useTagNamesServiceTagNamesControllerFindAll({ term: '' });
-  const { mutateAsync: createNote } = useAutoNotesServiceAutoNotesControllerCreate();
-  const { mutateAsync: updateNote } = useAutoNotesServiceAutoNotesControllerUpdate();
-  const { data: autoNoteResponse } = useAutoNotesServiceAutoNotesControllerFindOne(
-    { id: id as string },
-    [useAutoNotesServiceAutoNotesControllerFindOneKey, id as string],
-    { enabled: !!id }
-  );
+  const { data: tags } = useQuery({ ...tagNamesControllerFindAllOptions({ query: { term: '' } }) });
+  const { mutateAsync: createNote } = useMutation({ ...autoNotesControllerCreateMutation() });
+  const { mutateAsync: updateNote } = useMutation({ ...autoNotesControllerUpdateMutation() });
+  const { data: autoNoteResponse } = useQuery({
+    ...autoNotesControllerFindOneOptions({ path: { id: id as string } }),
+    enabled: !!id,
+  });
   const autoNote = autoNoteResponse as AutoNote | undefined;
 
   const variableOptions: SelectOption<types.ConditionVariable>[] = Object.values(
@@ -62,8 +61,8 @@ export function EditAutoNoteModal() {
   const handleSave = async (autoNote: Omit<AutoNote, 'id'>) => {
     if (id) {
       await updateNote({
-        id,
-        requestBody: {
+        path: { id },
+        body: {
           title: autoNote.title,
           tagNameIds: autoNote.tagNameIds,
           variable: autoNote.variable,
@@ -77,7 +76,7 @@ export function EditAutoNoteModal() {
       });
     } else {
       await createNote({
-        requestBody: {
+        body: {
           title: autoNote.title,
           tagNameIds: autoNote.tagNameIds,
           variable: autoNote.variable,

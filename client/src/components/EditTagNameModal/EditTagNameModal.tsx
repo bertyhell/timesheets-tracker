@@ -4,12 +4,12 @@ import React, { type ChangeEvent, useEffect, useState } from 'react';
 import { Modal } from 'react-responsive-modal';
 import { type TagName } from '../../types/types';
 import { ROUTE_PARTS } from '../../App';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
-  useAutoTagsServiceAutoTagsControllerFindOneKey,
-  useTagNamesServiceTagNamesControllerCreate,
-  useTagNamesServiceTagNamesControllerFindOne,
-  useTagNamesServiceTagNamesControllerUpdate,
-} from '../../generated/api/queries';
+  tagNamesControllerCreateMutation,
+  tagNamesControllerFindOneOptions,
+  tagNamesControllerUpdateMutation,
+} from '../../generated/api/@tanstack/react-query.gen';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { ColorInput } from '../ColorInput/ColorInput';
@@ -21,13 +21,12 @@ export function EditTagNameModal() {
   const [name, setName] = useState<string>('');
   const [code, setCode] = useState<string>('');
   const [color, setColor] = useState<string>(COLOR_LIST[0]);
-  const { mutateAsync: createTagName } = useTagNamesServiceTagNamesControllerCreate();
-  const { mutateAsync: updateTagName } = useTagNamesServiceTagNamesControllerUpdate();
-  const { data: tagNameResponse } = useTagNamesServiceTagNamesControllerFindOne(
-    { id: id as string },
-    [useAutoTagsServiceAutoTagsControllerFindOneKey, id as string],
-    { enabled: !!id }
-  );
+  const { mutateAsync: createTagName } = useMutation({ ...tagNamesControllerCreateMutation() });
+  const { mutateAsync: updateTagName } = useMutation({ ...tagNamesControllerUpdateMutation() });
+  const { data: tagNameResponse } = useQuery({
+    ...tagNamesControllerFindOneOptions({ path: { id: id as string } }),
+    enabled: !!id,
+  });
   const tagName = tagNameResponse as TagName;
 
   useEffect(() => {
@@ -45,8 +44,8 @@ export function EditTagNameModal() {
   const handleSave = async (tagName: Omit<TagName, 'id'>) => {
     if (id) {
       await updateTagName({
-        id,
-        requestBody: {
+        path: { id },
+        body: {
           title: tagName.title,
           code: tagName.code,
           color: tagName.color,
@@ -58,7 +57,7 @@ export function EditTagNameModal() {
       });
     } else {
       await createTagName({
-        requestBody: {
+        body: {
           title: tagName.title,
           code: tagName.code,
           color: tagName.color,

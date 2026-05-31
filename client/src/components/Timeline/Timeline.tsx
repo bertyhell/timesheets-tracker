@@ -15,7 +15,7 @@ import { formatDuration } from '../../helpers/format-duration';
 import type { TagName } from '../../types/types';
 import { type ActionMeta, type MultiValue, type OnChangeValue } from 'react-select';
 import TagSelectMulti from '../TagSelect/TagSelectMulti';
-import { TimelineDto, TimelineEventDto } from '../../generated/api/requests';
+import type { TimelineDto, TimelineEventDto } from '../../generated/api/types.gen';
 import { getColorForEvent } from './helpers/getColorForEvent';
 import { getTicks } from './helpers/getTicks';
 

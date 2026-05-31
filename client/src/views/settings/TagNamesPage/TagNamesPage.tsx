@@ -2,11 +2,11 @@ import './TagNamesPage.css';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import type { TagName } from '../../../types/types';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
-  useTagNamesServiceTagNamesControllerFindAll,
-  useTagNamesServiceTagNamesControllerFindAllKey,
-  useTagNamesServiceTagNamesControllerRemove,
-} from '../../../generated/api/queries';
+  tagNamesControllerFindAllOptions,
+  tagNamesControllerRemoveMutation,
+} from '../../../generated/api/@tanstack/react-query.gen';
 import React, { type ReactNode, useEffect, useState } from 'react';
 import { ROUTE_PARTS } from '../../../App';
 import { toast } from 'react-toastify';
@@ -27,14 +27,11 @@ export function TagNamesPage() {
     <span style={{ fontSize: '0.7em', color: 'black' }}>{sortDir === 'asc' ? ' ▲' : ' ▼'}</span>
   );
 
-  const { data: tagNames, refetch: refetchTagNames } = useTagNamesServiceTagNamesControllerFindAll(
-    {
-      term: '',
-    },
-    [useTagNamesServiceTagNamesControllerFindAllKey],
-    { refetchOnMount: true }
-  );
-  const { mutateAsync: deleteTagName } = useTagNamesServiceTagNamesControllerRemove();
+  const { data: tagNames, refetch: refetchTagNames } = useQuery({
+    ...tagNamesControllerFindAllOptions({ query: { term: '' } }),
+    refetchOnMount: true,
+  });
+  const { mutateAsync: deleteTagName } = useMutation({ ...tagNamesControllerRemoveMutation() });
 
   // Refetch tag names when edit or create modal closes
   useEffect(() => {
@@ -129,9 +126,7 @@ export function TagNamesPage() {
                     onClick={async (e) => {
                       e.stopPropagation();
                       if (tagName.id) {
-                        await deleteTagName({
-                          id: tagName.id,
-                        });
+                        await deleteTagName({ path: { id: tagName.id } });
                         await refetchTagNames();
                         toast('Tag name has been deleted', { type: 'success' });
                       } else {

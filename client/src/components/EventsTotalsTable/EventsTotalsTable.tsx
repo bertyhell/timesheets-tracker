@@ -13,7 +13,7 @@ import {
   TimelineEventDto,
   TimelineType,
   WebsiteEventInfoDto,
-} from '../../generated/api/requests';
+} from '../../generated/api/types.gen';
 import { useVirtualizer } from '@tanstack/react-virtual';
 
 interface SortDescriptor {
@@ -51,7 +51,7 @@ function getCategoryLabel(event: TimelineEventDto, timelineType: TimelineType): 
     case 'Tag':
       return (info as TagEventInfoDto).tagNameName;
     case 'AutoTag':
-      return (info as AutoTagEventInfoDto).tagNameName;
+      return (info as AutoTagEventInfoDto).tagNameTitle;
     case 'Website':
       return (info as WebsiteEventInfoDto).websiteTitle;
     case 'Calendar':

@@ -3,15 +3,14 @@ import './EditTimelineModal.css';
 import React, { type ChangeEvent, useEffect, useState } from 'react';
 import { Modal } from 'react-responsive-modal';
 import { ROUTE_PARTS } from '../../App';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
-  useTimelinesServiceTimelinesControllerCreate,
-  useTimelinesServiceTimelinesControllerFindAll,
-  useTimelinesServiceTimelinesControllerFindAllKey,
-  useTimelinesServiceTimelinesControllerFindOne,
-  useTimelinesServiceTimelinesControllerFindOneKey,
-  useTimelinesServiceTimelinesControllerUpdate,
-} from '../../generated/api/queries';
-import type { TimelineType } from '../../generated/api/requests/types.gen';
+  timelinesControllerCreateMutation,
+  timelinesControllerFindAllOptions,
+  timelinesControllerFindOneOptions,
+  timelinesControllerUpdateMutation,
+} from '../../generated/api/@tanstack/react-query.gen';
+import type { TimelineType } from '../../generated/api/types.gen';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -32,18 +31,16 @@ export function EditTimelineModal() {
   const [icsUrl, setIcsUrl] = useState<string>('');
   const [visualOrder, setVisualOrder] = useState<number>(0);
 
-  const { mutateAsync: createTimeline } = useTimelinesServiceTimelinesControllerCreate();
-  const { mutateAsync: updateTimeline } = useTimelinesServiceTimelinesControllerUpdate();
-  const { data: allTimelines } = useTimelinesServiceTimelinesControllerFindAll(
-    { term: '' },
-    [useTimelinesServiceTimelinesControllerFindAllKey],
-    { enabled: !id }
-  );
-  const { data: timelineResponse } = useTimelinesServiceTimelinesControllerFindOne(
-    { id: id as string },
-    [useTimelinesServiceTimelinesControllerFindOneKey, id as string],
-    { enabled: !!id }
-  );
+  const { mutateAsync: createTimeline } = useMutation({ ...timelinesControllerCreateMutation() });
+  const { mutateAsync: updateTimeline } = useMutation({ ...timelinesControllerUpdateMutation() });
+  const { data: allTimelines } = useQuery({
+    ...timelinesControllerFindAllOptions(),
+    enabled: !id,
+  });
+  const { data: timelineResponse } = useQuery({
+    ...timelinesControllerFindOneOptions({ path: { id: id as string } }),
+    enabled: !!id,
+  });
 
   useEffect(() => {
     if (timelineResponse) {
@@ -67,8 +64,8 @@ export function EditTimelineModal() {
   const handleSave = async () => {
     if (id) {
       await updateTimeline({
-        id,
-        requestBody: {
+        path: { id },
+        body: {
           title,
           timelineType,
           eventProviderInfo: timelineType === 'Calendar' ? { icsUrl } : {},
@@ -78,7 +75,7 @@ export function EditTimelineModal() {
       toast('Timeline has been updated', { type: 'success' });
     } else {
       await createTimeline({
-        requestBody: {
+        body: {
           title,
           timelineType,
           eventProviderInfo: timelineType === 'Calendar' ? { icsUrl } : {},

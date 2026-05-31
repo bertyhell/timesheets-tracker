@@ -6,7 +6,7 @@
     "dev:client": "vite",
     "build": "tsc && vite build",
     "serve": "vite preview",
-    "generate-api-helpers": "openapi-rq -c fetch -i http://localhost:55577/docs-yaml -o ./src/generated/api && npx tsx scripts/ignore-types-in-generated-files.ts",
+    "generate-api-helpers": "openapi-ts",
     "bump": "npx bump-package-versions --part=patch --strategy=highest ./package.json ../package.json ../api/package.json"
   },
   "dependencies": {
@@ -32,7 +32,7 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@7nohe/openapi-react-query-codegen": "2.1.0",
+    "@hey-api/openapi-ts": "^0.97.3",
     "@types/lodash-es": "4.17.8",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",

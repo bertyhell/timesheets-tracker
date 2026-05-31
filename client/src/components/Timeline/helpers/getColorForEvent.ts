@@ -6,7 +6,7 @@ import {
   TagEventInfoDto,
   TimelineDto,
   TimelineEventDto,
-} from '../../../generated/api/requests';
+} from '../../../generated/api/types.gen';
 import { stringToColorIndex } from '../../../helpers/string-to-color-index';
 import { TimelineType } from '../Timeline.types';
 

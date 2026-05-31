@@ -21,33 +21,33 @@ import { TimelineType } from '../Timeline/Timeline.types';
 import { ColumnDef } from './Table.types';
 
 const FIXED_COLUMNS: ColumnDef[] = [
-  { key: 'startedAt', title: 'Start', width: 100, allowsSorting: true },
-  { key: 'endedAt', title: 'End', width: 100, allowsSorting: true },
-  { key: 'duration', title: 'Duration', width: 100, allowsSorting: true },
+  { id: 'startedAt', title: 'Start', width: 100, allowsSorting: true },
+  { id: 'endedAt', title: 'End', width: 100, allowsSorting: true },
+  { id: 'duration', title: 'Duration', width: 100, allowsSorting: true },
 ];
 
 function getDynamicColumns(timelineType: string | undefined): ColumnDef[] {
   switch (timelineType) {
     case TimelineType.Program:
       return [
-        { key: 'program', title: 'Program', allowsSorting: true, width: 150 },
-        { key: 'title', title: 'Title', allowsSorting: true, width: 150 },
+        { id: 'program', title: 'Program', allowsSorting: true, width: 150 },
+        { id: 'title', title: 'Title', allowsSorting: true, width: 150 },
       ];
 
     case TimelineType.ActiveState:
-      return [{ key: 'isActive', title: 'Active', allowsSorting: true }];
+      return [{ id: 'isActive', title: 'Active', allowsSorting: true }];
 
     case TimelineType.Tag:
-      return [{ key: 'tagName', title: 'Tag', allowsSorting: true }];
+      return [{ id: 'tagName', title: 'Tag', allowsSorting: true }];
 
     case TimelineType.AutoTag:
-      return [{ key: 'tagName', title: 'Tag', allowsSorting: true }];
+      return [{ id: 'tagName', title: 'Tag', allowsSorting: true }];
 
     case TimelineType.Website:
-      return [{ key: 'websiteName', title: 'Website', allowsSorting: true }];
+      return [{ id: 'websiteName', title: 'Website', allowsSorting: true }];
 
     case TimelineType.Calendar:
-      return [{ key: 'summary', title: 'Summary', allowsSorting: true }];
+      return [{ id: 'summary', title: 'Summary', allowsSorting: true }];
 
     default:
       return [];
@@ -101,13 +101,21 @@ export function EventsTable({ timeline, events, className }: EventsTableProps) {
 
   const columns = [...getDynamicColumns(timeline?.type), ...FIXED_COLUMNS];
 
+  const filterEvents = () => {
+    if (searchTermRef.current) {
+      return eventsRef.current.filter((event) =>
+        JSON.stringify(event).toLowerCase().includes(searchTermRef.current)
+      );
+    } else {
+      return eventsRef.current;
+    }
+  };
+
   const tableEvents = useAsyncList<TimelineEventDto>({
     initialSortDescriptor: { column: 'startedAt', direction: 'ascending' },
     async load() {
       return {
-        items: eventsRef.current.filter((event) =>
-          JSON.stringify(event).toLowerCase().includes(searchTermRef.current)
-        ),
+        items: filterEvents(),
       };
     },
     async sort({
@@ -158,7 +166,7 @@ export function EventsTable({ timeline, events, className }: EventsTableProps) {
     <div className={'c-spectrum-table ' + className}>
       <Provider colorScheme="light">
         <TableView
-          key={columns.map((c) => c.key).join(',')}
+          key={columns.map((c) => c.id).join(',')}
           aria-label="Timeline events"
           selectionMode="multiple"
           selectedKeys={selectedKeys}
@@ -171,8 +179,8 @@ export function EventsTable({ timeline, events, className }: EventsTableProps) {
           <TableHeader columns={columns}>
             {(column) => (
               <Column
-                id={column.key}
-                isRowHeader={column.key === columns[0]?.key}
+                id={column.id}
+                isRowHeader={column.id === columns[0]?.id}
                 allowsSorting={column.allowsSorting}
                 width={column.width}
               >
@@ -183,7 +191,7 @@ export function EventsTable({ timeline, events, className }: EventsTableProps) {
           <TableBody items={tableEvents.items} renderEmptyState={() => <>No events</>}>
             {(event) => (
               <Row id={event.id} columns={columns}>
-                {(column) => <Cell>{getCellValue(event, column.key)}</Cell>}
+                {(column) => <Cell>{getCellValue(event, column.id)}</Cell>}
               </Row>
             )}
           </TableBody>

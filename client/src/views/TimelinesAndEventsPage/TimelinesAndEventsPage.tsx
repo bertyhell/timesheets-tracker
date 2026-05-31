@@ -156,6 +156,7 @@ export function TimelinesAndEventsPage() {
   };
 
   const handleMouseDown = (timelineId: string, posX: number) => {
+    console.log('mouse down: ', posX);
     setSelectionStartPercent(clamp(posX, 0, 100));
     setSelectionMovePercent(null);
     setSelectionEndPercent(null);
@@ -174,16 +175,19 @@ export function TimelinesAndEventsPage() {
     setSelectionMovePercent(posX);
   };
 
-  const handleMouseUp = (timelineId: string, posX: number) => {
+  const handleMouseUp = (timelineId: string, posX: number, eventId: string | null) => {
+    console.log('mouse up: ', posX);
     if (isApproxEqual(posX, selectionStartPercent)) {
+      console.log('approx equal');
       setSelectionStartPercent(null);
       setSelectionEndPercent(null);
       setActiveSelectionTimeline(null);
       setSelectedTimelineAndEvent({
         selectedTimelineId: timelineId,
-        selectedEventId: null,
+        selectedEventId: eventId,
       });
     } else {
+      console.log('set selection percent');
       setSelectionEndPercent(clamp(posX, 0, 100));
     }
   };
@@ -239,7 +243,9 @@ export function TimelinesAndEventsPage() {
           maxTime={maxTime}
           onMouseDown={(posX: number) => handleMouseDown(timelineInfo.id, posX)}
           onMouseMove={(posX: number) => handleMouseMove(timelineInfo.id, posX)}
-          onMouseUp={(posX: number) => handleMouseUp(timelineInfo.id, posX)}
+          onMouseUp={(posX: number, eventId: string | null) =>
+            handleMouseUp(timelineInfo.id, posX, eventId)
+          }
           selectionPercentages={activeSelectionTimeline === timelineInfo.id ? selection : null}
           onCreateTagName={handleCreateTagName}
           onCreateTag={handleCreateTag}

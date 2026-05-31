@@ -40,8 +40,8 @@ interface TotalRow {
 }
 
 const columns = [
-  { key: 'category', title: 'Category', allowsSorting: true },
-  { key: 'duration', title: 'Duration', width: 130, allowsSorting: true },
+  { id: 'category', title: 'Category', allowsSorting: true },
+  { id: 'duration', title: 'Duration', width: 130, allowsSorting: true },
 ];
 
 function getCategoryLabel(event: TimelineEventDto, timelineType: TimelineType): string {
@@ -109,7 +109,7 @@ export function EventsTotalsTable({ events, timelineType, className }: EventsTot
     <div className={`c-spectrum-table c-events-totals-table${className ? ` ${className}` : ''}`}>
       <Provider colorScheme="light">
         <TableView
-          key={columns.map((c) => c.key).join(',')}
+          key={columns.map((c) => c.id).join(',')}
           aria-label="Timeline event totals"
           selectionMode="multiple"
           selectedKeys={selectedKeys}
@@ -121,7 +121,7 @@ export function EventsTotalsTable({ events, timelineType, className }: EventsTot
           <TableHeader columns={columns}>
             {(column) => (
               <Column
-                id={column.key}
+                id={column.id}
                 isRowHeader={true}
                 width={column.width}
                 allowsSorting={column.allowsSorting}
@@ -133,7 +133,7 @@ export function EventsTotalsTable({ events, timelineType, className }: EventsTot
           <TableBody items={sortedTotals} renderEmptyState={() => <>No events</>}>
             {(row) => (
               <Row id={row.id} columns={columns}>
-                {(column) => <Cell>{String(row[column.key as keyof TotalRow] ?? '')}</Cell>}
+                {(column) => <Cell>{String(row[column.id as keyof TotalRow] ?? '')}</Cell>}
               </Row>
             )}
           </TableBody>

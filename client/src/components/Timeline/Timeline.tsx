@@ -26,7 +26,7 @@ interface TimelineProps {
   maxTime: Date;
   onMouseDown: (posX: number) => void;
   onMouseMove: (posX: number) => void;
-  onMouseUp: (posX: number) => void;
+  onMouseUp: (posX: number, eventId: string | null) => void;
   selectionPercentages: { start: number; end: number } | null;
   onCreateTagName: (name: string) => Promise<TagName>;
   onCreateTag: (tagNameId: string) => Promise<void>;
@@ -62,15 +62,21 @@ function Timeline({
   );
 
   const getMousePositionXPercent = (evt: MouseEvent) => {
-    return (
-      ((evt.clientX - (evt.target as HTMLDivElement).offsetLeft) /
-        (evt.target as HTMLDivElement).offsetWidth) *
-      100
+    const timelineElement: HTMLDivElement | null = (evt.target as HTMLDivElement).closest(
+      '.c-timeline__track'
     );
+    if (!timelineElement) {
+      return -1;
+    }
+    return ((evt.clientX - timelineElement.offsetLeft) / timelineElement.offsetWidth) * 100;
   };
 
   const handleMouseDown = (evt: MouseEvent) => {
     const posX = getMousePositionXPercent(evt);
+    if (posX < 0 || posX > 100) {
+      // Ignore impossible values
+      return;
+    }
     onMouseDown(posX);
   };
 
@@ -86,8 +92,14 @@ function Timeline({
 
   const handleMouseUp = (evt: MouseEvent) => {
     const posX = getMousePositionXPercent(evt);
+    if (posX < 0 || posX > 100) {
+      // Ignore impossible values
+      return;
+    }
     console.log('mouse up ', posX);
-    onMouseUp(posX);
+    const eventId: string | null =
+      (evt.target as HTMLElement)?.getAttribute('data-event-id') || null;
+    onMouseUp(posX, eventId);
   };
 
   const handleTagNameChange = async (
@@ -211,6 +223,7 @@ function Timeline({
                   'c-timeline__event' +
                   (selectedEvent?.id === event.id ? ' c-timeline__event--selected' : '')
                 }
+                data-event-id={event.id}
                 key={'c-timeline__' + timelineInfo.title + '__event__div__' + event.startedAt}
                 style={{
                   left:

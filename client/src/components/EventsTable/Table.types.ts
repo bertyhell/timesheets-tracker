@@ -1,5 +1,5 @@
 export interface ColumnDef {
-  key: string;
+  id: string;
   title: string;
   width?: number;
   allowsSorting?: boolean;

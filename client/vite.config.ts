@@ -16,15 +16,5 @@ export default defineConfig({
   },
   build: {
     target: ['es2022'],
-    cssMinify: 'lightningcss',
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (/macro-(.*)\.css$/.test(id) || /@react-spectrum\/s2\/.*\.css$/.test(id)) {
-            return 's2-styles';
-          }
-        },
-      },
-    },
   },
 });

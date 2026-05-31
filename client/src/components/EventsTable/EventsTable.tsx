@@ -1,24 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react';
-import {
-  Cell,
-  Column,
-  Provider,
-  Row,
-  TableBody,
-  TableHeader,
-  TableView,
-  useAsyncList,
-  type AsyncListData,
-  type Key,
-  type Selection,
-} from '@react-spectrum/s2';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { orderBy } from 'lodash-es';
-import { format, parseISO } from 'date-fns';
+import { format, intervalToDuration, parseISO } from 'date-fns';
 import { useAtom } from 'jotai';
 import { searchTermAtom } from '../../store/store';
 import { TimelineEventDto, TimelineWithEventsDto } from '../../generated/api/requests';
 import { TimelineType } from '../Timeline/Timeline.types';
 import { ColumnDef } from './Table.types';
+
+interface SortDescriptor {
+  column: string;
+  direction: 'ascending' | 'descending';
+}
 
 const FIXED_COLUMNS: ColumnDef[] = [
   { id: 'startedAt', title: 'Start', width: 100, allowsSorting: true },
@@ -54,7 +47,7 @@ function getDynamicColumns(timelineType: string | undefined): ColumnDef[] {
   }
 }
 
-function getCellValue(event: TimelineEventDto, columnKey: Key): string {
+function getCellValue(event: TimelineEventDto, columnKey: string): string {
   const info = event.info as Record<string, string | number | boolean>;
   switch (columnKey) {
     case 'program':
@@ -73,15 +66,23 @@ function getCellValue(event: TimelineEventDto, columnKey: Key): string {
       return format(parseISO(event.startedAt), 'HH:mm:ss');
     case 'endedAt':
       return format(parseISO(event.endedAt), 'HH:mm:ss');
-    case 'duration':
-      return format(
-        new Date(parseISO(event.endedAt).getTime() - parseISO(event.startedAt).getTime()),
-        'HH:mm:ss'
-      );
+    case 'duration': {
+      const duration = intervalToDuration({
+        start: parseISO(event.startedAt).getTime(),
+        end: parseISO(event.endedAt).getTime(),
+      });
+      return [
+        String(duration.hours ?? 0).padStart(2, '0'),
+        String(duration.minutes ?? 0).padStart(2, '0'),
+        String(duration.seconds ?? 0).padStart(2, '0'),
+      ].join(':');
+    }
     default:
       return '';
   }
 }
+
+const ROW_HEIGHT = 32;
 
 interface EventsTableProps {
   timeline: TimelineWithEventsDto | null;
@@ -91,112 +92,146 @@ interface EventsTableProps {
 
 export function EventsTable({ timeline, events, className }: EventsTableProps) {
   const [searchTerm] = useAtom(searchTermAtom);
-  const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([0]));
-
-  // Keep refs updated synchronously so the load closure always reads latest values
-  const eventsRef = useRef(events);
-  eventsRef.current = events;
-  const searchTermRef = useRef(searchTerm);
-  searchTermRef.current = searchTerm;
-
-  const columns = [...getDynamicColumns(timeline?.type), ...FIXED_COLUMNS];
-
-  const filterEvents = () => {
-    if (searchTermRef.current) {
-      return eventsRef.current.filter((event) =>
-        JSON.stringify(event).toLowerCase().includes(searchTermRef.current)
-      );
-    } else {
-      return eventsRef.current;
-    }
-  };
-
-  const tableEvents = useAsyncList<TimelineEventDto>({
-    initialSortDescriptor: { column: 'startedAt', direction: 'ascending' },
-    async load() {
-      return {
-        items: filterEvents(),
-      };
-    },
-    async sort({
-      items,
-      sortDescriptor,
-    }: {
-      items: TimelineEventDto[];
-      sortDescriptor: AsyncListData<TimelineEventDto>['sortDescriptor'];
-    }) {
-      return {
-        items: orderBy(
-          items,
-          [
-            (event) => {
-              switch (sortDescriptor?.column) {
-                case 'program':
-                  return (event.info as any)['programName'];
-                case 'title':
-                  return (event.info as any)['windowTitle'];
-                case 'isActive':
-                  return (event.info as any)['isActive'];
-                case 'tagName':
-                  return (event.info as any)['tagNameName'];
-                case 'websiteName':
-                  return (event.info as any)['websiteTitle'];
-                case 'summary':
-                  return (event.info as any)['summary'];
-                case 'startedAt':
-                  return event.startedAt;
-                case 'endedAt':
-                  return event.endedAt;
-                case 'duration':
-                  return parseISO(event.endedAt).getTime() - parseISO(event.startedAt).getTime();
-              }
-            },
-          ],
-          sortDescriptor?.direction === 'descending' ? ['desc'] : ['asc']
-        ),
-      };
-    },
+  const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+    column: 'startedAt',
+    direction: 'ascending',
   });
 
-  useEffect(() => {
-    tableEvents.reload();
-  }, [timeline?.id, events, searchTerm]);
+  const parentRef = useRef<HTMLDivElement>(null);
+  const columns = [...getDynamicColumns(timeline?.type), ...FIXED_COLUMNS];
+
+  const sortedItems = useMemo(() => {
+    const lowerSearch = searchTerm.toLowerCase();
+    const filtered = lowerSearch
+      ? events.filter((e) => JSON.stringify(e).toLowerCase().includes(lowerSearch))
+      : events;
+
+    return orderBy(
+      filtered,
+      [
+        (event) => {
+          switch (sortDescriptor.column) {
+            case 'program':
+              return (event.info as any)['programName'];
+            case 'title':
+              return (event.info as any)['windowTitle'];
+            case 'isActive':
+              return (event.info as any)['isActive'];
+            case 'tagName':
+              return (event.info as any)['tagNameName'];
+            case 'websiteName':
+              return (event.info as any)['websiteTitle'];
+            case 'summary':
+              return (event.info as any)['summary'];
+            case 'startedAt':
+              return event.startedAt;
+            case 'endedAt':
+              return event.endedAt;
+            case 'duration':
+              return parseISO(event.endedAt).getTime() - parseISO(event.startedAt).getTime();
+            default:
+              return '';
+          }
+        },
+      ],
+      [sortDescriptor.direction === 'descending' ? 'desc' : 'asc']
+    );
+  }, [events, searchTerm, sortDescriptor]);
+
+  const getItemKey = useCallback((index: number) => sortedItems[index]?.id ?? index, [sortedItems]);
+
+  const virtualizer = useVirtualizer({
+    count: sortedItems.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => ROW_HEIGHT,
+    overscan: 5,
+    getItemKey,
+  });
+
+  const virtualItems = virtualizer.getVirtualItems();
+  const totalSize = virtualizer.getTotalSize();
+  const paddingTop = virtualItems.length > 0 ? (virtualItems[0]?.start ?? 0) : 0;
+  const paddingBottom =
+    virtualItems.length > 0 ? totalSize - (virtualItems[virtualItems.length - 1]?.end ?? 0) : 0;
+
+  const handleSort = (columnId: string) => {
+    setSortDescriptor((prev) => ({
+      column: columnId,
+      direction:
+        prev.column === columnId && prev.direction === 'ascending' ? 'descending' : 'ascending',
+    }));
+  };
 
   return (
-    <div className={'c-spectrum-table ' + className}>
-      <Provider colorScheme="light">
-        <TableView
-          key={columns.map((c) => c.id).join(',')}
-          aria-label="Timeline events"
-          selectionMode="multiple"
-          selectedKeys={selectedKeys}
-          onSelectionChange={setSelectedKeys}
-          sortDescriptor={tableEvents.sortDescriptor}
-          onSortChange={tableEvents.sort}
-          density="compact"
-          loadingState={tableEvents.loadingState}
-        >
-          <TableHeader columns={columns}>
-            {(column) => (
-              <Column
-                id={column.id}
-                isRowHeader={column.id === columns[0]?.id}
-                allowsSorting={column.allowsSorting}
-                width={column.width}
+    <div ref={parentRef} className={`c-events-table${className ? ` ${className}` : ''}`}>
+      <table className="c-table" aria-label="Timeline events">
+        <colgroup>
+          {columns.map((col) => (
+            <col key={col.id} style={{ width: col.width ? `${col.width}px` : undefined }} />
+          ))}
+        </colgroup>
+        <thead>
+          <tr>
+            {columns.map((col) => (
+              <th
+                key={col.id}
+                aria-sort={
+                  sortDescriptor.column === col.id
+                    ? sortDescriptor.direction === 'ascending'
+                      ? 'ascending'
+                      : 'descending'
+                    : col.allowsSorting
+                      ? 'none'
+                      : undefined
+                }
               >
-                {column.title}
-              </Column>
-            )}
-          </TableHeader>
-          <TableBody items={tableEvents.items} renderEmptyState={() => <>No events</>}>
-            {(event) => (
-              <Row id={event.id} columns={columns}>
-                {(column) => <Cell>{getCellValue(event, column.id)}</Cell>}
-              </Row>
-            )}
-          </TableBody>
-        </TableView>
-      </Provider>
+                {col.allowsSorting ? (
+                  <button className="c-table-sort-btn" onClick={() => handleSort(col.id)}>
+                    {col.title}
+                    {sortDescriptor.column === col.id && (
+                      <span aria-hidden="true">
+                        {sortDescriptor.direction === 'ascending' ? ' ↑' : ' ↓'}
+                      </span>
+                    )}
+                  </button>
+                ) : (
+                  col.title
+                )}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {paddingTop > 0 && (
+            <tr aria-hidden="true">
+              <td colSpan={columns.length} style={{ height: paddingTop, padding: 0 }} />
+            </tr>
+          )}
+          {virtualItems.map((virtualRow) => {
+            const event = sortedItems[virtualRow.index];
+            return (
+              <tr
+                key={virtualRow.key}
+                style={{ height: ROW_HEIGHT }}
+                aria-selected={selectedKey === event.id}
+                className={selectedKey === event.id ? 'is-selected' : undefined}
+                onClick={() => setSelectedKey(event.id)}
+              >
+                {columns.map((col) => (
+                  <td key={col.id}>{getCellValue(event, col.id)}</td>
+                ))}
+              </tr>
+            );
+          })}
+          {paddingBottom > 0 && (
+            <tr aria-hidden="true">
+              <td colSpan={columns.length} style={{ height: paddingBottom, padding: 0 }} />
+            </tr>
+          )}
+        </tbody>
+      </table>
+      {sortedItems.length === 0 && <div className="c-table-empty">No events</div>}
     </div>
   );
 }

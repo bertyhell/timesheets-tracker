@@ -18,7 +18,7 @@ import { resolve } from 'path';
 import { APP_PORT } from '../../api/src/app.const';
 
 const APP_URL = `http://localhost:${APP_PORT}`;
-const ICON_PATH = 'views://assets/icon.png';
+const ICON_PATH = 'views://assets/icon.ico';
 
 // __PROJECT_ROOT__ is injected at build time by electrobun.config.ts define.
 // It resolves to the repo root so we can locate api/ regardless of where
@@ -53,7 +53,7 @@ serverProcess.exited.then((code) => {
   console.log('[electrobun] NestJS subprocess exited with code:', code);
 });
 
-async function waitForServer(url: string, timeoutMs = 30_000): Promise<void> {
+async function waitForServer(url: string, timeoutMs = 120_000): Promise<void> {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     try {

@@ -1,6 +1,7 @@
 import './EditTagNameModal.css';
 
 import React, { type ChangeEvent, useEffect, useState } from 'react';
+import Button, { ButtonVariant } from '../Button/Button';
 import { Modal } from 'react-responsive-modal';
 import { type TagName } from '../../types/types';
 import { ROUTE_PARTS } from '../../App';
@@ -100,11 +101,10 @@ export function EditTagNameModal() {
       </div>
 
       <div className="flex flex-row justify-end gap-2 mt-48">
-        <button className="c-button" onClick={handleClose}>
+        <Button onClick={handleClose} variant={ButtonVariant.Secondary}>
           Cancel
-        </button>
-        <button
-          className="c-button"
+        </Button>
+        <Button
           disabled={!name || !color}
           onClick={async () => {
             await handleSave({
@@ -113,9 +113,10 @@ export function EditTagNameModal() {
               color,
             });
           }}
+          variant={ButtonVariant.Primary}
         >
           Save
-        </button>
+        </Button>
       </div>
     </Modal>
   );

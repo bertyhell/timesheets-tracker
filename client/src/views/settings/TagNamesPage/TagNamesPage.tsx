@@ -1,5 +1,6 @@
 import './TagNamesPage.css';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
+import Button, { ButtonVariant } from '../../../components/Button/Button';
 import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import type { TagName } from '../../../types/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -52,16 +53,16 @@ export function TagNamesPage() {
         title="Tag names"
         description="Tag names allow you to tag time with a certain label and code and color. They can be used to identify which customer you worked for, or which timesheet code you want the time to billed on."
       >
-        <button
-          className="c-button"
+        <Button
           onClick={() =>
             navigate(
               '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.tagNames + '/' + ROUTE_PARTS.create
             )
           }
+          variant={ButtonVariant.Primary}
         >
           Add tag name
-        </button>
+        </Button>
       </PageHeader>
       <table className="c-table w-full">
         <thead>
@@ -100,8 +101,7 @@ export function TagNamesPage() {
                 </td>
                 <td className="pl-3">{tagName.title}</td>
                 <td className="w-px whitespace-nowrap">
-                  <button
-                    className="c-button"
+                  <Button
                     onClick={(e) => {
                       e.stopPropagation();
                       setSelectedTagName(tagName as unknown as TagName);
@@ -116,13 +116,13 @@ export function TagNamesPage() {
                           ROUTE_PARTS.edit
                       );
                     }}
+                    variant={ButtonVariant.Secondary}
                   >
                     EDIT
-                  </button>
+                  </Button>
                 </td>
                 <td className="w-px whitespace-nowrap">
-                  <button
-                    className="c-button"
+                  <Button
                     onClick={async (e) => {
                       e.stopPropagation();
                       if (tagName.id) {
@@ -135,9 +135,10 @@ export function TagNamesPage() {
                         });
                       }
                     }}
+                    variant={ButtonVariant.Secondary}
                   >
                     DELETE
-                  </button>
+                  </Button>
                 </td>
               </tr>
             )

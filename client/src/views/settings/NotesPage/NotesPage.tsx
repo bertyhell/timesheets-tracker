@@ -1,5 +1,6 @@
 import './NotesPage.css';
 import React, { type ReactNode, useEffect, useState } from 'react';
+import Button, { ButtonVariant } from '../../../components/Button/Button';
 import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -45,16 +46,16 @@ export function NotesPage() {
         title="Auto notes"
         description="This allows you to define what should be added to the notes of an auto tag. You can copy the name of the program or maybe some commit messages. or even use a regex to extract some info from one of the available variables (wip)."
       >
-        <button
-          className="c-button"
+        <Button
           onClick={() =>
             navigate(
               '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.notes + '/' + ROUTE_PARTS.create
             )
           }
+          variant={ButtonVariant.Primary}
         >
           Add auto note
-        </button>
+        </Button>
       </PageHeader>
       <table className="c-table w-full">
         <thead>
@@ -86,8 +87,7 @@ export function NotesPage() {
               >
                 <td className="pl-3">{note.title}</td>
                 <td className="w-px whitespace-nowrap">
-                  <button
-                    className="c-button"
+                  <Button
                     onClick={(e) => {
                       e.stopPropagation();
                       setSelectedNote(note as unknown as AutoNote);
@@ -102,13 +102,13 @@ export function NotesPage() {
                           ROUTE_PARTS.edit
                       );
                     }}
+                    variant={ButtonVariant.Secondary}
                   >
                     EDIT
-                  </button>
+                  </Button>
                 </td>
                 <td className="w-px whitespace-nowrap">
-                  <button
-                    className="c-button"
+                  <Button
                     onClick={async (e) => {
                       e.stopPropagation();
                       if (note.id) {
@@ -119,9 +119,10 @@ export function NotesPage() {
                         toast('Note could not be deleted, no id has been set', { type: 'warning' });
                       }
                     }}
+                    variant={ButtonVariant.Secondary}
                   >
                     DELETE
-                  </button>
+                  </Button>
                 </td>
               </tr>
             )

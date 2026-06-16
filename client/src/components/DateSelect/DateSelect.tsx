@@ -1,6 +1,7 @@
 import './DateSelect.css';
 
 import { addDays, format, parseISO } from 'date-fns';
+import Button, { ButtonVariant } from '../Button/Button';
 import { useAtom } from 'jotai';
 import React from 'react';
 
@@ -13,21 +14,27 @@ function DateSelect({ className }: { className?: string }) {
 
   return (
     <div className={'c-date-select' + (className ? ' ' + className : '')}>
-      <button className="c-button" onClick={() => setViewDate(new Date())}>
+      <Button onClick={() => setViewDate(new Date())} variant={ButtonVariant.Transparent}>
         TODAY
-      </button>
-      <button className="c-button" onClick={() => setViewDate((prevDate) => addDays(prevDate, -1))}>
+      </Button>
+      <Button
+        onClick={() => setViewDate((prevDate) => addDays(prevDate, -1))}
+        variant={ButtonVariant.Transparent}
+      >
         -
-      </button>
+      </Button>
       <span>{format(viewDate, 'eee')}</span>
       <input
         type="date"
         value={format(viewDate, 'yyyy-MM-dd')}
         onChange={(evt) => setViewDate(parseISO(evt.target.value))}
       />
-      <button className="c-button" onClick={() => setViewDate((prevDate) => addDays(prevDate, 1))}>
+      <Button
+        onClick={() => setViewDate((prevDate) => addDays(prevDate, 1))}
+        variant={ButtonVariant.Transparent}
+      >
         +
-      </button>
+      </Button>
     </div>
   );
 }

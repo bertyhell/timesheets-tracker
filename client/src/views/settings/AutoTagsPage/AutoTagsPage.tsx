@@ -1,5 +1,6 @@
 import './AutoTagsPage.css';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import Button, { ButtonVariant } from '../../../components/Button/Button';
 import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
@@ -132,8 +133,7 @@ export function AutoTagsPage() {
 
   const renderDeleteButton = (autoTag: AutoTagDto) => {
     return (
-      <button
-        className="c-button"
+      <Button
         onClick={async (e) => {
           e.stopPropagation();
           if (autoTag.id) {
@@ -146,9 +146,10 @@ export function AutoTagsPage() {
             });
           }
         }}
+        variant={ButtonVariant.Secondary}
       >
         DELETE
-      </button>
+      </Button>
     );
   };
 
@@ -222,9 +223,9 @@ export function AutoTagsPage() {
       >
         <div className="flex flex-row gap-2" style={{ flexWrap: 'wrap' }}>
           {renderAddAutoTagButton()}
-          <button className="c-button" onClick={copyAutoTagsToClipboard}>
+          <Button onClick={copyAutoTagsToClipboard} variant={ButtonVariant.Transparent}>
             Copy autotags
-          </button>
+          </Button>
         </div>
       </PageHeader>
       {renderAutoTagsTable()}

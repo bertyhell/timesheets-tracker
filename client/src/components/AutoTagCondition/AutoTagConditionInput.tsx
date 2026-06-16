@@ -1,6 +1,7 @@
 import './AutoTagConditionInput.css';
 
 import React from 'react';
+import Button, { ButtonSize, ButtonVariant } from '../Button/Button';
 import Select from 'react-select';
 import * as types from '../../types/types';
 import { type SelectOption } from '../../helpers/select-option.types'; //{ BooleanOperator, types.ConditionOperator, ConditionVariable } from '../../types/types';
@@ -49,8 +50,9 @@ function AutoTagConditionInput({
       }
     >
       {showBooleanOperator && (
-        <button
-          className="c-auto-tag-condition__boolean-operator-button c-button c-button--small"
+        <Button
+          className="c-auto-tag-condition__boolean-operator-button"
+          size={ButtonSize.Small}
           onClick={() =>
             onChange(
               booleanOperator === types.BooleanOperator.AND
@@ -61,9 +63,10 @@ function AutoTagConditionInput({
               value
             )
           }
+          variant={ButtonVariant.Secondary}
         >
           {booleanOperator}
-        </button>
+        </Button>
       )}
       <Select<SelectOption<types.ConditionVariable>>
         className="c-auto-tag-condition__variable-select"
@@ -89,9 +92,13 @@ function AutoTagConditionInput({
         onChange={(evt) => onChange(booleanOperator, variable, operator, evt.target.value)}
       />
       {showDelete && (
-        <button className="c-button c-button--small" onClick={() => onDelete(index)}>
+        <Button
+          size={ButtonSize.Small}
+          onClick={() => onDelete(index)}
+          variant={ButtonVariant.Transparent}
+        >
           delete
-        </button>
+        </Button>
       )}
     </div>
   );

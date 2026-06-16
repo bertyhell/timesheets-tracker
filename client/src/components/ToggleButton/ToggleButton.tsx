@@ -1,6 +1,7 @@
 import './ToggleButton.css';
 
 import React, { type FC } from 'react';
+import Button, { ButtonSize, ButtonVariant } from '../Button/Button';
 
 interface ToggleButtonProps {
   optionTwoSelected: boolean;
@@ -19,24 +20,26 @@ const ToggleButton: FC<ToggleButtonProps> = ({
 }: ToggleButtonProps) => {
   return (
     <div className={'c-toggle-button ' + (className ? className : '')}>
-      <button
+      <Button
+        size={ButtonSize.Small}
         className={
-          'c-button c-button--small c-toggle-button__option1 ' +
-          (optionTwoSelected ? '' : 'c-toggle-button--selected')
+          'c-toggle-button__option1 ' + (optionTwoSelected ? '' : 'c-toggle-button--selected')
         }
         onClick={() => onChange(false)}
+        variant={optionTwoSelected ? ButtonVariant.Secondary : ButtonVariant.Primary}
       >
         {label1}
-      </button>
-      <button
+      </Button>
+      <Button
+        size={ButtonSize.Small}
         className={
-          'c-button c-button--small c-toggle-button__option2 ' +
-          (optionTwoSelected ? 'c-toggle-button--selected' : '')
+          'c-toggle-button__option2 ' + (optionTwoSelected ? 'c-toggle-button--selected' : '')
         }
         onClick={() => onChange(true)}
+        variant={optionTwoSelected ? ButtonVariant.Primary : ButtonVariant.Secondary}
       >
         {label2}
-      </button>
+      </Button>
     </div>
   );
 };

@@ -2,6 +2,10 @@
   --focus-color: #2684ff;
   --bg-alternative: #f1f1f1;
   --hover-highlight: #f2f8ff; /* lighten(#2684ff, 40%) */
-  --primary: darkslategray;
+  --primary-0: #9272e7;
+  --primary-1: #a891e8ff;
+  --primary-2: #b4a3e8ff;
+  --primary-3: #c3b9e8ff;
+  --primary-4: #f7f5fe;
   --header-height: 3.5rem;
 }

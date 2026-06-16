@@ -68,11 +68,11 @@
 }
 
 .tippy-arrow {
-  color: var(--primary);
+  color: var(--primary-0);
 }
 
 .tippy-content {
-  background-color: var(--primary);
+  background-color: var(--primary-0);
 
   ul {
     padding: 0 1rem;

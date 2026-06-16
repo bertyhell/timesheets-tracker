@@ -2,6 +2,7 @@ import './EditAutoTagModal.css';
 
 import { cloneDeep } from 'lodash-es';
 import React, { type ChangeEvent, useEffect, useState } from 'react';
+import Button, { ButtonVariant } from '../Button/Button';
 import { Modal } from 'react-responsive-modal';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -206,12 +207,12 @@ export function EditAutoTagModal() {
         </div>
       </div>
       <div className="flex flex-row justify-end gap-2 mt-48">
-        <button className="c-button" onClick={handleClose}>
+        <Button onClick={handleClose} variant={ButtonVariant.Secondary}>
           Cancel
-        </button>
-        <button className="c-button" onClick={handleSave}>
+        </Button>
+        <Button onClick={handleSave} variant={ButtonVariant.Primary}>
           Save
-        </button>
+        </Button>
       </div>
     </Modal>
   );

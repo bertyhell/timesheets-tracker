@@ -1,4 +1,5 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import Button, { ButtonVariant } from '../../../components/Button/Button';
 import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
@@ -47,16 +48,16 @@ export function TimelinesPage() {
         title="Timelines"
         description="Manages the lanes you see on the main timeline overview page. Timelines show you what events or programs were open at what time. You can also configure a timeline for tagging time and even an auto tagging timeline that uses rules to auto tag time."
       >
-        <button
-          className="c-button"
+        <Button
           onClick={() =>
             navigate(
               '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.timelines + '/' + ROUTE_PARTS.create
             )
           }
+          variant={ButtonVariant.Primary}
         >
           Add timeline
-        </button>
+        </Button>
       </PageHeader>
       <table className="c-table w-full">
         <thead>
@@ -109,8 +110,7 @@ export function TimelinesPage() {
                 <td className="pl-3">{timeline.timelineType}</td>
                 <td className="pl-3">{timeline.visualOrder}</td>
                 <td className="w-px whitespace-nowrap">
-                  <button
-                    className="c-button"
+                  <Button
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate(
@@ -124,13 +124,13 @@ export function TimelinesPage() {
                           ROUTE_PARTS.edit
                       );
                     }}
+                    variant={ButtonVariant.Secondary}
                   >
                     EDIT
-                  </button>
+                  </Button>
                 </td>
                 <td className="w-px whitespace-nowrap">
-                  <button
-                    className="c-button"
+                  <Button
                     onClick={async (e) => {
                       e.stopPropagation();
                       if (timeline.id) {
@@ -143,9 +143,10 @@ export function TimelinesPage() {
                         });
                       }
                     }}
+                    variant={ButtonVariant.Secondary}
                   >
                     DELETE
-                  </button>
+                  </Button>
                 </td>
               </tr>
             )

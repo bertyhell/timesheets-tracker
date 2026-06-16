@@ -1,6 +1,7 @@
 import './EditTimelineModal.css';
 
 import React, { type ChangeEvent, useEffect, useState } from 'react';
+import Button, { ButtonVariant } from '../Button/Button';
 import { Modal } from 'react-responsive-modal';
 import { ROUTE_PARTS } from '../../App';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -145,12 +146,12 @@ export function EditTimelineModal() {
       </div>
 
       <div className="flex flex-row justify-end gap-2 mt-8">
-        <button className="c-button" onClick={handleClose}>
+        <Button onClick={handleClose} variant={ButtonVariant.Secondary}>
           Cancel
-        </button>
-        <button className="c-button" disabled={!title} onClick={handleSave}>
+        </Button>
+        <Button disabled={!title} onClick={handleSave} variant={ButtonVariant.Primary}>
           Save
-        </button>
+        </Button>
       </div>
     </Modal>
   );

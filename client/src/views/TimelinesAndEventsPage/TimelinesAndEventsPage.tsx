@@ -15,7 +15,7 @@ import { TimelineType } from '../../components/Timeline/Timeline.types';
 import type { TagName } from '../../types/types';
 import { clamp, maxBy, minBy } from 'lodash-es';
 import { useAtom } from 'jotai';
-import { viewDateAtom, sidebarCollapsedAtom } from '../../store/store';
+import { sidebarCollapsedAtom, viewDateAtom } from '../../store/store';
 import { EventsTable } from '../../components/EventsTable/EventsTable';
 import { EventsTotalsTable } from '../../components/EventsTotalsTable/EventsTotalsTable';
 import { TimelineRuler } from '../../components/Timeline/TimelineRuler';
@@ -32,8 +32,10 @@ import {
 import { COLOR_LIST } from '../../components/Timeline/helpers/getColorForEvent';
 import GlobalSearchBar from '../../components/GlobalSearchBar/GlobalSearchBar';
 import DateSelect from '../../components/DateSelect/DateSelect';
-import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from 'react-resizable-panels';
+import { Group as PanelGroup, Panel, Separator as PanelResizeHandle } from 'react-resizable-panels';
 import { isApproxEqual } from '../../helpers/is-approx-equal';
+import Button, { ButtonSize, ButtonVariant } from '../../components/Button/Button';
+import { ButtonToolbar } from '../../components/ButtonToolbar/ButtonToolbar';
 
 export function TimelinesAndEventsPage() {
   const [viewDate] = useAtom(viewDateAtom);
@@ -313,32 +315,36 @@ export function TimelinesAndEventsPage() {
   return (
     <div className="p-timelines-and-events-page">
       <div className="m-page-toolbar">
-        <button
-          className="c-sidebar-toggle"
-          onClick={() => setSidebarCollapsed((prev) => !prev)}
-          aria-label={sidebarCollapsed ? 'Show sidebar' : 'Hide sidebar'}
-          title={sidebarCollapsed ? 'Show sidebar' : 'Hide sidebar'}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
+        <ButtonToolbar>
+          <Button
+            className="c-sidebar-toggle"
+            onClick={() => setSidebarCollapsed((prev) => !prev)}
+            ariaLabel={sidebarCollapsed ? 'Show sidebar' : 'Hide sidebar'}
+            title={sidebarCollapsed ? 'Show sidebar' : 'Hide sidebar'}
+            variant={ButtonVariant.Secondary}
+            size={ButtonSize.Small}
           >
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <line x1="3" y1="12" x2="21" y2="12" />
-            <line x1="3" y1="18" x2="21" y2="18" />
-          </svg>
-        </button>
-        <GlobalSearchBar />
-        <DateSelect />
-        {isLoadingTimelineEvents && <div>Loading...</div>}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </Button>
+          <GlobalSearchBar />
+          <DateSelect />
+          {isLoadingTimelineEvents && <div>Loading...</div>}
+        </ButtonToolbar>
       </div>
       {renderPageContent()}
     </div>

@@ -10,6 +10,7 @@
   align-items: center;
   gap: 0.5rem;
   margin: 0;
+  font-weight: bold;
 
   &:disabled {
     opacity: 0.5;
@@ -42,6 +43,19 @@
   &.c-button--secondary {
     background-color: var(--primary-4);
     color: var(--primary-0);
+    border: 1px solid var(--gray-100);
+    border-radius: 8px;
+
+    &:hover {
+    }
+
+    &:focus {
+    }
+  }
+
+  &.c-button--tertiary {
+    background-color: white;
+    color: #666;
     border-radius: 8px;
 
     &:hover {

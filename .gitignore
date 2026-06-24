@@ -23,3 +23,6 @@ build/
 
 artifacts/
 /.agents/skills/
+
+src/electron/dist/
+release/

@@ -153,11 +153,11 @@ export function EditAutoTagModal() {
       <div className="c-form">
         <label>Program Tag</label>
         <ToggleButton
-          optionTwoSelected={false}
+          optionTwoSelected={showCreateNewTagControls}
           onChange={setShowCreateNewTagControls}
           label1="Existing tag"
           label2="Create new tag"
-        ></ToggleButton>
+        />
         {!showCreateNewTagControls && (
           <TagSelectSingle
             value={selectedTagName || null}

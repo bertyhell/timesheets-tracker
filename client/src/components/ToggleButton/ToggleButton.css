@@ -1,5 +1,39 @@
-.c-tag-input {
-  [class*='ValueContainer2'] {
-    padding: 0.15rem;
+.c-toggle-button {
+  display: inline-flex;
+  border: 1px solid var(--primary-3);
+  border-radius: 9999px;
+  overflow: hidden;
+  background-color: #fff;
+  margin-bottom: 0.625rem;
+}
+
+.c-toggle-button__btn {
+  padding: 0.3125rem 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  color: var(--gray-500);
+  transition: background-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+
+  &:hover:not(.c-toggle-button__btn--active) {
+    background-color: var(--primary-4);
+    color: var(--primary-0);
   }
+}
+
+.c-toggle-button__btn--left {
+  border-radius: 9999px 0 0 9999px;
+}
+
+.c-toggle-button__btn--right {
+  border-radius: 0 9999px 9999px 0;
+}
+
+.c-toggle-button__btn--active {
+  background-color: var(--primary-0);
+  color: #fff;
 }

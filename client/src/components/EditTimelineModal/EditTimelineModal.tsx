@@ -123,7 +123,17 @@ export function EditTimelineModal() {
 
         {timelineType === 'Calendar' && (
           <>
-            <h4 className="mt-4">Calendar ICS link</h4>
+            <div className="flex justify-between items-center mt-4">
+              <h4>Calendar ICS link</h4>
+              <a
+                href="https://www.onecal.io/blog/how-to-get-an-ics-url-for-your-calendar"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-blue-500 hover:underline"
+              >
+                how to get .ics
+              </a>
+            </div>
             <input
               className="c-input"
               value={icsUrl}

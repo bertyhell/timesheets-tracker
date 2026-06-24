@@ -185,7 +185,6 @@ function Timeline({
           return (
             <Tooltip
               key={'c-timeline__' + timelineInfo.title + '__event__tippy__' + event.startedAt}
-              visible={!!selectedEvent?.id && selectedEvent.id === event.id}
               content={
                 <ul
                   className="c-timeline__event__tooltip"

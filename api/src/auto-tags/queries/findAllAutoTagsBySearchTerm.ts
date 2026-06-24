@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type FindAllAutoTagsBySearchTermParams = {
 	searchTerm: string;
@@ -15,7 +15,7 @@ export type FindAllAutoTagsBySearchTermResult = {
 	"tagName.color": string;
 }
 
-export function findAllAutoTagsBySearchTerm(db: Database, params: FindAllAutoTagsBySearchTermParams): FindAllAutoTagsBySearchTermResult[] {
+export function findAllAutoTagsBySearchTerm(db: DatabaseSync, params: FindAllAutoTagsBySearchTermParams): FindAllAutoTagsBySearchTermResult[] {
 	const sql = `
 	SELECT
 	    autoTags.id,
@@ -31,20 +31,20 @@ export function findAllAutoTagsBySearchTerm(db: Database, params: FindAllAutoTag
 	WHERE autoTags.title like '%' || ? || '%'
 	`
 	return db.prepare(sql)
-		.values(params.searchTerm)
+		.all(params.searchTerm)
 		.map(data => mapArrayToFindAllAutoTagsBySearchTermResult(data));
 }
 
 function mapArrayToFindAllAutoTagsBySearchTermResult(data: any) {
 	const result: FindAllAutoTagsBySearchTermResult = {
-		id: data[0],
-		title: data[1],
-		tagNameId: data[2],
-		priority: data[3],
-		conditions: data[4],
-		"tagName.id": data[5],
-		"tagName.title": data[6],
-		"tagName.color": data[7]
+		id: data.id,
+		title: data.title,
+		tagNameId: data.tagNameId,
+		priority: data.priority,
+		conditions: data.conditions,
+		"tagName.id": data["tagName.id"],
+		"tagName.title": data["tagName.title"],
+		"tagName.color": data["tagName.color"]
 	}
 	return result;
 }

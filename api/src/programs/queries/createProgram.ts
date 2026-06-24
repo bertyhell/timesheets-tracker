@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type CreateProgramParams = {
 	id: string;
@@ -14,7 +14,7 @@ export type CreateProgramResult = {
 	lastInsertRowid: number;
 }
 
-export function createProgram(db: Database, params: CreateProgramParams): CreateProgramResult {
+export function createProgram(db: DatabaseSync, params: CreateProgramParams): CreateProgramResult {
 	const sql = `
 	INSERT INTO programs
 	(id, programName, windowTitle, startedAt, endedAt, iconColor)

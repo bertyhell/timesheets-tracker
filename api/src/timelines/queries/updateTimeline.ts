@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type UpdateTimelineData = {
 	title: string;
@@ -16,7 +16,7 @@ export type UpdateTimelineResult = {
 	changes: number;
 }
 
-export function updateTimeline(db: Database, data: UpdateTimelineData, params: UpdateTimelineParams): UpdateTimelineResult {
+export function updateTimeline(db: DatabaseSync, data: UpdateTimelineData, params: UpdateTimelineParams): UpdateTimelineResult {
 	const sql = `
 	UPDATE timelines
 	SET

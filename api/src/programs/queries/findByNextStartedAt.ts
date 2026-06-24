@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type FindByNextStartedAtParams = {
 	startedAt: string;
@@ -12,7 +12,7 @@ export type FindByNextStartedAtResult = {
 	endedAt: string;
 }
 
-export function findByNextStartedAt(db: Database, params: FindByNextStartedAtParams): FindByNextStartedAtResult | null {
+export function findByNextStartedAt(db: DatabaseSync, params: FindByNextStartedAtParams): FindByNextStartedAtResult | null {
 	const sql = `
 	SELECT id, programName, windowTitle, startedAt, endedAt
 	FROM programs
@@ -20,19 +20,5 @@ export function findByNextStartedAt(db: Database, params: FindByNextStartedAtPar
 	ORDER BY startedAt
 	limit 1
 	`
-	const res = db.prepare(sql)
-		.values(params.startedAt);
-
-	return res.length > 0 ? mapArrayToFindByNextStartedAtResult(res[0]) : null;
-}
-
-function mapArrayToFindByNextStartedAtResult(data: any) {
-	const result: FindByNextStartedAtResult = {
-		id: data[0],
-		programName: data[1],
-		windowTitle: data[2],
-		startedAt: data[3],
-		endedAt: data[4]
-	}
-	return result;
+	return db.prepare(sql).get(params.startedAt) as FindByNextStartedAtResult | null ?? null;
 }

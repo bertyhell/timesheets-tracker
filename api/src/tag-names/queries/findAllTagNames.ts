@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type FindAllTagNamesResult = {
 	id: string;
@@ -7,22 +7,22 @@ export type FindAllTagNamesResult = {
 	color: string;
 }
 
-export function findAllTagNames(db: Database): FindAllTagNamesResult[] {
+export function findAllTagNames(db: DatabaseSync): FindAllTagNamesResult[] {
 	const sql = `
 	SELECT id, title, code, color
 	FROM tagNames
 	`
 	return db.prepare(sql)
-		.values()
+		.all()
 		.map(data => mapArrayToFindAllTagNamesResult(data));
 }
 
 function mapArrayToFindAllTagNamesResult(data: any) {
 	const result: FindAllTagNamesResult = {
-		id: data[0],
-		title: data[1],
-		code: data[2],
-		color: data[3]
+		id: data.id,
+		title: data.title,
+		code: data.code,
+		color: data.color
 	}
 	return result;
 }

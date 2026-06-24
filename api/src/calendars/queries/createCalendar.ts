@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type CreateCalendarParams = {
 	id: string;
@@ -12,7 +12,7 @@ export type CreateCalendarResult = {
 	lastInsertRowid: number;
 }
 
-export function createCalendar(db: Database, params: CreateCalendarParams): CreateCalendarResult {
+export function createCalendar(db: DatabaseSync, params: CreateCalendarParams): CreateCalendarResult {
 	const sql = `
 	INSERT INTO calendars
 	(

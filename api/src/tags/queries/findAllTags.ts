@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type FindAllTagsParams = {
 	startedAt: string;
@@ -15,7 +15,7 @@ export type FindAllTagsResult = {
 	"tagName.color"?: string;
 }
 
-export function findAllTags(db: Database, params: FindAllTagsParams): FindAllTagsResult[] {
+export function findAllTags(db: DatabaseSync, params: FindAllTagsParams): FindAllTagsResult[] {
 	const sql = `
 	SELECT
 	    tags.id as id,
@@ -34,19 +34,19 @@ export function findAllTags(db: Database, params: FindAllTagsParams): FindAllTag
 	WHERE tags.rn = 1
 	`
 	return db.prepare(sql)
-		.values(params.startedAt, params.endedAt)
+		.all(params.startedAt, params.endedAt)
 		.map(data => mapArrayToFindAllTagsResult(data));
 }
 
 function mapArrayToFindAllTagsResult(data: any) {
 	const result: FindAllTagsResult = {
-		id: data[0],
-		tagNameId: data[1],
-		startedAt: data[2],
-		endedAt: data[3],
-		"tagName.id": data[4],
-		"tagName.title": data[5],
-		"tagName.color": data[6]
+		id: data.id,
+		tagNameId: data.tagNameId,
+		startedAt: data.startedAt,
+		endedAt: data.endedAt,
+		"tagName.id": data["tagName.id"],
+		"tagName.title": data["tagName.title"],
+		"tagName.color": data["tagName.color"]
 	}
 	return result;
 }

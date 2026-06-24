@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type DeleteTagParams = {
 	id: string;
@@ -8,7 +8,7 @@ export type DeleteTagResult = {
 	changes: number;
 }
 
-export function deleteTag(db: Database, params: DeleteTagParams): DeleteTagResult {
+export function deleteTag(db: DatabaseSync, params: DeleteTagParams): DeleteTagResult {
 	const sql = `
 	DELETE FROM tags
 	WHERE id = ?

@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type CreateAutoTagParams = {
 	id: string;
@@ -13,7 +13,7 @@ export type CreateAutoTagResult = {
 	lastInsertRowid: number;
 }
 
-export function createAutoTag(db: Database, params: CreateAutoTagParams): CreateAutoTagResult {
+export function createAutoTag(db: DatabaseSync, params: CreateAutoTagParams): CreateAutoTagResult {
 	const sql = `
 	INSERT INTO autoTags
 	(

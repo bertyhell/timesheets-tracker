@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type CreateTagNameParams = {
 	id: string;
@@ -12,7 +12,7 @@ export type CreateTagNameResult = {
 	lastInsertRowid: number;
 }
 
-export function createTagName(db: Database, params: CreateTagNameParams): CreateTagNameResult {
+export function createTagName(db: DatabaseSync, params: CreateTagNameParams): CreateTagNameResult {
 	const sql = `
 	INSERT INTO tagNames
 	(id, title, code, color)

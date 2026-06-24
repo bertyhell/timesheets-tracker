@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type DeleteAutoNoteParams = {
 	id: string;
@@ -8,7 +8,7 @@ export type DeleteAutoNoteResult = {
 	changes: number;
 }
 
-export function deleteAutoNote(db: Database, params: DeleteAutoNoteParams): DeleteAutoNoteResult {
+export function deleteAutoNote(db: DatabaseSync, params: DeleteAutoNoteParams): DeleteAutoNoteResult {
 	const sql = `
 	DELETE FROM autoNotes
 	WHERE id = ?

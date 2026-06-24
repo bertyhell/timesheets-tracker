@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type UpdateProgramData = {
 	programName: string | null;
@@ -15,7 +15,7 @@ export type UpdateProgramResult = {
 	changes: number;
 }
 
-export function updateProgram(db: Database, data: UpdateProgramData, params: UpdateProgramParams): UpdateProgramResult {
+export function updateProgram(db: DatabaseSync, data: UpdateProgramData, params: UpdateProgramParams): UpdateProgramResult {
 	const sql = `
 	UPDATE programs
 	SET

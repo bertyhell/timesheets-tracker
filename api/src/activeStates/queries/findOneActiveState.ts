@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type FindOneActiveStateParams = {
 	id: string;
@@ -11,25 +11,12 @@ export type FindOneActiveStateResult = {
 	endedAt: string;
 }
 
-export function findOneActiveState(db: Database, params: FindOneActiveStateParams): FindOneActiveStateResult | null {
+export function findOneActiveState(db: DatabaseSync, params: FindOneActiveStateParams): FindOneActiveStateResult | null {
 	const sql = `
 	SELECT id, isActive, startedAt, endedAt
 	FROM activeStates
 	WHERE id = ?
 	LIMIT 1
 	`
-	const res = db.prepare(sql)
-		.values(params.id);
-
-	return res.length > 0 ? mapArrayToFindOneActiveStateResult(res[0]) : null;
-}
-
-function mapArrayToFindOneActiveStateResult(data: any) {
-	const result: FindOneActiveStateResult = {
-		id: data[0],
-		isActive: data[1],
-		startedAt: data[2],
-		endedAt: data[3]
-	}
-	return result;
+	return db.prepare(sql).get(params.id) as FindOneActiveStateResult | null ?? null;
 }

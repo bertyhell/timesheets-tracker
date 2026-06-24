@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 import { CustomError } from '../shared/CustomError';
-import { Database } from 'bun:sqlite';
+import { DatabaseSync } from 'node:sqlite';
 import { resolveProjectPath } from '../shared/resolve-src-path';
 
 @Injectable()
 export class SeedService {
-  private async seedFile(db: Database, seedFilePath: string): Promise<void> {
+  private async seedFile(db: DatabaseSync, seedFilePath: string): Promise<void> {
     let sqlFilePath: string | null = null;
     try {
       sqlFilePath = resolveProjectPath(seedFilePath);
@@ -16,7 +16,7 @@ export class SeedService {
       }
 
       const sqlQuery = fs.readFileSync(sqlFilePath, 'utf-8');
-      db.run(sqlQuery);
+      db.exec(sqlQuery);
     } catch (err) {
       throw new CustomError('Failed to seed file', err, {
         sqlFilePath,
@@ -24,12 +24,12 @@ export class SeedService {
     }
   }
 
-  private countEntries(db: Database, sqlCountQueryPath: string): number {
+  private countEntries(db: DatabaseSync, sqlCountQueryPath: string): number {
     const sqlQuery = fs.readFileSync(resolveProjectPath(sqlCountQueryPath), 'utf-8');
-    return db.prepare<{ count: number }, []>(sqlQuery).get().count;
+    return (db.prepare(sqlQuery).get() as { count: number }).count;
   }
 
-  async seedTags(db: Database): Promise<void> {
+  async seedTags(db: DatabaseSync): Promise<void> {
     let sqlFilePath: string | null = null;
     try {
       const count = this.countEntries(db, './src/tag-names/queries/countTagNames.sql');
@@ -46,7 +46,7 @@ export class SeedService {
     }
   }
 
-  async seedAutoTags(db: Database): Promise<void> {
+  async seedAutoTags(db: DatabaseSync): Promise<void> {
     let sqlFilePath: string | null = null;
     try {
       const count = this.countEntries(db, './src/auto-tags/queries/countAutoTags.sql');
@@ -63,7 +63,7 @@ export class SeedService {
     }
   }
 
-  async seedPrograms(db: Database): Promise<void> {
+  async seedPrograms(db: DatabaseSync): Promise<void> {
     let sqlFilePath: string | null = null;
     try {
       const count = this.countEntries(db, './src/programs/queries/countPrograms.sql');

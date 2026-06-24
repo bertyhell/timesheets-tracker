@@ -1,23 +1,13 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type CountWebsitesResult = {
 	count: number;
 }
 
-export function countWebsites(db: Database): CountWebsitesResult | null {
+export function countWebsites(db: DatabaseSync): CountWebsitesResult | null {
 	const sql = `
 	SELECT count(*) as count
 	FROM websites
 	`
-	const res = db.prepare(sql)
-		.values();
-
-	return res.length > 0 ? mapArrayToCountWebsitesResult(res[0]) : null;
-}
-
-function mapArrayToCountWebsitesResult(data: any) {
-	const result: CountWebsitesResult = {
-		count: data[0]
-	}
-	return result;
+	return db.prepare(sql).get() as CountWebsitesResult | null ?? null;
 }

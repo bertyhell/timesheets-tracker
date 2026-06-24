@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type FindAllTagNamesBySearchTermParams = {
 	searchTerm: string;
@@ -11,23 +11,23 @@ export type FindAllTagNamesBySearchTermResult = {
 	color: string;
 }
 
-export function findAllTagNamesBySearchTerm(db: Database, params: FindAllTagNamesBySearchTermParams): FindAllTagNamesBySearchTermResult[] {
+export function findAllTagNamesBySearchTerm(db: DatabaseSync, params: FindAllTagNamesBySearchTermParams): FindAllTagNamesBySearchTermResult[] {
 	const sql = `
 	SELECT id, title, code, color
 	FROM tagNames
 	WHERE title like '%' || ? || '%'
 	`
 	return db.prepare(sql)
-		.values(params.searchTerm)
+		.all(params.searchTerm)
 		.map(data => mapArrayToFindAllTagNamesBySearchTermResult(data));
 }
 
 function mapArrayToFindAllTagNamesBySearchTermResult(data: any) {
 	const result: FindAllTagNamesBySearchTermResult = {
-		id: data[0],
-		title: data[1],
-		code: data[2],
-		color: data[3]
+		id: data.id,
+		title: data.title,
+		code: data.code,
+		color: data.color
 	}
 	return result;
 }

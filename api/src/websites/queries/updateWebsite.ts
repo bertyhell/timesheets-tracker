@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type UpdateWebsiteData = {
 	websiteTitle: string | null;
@@ -14,7 +14,7 @@ export type UpdateWebsiteResult = {
 	changes: number;
 }
 
-export function updateWebsite(db: Database, data: UpdateWebsiteData, params: UpdateWebsiteParams): UpdateWebsiteResult {
+export function updateWebsite(db: DatabaseSync, data: UpdateWebsiteData, params: UpdateWebsiteParams): UpdateWebsiteResult {
 	const sql = `
 	UPDATE websites
 	SET

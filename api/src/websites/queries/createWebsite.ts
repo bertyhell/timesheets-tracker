@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type CreateWebsiteParams = {
 	id: string;
@@ -12,7 +12,7 @@ export type CreateWebsiteResult = {
 	lastInsertRowid: number;
 }
 
-export function createWebsite(db: Database, params: CreateWebsiteParams): CreateWebsiteResult {
+export function createWebsite(db: DatabaseSync, params: CreateWebsiteParams): CreateWebsiteResult {
 	const sql = `
 	INSERT INTO websites
 	(id, websiteTitle, websiteUrl, startedAt)

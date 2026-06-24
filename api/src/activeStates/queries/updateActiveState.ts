@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type UpdateActiveStateData = {
 	isActive: number | null;
@@ -14,7 +14,7 @@ export type UpdateActiveStateResult = {
 	changes: number;
 }
 
-export function updateActiveState(db: Database, data: UpdateActiveStateData, params: UpdateActiveStateParams): UpdateActiveStateResult {
+export function updateActiveState(db: DatabaseSync, data: UpdateActiveStateData, params: UpdateActiveStateParams): UpdateActiveStateResult {
 	const sql = `
 	UPDATE activeStates
 	SET isActive = ?, startedAt = ?, endedAt = ?

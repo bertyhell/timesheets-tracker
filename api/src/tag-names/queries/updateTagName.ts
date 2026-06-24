@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type UpdateTagNameData = {
 	title: string;
@@ -14,7 +14,7 @@ export type UpdateTagNameResult = {
 	changes: number;
 }
 
-export function updateTagName(db: Database, data: UpdateTagNameData, params: UpdateTagNameParams): UpdateTagNameResult {
+export function updateTagName(db: DatabaseSync, data: UpdateTagNameData, params: UpdateTagNameParams): UpdateTagNameResult {
 	const sql = `
 	UPDATE tagNames
 	SET

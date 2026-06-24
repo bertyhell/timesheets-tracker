@@ -11,7 +11,7 @@ export type FindAllAutoTagsResult = {
   'tagName.color': string;
 };
 
-export function findAllAutoTags(db: Database): FindAllAutoTagsResult[] {
+export function findAllAutoTags(db: DatabaseSync): FindAllAutoTagsResult[] {
   const sql = `
 	SELECT
 	    autoTags.id,
@@ -27,20 +27,20 @@ export function findAllAutoTags(db: Database): FindAllAutoTagsResult[] {
 	`;
   return db
     .prepare(sql)
-    .values()
+    .all()
     .map((data) => mapArrayToFindAllAutoTagsResult(data));
 }
 
 function mapArrayToFindAllAutoTagsResult(data: any) {
   const result: FindAllAutoTagsResult = {
-    id: data[0],
-    title: data[1],
-    tagNameId: data[2],
-    priority: data[3],
-    conditions: data[4],
-    'tagName.id': data[5],
-    'tagName.title': data[6],
-    'tagName.color': data[7],
+    id: data.id,
+    title: data.title,
+    tagNameId: data.tagNameId,
+    priority: data.priority,
+    conditions: data.conditions,
+    'tagName.id': data['tagName.id'],
+    'tagName.title': data['tagName.title'],
+    'tagName.color': data['tagName.color'],
   };
   return result;
 }

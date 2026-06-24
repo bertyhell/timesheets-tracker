@@ -32,7 +32,7 @@ import {
 import { COLOR_LIST } from '../../components/Timeline/helpers/getColorForEvent';
 import GlobalSearchBar from '../../components/GlobalSearchBar/GlobalSearchBar';
 import DateSelect from '../../components/DateSelect/DateSelect';
-import { Group as PanelGroup, Panel, Separator as PanelResizeHandle } from 'react-resizable-panels';
+import { Group as PanelGroup, Panel, Separator as PanelResizeHandle, useDefaultLayout } from 'react-resizable-panels';
 import { isApproxEqual } from '../../helpers/is-approx-equal';
 import Button, { ButtonSize, ButtonVariant } from '../../components/Button/Button';
 import { Menu, Plus, Filter, List, Calendar } from 'lucide-react';
@@ -264,9 +264,24 @@ export function TimelinesAndEventsPage() {
 
   const totalEventCount = allEvents?.length ?? 0;
 
+  const {
+    defaultLayout: verticalDefaultLayout,
+    onLayoutChanged: onVerticalLayoutChanged,
+  } = useDefaultLayout({ id: 'timelines-vertical', storage: localStorage });
+
+  const {
+    defaultLayout: horizontalDefaultLayout,
+    onLayoutChanged: onHorizontalLayoutChanged,
+  } = useDefaultLayout({ id: 'timelines-horizontal', storage: localStorage });
+
   const renderTimelinesAndEvents = () => {
     return (
-      <PanelGroup orientation="vertical" className="p-timelines-page">
+      <PanelGroup
+        orientation="vertical"
+        className="p-timelines-page"
+        defaultLayout={verticalDefaultLayout}
+        onLayoutChanged={onVerticalLayoutChanged}
+      >
         <Panel defaultSize="50%" minSize="15%" className="c-timelines-panel">
           <div className="c-timelines">
             <TimelineRuler minTime={minTime} maxTime={maxTime} />
@@ -287,7 +302,11 @@ export function TimelinesAndEventsPage() {
             </div>
           </div>
 
-          <PanelGroup orientation="horizontal">
+          <PanelGroup
+            orientation="horizontal"
+            defaultLayout={horizontalDefaultLayout}
+            onLayoutChanged={onHorizontalLayoutChanged}
+          >
             <Panel minSize="15%" defaultSize="70%">
               {!selectedTimeline?.events?.length ? (
                 <div className="u-center c-no-events">No events</div>

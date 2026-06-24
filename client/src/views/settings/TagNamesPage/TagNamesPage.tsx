@@ -95,7 +95,7 @@ export function TagNamesPage() {
               >
                 <td className="w-px py-1 pl-2">
                   <span
-                    className="block h-16 w-16"
+                    className="block h-5 w-5 rounded-md"
                     style={{ backgroundColor: tagName.color }}
                   ></span>
                 </td>

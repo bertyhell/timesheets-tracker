@@ -4,6 +4,58 @@
   height: 100%;
 }
 
+/* Page header area */
+.p-page-header-area {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem 1rem;
+  border-bottom: 1px solid var(--gray-100);
+  background: #fff;
+  flex-shrink: 0;
+  gap: 1rem;
+}
+
+.p-page-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.p-page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.p-page-subtitle {
+  font-size: 0.8125rem;
+  color: var(--gray-500);
+  margin: 0;
+  margin-top: 0.125rem;
+}
+
+.p-page-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.p-header-divider {
+  width: 1px;
+  height: 1.5rem;
+  background-color: var(--gray-200);
+  flex-shrink: 0;
+}
+
+.p-loading-indicator {
+  font-size: 0.8125rem;
+  color: var(--gray-500);
+}
+
+/* Timelines page layout */
 .p-timelines-page {
   flex: 1;
   min-height: 0;
@@ -18,6 +70,8 @@
 
   .c-timeline-events-list {
     height: 100%;
+    display: flex;
+    flex-direction: column;
 
     .c-events-table,
     .c-events-totals-table {
@@ -27,15 +81,85 @@
   }
 }
 
+/* Events section header */
+.c-events-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.625rem 1rem;
+  border-bottom: 1px solid var(--gray-100);
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.c-events-section-header__title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.c-events-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.375rem;
+  height: 1.375rem;
+  padding: 0 0.375rem;
+  background-color: var(--primary-4);
+  color: var(--primary-0);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.c-events-view-toggle {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.c-events-view-toggle__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 6px;
+  border: 1px solid var(--gray-200);
+  background: #fff;
+  color: var(--gray-500);
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+
+  &:hover {
+    background-color: var(--bg-alternative);
+    color: var(--primary-0);
+  }
+
+  &.active {
+    background-color: var(--primary-4);
+    color: var(--primary-0);
+    border-color: var(--primary-3);
+  }
+}
+
+.c-no-events {
+  color: var(--gray-500);
+  font-size: 0.875rem;
+}
+
+/* Resize handles */
 .c-resize-handle {
-  background-color: #eee;
+  background-color: var(--gray-100);
   transition: background-color 0.15s ease;
   flex-shrink: 0;
 }
 
 .c-resize-handle:hover,
 .c-resize-handle[data-resize-handle-active] {
-  background-color: #a0a0ff;
+  background-color: var(--primary-2);
 }
 
 .c-resize-handle--horizontal {

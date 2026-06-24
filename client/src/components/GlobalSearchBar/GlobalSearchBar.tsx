@@ -2,29 +2,20 @@ import React from 'react';
 
 import './GlobalSearchBar.css';
 import { useAtom } from 'jotai';
+import { Search } from 'lucide-react';
 
 import { searchTermAtom } from '../../store/store';
-
-// interface GlobalSearchBarProps {}
 
 function GlobalSearchBar() {
   const [searchTerm, setSearchTerm] = useAtom(searchTermAtom);
 
-  // useEffect(() => {
-  //   document.onkeydown = function (evt) {
-  //     evt = evt || window.event;
-  //     if (evt.ctrlKey && evt.keyCode == 90) {
-  //       alert('Ctrl-Z');
-  //     }
-  //   };
-  // }, []);
-
   return (
     <div className="c-global-search-bar">
+      <Search size={14} className="c-global-search-bar__icon" />
       <input
         value={searchTerm}
         onChange={(evt) => setSearchTerm(evt.target.value)}
-        placeholder="Search"
+        placeholder="Search events..."
       />
     </div>
   );

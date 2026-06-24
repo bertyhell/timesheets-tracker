@@ -1,12 +1,16 @@
 :root {
-  --focus-color: #2684ff;
-  --bg-alternative: #f1f1f1;
-  --hover-highlight: #f2f8ff; /* lighten(#2684ff, 40%) */
-  --primary-0: #9272e7;
-  --primary-1: #a891e8ff;
-  --primary-2: #b4a3e8ff;
-  --primary-3: #c3b9e8ff;
-  --primary-4: #e4e0ff;
-  --gray-100: #ddd;
+  --focus-color: #7c3aed;
+  --bg-alternative: #f8f7ff;
+  --hover-highlight: #f5f3ff;
+  --primary-0: #7c3aed;
+  --primary-1: #8b5cf6;
+  --primary-2: #a78bfa;
+  --primary-3: #c4b5fd;
+  --primary-4: #ede9fe;
+  --gray-100: #e5e7eb;
+  --gray-200: #d1d5db;
+  --gray-500: #6b7280;
+  --gray-700: #374151;
+  --sidebar-width: 14rem;
   --header-height: 3.5rem;
 }

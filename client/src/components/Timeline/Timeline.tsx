@@ -15,8 +15,9 @@ import type { TagName } from '../../types/types';
 import { type ActionMeta, type MultiValue, type OnChangeValue } from 'react-select';
 import TagSelectMulti from '../TagSelect/TagSelectMulti';
 import type { TimelineDto, TimelineEventDto } from '../../generated/api/types.gen';
-import { getColorForEvent } from './helpers/getColorForEvent';
+import { getColorForEvent, getColorFromString } from './helpers/getColorForEvent';
 import { getTicks } from './helpers/getTicks';
+import { getEventLabel } from './helpers/getEventLabel';
 
 interface TimelineProps {
   timelineInfo: TimelineDto;
@@ -73,7 +74,6 @@ function Timeline({
   const handleMouseDown = (evt: MouseEvent) => {
     const posX = getMousePositionXPercent(evt);
     if (posX < 0 || posX > 100) {
-      // Ignore impossible values
       return;
     }
     onMouseDown(posX);
@@ -83,7 +83,6 @@ function Timeline({
     const posX = getMousePositionXPercent(evt);
 
     if (posX < 0 || posX > 100) {
-      // Ignore impossible values
       return;
     }
     onMouseMove(posX);
@@ -92,7 +91,6 @@ function Timeline({
   const handleMouseUp = (evt: MouseEvent) => {
     const posX = getMousePositionXPercent(evt);
     if (posX < 0 || posX > 100) {
-      // Ignore impossible values
       return;
     }
     console.log('mouse up ', posX);
@@ -128,6 +126,11 @@ function Timeline({
     }
   };
 
+  // Derive a consistent dot color for the timeline label from its title
+  const timelineDotColor = events[0]
+    ? getColorForEvent(timelineInfo, events[0])
+    : getColorFromString(timelineInfo.title);
+
   const hourTicks = getTicks(minTime, maxTime, 60);
   const quarterTicks = getTicks(minTime, maxTime, 15);
   return (
@@ -137,7 +140,13 @@ function Timeline({
       onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
     >
-      <div className="c-timeline__title cursor-pointer">{timelineInfo.title}</div>
+      <div className="c-timeline__title cursor-pointer">
+        <span
+          className="c-timeline__dot"
+          style={{ backgroundColor: timelineDotColor }}
+        />
+        <span className="c-timeline__label">{timelineInfo.title}</span>
+      </div>
       <div className="c-timeline__track">
         {/* Hour and quarter ticks */}
         {quarterTicks.map((quarterTick) => (
@@ -175,13 +184,18 @@ function Timeline({
 
         {/* Events */}
         {events.map((event) => {
-          const width =
+          const widthPercent =
             (differenceInMilliseconds(parseISO(event.endedAt), parseISO(event.startedAt)) /
               windowInMilliseconds) *
-              100 +
-            '%';
+            100;
+          const width = widthPercent + '%';
+          const isNarrow = widthPercent < 5;
 
           const eventInfo = event.info as Record<string, string | number | boolean>;
+          const label = getEventLabel(timelineInfo, event);
+          const timeRange = `${format(parseISO(event.startedAt), 'HH:mm')} - ${format(parseISO(event.endedAt), 'HH:mm')}`;
+          const color = getColorForEvent(timelineInfo, event);
+
           return (
             <Tooltip
               key={'c-timeline__' + timelineInfo.title + '__event__tippy__' + event.startedAt}
@@ -218,7 +232,8 @@ function Timeline({
               <div
                 className={
                   'c-timeline__event' +
-                  (selectedEvent?.id === event.id ? ' c-timeline__event--selected' : '')
+                  (selectedEvent?.id === event.id ? ' c-timeline__event--selected' : '') +
+                  (isNarrow ? ' c-timeline__event--narrow' : '')
                 }
                 data-event-id={event.id}
                 key={'c-timeline__' + timelineInfo.title + '__event__div__' + event.startedAt}
@@ -229,12 +244,22 @@ function Timeline({
                       100 +
                     '%',
                   width,
-                  backgroundColor: getColorForEvent(timelineInfo, event),
+                  backgroundColor: color + '33',
+                  borderLeft: `3px solid ${color}`,
                 }}
                 onClick={() => {
                   setSelectedEvent(event, timelineInfo);
                 }}
-              ></div>
+              >
+                {!isNarrow && (
+                  <div className="c-timeline__event-content">
+                    <span className="c-timeline__event-label" style={{ color }}>
+                      {label}
+                    </span>
+                    <span className="c-timeline__event-time">{timeRange}</span>
+                  </div>
+                )}
+              </div>
             </Tooltip>
           );
         })}

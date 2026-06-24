@@ -199,7 +199,7 @@ export function AutoTagsPage() {
               >
                 <td className="w-px py-1 pl-2">
                   <span
-                    className="block w-16 h-16"
+                    className="block h-5 w-5 rounded-md"
                     style={{ backgroundColor: autoTag.tagName?.color }}
                   ></span>
                 </td>

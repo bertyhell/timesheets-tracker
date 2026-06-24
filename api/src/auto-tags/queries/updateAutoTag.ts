@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type UpdateAutoTagData = {
 	title: string;
@@ -15,7 +15,7 @@ export type UpdateAutoTagResult = {
 	changes: number;
 }
 
-export function updateAutoTag(db: Database, data: UpdateAutoTagData, params: UpdateAutoTagParams): UpdateAutoTagResult {
+export function updateAutoTag(db: DatabaseSync, data: UpdateAutoTagData, params: UpdateAutoTagParams): UpdateAutoTagResult {
 	const sql = `
 	UPDATE autoTags
 	SET

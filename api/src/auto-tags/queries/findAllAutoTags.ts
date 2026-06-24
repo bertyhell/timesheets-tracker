@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type FindAllAutoTagsResult = {
   id: string;

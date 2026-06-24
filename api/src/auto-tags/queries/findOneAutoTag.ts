@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type FindOneAutoTagParams = {
 	id: string;
@@ -15,7 +15,7 @@ export type FindOneAutoTagResult = {
 	"tagName.color": string;
 }
 
-export function findOneAutoTag(db: Database, params: FindOneAutoTagParams): FindOneAutoTagResult | null {
+export function findOneAutoTag(db: DatabaseSync, params: FindOneAutoTagParams): FindOneAutoTagResult | null {
 	const sql = `
 	SELECT
 	    autoTags.id,
@@ -31,22 +31,5 @@ export function findOneAutoTag(db: Database, params: FindOneAutoTagParams): Find
 	WHERE autoTags.id = ?
 	LIMIT 1
 	`
-	const res = db.prepare(sql)
-		.values(params.id);
-
-	return res.length > 0 ? mapArrayToFindOneAutoTagResult(res[0]) : null;
-}
-
-function mapArrayToFindOneAutoTagResult(data: any) {
-	const result: FindOneAutoTagResult = {
-		id: data[0],
-		title: data[1],
-		tagNameId: data[2],
-		priority: data[3],
-		conditions: data[4],
-		"tagName.id": data[5],
-		"tagName.title": data[6],
-		"tagName.color": data[7]
-	}
-	return result;
+	return db.prepare(sql).get(params.id) as FindOneAutoTagResult | null ?? null;
 }

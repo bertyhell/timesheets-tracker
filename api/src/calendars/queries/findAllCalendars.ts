@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type FindAllCalendarsResult = {
 	id: string;
@@ -7,7 +7,7 @@ export type FindAllCalendarsResult = {
 	color: string;
 }
 
-export function findAllCalendars(db: Database): FindAllCalendarsResult[] {
+export function findAllCalendars(db: DatabaseSync): FindAllCalendarsResult[] {
 	const sql = `
 	SELECT
 	    id,
@@ -17,16 +17,16 @@ export function findAllCalendars(db: Database): FindAllCalendarsResult[] {
 	FROM calendars
 	`
 	return db.prepare(sql)
-		.values()
+		.all()
 		.map(data => mapArrayToFindAllCalendarsResult(data));
 }
 
 function mapArrayToFindAllCalendarsResult(data: any) {
 	const result: FindAllCalendarsResult = {
-		id: data[0],
-		title: data[1],
-		url: data[2],
-		color: data[3]
+		id: data.id,
+		title: data.title,
+		url: data.url,
+		color: data.color
 	}
 	return result;
 }

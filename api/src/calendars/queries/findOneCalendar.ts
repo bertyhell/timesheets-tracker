@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type FindOneCalendarParams = {
 	id: string;
@@ -11,7 +11,7 @@ export type FindOneCalendarResult = {
 	color: string;
 }
 
-export function findOneCalendar(db: Database, params: FindOneCalendarParams): FindOneCalendarResult | null {
+export function findOneCalendar(db: DatabaseSync, params: FindOneCalendarParams): FindOneCalendarResult | null {
 	const sql = `
 	SELECT
 	    id,
@@ -22,18 +22,5 @@ export function findOneCalendar(db: Database, params: FindOneCalendarParams): Fi
 	WHERE id = ?
 	LIMIT 1
 	`
-	const res = db.prepare(sql)
-		.values(params.id);
-
-	return res.length > 0 ? mapArrayToFindOneCalendarResult(res[0]) : null;
-}
-
-function mapArrayToFindOneCalendarResult(data: any) {
-	const result: FindOneCalendarResult = {
-		id: data[0],
-		title: data[1],
-		url: data[2],
-		color: data[3]
-	}
-	return result;
+	return db.prepare(sql).get(params.id) as FindOneCalendarResult | null ?? null;
 }

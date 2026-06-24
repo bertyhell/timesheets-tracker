@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type CreateActiveStateParams = {
 	id: string;
@@ -12,7 +12,7 @@ export type CreateActiveStateResult = {
 	lastInsertRowid: number;
 }
 
-export function createActiveState(db: Database, params: CreateActiveStateParams): CreateActiveStateResult {
+export function createActiveState(db: DatabaseSync, params: CreateActiveStateParams): CreateActiveStateResult {
 	const sql = `
 	INSERT INTO activeStates
 	(id, isActive, startedAt, endedAt)

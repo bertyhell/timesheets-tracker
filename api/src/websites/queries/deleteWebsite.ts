@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type DeleteWebsiteParams = {
 	id: string;
@@ -8,7 +8,7 @@ export type DeleteWebsiteResult = {
 	changes: number;
 }
 
-export function deleteWebsite(db: Database, params: DeleteWebsiteParams): DeleteWebsiteResult {
+export function deleteWebsite(db: DatabaseSync, params: DeleteWebsiteParams): DeleteWebsiteResult {
 	const sql = `
 	DELETE FROM websites
 	WHERE id = ?

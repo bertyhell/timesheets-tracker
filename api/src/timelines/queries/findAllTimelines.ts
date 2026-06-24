@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type FindAllTimelinesResult = {
 	id: string;
@@ -10,7 +10,7 @@ export type FindAllTimelinesResult = {
 	visualOrder: number;
 }
 
-export function findAllTimelines(db: Database): FindAllTimelinesResult[] {
+export function findAllTimelines(db: DatabaseSync): FindAllTimelinesResult[] {
 	const sql = `
 	SELECT
 	    id,
@@ -24,19 +24,19 @@ export function findAllTimelines(db: Database): FindAllTimelinesResult[] {
 	ORDER BY visualOrder ASC
 	`
 	return db.prepare(sql)
-		.values()
+		.all()
 		.map(data => mapArrayToFindAllTimelinesResult(data));
 }
 
 function mapArrayToFindAllTimelinesResult(data: any) {
 	const result: FindAllTimelinesResult = {
-		id: data[0],
-		title: data[1],
-		timelineType: data[2],
-		eventProviderInfo: data[3],
-		createdAt: data[4],
-		updatedAt: data[5],
-		visualOrder: data[6]
+		id: data.id,
+		title: data.title,
+		timelineType: data.timelineType,
+		eventProviderInfo: data.eventProviderInfo,
+		createdAt: data.createdAt,
+		updatedAt: data.updatedAt,
+		visualOrder: data.visualOrder
 	}
 	return result;
 }

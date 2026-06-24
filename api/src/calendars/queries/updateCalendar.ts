@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type UpdateCalendarData = {
 	title: string;
@@ -14,7 +14,7 @@ export type UpdateCalendarResult = {
 	changes: number;
 }
 
-export function updateCalendar(db: Database, data: UpdateCalendarData, params: UpdateCalendarParams): UpdateCalendarResult {
+export function updateCalendar(db: DatabaseSync, data: UpdateCalendarData, params: UpdateCalendarParams): UpdateCalendarResult {
 	const sql = `
 	UPDATE calendars
 	SET

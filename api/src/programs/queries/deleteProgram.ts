@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type DeleteProgramParams = {
 	id: string;
@@ -8,7 +8,7 @@ export type DeleteProgramResult = {
 	changes: number;
 }
 
-export function deleteProgram(db: Database, params: DeleteProgramParams): DeleteProgramResult {
+export function deleteProgram(db: DatabaseSync, params: DeleteProgramParams): DeleteProgramResult {
 	const sql = `
 	DELETE FROM programs
 	WHERE id = ?

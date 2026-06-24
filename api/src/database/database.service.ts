@@ -2,7 +2,7 @@ import { Injectable, type OnModuleInit, Logger, OnModuleDestroy } from '@nestjs/
 import * as path from 'path';
 import * as fs from 'fs';
 import * as fsPromise from 'fs/promises';
-import { Database, Statement, Changes } from 'bun:sqlite';
+import { DatabaseSync, StatementSync } from 'node:sqlite';
 import { CustomError } from '../shared/CustomError';
 import { SeedService } from '../seed/seed.service';
 import { resolve } from 'node:path';
@@ -11,7 +11,7 @@ import { resolveProjectPath } from '../shared/resolve-src-path';
 
 @Injectable()
 export class DatabaseService implements OnModuleInit, OnModuleDestroy {
-  private db: Database;
+  private db: DatabaseSync;
   private databasePath = path.resolve('./timesheets-tracker-database.sqlite3');
   private readonly logger = new Logger(DatabaseService.name);
 
@@ -20,7 +20,7 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   async onModuleInit(): Promise<void> {
     this.logger.log('starting database module');
     this.logger.log('databasePath: ' + this.databasePath);
-    this.db = new Database(this.databasePath);
+    this.db = new DatabaseSync(this.databasePath);
     this.logger.log('creating database tables');
     await this.createTables();
     this.logger.log('database module started successfully');
@@ -47,8 +47,8 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     let sqlQuery: string | null = null;
     try {
       sqlQuery = await this.getQueryFromFile(sqlFile);
-      const statement = this.db.query(sqlQuery);
-      return statement.all(params) as TResult[];
+      const statement = this.db.prepare(sqlQuery);
+      return statement.all(params as any) as TResult[];
     } catch (err) {
       const error = new CustomError('Failed to execute SQL query', err, {
         sqlFile,
@@ -60,12 +60,12 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  public async mutate(sqlFile: string, params?: DbQueryParams): Promise<Changes> {
+  public async mutate(sqlFile: string, params?: DbQueryParams): Promise<{ changes: number; lastInsertRowid: number | bigint }> {
     let sqlQuery: string | null = null;
     try {
       sqlQuery = await this.getQueryFromFile(sqlFile);
-      const statement: Statement = this.db.query(sqlQuery);
-      return statement.run(params);
+      const statement: StatementSync = this.db.prepare(sqlQuery);
+      return statement.run(params as any) as { changes: number; lastInsertRowid: number | bigint };
     } catch (err) {
       throw new CustomError('Failed to execute SQL query', err, { sqlFile, sqlQuery, params });
     }
@@ -74,7 +74,7 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   /**
    * Create database tables if they do not exist yet.
    * Uses db.exec() (not db.query()) because the SQL file contains
-   * multiple statements and bun:sqlite's query() only prepares the first one.
+   * multiple statements and node:sqlite's prepare() only prepares the first one.
    */
   async createTables(): Promise<void> {
     const sqlFilePath = resolveProjectPath('./src/database/queries/create-database-tables.sql');
@@ -119,7 +119,7 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  public getDb(): Database {
+  public getDb(): DatabaseSync {
     return this.db;
   }
 

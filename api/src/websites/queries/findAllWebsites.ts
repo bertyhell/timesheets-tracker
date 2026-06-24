@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type FindAllWebsitesParams = {
 	startedAt: string;
@@ -12,7 +12,7 @@ export type FindAllWebsitesResult = {
 	startedAt: string;
 }
 
-export function findAllWebsites(db: Database, params: FindAllWebsitesParams): FindAllWebsitesResult[] {
+export function findAllWebsites(db: DatabaseSync, params: FindAllWebsitesParams): FindAllWebsitesResult[] {
 	const sql = `
 	SELECT id, websiteTitle, websiteUrl, startedAt
 	FROM (
@@ -23,16 +23,16 @@ export function findAllWebsites(db: Database, params: FindAllWebsitesParams): Fi
 	WHERE rn = 1
 	`
 	return db.prepare(sql)
-		.values(params.startedAt, params.endedAt)
+		.all(params.startedAt, params.endedAt)
 		.map(data => mapArrayToFindAllWebsitesResult(data));
 }
 
 function mapArrayToFindAllWebsitesResult(data: any) {
 	const result: FindAllWebsitesResult = {
-		id: data[0],
-		websiteTitle: data[1],
-		websiteUrl: data[2],
-		startedAt: data[3]
+		id: data.id,
+		websiteTitle: data.websiteTitle,
+		websiteUrl: data.websiteUrl,
+		startedAt: data.startedAt
 	}
 	return result;
 }

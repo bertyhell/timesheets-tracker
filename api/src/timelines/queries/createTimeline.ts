@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type CreateTimelineParams = {
 	id: string;
@@ -15,7 +15,7 @@ export type CreateTimelineResult = {
 	lastInsertRowid: number;
 }
 
-export function createTimeline(db: Database, params: CreateTimelineParams): CreateTimelineResult {
+export function createTimeline(db: DatabaseSync, params: CreateTimelineParams): CreateTimelineResult {
 	const sql = `
 	INSERT INTO timelines
 	(

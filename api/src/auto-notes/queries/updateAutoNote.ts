@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type UpdateAutoNoteData = {
 	title: string;
@@ -16,7 +16,7 @@ export type UpdateAutoNoteResult = {
 	changes: number;
 }
 
-export function updateAutoNote(db: Database, data: UpdateAutoNoteData, params: UpdateAutoNoteParams): UpdateAutoNoteResult {
+export function updateAutoNote(db: DatabaseSync, data: UpdateAutoNoteData, params: UpdateAutoNoteParams): UpdateAutoNoteResult {
 	const sql = `
 	UPDATE autoNotes
 	SET

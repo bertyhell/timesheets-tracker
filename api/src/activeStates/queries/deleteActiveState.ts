@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type DeleteActiveStateParams = {
 	id: string;
@@ -8,7 +8,7 @@ export type DeleteActiveStateResult = {
 	changes: number;
 }
 
-export function deleteActiveState(db: Database, params: DeleteActiveStateParams): DeleteActiveStateResult {
+export function deleteActiveState(db: DatabaseSync, params: DeleteActiveStateParams): DeleteActiveStateResult {
 	const sql = `
 	DELETE FROM activeStates
 	WHERE id = ?

@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type FindOneTagNameParams = {
 	id: string;
@@ -11,25 +11,12 @@ export type FindOneTagNameResult = {
 	color: string;
 }
 
-export function findOneTagName(db: Database, params: FindOneTagNameParams): FindOneTagNameResult | null {
+export function findOneTagName(db: DatabaseSync, params: FindOneTagNameParams): FindOneTagNameResult | null {
 	const sql = `
 	SELECT id, title, code, color
 	FROM tagNames
 	WHERE id = ?
 	LIMIT 1
 	`
-	const res = db.prepare(sql)
-		.values(params.id);
-
-	return res.length > 0 ? mapArrayToFindOneTagNameResult(res[0]) : null;
-}
-
-function mapArrayToFindOneTagNameResult(data: any) {
-	const result: FindOneTagNameResult = {
-		id: data[0],
-		title: data[1],
-		code: data[2],
-		color: data[3]
-	}
-	return result;
+	return db.prepare(sql).get(params.id) as FindOneTagNameResult | null ?? null;
 }

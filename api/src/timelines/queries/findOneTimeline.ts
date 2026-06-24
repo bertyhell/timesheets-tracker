@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type FindOneTimelineParams = {
 	id: string;
@@ -14,7 +14,7 @@ export type FindOneTimelineResult = {
 	visualOrder: number;
 }
 
-export function findOneTimeline(db: Database, params: FindOneTimelineParams): FindOneTimelineResult | null {
+export function findOneTimeline(db: DatabaseSync, params: FindOneTimelineParams): FindOneTimelineResult | null {
 	const sql = `
 	SELECT
 	    id,
@@ -28,21 +28,5 @@ export function findOneTimeline(db: Database, params: FindOneTimelineParams): Fi
 	WHERE id = ?
 	LIMIT 1
 	`
-	const res = db.prepare(sql)
-		.values(params.id);
-
-	return res.length > 0 ? mapArrayToFindOneTimelineResult(res[0]) : null;
-}
-
-function mapArrayToFindOneTimelineResult(data: any) {
-	const result: FindOneTimelineResult = {
-		id: data[0],
-		title: data[1],
-		timelineType: data[2],
-		eventProviderInfo: data[3],
-		createdAt: data[4],
-		updatedAt: data[5],
-		visualOrder: data[6]
-	}
-	return result;
+	return db.prepare(sql).get(params.id) as FindOneTimelineResult | null ?? null;
 }

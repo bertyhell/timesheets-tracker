@@ -1,22 +1,12 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type CountProgramsResult = {
 	count: number;
 }
 
-export function countPrograms(db: Database): CountProgramsResult | null {
+export function countPrograms(db: DatabaseSync): CountProgramsResult | null {
 	const sql = `
 	SELECT COUNT(*) as count FROM programs
 	`
-	const res = db.prepare(sql)
-		.values();
-
-	return res.length > 0 ? mapArrayToCountProgramsResult(res[0]) : null;
-}
-
-function mapArrayToCountProgramsResult(data: any) {
-	const result: CountProgramsResult = {
-		count: data[0]
-	}
-	return result;
+	return db.prepare(sql).get() as CountProgramsResult | null ?? null;
 }

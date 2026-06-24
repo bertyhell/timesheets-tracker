@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type CreateAutoNoteParams = {
 	id: string;
@@ -14,7 +14,7 @@ export type CreateAutoNoteResult = {
 	lastInsertRowid: number;
 }
 
-export function createAutoNote(db: Database, params: CreateAutoNoteParams): CreateAutoNoteResult {
+export function createAutoNote(db: DatabaseSync, params: CreateAutoNoteParams): CreateAutoNoteResult {
 	const sql = `
 	INSERT INTO autoNotes
 	(id, title, tagNameId, variable, extractRegex, extractRegexReplacement)

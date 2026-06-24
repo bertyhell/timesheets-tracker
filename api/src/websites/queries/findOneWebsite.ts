@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type FindOneWebsiteParams = {
 	id: string;
@@ -11,25 +11,12 @@ export type FindOneWebsiteResult = {
 	startedAt: string;
 }
 
-export function findOneWebsite(db: Database, params: FindOneWebsiteParams): FindOneWebsiteResult | null {
+export function findOneWebsite(db: DatabaseSync, params: FindOneWebsiteParams): FindOneWebsiteResult | null {
 	const sql = `
 	SELECT id, websiteTitle, websiteUrl, startedAt
 	FROM websites
 	WHERE id = ?
 	LIMIT 1
 	`
-	const res = db.prepare(sql)
-		.values(params.id);
-
-	return res.length > 0 ? mapArrayToFindOneWebsiteResult(res[0]) : null;
-}
-
-function mapArrayToFindOneWebsiteResult(data: any) {
-	const result: FindOneWebsiteResult = {
-		id: data[0],
-		websiteTitle: data[1],
-		websiteUrl: data[2],
-		startedAt: data[3]
-	}
-	return result;
+	return db.prepare(sql).get(params.id) as FindOneWebsiteResult | null ?? null;
 }

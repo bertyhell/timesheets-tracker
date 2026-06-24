@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 export type CreateTagParams = {
 	id: string;
@@ -12,7 +12,7 @@ export type CreateTagResult = {
 	lastInsertRowid: number;
 }
 
-export function createTag(db: Database, params: CreateTagParams): CreateTagResult {
+export function createTag(db: DatabaseSync, params: CreateTagParams): CreateTagResult {
 	const sql = `
 	INSERT INTO tags
 	(id, tagNameId, startedAt, endedAt)

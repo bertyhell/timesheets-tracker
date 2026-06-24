@@ -102,7 +102,7 @@ export function AutoTagsPage() {
   const renderAddAutoTagButton = () => {
     return (
       <NavLink
-        className="c-button"
+        className="c-button c-button--primary c-button--small"
         to={'/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.autoTagRules + '/' + ROUTE_PARTS.create}
       >
         Add auto tag
@@ -113,7 +113,7 @@ export function AutoTagsPage() {
   const renderEditButton = (autoTag: AutoTagDto) => {
     return (
       <NavLink
-        className="c-button"
+        className="c-button c-button--secondary c-button--small"
         to={
           '/' +
           ROUTE_PARTS.settings +

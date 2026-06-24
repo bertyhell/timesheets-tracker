@@ -66,23 +66,3 @@
     opacity: 0.6;
   }
 }
-
-.tippy-arrow {
-  color: var(--primary);
-}
-
-.tippy-content {
-  background-color: var(--primary);
-
-  ul {
-    padding: 0 1rem;
-  }
-
-  li {
-    list-style: none;
-  }
-
-  [id*='react-select-'] {
-    color: black;
-  }
-}

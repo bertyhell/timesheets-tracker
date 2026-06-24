@@ -1,7 +1,6 @@
 import './Timeline.css';
-import Tippy from '@tippyjs/react';
-import 'tippy.js/dist/tippy.css';
 import React, { type MouseEvent } from 'react';
+import Tooltip from '../Tooltip/Tooltip';
 import {
   addMilliseconds,
   differenceInMilliseconds,
@@ -184,10 +183,9 @@ function Timeline({
 
           const eventInfo = event.info as Record<string, string | number | boolean>;
           return (
-            <Tippy
+            <Tooltip
               key={'c-timeline__' + timelineInfo.title + '__event__tippy__' + event.startedAt}
               visible={!!selectedEvent?.id && selectedEvent.id === event.id}
-              interactive
               content={
                 <ul
                   className="c-timeline__event__tooltip"
@@ -238,16 +236,15 @@ function Timeline({
                   setSelectedEvent(event, timelineInfo);
                 }}
               ></div>
-            </Tippy>
+            </Tooltip>
           );
         })}
 
         {/* Selection */}
         {selectionPercentages && (
-          <Tippy
+          <Tooltip
             key={'c-timeline__' + timelineInfo.title + '__selection__tippy'}
             className="c-timeline__selection__tooltip--ended"
-            interactive
             content={
               <ul
                 onMouseMove={(evt) => evt.stopPropagation()}
@@ -273,7 +270,7 @@ function Timeline({
                 right: 100 - selectionPercentages.end + '%',
               }}
             ></div>
-          </Tippy>
+          </Tooltip>
         )}
       </div>
     </div>

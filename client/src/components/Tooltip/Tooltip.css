@@ -1,0 +1,27 @@
+.c-tooltip {
+  z-index: 9999;
+}
+
+.c-tooltip__arrow {
+  fill: var(--primary);
+}
+
+.c-tooltip__content {
+  background-color: var(--primary);
+  padding: 5px 9px;
+  border-radius: 4px;
+  color: white;
+  font-size: 0.875rem;
+
+  ul {
+    padding: 0 1rem;
+  }
+
+  li {
+    list-style: none;
+  }
+
+  [id*='react-select-'] {
+    color: black;
+  }
+}

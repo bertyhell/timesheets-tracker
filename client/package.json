@@ -10,10 +10,10 @@
     "bump": "npx bump-package-versions --part=patch --strategy=highest ./package.json ../package.json ../api/package.json"
   },
   "dependencies": {
+    "@floating-ui/react": "^0.27.19",
     "@nestjs/schedule": "^6.1.1",
     "@tanstack/react-query": "^5.100.10",
     "@tanstack/react-virtual": "^3.13.26",
-    "@tippyjs/react": "4.2.6",
     "baseline-browser-mapping": "^2.9.19",
     "blend-promise-utils": "^1.29.0",
     "caniuse-lite": "^1.0.30001769",

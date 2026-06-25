@@ -12,7 +12,9 @@
   font-weight: 500;
   font-size: 0.875rem;
   border-radius: 8px;
-  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
   white-space: nowrap;
 
   &:disabled {

@@ -1,13 +1,13 @@
 import type { DatabaseSync } from 'node:sqlite';
 
 export type CountWebsitesResult = {
-	count: number;
-}
+  count: number;
+};
 
 export function countWebsites(db: DatabaseSync): CountWebsitesResult | null {
-	const sql = `
+  const sql = `
 	SELECT count(*) as count
 	FROM websites
-	`
-	return db.prepare(sql).get() as CountWebsitesResult | null ?? null;
+	`;
+  return (db.prepare(sql).get() as CountWebsitesResult | null) ?? null;
 }

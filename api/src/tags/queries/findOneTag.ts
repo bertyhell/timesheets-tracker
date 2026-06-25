@@ -1,21 +1,21 @@
 import type { DatabaseSync } from 'node:sqlite';
 
 export type FindOneTagParams = {
-	id: string;
-}
+  id: string;
+};
 
 export type FindOneTagResult = {
-	id: string;
-	tagNameId: string;
-	startedAt: string;
-	endedAt: string;
-	"tagName.id": string;
-	"tagName.title": string;
-	"tagName.color": string;
-}
+  id: string;
+  tagNameId: string;
+  startedAt: string;
+  endedAt: string;
+  'tagName.id': string;
+  'tagName.title': string;
+  'tagName.color': string;
+};
 
 export function findOneTag(db: DatabaseSync, params: FindOneTagParams): FindOneTagResult | null {
-	const sql = `
+  const sql = `
 	SELECT
 	    tags.id as id,
 	    tags.tagNameId as tagNameId,
@@ -28,6 +28,6 @@ export function findOneTag(db: DatabaseSync, params: FindOneTagParams): FindOneT
 	LEFT JOIN tagNames ON tagNames.id = tags.tagNameId
 	WHERE tags.id = ?
 	LIMIT 1
-	`
-	return db.prepare(sql).get(params.id) as FindOneTagResult | null ?? null;
+	`;
+  return (db.prepare(sql).get(params.id) as FindOneTagResult | null) ?? null;
 }

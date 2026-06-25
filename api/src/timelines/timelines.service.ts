@@ -29,6 +29,7 @@ import { AutoTagsService } from '../auto-tags/auto-tags.service';
 import { ActiveStatesService } from '../activeStates/active-states.service';
 import { AutoTagDto } from '../auto-tags/dto/response-auto-tag.dto';
 import { TagNamesService } from '../tag-names/tag-names.service';
+import { CustomError } from '../shared/CustomError';
 
 @Injectable()
 export class TimelinesService {
@@ -222,25 +223,36 @@ export class TimelinesService {
 
           case TimelineType.Calendar:
             return (async () => {
-              const calendarEvents = await this.calendarsService.getEvents(
-                timelineInfo.eventProviderInfo.icsUrl,
-                startedAt,
-                endedAt
-              );
-              return calendarEvents.map((calendarEvent: CalendarEvent): TimelineEventDto => {
-                return {
-                  id: calendarEvent.id,
-                  startedAt: calendarEvent.startedAt,
-                  endedAt: calendarEvent.endedAt,
-                  info: {
-                    summary: calendarEvent.summary,
-                    description: calendarEvent.description,
-                    location: calendarEvent.location,
-                    allDay: calendarEvent.allDay,
-                  },
-                  timelineId: timelineInfo.id,
-                };
-              });
+              try {
+                const calendarEvents = await this.calendarsService.getEvents(
+                  timelineInfo.eventProviderInfo.icsUrl,
+                  startedAt,
+                  endedAt
+                );
+                return calendarEvents.map((calendarEvent: CalendarEvent): TimelineEventDto => {
+                  return {
+                    id: calendarEvent.id,
+                    startedAt: calendarEvent.startedAt,
+                    endedAt: calendarEvent.endedAt,
+                    info: {
+                      summary: calendarEvent.summary,
+                      description: calendarEvent.description,
+                      location: calendarEvent.location,
+                      allDay: calendarEvent.allDay,
+                    },
+                    timelineId: timelineInfo.id,
+                  };
+                });
+              } catch (err) {
+                console.error(
+                  new CustomError('Failed to fetch events from calendar', err, {
+                    icsUrl: timelineInfo.eventProviderInfo.icsUrl,
+                    startedAt,
+                    endedAt,
+                  })
+                );
+                return []; // TODO pass errors to client to show as toast messages
+              }
             })();
         }
       }

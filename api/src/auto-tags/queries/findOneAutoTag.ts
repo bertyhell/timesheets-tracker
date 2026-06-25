@@ -1,22 +1,25 @@
 import type { DatabaseSync } from 'node:sqlite';
 
 export type FindOneAutoTagParams = {
-	id: string;
-}
+  id: string;
+};
 
 export type FindOneAutoTagResult = {
-	id: string;
-	title: string;
-	tagNameId: string;
-	priority: number;
-	conditions: string;
-	"tagName.id": string;
-	"tagName.title": string;
-	"tagName.color": string;
-}
+  id: string;
+  title: string;
+  tagNameId: string;
+  priority: number;
+  conditions: string;
+  'tagName.id': string;
+  'tagName.title': string;
+  'tagName.color': string;
+};
 
-export function findOneAutoTag(db: DatabaseSync, params: FindOneAutoTagParams): FindOneAutoTagResult | null {
-	const sql = `
+export function findOneAutoTag(
+  db: DatabaseSync,
+  params: FindOneAutoTagParams
+): FindOneAutoTagResult | null {
+  const sql = `
 	SELECT
 	    autoTags.id,
 	    autoTags.title,
@@ -30,6 +33,6 @@ export function findOneAutoTag(db: DatabaseSync, params: FindOneAutoTagParams): 
 	LEFT JOIN tagNames ON tagNames.id = autoTags.tagNameId
 	WHERE autoTags.id = ?
 	LIMIT 1
-	`
-	return db.prepare(sql).get(params.id) as FindOneAutoTagResult | null ?? null;
+	`;
+  return (db.prepare(sql).get(params.id) as FindOneAutoTagResult | null) ?? null;
 }

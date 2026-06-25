@@ -1,18 +1,20 @@
 import type { DatabaseSync } from 'node:sqlite';
 
 export type DeleteActiveStateParams = {
-	id: string;
-}
+  id: string;
+};
 
 export type DeleteActiveStateResult = {
-	changes: number;
-}
+  changes: number;
+};
 
-export function deleteActiveState(db: DatabaseSync, params: DeleteActiveStateParams): DeleteActiveStateResult {
-	const sql = `
+export function deleteActiveState(
+  db: DatabaseSync,
+  params: DeleteActiveStateParams
+): DeleteActiveStateResult {
+  const sql = `
 	DELETE FROM activeStates
 	WHERE id = ?
-	`
-	return db.prepare(sql)
-		.run(params.id) as DeleteActiveStateResult;
+	`;
+  return db.prepare(sql).run(params.id) as DeleteActiveStateResult;
 }

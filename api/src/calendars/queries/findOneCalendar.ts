@@ -1,18 +1,21 @@
 import type { DatabaseSync } from 'node:sqlite';
 
 export type FindOneCalendarParams = {
-	id: string;
-}
+  id: string;
+};
 
 export type FindOneCalendarResult = {
-	id: string;
-	title: string;
-	url: string;
-	color: string;
-}
+  id: string;
+  title: string;
+  url: string;
+  color: string;
+};
 
-export function findOneCalendar(db: DatabaseSync, params: FindOneCalendarParams): FindOneCalendarResult | null {
-	const sql = `
+export function findOneCalendar(
+  db: DatabaseSync,
+  params: FindOneCalendarParams
+): FindOneCalendarResult | null {
+  const sql = `
 	SELECT
 	    id,
 	    title,
@@ -21,6 +24,6 @@ export function findOneCalendar(db: DatabaseSync, params: FindOneCalendarParams)
 	FROM calendars
 	WHERE id = ?
 	LIMIT 1
-	`
-	return db.prepare(sql).get(params.id) as FindOneCalendarResult | null ?? null;
+	`;
+  return (db.prepare(sql).get(params.id) as FindOneCalendarResult | null) ?? null;
 }

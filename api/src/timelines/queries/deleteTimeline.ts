@@ -1,18 +1,20 @@
 import type { DatabaseSync } from 'node:sqlite';
 
 export type DeleteTimelineParams = {
-	id: string;
-}
+  id: string;
+};
 
 export type DeleteTimelineResult = {
-	changes: number;
-}
+  changes: number;
+};
 
-export function deleteTimeline(db: DatabaseSync, params: DeleteTimelineParams): DeleteTimelineResult {
-	const sql = `
+export function deleteTimeline(
+  db: DatabaseSync,
+  params: DeleteTimelineParams
+): DeleteTimelineResult {
+  const sql = `
 	DELETE FROM timelines
 	WHERE id = ?
-	`
-	return db.prepare(sql)
-		.run(params.id) as DeleteTimelineResult;
+	`;
+  return db.prepare(sql).run(params.id) as DeleteTimelineResult;
 }

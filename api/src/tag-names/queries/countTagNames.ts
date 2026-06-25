@@ -1,13 +1,13 @@
 import type { DatabaseSync } from 'node:sqlite';
 
 export type CountTagNamesResult = {
-	count: number;
-}
+  count: number;
+};
 
 export function countTagNames(db: DatabaseSync): CountTagNamesResult | null {
-	const sql = `
+  const sql = `
 	SELECT count(*) as count
 	FROM tagNames
-	`
-	return db.prepare(sql).get() as CountTagNamesResult | null ?? null;
+	`;
+  return (db.prepare(sql).get() as CountTagNamesResult | null) ?? null;
 }

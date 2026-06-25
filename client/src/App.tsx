@@ -32,9 +32,7 @@ export enum ROUTE_PARTS {
   edit = 'edit',
 }
 
-const OVERVIEW_NAV = [
-  { to: ROUTE_PARTS.timelinesAndEvents, label: 'Overview', icon: BarChart2 },
-];
+const OVERVIEW_NAV = [{ to: ROUTE_PARTS.timelinesAndEvents, label: 'Overview', icon: BarChart2 }];
 
 const MANAGE_NAV = [
   { to: ROUTE_PARTS.settings + '/' + ROUTE_PARTS.timelines, label: 'Timelines', icon: List },

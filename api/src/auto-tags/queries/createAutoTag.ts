@@ -1,20 +1,20 @@
 import type { DatabaseSync } from 'node:sqlite';
 
 export type CreateAutoTagParams = {
-	id: string;
-	title: string;
-	tagNameId: string;
-	priority: number;
-	conditions: string;
-}
+  id: string;
+  title: string;
+  tagNameId: string;
+  priority: number;
+  conditions: string;
+};
 
 export type CreateAutoTagResult = {
-	changes: number;
-	lastInsertRowid: number;
-}
+  changes: number;
+  lastInsertRowid: number;
+};
 
 export function createAutoTag(db: DatabaseSync, params: CreateAutoTagParams): CreateAutoTagResult {
-	const sql = `
+  const sql = `
 	INSERT INTO autoTags
 	(
 	    id,
@@ -24,7 +24,14 @@ export function createAutoTag(db: DatabaseSync, params: CreateAutoTagParams): Cr
 	    conditions
 	)
 	VALUES (?, ?, ?, ?, ?)
-	`
-	return db.prepare(sql)
-		.run(params.id, params.title, params.tagNameId, params.priority, params.conditions) as CreateAutoTagResult;
+	`;
+  return db
+    .prepare(sql)
+    .run(
+      params.id,
+      params.title,
+      params.tagNameId,
+      params.priority,
+      params.conditions
+    ) as CreateAutoTagResult;
 }

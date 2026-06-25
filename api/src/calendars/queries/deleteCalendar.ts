@@ -1,18 +1,20 @@
 import type { DatabaseSync } from 'node:sqlite';
 
 export type DeleteCalendarParams = {
-	id: string;
-}
+  id: string;
+};
 
 export type DeleteCalendarResult = {
-	changes: number;
-}
+  changes: number;
+};
 
-export function deleteCalendar(db: DatabaseSync, params: DeleteCalendarParams): DeleteCalendarResult {
-	const sql = `
+export function deleteCalendar(
+  db: DatabaseSync,
+  params: DeleteCalendarParams
+): DeleteCalendarResult {
+  const sql = `
 	DELETE FROM calendars
 	WHERE id = ?
-	`
-	return db.prepare(sql)
-		.run(params.id) as DeleteCalendarResult;
+	`;
+  return db.prepare(sql).run(params.id) as DeleteCalendarResult;
 }

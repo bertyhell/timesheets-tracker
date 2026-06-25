@@ -12,10 +12,19 @@ export function getTicks(minTime: Date, maxTime: Date, intervalMinutes?: number)
 
   const interval =
     intervalMinutes ??
-    (NICE_INTERVALS_MINUTES.find((i) => i >= windowMinutes / 8) ?? NICE_INTERVALS_MINUTES.at(-1)!);
+    NICE_INTERVALS_MINUTES.find((i) => i >= windowMinutes / 8) ??
+    NICE_INTERVALS_MINUTES.at(-1)!;
 
   const ticks: Date[] = [];
-  const dayStart = new Date(minTime.getFullYear(), minTime.getMonth(), minTime.getDate(), 0, 0, 0, 0);
+  const dayStart = new Date(
+    minTime.getFullYear(),
+    minTime.getMonth(),
+    minTime.getDate(),
+    0,
+    0,
+    0,
+    0
+  );
   const msSinceMidnight = minTime.getTime() - dayStart.getTime();
   const intervalMs = interval * 60_000;
   const firstTickMinutes = Math.ceil(msSinceMidnight / intervalMs) * interval;

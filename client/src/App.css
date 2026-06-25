@@ -70,7 +70,9 @@
   color: var(--gray-700);
   font-size: 0.875rem;
   font-weight: 500;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 
   &:hover {
     background-color: var(--bg-alternative);

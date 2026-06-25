@@ -1,23 +1,27 @@
 import type { DatabaseSync } from 'node:sqlite';
 
 export type UpdateTimelineData = {
-	title: string;
-	timelineType: string;
-	eventProviderInfo: string | null;
-	updatedAt: string;
-	visualOrder: number;
-}
+  title: string;
+  timelineType: string;
+  eventProviderInfo: string | null;
+  updatedAt: string;
+  visualOrder: number;
+};
 
 export type UpdateTimelineParams = {
-	id: string;
-}
+  id: string;
+};
 
 export type UpdateTimelineResult = {
-	changes: number;
-}
+  changes: number;
+};
 
-export function updateTimeline(db: DatabaseSync, data: UpdateTimelineData, params: UpdateTimelineParams): UpdateTimelineResult {
-	const sql = `
+export function updateTimeline(
+  db: DatabaseSync,
+  data: UpdateTimelineData,
+  params: UpdateTimelineParams
+): UpdateTimelineResult {
+  const sql = `
 	UPDATE timelines
 	SET
 	    title = ?,
@@ -26,7 +30,15 @@ export function updateTimeline(db: DatabaseSync, data: UpdateTimelineData, param
 	    updatedAt = ?,
 	    visualOrder = ?
 	WHERE id = ?
-	`
-	return db.prepare(sql)
-		.run(data.title, data.timelineType, data.eventProviderInfo, data.updatedAt, data.visualOrder, params.id) as UpdateTimelineResult;
+	`;
+  return db
+    .prepare(sql)
+    .run(
+      data.title,
+      data.timelineType,
+      data.eventProviderInfo,
+      data.updatedAt,
+      data.visualOrder,
+      params.id
+    ) as UpdateTimelineResult;
 }

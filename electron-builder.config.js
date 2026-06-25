@@ -9,11 +9,7 @@ module.exports = {
   },
 
   // Files included in the app.asar (main process only)
-  files: [
-    'src/electron/dist/**/*',
-    'icon/**/*',
-    'package.json',
-  ],
+  files: ['src/electron/dist/**/*', 'icon/**/*', 'package.json'],
 
   // API (NestJS) and built client live outside the asar so native modules work
   extraResources: [
@@ -33,11 +29,7 @@ module.exports = {
     {
       from: 'api/node_modules',
       to: 'api/node_modules',
-      filter: [
-        '**',
-        '!.cache/**',
-        '!**/*.map',
-      ],
+      filter: ['**', '!.cache/**', '!**/*.map'],
     },
     {
       from: 'client/dist',
@@ -59,9 +51,7 @@ module.exports = {
 
   // ── macOS ─────────────────────────────────────────────────────────────────
   mac: {
-    target: [
-      { target: 'dmg', arch: ['x64', 'arm64'] },
-    ],
+    target: [{ target: 'dmg', arch: ['x64', 'arm64'] }],
     icon: 'icon/icon.png',
     category: 'public.app-category.productivity',
     // Keep running in tray after closing last window

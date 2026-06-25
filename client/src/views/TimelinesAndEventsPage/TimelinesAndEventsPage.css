@@ -131,7 +131,10 @@
   background: #fff;
   color: var(--gray-500);
   cursor: pointer;
-  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+  transition:
+    background-color 0.15s,
+    color 0.15s,
+    border-color 0.15s;
 
   &:hover {
     background-color: var(--bg-alternative);

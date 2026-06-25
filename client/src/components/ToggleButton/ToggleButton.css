@@ -16,7 +16,9 @@
   outline: none;
   background-color: transparent;
   color: var(--gray-500);
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
   white-space: nowrap;
 
   &:hover:not(.c-toggle-button__btn--active) {

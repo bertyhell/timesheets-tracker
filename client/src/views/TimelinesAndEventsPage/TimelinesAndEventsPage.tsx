@@ -32,7 +32,12 @@ import {
 import { COLOR_LIST } from '../../components/Timeline/helpers/getColorForEvent';
 import GlobalSearchBar from '../../components/GlobalSearchBar/GlobalSearchBar';
 import DateSelect from '../../components/DateSelect/DateSelect';
-import { Group as PanelGroup, Panel, Separator as PanelResizeHandle, useDefaultLayout } from 'react-resizable-panels';
+import {
+  Group as PanelGroup,
+  Panel,
+  Separator as PanelResizeHandle,
+  useDefaultLayout,
+} from 'react-resizable-panels';
 import { isApproxEqual } from '../../helpers/is-approx-equal';
 import Button, { ButtonSize, ButtonVariant } from '../../components/Button/Button';
 import { Menu, Plus, Filter, List, Calendar } from 'lucide-react';
@@ -264,15 +269,11 @@ export function TimelinesAndEventsPage() {
 
   const totalEventCount = allEvents?.length ?? 0;
 
-  const {
-    defaultLayout: verticalDefaultLayout,
-    onLayoutChanged: onVerticalLayoutChanged,
-  } = useDefaultLayout({ id: 'timelines-vertical', storage: localStorage });
+  const { defaultLayout: verticalDefaultLayout, onLayoutChanged: onVerticalLayoutChanged } =
+    useDefaultLayout({ id: 'timelines-vertical', storage: localStorage });
 
-  const {
-    defaultLayout: horizontalDefaultLayout,
-    onLayoutChanged: onHorizontalLayoutChanged,
-  } = useDefaultLayout({ id: 'timelines-horizontal', storage: localStorage });
+  const { defaultLayout: horizontalDefaultLayout, onLayoutChanged: onHorizontalLayoutChanged } =
+    useDefaultLayout({ id: 'timelines-horizontal', storage: localStorage });
 
   const renderTimelinesAndEvents = () => {
     return (
@@ -364,9 +365,7 @@ export function TimelinesAndEventsPage() {
         </div>
 
         <div className="p-page-header-right">
-          {isLoadingTimelineEvents && (
-              <span className="p-loading-indicator">Loading...</span>
-          )}
+          {isLoadingTimelineEvents && <span className="p-loading-indicator">Loading...</span>}
           <DateSelect />
           <div className="p-header-divider" />
           <GlobalSearchBar />

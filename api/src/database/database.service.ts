@@ -60,7 +60,10 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  public async mutate(sqlFile: string, params?: DbQueryParams): Promise<{ changes: number; lastInsertRowid: number | bigint }> {
+  public async mutate(
+    sqlFile: string,
+    params?: DbQueryParams
+  ): Promise<{ changes: number; lastInsertRowid: number | bigint }> {
     let sqlQuery: string | null = null;
     try {
       sqlQuery = await this.getQueryFromFile(sqlFile);
@@ -105,8 +108,8 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
 
     const executed = new Set(
       (db.prepare('SELECT filename FROM executed_migrations').all() as { filename: string }[]).map(
-        (row) => row.filename,
-      ),
+        (row) => row.filename
+      )
     );
 
     for (const file of files) {

@@ -1,21 +1,24 @@
 import type { DatabaseSync } from 'node:sqlite';
 
 export type FindOneTimelineParams = {
-	id: string;
-}
+  id: string;
+};
 
 export type FindOneTimelineResult = {
-	id: string;
-	title: string;
-	timelineType: string;
-	eventProviderInfo?: string;
-	createdAt: string;
-	updatedAt: string;
-	visualOrder: number;
-}
+  id: string;
+  title: string;
+  timelineType: string;
+  eventProviderInfo?: string;
+  createdAt: string;
+  updatedAt: string;
+  visualOrder: number;
+};
 
-export function findOneTimeline(db: DatabaseSync, params: FindOneTimelineParams): FindOneTimelineResult | null {
-	const sql = `
+export function findOneTimeline(
+  db: DatabaseSync,
+  params: FindOneTimelineParams
+): FindOneTimelineResult | null {
+  const sql = `
 	SELECT
 	    id,
 	    title,
@@ -27,6 +30,6 @@ export function findOneTimeline(db: DatabaseSync, params: FindOneTimelineParams)
 	FROM timelines
 	WHERE id = ?
 	LIMIT 1
-	`
-	return db.prepare(sql).get(params.id) as FindOneTimelineResult | null ?? null;
+	`;
+  return (db.prepare(sql).get(params.id) as FindOneTimelineResult | null) ?? null;
 }

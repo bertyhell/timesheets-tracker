@@ -22,9 +22,7 @@ const APP_URL = `http://localhost:${APP_PORT}`;
 // __dirname resolves to src/electron/dist/, so API and icons are at ../../
 const isDev = !app.isPackaged;
 
-const API_DIR = isDev
-  ? path.join(__dirname, '../../api')
-  : path.join(process.resourcesPath, 'api');
+const API_DIR = isDev ? path.join(__dirname, '../../api') : path.join(process.resourcesPath, 'api');
 
 const ICON_PATH = path.join(__dirname, '../../icon/icon.png');
 
@@ -167,7 +165,8 @@ function setAppMenu(): void {
         },
         {
           label: 'Open Installation Dir',
-          click: () => shell.openPath(isDev ? path.join(__dirname, '../..') : app.getPath('userData')),
+          click: () =>
+            shell.openPath(isDev ? path.join(__dirname, '../..') : app.getPath('userData')),
         },
         {
           label: 'Open Database Folder',

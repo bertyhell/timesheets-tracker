@@ -141,10 +141,7 @@ function Timeline({
       onMouseMove={handleMouseMove}
     >
       <div className="c-timeline__title cursor-pointer">
-        <span
-          className="c-timeline__dot"
-          style={{ backgroundColor: timelineDotColor }}
-        />
+        <span className="c-timeline__dot" style={{ backgroundColor: timelineDotColor }} />
         <span className="c-timeline__label">{timelineInfo.title}</span>
       </div>
       <div className="c-timeline__track">

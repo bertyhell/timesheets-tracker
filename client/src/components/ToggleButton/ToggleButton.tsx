@@ -21,14 +21,20 @@ const ToggleButton: FC<ToggleButtonProps> = ({
     <div className={'c-toggle-button ' + (className ?? '')}>
       <button
         type="button"
-        className={'c-toggle-button__btn c-toggle-button__btn--left' + (!optionTwoSelected ? ' c-toggle-button__btn--active' : '')}
+        className={
+          'c-toggle-button__btn c-toggle-button__btn--left' +
+          (!optionTwoSelected ? ' c-toggle-button__btn--active' : '')
+        }
         onClick={() => onChange(false)}
       >
         {label1}
       </button>
       <button
         type="button"
-        className={'c-toggle-button__btn c-toggle-button__btn--right' + (optionTwoSelected ? ' c-toggle-button__btn--active' : '')}
+        className={
+          'c-toggle-button__btn c-toggle-button__btn--right' +
+          (optionTwoSelected ? ' c-toggle-button__btn--active' : '')
+        }
         onClick={() => onChange(true)}
       >
         {label2}

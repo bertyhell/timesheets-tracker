@@ -6,7 +6,11 @@ import { logger } from '../shared/logger';
 import { ProgramsService } from './programs.service';
 import { CreateProgramDto } from './dto/create-activity.dto';
 import { extractIconColor } from './helpers/extract-icon-color';
-import { WaylandActiveWindow, isWayland, type WaylandWindowInfo } from './helpers/wayland-active-window';
+import {
+  WaylandActiveWindow,
+  isWayland,
+  type WaylandWindowInfo,
+} from './helpers/wayland-active-window';
 
 @Injectable()
 export class ProgramsListener implements OnApplicationBootstrap {
@@ -87,9 +91,13 @@ export class ProgramsListener implements OnApplicationBootstrap {
         };
 
         const { icon, ...info } = windowInfo;
-        await this.handleProgramChange(currentProgram, () => {
-          logger.info(`changed application: ${info.title},,${info.application},,${info.path}`);
-        }, icon ?? null as string | null);
+        await this.handleProgramChange(
+          currentProgram,
+          () => {
+            logger.info(`changed application: ${info.title},,${info.application},,${info.path}`);
+          },
+          icon ?? (null as string | null)
+        );
       }
     );
   }
@@ -125,13 +133,16 @@ export class ProgramsListener implements OnApplicationBootstrap {
 
     logFn();
     const iconColor = icon ? await extractIconColor(this.lastProgram.programName, icon) : null;
-    await this.programsService.create({
-      programName: this.lastProgram.programName,
-      windowTitle: this.lastProgram.windowTitle,
-      startedAt: this.lastProgram.startedAt,
-      endedAt: currentProgram.startedAt,
-      iconColor: iconColor ?? undefined,
-    });
+    if (this.lastProgram.programName || this.lastProgram.windowTitle) {
+      await this.programsService.create({
+        programName: this.lastProgram.programName,
+        windowTitle: this.lastProgram.windowTitle,
+        startedAt: this.lastProgram.startedAt,
+        endedAt: currentProgram.startedAt,
+        iconColor: iconColor ?? undefined,
+      });
+    }
+
     this.lastProgram = currentProgram;
   }
 }

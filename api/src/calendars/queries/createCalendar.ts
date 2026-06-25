@@ -1,19 +1,22 @@
 import type { DatabaseSync } from 'node:sqlite';
 
 export type CreateCalendarParams = {
-	id: string;
-	title: string;
-	url: string;
-	color: string;
-}
+  id: string;
+  title: string;
+  url: string;
+  color: string;
+};
 
 export type CreateCalendarResult = {
-	changes: number;
-	lastInsertRowid: number;
-}
+  changes: number;
+  lastInsertRowid: number;
+};
 
-export function createCalendar(db: DatabaseSync, params: CreateCalendarParams): CreateCalendarResult {
-	const sql = `
+export function createCalendar(
+  db: DatabaseSync,
+  params: CreateCalendarParams
+): CreateCalendarResult {
+  const sql = `
 	INSERT INTO calendars
 	(
 	    id,
@@ -22,7 +25,8 @@ export function createCalendar(db: DatabaseSync, params: CreateCalendarParams): 
 	    color
 	)
 	VALUES (?, ?, ?, ?)
-	`
-	return db.prepare(sql)
-		.run(params.id, params.title, params.url, params.color) as CreateCalendarResult;
+	`;
+  return db
+    .prepare(sql)
+    .run(params.id, params.title, params.url, params.color) as CreateCalendarResult;
 }

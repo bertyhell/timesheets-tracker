@@ -9,6 +9,7 @@ import { findOneProgram } from './queries/findOneProgram';
 import { findByNextStartedAt } from './queries/findByNextStartedAt';
 import { createProgram } from './queries/createProgram';
 import { deleteProgram } from './queries/deleteProgram';
+import { CustomError } from '../shared/CustomError';
 
 const MINIMUM_ACTIVITY_DURATION_SECONDS = 5;
 
@@ -46,17 +47,27 @@ export class ProgramsService {
   }
 
   async create(activity: CreateProgramDto): Promise<Program> {
-    const id = uuid();
-    await createProgram(this.databaseService.getDb(), {
-      id,
-      programName: activity.programName,
-      windowTitle: activity.windowTitle,
-      startedAt: min([new Date(activity.startedAt), new Date(activity.endedAt)]).toISOString(),
-      endedAt: max([new Date(activity.startedAt), new Date(activity.endedAt)]).toISOString(),
-      iconColor: activity.iconColor ?? null,
-    });
+    let id: string | null = null;
+    try {
+      id = uuid();
+      await createProgram(this.databaseService.getDb(), {
+        id,
+        programName: activity.programName,
+        windowTitle: activity.windowTitle,
+        startedAt: min([new Date(activity.startedAt), new Date(activity.endedAt)]).toISOString(),
+        endedAt: max([new Date(activity.startedAt), new Date(activity.endedAt)]).toISOString(),
+        iconColor: activity.iconColor ?? null,
+      });
 
-    return this.findOne(id);
+      return this.findOne(id);
+    } catch (err) {
+      const error = new CustomError('Failed to create a program entry in the database', err, {
+        id,
+        activity,
+      });
+      console.error(error);
+      throw error;
+    }
   }
 
   async delete(id: string): Promise<void> {

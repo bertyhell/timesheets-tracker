@@ -1,22 +1,26 @@
 import type { DatabaseSync } from 'node:sqlite';
 
 export type UpdateAutoTagData = {
-	title: string;
-	tagNameId: string;
-	priority: number;
-	conditions: string;
-}
+  title: string;
+  tagNameId: string;
+  priority: number;
+  conditions: string;
+};
 
 export type UpdateAutoTagParams = {
-	id: string;
-}
+  id: string;
+};
 
 export type UpdateAutoTagResult = {
-	changes: number;
-}
+  changes: number;
+};
 
-export function updateAutoTag(db: DatabaseSync, data: UpdateAutoTagData, params: UpdateAutoTagParams): UpdateAutoTagResult {
-	const sql = `
+export function updateAutoTag(
+  db: DatabaseSync,
+  data: UpdateAutoTagData,
+  params: UpdateAutoTagParams
+): UpdateAutoTagResult {
+  const sql = `
 	UPDATE autoTags
 	SET
 	    title = ?,
@@ -24,7 +28,14 @@ export function updateAutoTag(db: DatabaseSync, data: UpdateAutoTagData, params:
 	    priority = ?,
 	    conditions = ?
 	WHERE id = ?
-	`
-	return db.prepare(sql)
-		.run(data.title, data.tagNameId, data.priority, data.conditions, params.id) as UpdateAutoTagResult;
+	`;
+  return db
+    .prepare(sql)
+    .run(
+      data.title,
+      data.tagNameId,
+      data.priority,
+      data.conditions,
+      params.id
+    ) as UpdateAutoTagResult;
 }

@@ -2,7 +2,8 @@
   --focus-color: #7c3aed;
   --bg-alternative: #f8f7ff;
   --hover-highlight: #f5f3ff;
-  --primary-0: #7c3aed;
+  --primary: #7c3aed;
+  --primary-0: var(--primary);
   --primary-1: #8b5cf6;
   --primary-2: #a78bfa;
   --primary-3: #c4b5fd;

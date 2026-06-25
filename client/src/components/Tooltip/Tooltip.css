@@ -3,11 +3,11 @@
 }
 
 .c-tooltip__arrow {
-  fill: var(--primary);
+  fill: var(--primary-0);
 }
 
 .c-tooltip__content {
-  background-color: var(--primary);
+  background-color: var(--primary-0);
   padding: 5px 9px;
   border-radius: 4px;
   color: white;

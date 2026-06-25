@@ -22,12 +22,21 @@ module.exports = {
       to: 'api',
       filter: [
         'dist/**',
-        'node_modules/**',
         'package.json',
         'timesheets-tracker-database.sqlite3',
-        '!node_modules/.cache/**',
         '!**/*.map',
         '!**/*.d.ts',
+      ],
+    },
+    // node_modules must be a separate entry so electron-builder doesn't apply
+    // api/.gitignore (which excludes /node_modules) to this copy step.
+    {
+      from: 'api/node_modules',
+      to: 'api/node_modules',
+      filter: [
+        '**',
+        '!.cache/**',
+        '!**/*.map',
       ],
     },
     {

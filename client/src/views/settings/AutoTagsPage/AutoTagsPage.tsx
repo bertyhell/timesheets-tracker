@@ -168,7 +168,7 @@ export function AutoTagsPage() {
           placeholder="Search..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="c-input c-input--search mb-3 ml-6 w-full max-w-sm"
+          className="c-input c-input--search mb-3 ml-4 w-full max-w-sm text-sm"
         />
         <table className="c-table w-full">
         <thead>

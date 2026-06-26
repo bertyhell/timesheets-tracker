@@ -314,6 +314,12 @@ export function TimelinesAndEventsPage() {
             })
           }
           isActive={selectedTimeline?.id === timelineInfo.id}
+          onSelectTimeline={() =>
+            setSelectedTimelineAndEvent({
+              selectedTimelineId: timelineInfo.id,
+              selectedEventId: null,
+            })
+          }
           onTagResized={handleTagResized}
         ></Timeline>
       );

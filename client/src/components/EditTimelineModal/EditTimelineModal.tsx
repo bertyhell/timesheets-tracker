@@ -4,15 +4,15 @@ import React, { type ChangeEvent, useEffect, useState } from 'react';
 import Button, { ButtonVariant } from '../Button/Button';
 import { Modal } from 'react-responsive-modal';
 import { ROUTE_PARTS } from '../../App';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   timelinesControllerCreateMutation,
   timelinesControllerDeleteMutation,
-  timelinesControllerFindAllOptions,
+  timelinesControllerFindAllQueryKey,
   timelinesControllerFindOneOptions,
   timelinesControllerUpdateMutation,
 } from '../../generated/api/@tanstack/react-query.gen';
-import type { TimelineType } from '../../generated/api/types.gen';
+import type { TimelineDto, TimelineType } from '../../generated/api/types.gen';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { ColorInput } from '../ColorInput/ColorInput';
@@ -30,6 +30,7 @@ const TIMELINE_TYPES: TimelineType[] = [
 export function EditTimelineModal() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [title, setTitle] = useState<string>('');
   const [timelineType, setTimelineType] = useState<TimelineType>('Program');
   const [icsUrl, setIcsUrl] = useState<string>('');
@@ -39,13 +40,17 @@ export function EditTimelineModal() {
   const { mutateAsync: createTimeline } = useMutation({ ...timelinesControllerCreateMutation() });
   const { mutateAsync: updateTimeline } = useMutation({ ...timelinesControllerUpdateMutation() });
   const { mutateAsync: deleteTimeline } = useMutation({ ...timelinesControllerDeleteMutation() });
-  const { data: allTimelines } = useQuery({
-    ...timelinesControllerFindAllOptions(),
-    enabled: !id,
-  });
+
+  // Seed from list cache immediately so the form pre-fills before findOne resolves
+  const cachedTimelines = queryClient.getQueryData<Array<TimelineDto>>(
+    timelinesControllerFindAllQueryKey()
+  );
+  const cachedTimeline = id ? cachedTimelines?.find((t) => t.id === id) : undefined;
+
   const { data: timelineResponse } = useQuery({
     ...timelinesControllerFindOneOptions({ path: { id: id as string } }),
     enabled: !!id,
+    placeholderData: cachedTimeline,
   });
 
   useEffect(() => {
@@ -60,11 +65,11 @@ export function EditTimelineModal() {
   }, [timelineResponse]);
 
   useEffect(() => {
-    if (!id && allTimelines) {
-      const maxOrder = allTimelines.reduce((max, t) => Math.max(max, t.visualOrder ?? 0), -1);
+    if (!id && cachedTimelines) {
+      const maxOrder = cachedTimelines.reduce((max, t) => Math.max(max, t.visualOrder ?? 0), -1);
       setVisualOrder(maxOrder + 1);
     }
-  }, [id, allTimelines]);
+  }, [id, cachedTimelines]);
 
   const handleClose = () => navigate('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.timelines);
 

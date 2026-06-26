@@ -247,8 +247,7 @@ function Timeline({
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
-      <div className="c-timeline__title cursor-pointer" onClick={onSelectTimeline} onContextMenu={handleTitleContextMenu}>
-        <span className="c-timeline__dot" style={{ backgroundColor: timelineDotColor }} />
+      <div className="c-timeline__title cursor-pointer" onClick={onSelectTimeline} onContextMenu={handleTitleContextMenu} style={{ borderLeft: `3px solid ${timelineDotColor}` }}>
         <span className="c-timeline__label">{timelineInfo.title}</span>
       </div>
       <div className="c-timeline__track" ref={trackRef}>

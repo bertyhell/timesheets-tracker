@@ -25,14 +25,8 @@
     width: 7rem;
     flex-shrink: 0;
     border-right: 1px solid var(--gray-100);
+    border-radius: 4px 0 0 4px;
     transition: background-color 0.15s ease;
-  }
-
-  .c-timeline__dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
   }
 
   .c-timeline__label {

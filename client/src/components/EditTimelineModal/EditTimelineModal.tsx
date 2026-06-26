@@ -7,6 +7,7 @@ import { ROUTE_PARTS } from '../../App';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   timelinesControllerCreateMutation,
+  timelinesControllerDeleteMutation,
   timelinesControllerFindAllOptions,
   timelinesControllerFindOneOptions,
   timelinesControllerUpdateMutation,
@@ -34,6 +35,7 @@ export function EditTimelineModal() {
 
   const { mutateAsync: createTimeline } = useMutation({ ...timelinesControllerCreateMutation() });
   const { mutateAsync: updateTimeline } = useMutation({ ...timelinesControllerUpdateMutation() });
+  const { mutateAsync: deleteTimeline } = useMutation({ ...timelinesControllerDeleteMutation() });
   const { data: allTimelines } = useQuery({
     ...timelinesControllerFindAllOptions(),
     enabled: !id,
@@ -86,6 +88,12 @@ export function EditTimelineModal() {
       toast('Timeline has been created', { type: 'success' });
     }
 
+    handleClose();
+  };
+
+  const handleDelete = async () => {
+    await deleteTimeline({ path: { id: id as string } });
+    toast('Timeline has been deleted', { type: 'success' });
     handleClose();
   };
 
@@ -155,13 +163,22 @@ export function EditTimelineModal() {
         />
       </div>
 
-      <div className="flex flex-row justify-end gap-2 mt-8">
-        <Button onClick={handleClose} variant={ButtonVariant.Secondary}>
-          Cancel
-        </Button>
-        <Button disabled={!title} onClick={handleSave} variant={ButtonVariant.Primary}>
-          Save
-        </Button>
+      <div className="flex flex-row justify-between gap-2 mt-8">
+        <div>
+          {id && (
+            <Button onClick={handleDelete} className="!bg-red-100 !text-red-700 hover:!bg-red-200">
+              Delete
+            </Button>
+          )}
+        </div>
+        <div className="flex flex-row gap-2">
+          <Button onClick={handleClose} variant={ButtonVariant.Secondary}>
+            Cancel
+          </Button>
+          <Button disabled={!title} onClick={handleSave} variant={ButtonVariant.Primary}>
+            Save
+          </Button>
+        </div>
       </div>
     </Modal>
   );

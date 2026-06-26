@@ -13,6 +13,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   autoNotesControllerCreateMutation,
   autoNotesControllerFindOneOptions,
+  autoNotesControllerRemoveMutation,
   autoNotesControllerUpdateMutation,
   tagNamesControllerFindAllOptions,
 } from '../../generated/api/@tanstack/react-query.gen';
@@ -33,6 +34,7 @@ export function EditAutoNoteModal() {
   const { data: tags } = useQuery({ ...tagNamesControllerFindAllOptions({ query: { term: '' } }) });
   const { mutateAsync: createNote } = useMutation({ ...autoNotesControllerCreateMutation() });
   const { mutateAsync: updateNote } = useMutation({ ...autoNotesControllerUpdateMutation() });
+  const { mutateAsync: deleteNote } = useMutation({ ...autoNotesControllerRemoveMutation() });
   const { data: autoNoteResponse } = useQuery({
     ...autoNotesControllerFindOneOptions({ path: { id: id as string } }),
     enabled: !!id,
@@ -122,6 +124,12 @@ export function EditAutoNoteModal() {
     }
   };
 
+  const handleDelete = async () => {
+    await deleteNote({ path: { id: id as string } });
+    toast('Note has been deleted', { type: 'success' });
+    handleClose();
+  };
+
   return (
     <Modal
       open
@@ -177,25 +185,34 @@ export function EditAutoNoteModal() {
         />
       </div>
 
-      <div className="flex flex-row justify-end gap-2 mt-48">
-        <Button onClick={handleClose} variant={ButtonVariant.Secondary}>
-          Cancel
-        </Button>
-        <Button
-          disabled={!name || !variable}
-          onClick={async () => {
-            await handleSave({
-              title: name,
-              tagNameIds: tagNames.map((tagName) => tagName.id),
-              variable,
-              extractRegex,
-              extractRegexReplacement,
-            });
-          }}
-          variant={ButtonVariant.Primary}
-        >
-          Save
-        </Button>
+      <div className="flex flex-row justify-between gap-2 mt-48">
+        <div>
+          {id && (
+            <Button onClick={handleDelete} className="!bg-red-100 !text-red-700 hover:!bg-red-200">
+              Delete
+            </Button>
+          )}
+        </div>
+        <div className="flex flex-row gap-2">
+          <Button onClick={handleClose} variant={ButtonVariant.Secondary}>
+            Cancel
+          </Button>
+          <Button
+            disabled={!name || !variable}
+            onClick={async () => {
+              await handleSave({
+                title: name,
+                tagNameIds: tagNames.map((tagName) => tagName.id),
+                variable,
+                extractRegex,
+                extractRegexReplacement,
+              });
+            }}
+            variant={ButtonVariant.Primary}
+          >
+            Save
+          </Button>
+        </div>
       </div>
     </Modal>
   );

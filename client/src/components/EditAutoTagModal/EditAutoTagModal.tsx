@@ -12,6 +12,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   autoTagsControllerCountOptions,
   autoTagsControllerCreateMutation,
+  autoTagsControllerDeleteMutation,
   autoTagsControllerFindOneOptions,
   autoTagsControllerUpdateMutation,
   tagNamesControllerCreateMutation,
@@ -54,6 +55,7 @@ export function EditAutoTagModal() {
   const autoTag = autoTagResponse as AutoTag;
   const { mutateAsync: createAutoTag } = useMutation({ ...autoTagsControllerCreateMutation() });
   const { mutateAsync: updateAutoTag } = useMutation({ ...autoTagsControllerUpdateMutation() });
+  const { mutateAsync: deleteAutoTag } = useMutation({ ...autoTagsControllerDeleteMutation() });
   const { mutateAsync: createTagName } = useMutation({ ...tagNamesControllerCreateMutation() });
 
   useEffect(() => {
@@ -142,6 +144,12 @@ export function EditAutoTagModal() {
     handleClose();
   };
 
+  const handleDelete = async () => {
+    await deleteAutoTag({ path: { id: id as string } });
+    toast('Auto tag has been deleted', { type: 'success' });
+    handleClose();
+  };
+
   return (
     <Modal
       open
@@ -159,16 +167,30 @@ export function EditAutoTagModal() {
           label2="Create new tag"
         />
         {!showCreateNewTagControls && (
-          <TagSelectSingle
-            value={selectedTagName || null}
-            onChange={(newTagName) => {
-              setSelectedTagName(newTagName);
-              if (!name) {
-                setName(newTagName?.title || '');
-              }
-            }}
-            autoFocus={true}
-          />
+          <div className="flex flex-row items-center gap-2">
+            <div className="w-2/3">
+            <TagSelectSingle
+              value={selectedTagName || null}
+              onChange={(newTagName) => {
+                setSelectedTagName(newTagName);
+                if (!name) {
+                  setName(newTagName?.title || '');
+                }
+              }}
+              autoFocus={true}
+            />
+            </div>
+            {selectedTagName && (
+              <a
+                href={`/${ROUTE_PARTS.settings}/${ROUTE_PARTS.tagNames}/${selectedTagName.id}/${ROUTE_PARTS.edit}`}
+                target="_blank"
+                rel="noreferrer"
+                className="text-blue-600 hover:text-blue-800 whitespace-nowrap text-sm"
+              >
+                Open tag
+              </a>
+            )}
+          </div>
         )}
         {showCreateNewTagControls && (
           <div>
@@ -206,13 +228,22 @@ export function EditAutoTagModal() {
             ))}
         </div>
       </div>
-      <div className="flex flex-row justify-end gap-2 mt-48">
-        <Button onClick={handleClose} variant={ButtonVariant.Secondary}>
-          Cancel
-        </Button>
-        <Button onClick={handleSave} variant={ButtonVariant.Primary}>
-          Save
-        </Button>
+      <div className="flex flex-row justify-between gap-2 mt-48">
+        <div>
+          {id && (
+            <Button onClick={handleDelete} className="!bg-red-100 !text-red-700 hover:!bg-red-200">
+              Delete
+            </Button>
+          )}
+        </div>
+        <div className="flex flex-row gap-2">
+          <Button onClick={handleClose} variant={ButtonVariant.Secondary}>
+            Cancel
+          </Button>
+          <Button onClick={handleSave} variant={ButtonVariant.Primary}>
+            Save
+          </Button>
+        </div>
       </div>
     </Modal>
   );

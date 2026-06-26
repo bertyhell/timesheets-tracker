@@ -8,6 +8,7 @@ import { ROUTE_PARTS } from '../../App';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   tagNamesControllerCreateMutation,
+  tagNamesControllerRemoveMutation,
   tagNamesControllerFindOneOptions,
   tagNamesControllerUpdateMutation,
 } from '../../generated/api/@tanstack/react-query.gen';
@@ -24,6 +25,7 @@ export function EditTagNameModal() {
   const [color, setColor] = useState<string>(COLOR_LIST[0]);
   const { mutateAsync: createTagName } = useMutation({ ...tagNamesControllerCreateMutation() });
   const { mutateAsync: updateTagName } = useMutation({ ...tagNamesControllerUpdateMutation() });
+  const { mutateAsync: deleteTagName } = useMutation({ ...tagNamesControllerRemoveMutation() });
   const { data: tagNameResponse } = useQuery({
     ...tagNamesControllerFindOneOptions({ path: { id: id as string } }),
     enabled: !!id,
@@ -73,6 +75,12 @@ export function EditTagNameModal() {
     await handleClose();
   };
 
+  const handleDelete = async () => {
+    await deleteTagName({ path: { id: id as string } });
+    toast('Tag name has been deleted', { type: 'success' });
+    await handleClose();
+  };
+
   return (
     <Modal
       open={true}
@@ -100,23 +108,32 @@ export function EditTagNameModal() {
         <ColorInput color={color} onChange={setColor} />
       </div>
 
-      <div className="flex flex-row justify-end gap-2 mt-48">
-        <Button onClick={handleClose} variant={ButtonVariant.Secondary}>
-          Cancel
-        </Button>
-        <Button
-          disabled={!name || !color}
-          onClick={async () => {
-            await handleSave({
-              title: name,
-              code,
-              color,
-            });
-          }}
-          variant={ButtonVariant.Primary}
-        >
-          Save
-        </Button>
+      <div className="flex flex-row justify-between gap-2 mt-48">
+        <div>
+          {id && (
+            <Button onClick={handleDelete} className="!bg-red-100 !text-red-700 hover:!bg-red-200">
+              Delete
+            </Button>
+          )}
+        </div>
+        <div className="flex flex-row gap-2">
+          <Button onClick={handleClose} variant={ButtonVariant.Secondary}>
+            Cancel
+          </Button>
+          <Button
+            disabled={!name || !color}
+            onClick={async () => {
+              await handleSave({
+                title: name,
+                code,
+                color,
+              });
+            }}
+            variant={ButtonVariant.Primary}
+          >
+            Save
+          </Button>
+        </div>
       </div>
     </Modal>
   );

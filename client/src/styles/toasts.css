@@ -1,47 +1,53 @@
 #root .Toastify .Toastify__toast {
   border-radius: 6px;
-  background: #ffffff;
-  color: var(--gray-700);
-  border: 1px solid var(--gray-100);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 #root .Toastify .Toastify__toast-body {
-  color: var(--gray-700);
+  color: #ffffff;
 }
 
-#root .Toastify .Toastify__progress-bar--success {
+/* Success — green */
+#root .Toastify .Toastify__toast--success {
   background: #22c55e;
 }
 
-#root .Toastify .Toastify__progress-bar--warning {
-  background: #f59e0b;
-}
-
-#root .Toastify .Toastify__progress-bar--info {
-  background: #3b82f6;
-}
-
-#root .Toastify .Toastify__progress-bar--error {
+/* Error — red */
+#root .Toastify .Toastify__toast--error {
   background: #ef4444;
 }
 
-#root .Toastify .Toastify__toast--success .Toastify__toast-icon svg {
-  fill: #22c55e;
+/* Warning — orange */
+#root .Toastify .Toastify__toast--warning {
+  background: #f97316;
 }
 
-#root .Toastify .Toastify__toast--error .Toastify__toast-icon svg {
-  fill: #ef4444;
+/* Info — blue */
+#root .Toastify .Toastify__toast--info {
+  background: #3b82f6;
 }
 
-#root .Toastify .Toastify__toast--warning .Toastify__toast-icon svg {
-  fill: #f59e0b;
+/* Progress bars — white with opacity so they're visible on colored backgrounds */
+#root .Toastify .Toastify__progress-bar--success,
+#root .Toastify .Toastify__progress-bar--error,
+#root .Toastify .Toastify__progress-bar--warning,
+#root .Toastify .Toastify__progress-bar--info {
+  background: rgba(255, 255, 255, 0.5);
 }
 
+/* Icons — white */
+#root .Toastify .Toastify__toast--success .Toastify__toast-icon svg,
+#root .Toastify .Toastify__toast--error .Toastify__toast-icon svg,
+#root .Toastify .Toastify__toast--warning .Toastify__toast-icon svg,
 #root .Toastify .Toastify__toast--info .Toastify__toast-icon svg {
-  fill: #3b82f6;
+  fill: #ffffff;
 }
 
 #root .Toastify .Toastify__close-button {
-  color: var(--gray-500);
+  color: #ffffff;
+  opacity: 0.8;
+}
+
+#root .Toastify .Toastify__close-button:hover {
+  opacity: 1;
 }

@@ -1,4 +1,47 @@
 #root .Toastify .Toastify__toast {
-  border-radius: 0;
-  background: var(--primary-0);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--gray-700);
+  border: 1px solid var(--gray-100);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#root .Toastify .Toastify__toast-body {
+  color: var(--gray-700);
+}
+
+#root .Toastify .Toastify__progress-bar--success {
+  background: #22c55e;
+}
+
+#root .Toastify .Toastify__progress-bar--warning {
+  background: #f59e0b;
+}
+
+#root .Toastify .Toastify__progress-bar--info {
+  background: #3b82f6;
+}
+
+#root .Toastify .Toastify__progress-bar--error {
+  background: #ef4444;
+}
+
+#root .Toastify .Toastify__toast--success .Toastify__toast-icon svg {
+  fill: #22c55e;
+}
+
+#root .Toastify .Toastify__toast--error .Toastify__toast-icon svg {
+  fill: #ef4444;
+}
+
+#root .Toastify .Toastify__toast--warning .Toastify__toast-icon svg {
+  fill: #f59e0b;
+}
+
+#root .Toastify .Toastify__toast--info .Toastify__toast-icon svg {
+  fill: #3b82f6;
+}
+
+#root .Toastify .Toastify__close-button {
+  color: var(--gray-500);
 }

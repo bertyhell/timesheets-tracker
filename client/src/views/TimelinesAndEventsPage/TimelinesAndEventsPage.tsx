@@ -1,6 +1,7 @@
 import './TimelinesAndEventsPage.css';
 import { toast } from 'react-toastify';
 import React, { ReactNode, useEffect, useState } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
 import Timeline from '../../components/Timeline/Timeline';
 import {
   addHours,
@@ -43,6 +44,7 @@ import {
 } from 'react-resizable-panels';
 import { isApproxEqual } from '../../helpers/is-approx-equal';
 import Button, { ButtonSize, ButtonVariant } from '../../components/Button/Button';
+import { ROUTE_PARTS } from '../../App';
 import { Menu, Plus, Filter, List, Calendar } from 'lucide-react';
 
 export function TimelinesAndEventsPage() {
@@ -50,6 +52,7 @@ export function TimelinesAndEventsPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useAtom(sidebarCollapsedAtom);
   const [eventsView, setEventsView] = useState<'list' | 'calendar'>('list');
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const { data: timelineInfos, isLoading: isLoadingTimelineInfos } = useQuery({
     ...timelinesControllerFindAllOptions(),
@@ -353,6 +356,9 @@ export function TimelinesAndEventsPage() {
             await deleteTag({ path: { id: tagId } });
             toast('Tag was deleted', { type: 'success' });
           }}
+          onEditTag={(tagId: string) => {
+            navigate('/' + ROUTE_PARTS.timelinesAndEvents + '/' + tagId + '/' + ROUTE_PARTS.edit);
+          }}
         ></Timeline>
       );
     });
@@ -473,10 +479,19 @@ export function TimelinesAndEventsPage() {
           <DateSelect />
           <div className="p-header-divider" />
           <GlobalSearchBar />
+          <div className="p-header-divider" />
+          <Button
+            variant={ButtonVariant.Primary}
+            icon={<Plus size={14} />}
+            onClick={() => navigate('/' + ROUTE_PARTS.timelinesAndEvents + '/' + ROUTE_PARTS.create)}
+          >
+            Create tag
+          </Button>
         </div>
       </div>
 
       {renderPageContent()}
+      <Outlet />
     </div>
   );
 }

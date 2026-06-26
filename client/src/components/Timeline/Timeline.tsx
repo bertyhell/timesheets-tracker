@@ -49,6 +49,7 @@ interface TimelineProps {
   onSelectTimeline: () => void;
   onTagResized?: (tagId: string, newStartedAt: string, newEndedAt: string) => void;
   onDeleteTag?: (tagId: string) => void;
+  onEditTag?: (tagId: string) => void;
 }
 
 function Timeline({
@@ -68,6 +69,7 @@ function Timeline({
   onSelectTimeline,
   onTagResized,
   onDeleteTag,
+  onEditTag,
 }: TimelineProps) {
   const navigate = useNavigate();
   const [searchTerm] = useAtom(searchTermAtom);
@@ -194,7 +196,7 @@ function Timeline({
   };
 
   const handleContextMenu = (e: MouseEvent, eventId: string) => {
-    if (timelineInfo.timelineType !== TimelineType.Tag || !onDeleteTag) return;
+    if (timelineInfo.timelineType !== TimelineType.Tag || (!onDeleteTag && !onEditTag)) return;
     e.preventDefault();
     e.stopPropagation();
     setContextMenu({ x: e.clientX, y: e.clientY, eventId });
@@ -478,7 +480,10 @@ function Timeline({
     {contextMenu && (
       <ContextMenu
         position={{ x: contextMenu.x, y: contextMenu.y }}
-        items={[{ label: 'Delete tag', onClick: () => onDeleteTag?.(contextMenu.eventId), variant: 'danger' }]}
+        items={[
+          { label: 'Edit tag', onClick: () => onEditTag?.(contextMenu.eventId) },
+          { label: 'Delete tag', onClick: () => onDeleteTag?.(contextMenu.eventId), variant: 'danger' },
+        ]}
         onClose={() => setContextMenu(null)}
       />
     )}

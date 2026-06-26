@@ -69,7 +69,13 @@ export function AutoTagsPage() {
   };
 
   const onPasteContent = useCallback(async (evt: ClipboardEvent) => {
+    const mainRoute = '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.autoTagRules;
+    if (location.pathname !== mainRoute) {
+      return;
+    }
+
     try {
+
       if (evt.clipboardData && evt.clipboardData.getData) {
         const pastedText = evt.clipboardData.getData('text/plain');
 
@@ -84,7 +90,7 @@ export function AutoTagsPage() {
     } catch {
       toast("The pasted text doesn't contain any valid auto tags", { type: 'error' });
     }
-  }, []);
+  }, [location.pathname]);
 
   useEffect(() => {
     document.body.addEventListener('paste', onPasteContent);

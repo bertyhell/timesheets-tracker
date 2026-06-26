@@ -81,7 +81,7 @@ export class TagNamesService {
       await createTagName(db, {
         id,
         title: tagName.title,
-        code: tagName.code,
+        code: tagName.code ?? null,
         color: tagName.color,
       });
 

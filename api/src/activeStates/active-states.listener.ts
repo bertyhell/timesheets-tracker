@@ -2,9 +2,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 import { CreateActiveStateDto } from './dto/create-active-state.dto';
 import { UpdateActiveStateDto } from './dto/update-active-state.dto';
-import RealIdle from '@paymoapp/real-idle';
 import { ResponseActiveStateDto } from './dto/response-active-state.dto';
 import { ActiveStatesService } from './active-states.service';
+import { getIsActive } from './helpers/get-idle-state.helper';
 import { noop } from 'lodash';
 import { logger } from '../shared/logger';
 
@@ -20,14 +20,7 @@ export class ActiveStatesListener {
 
   @Interval(ACTIVE_STATE_POLLING_INTERVAL_SECONDS * 1000)
   private async checkActiveState(): Promise<void> {
-    const idleState = RealIdle.getIdleState(ACTIVE_STATE_POLLING_INTERVAL_SECONDS);
-    const currentIsActiveState: boolean = {
-      active: true,
-      idlePrevented: true,
-      idle: false,
-      locked: false,
-      unknown: false,
-    }[idleState];
+    const currentIsActiveState = await getIsActive(ACTIVE_STATE_POLLING_INTERVAL_SECONDS);
     if (!this.lastActiveState) {
       this.lastActiveState = {
         isActive: currentIsActiveState,

@@ -20,15 +20,18 @@ import { EventsTable } from '../../components/EventsTable/EventsTable';
 import { EventsTotalsTable } from '../../components/EventsTotalsTable/EventsTotalsTable';
 import { TimelineRuler } from '../../components/Timeline/TimelineRuler';
 import type { TimelineEventDto, TimelineWithEventsDto } from '../../generated/api/types.gen';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   tagNamesControllerCountOptions,
   tagNamesControllerCreateMutation,
   tagsControllerCreateMutation,
   tagsControllerRemoveMutation,
+  tagsControllerUpdateMutation,
   timelinesControllerFindAllEventsOptions,
+  timelinesControllerFindAllEventsQueryKey,
   timelinesControllerFindAllOptions,
 } from '../../generated/api/@tanstack/react-query.gen';
+import type { TimelinesControllerFindAllEventsResponse } from '../../generated/api/types.gen';
 import { COLOR_LIST } from '../../components/Timeline/helpers/getColorForEvent';
 import GlobalSearchBar from '../../components/GlobalSearchBar/GlobalSearchBar';
 import DateSelect from '../../components/DateSelect/DateSelect';
@@ -46,6 +49,7 @@ export function TimelinesAndEventsPage() {
   const [viewDate] = useAtom(viewDateAtom);
   const [sidebarCollapsed, setSidebarCollapsed] = useAtom(sidebarCollapsedAtom);
   const [eventsView, setEventsView] = useState<'list' | 'calendar'>('list');
+  const queryClient = useQueryClient();
 
   const { data: timelineInfos, isLoading: isLoadingTimelineInfos } = useQuery({
     ...timelinesControllerFindAllOptions(),
@@ -69,6 +73,7 @@ export function TimelinesAndEventsPage() {
     ...tagNamesControllerCountOptions(),
   });
   const { mutateAsync: deleteTag } = useMutation({ ...tagsControllerRemoveMutation() });
+  const { mutateAsync: updateTag } = useMutation({ ...tagsControllerUpdateMutation() });
 
   const { mutateAsync: createTagName } = useMutation({ ...tagNamesControllerCreateMutation() });
   const { mutateAsync: createTag } = useMutation({ ...tagsControllerCreateMutation() });
@@ -191,7 +196,7 @@ export function TimelinesAndEventsPage() {
         selectedTimelineId: timelineId,
         selectedEventId: eventId,
       });
-    } else {
+    } else if (selectionStartPercent !== null) {
       console.log('set selection percent');
       setSelectionEndPercent(clamp(posX, 0, 100));
     }
@@ -215,6 +220,11 @@ export function TimelinesAndEventsPage() {
       },
     });
     await Promise.all([refetchTimelinesWithEvents(), refetchTagNamesCount()]);
+    // Close the tooltip by clearing the selection
+    setSelectionStartPercent(null);
+    setSelectionEndPercent(null);
+    setSelectionMovePercent(null);
+    setActiveSelectionTimeline(null);
   };
 
   const selection =
@@ -230,6 +240,48 @@ export function TimelinesAndEventsPage() {
           ),
         }
       : null;
+
+  const handleTagResized = async (
+    tagId: string,
+    newStartedAt: string,
+    newEndedAt: string
+  ): Promise<void> => {
+    const queryKey = timelinesControllerFindAllEventsQueryKey({
+      query: {
+        startedAt: startOfDay(viewDate).toISOString(),
+        endedAt: endOfDay(viewDate).toISOString(),
+      },
+    });
+
+    // Cancel any in-flight refetches so they don't overwrite the optimistic update
+    await queryClient.cancelQueries({ queryKey });
+
+    // Snapshot the current data for rollback on error
+    const previousData =
+      queryClient.getQueryData<TimelinesControllerFindAllEventsResponse>(queryKey);
+
+    // Immediately update the cache so the bar stays where the user dropped it
+    queryClient.setQueryData<TimelinesControllerFindAllEventsResponse>(queryKey, (old) => {
+      if (!old) return old;
+      return old.map((timeline) => ({
+        ...timeline,
+        events: timeline.events.map((event) =>
+          event.id === tagId ? { ...event, startedAt: newStartedAt, endedAt: newEndedAt } : event
+        ),
+      }));
+    });
+
+    try {
+      await updateTag({
+        path: { id: tagId },
+        body: { startedAt: newStartedAt, endedAt: newEndedAt },
+      });
+      await refetchTimelinesWithEvents();
+    } catch {
+      // Roll back the optimistic update if the save failed
+      queryClient.setQueryData(queryKey, previousData);
+    }
+  };
 
   const renderTimelines = (): ReactNode | ReactNode[] => {
     if (timelineInfos?.length === 0) {
@@ -262,6 +314,7 @@ export function TimelinesAndEventsPage() {
             })
           }
           isActive={selectedTimeline?.id === timelineInfo.id}
+          onTagResized={handleTagResized}
         ></Timeline>
       );
     });

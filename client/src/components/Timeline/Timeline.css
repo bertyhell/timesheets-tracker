@@ -107,6 +107,43 @@
     }
   }
 
+  .c-timeline__event-resize-handle {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 8px;
+    z-index: 2;
+    opacity: 0;
+    background-color: rgba(0, 0, 0, 0.25);
+    transition: opacity 0.15s ease;
+    pointer-events: auto;
+
+    &.c-timeline__event-resize-handle--start {
+      left: 0;
+      cursor: w-resize;
+      border-radius: 4px 0 0 4px;
+    }
+
+    &.c-timeline__event-resize-handle--end {
+      right: 0;
+      cursor: e-resize;
+      border-radius: 0 4px 4px 0;
+    }
+  }
+
+  .c-timeline__event:hover .c-timeline__event-resize-handle {
+    opacity: 1;
+  }
+
+  &.c-timeline--resizing {
+    cursor: ew-resize;
+    user-select: none;
+
+    .c-timeline__event-resize-handle {
+      opacity: 1;
+    }
+  }
+
   .c-timeline__event-content {
     display: flex;
     flex-direction: column;

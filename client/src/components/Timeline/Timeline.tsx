@@ -1,5 +1,5 @@
 import './Timeline.css';
-import React, { type MouseEvent } from 'react';
+import React, { type MouseEvent, useState } from 'react';
 import Tooltip from '../Tooltip/Tooltip';
 import {
   addMilliseconds,
@@ -12,12 +12,19 @@ import {
 } from 'date-fns';
 import { formatDuration } from '../../helpers/format-duration';
 import type { TagName } from '../../types/types';
-import { type ActionMeta, type MultiValue, type OnChangeValue } from 'react-select';
-import TagSelectMulti from '../TagSelect/TagSelectMulti';
+import TagSelectSingle from '../TagSelect/TagSelectSingle';
 import type { TimelineDto, TimelineEventDto } from '../../generated/api/types.gen';
 import { getColorForEvent, getColorFromString } from './helpers/getColorForEvent';
 import { getTicks } from './helpers/getTicks';
 import { getEventLabel } from './helpers/getEventLabel';
+import { TimelineType } from './Timeline.types';
+
+interface ResizeState {
+  tagId: string;
+  side: 'start' | 'end';
+  originalStartedAt: string;
+  originalEndedAt: string;
+}
 
 interface TimelineProps {
   timelineInfo: TimelineDto;
@@ -33,6 +40,7 @@ interface TimelineProps {
   selectedEvent: TimelineEventDto | null;
   setSelectedEvent: (event: TimelineEventDto, timeline: TimelineDto) => void;
   isActive: boolean;
+  onTagResized?: (tagId: string, newStartedAt: string, newEndedAt: string) => void;
 }
 
 function Timeline({
@@ -49,7 +57,11 @@ function Timeline({
   selectedEvent,
   setSelectedEvent,
   isActive,
+  onTagResized,
 }: TimelineProps) {
+  const [resizeState, setResizeState] = useState<ResizeState | null>(null);
+  const [resizeCurrentPosX, setResizeCurrentPosX] = useState<number | null>(null);
+
   const windowInMilliseconds = differenceInMilliseconds(maxTime, minTime);
 
   const selectionStartTime = addMilliseconds(
@@ -72,6 +84,12 @@ function Timeline({
   };
 
   const handleMouseDown = (evt: MouseEvent) => {
+    // On tag timelines, don't start a selection drag when the user presses
+    // down on an existing tag event (clicking still selects via onClick).
+    if (timelineInfo.timelineType === TimelineType.Tag) {
+      const existingEventEl = (evt.target as HTMLElement).closest('[data-event-id]');
+      if (existingEventEl) return;
+    }
     const posX = getMousePositionXPercent(evt);
     if (posX < 0 || posX > 100) {
       return;
@@ -81,14 +99,42 @@ function Timeline({
 
   const handleMouseMove = (evt: MouseEvent) => {
     const posX = getMousePositionXPercent(evt);
-
     if (posX < 0 || posX > 100) {
+      return;
+    }
+    if (resizeState) {
+      setResizeCurrentPosX(posX);
       return;
     }
     onMouseMove(posX);
   };
 
   const handleMouseUp = (evt: MouseEvent) => {
+    if (resizeState && onTagResized) {
+      const rawPosX = getMousePositionXPercent(evt);
+      const posX = rawPosX >= 0 && rawPosX <= 100 ? rawPosX : (resizeCurrentPosX ?? 0);
+      const originalEndMs = differenceInMilliseconds(
+        parseISO(resizeState.originalEndedAt),
+        minTime
+      );
+      const originalStartMs = differenceInMilliseconds(
+        parseISO(resizeState.originalStartedAt),
+        minTime
+      );
+      let newStartedAt = resizeState.originalStartedAt;
+      let newEndedAt = resizeState.originalEndedAt;
+      if (resizeState.side === 'start') {
+        const clampedMs = Math.min((posX / 100) * windowInMilliseconds, originalEndMs - 60_000);
+        newStartedAt = addMilliseconds(minTime, clampedMs).toISOString();
+      } else {
+        const clampedMs = Math.max((posX / 100) * windowInMilliseconds, originalStartMs + 60_000);
+        newEndedAt = addMilliseconds(minTime, clampedMs).toISOString();
+      }
+      onTagResized(resizeState.tagId, newStartedAt, newEndedAt);
+      setResizeState(null);
+      setResizeCurrentPosX(null);
+      return;
+    }
     const posX = getMousePositionXPercent(evt);
     if (posX < 0 || posX > 100) {
       return;
@@ -99,30 +145,25 @@ function Timeline({
     onMouseUp(posX, eventId);
   };
 
-  const handleTagNameChange = async (
-    option: OnChangeValue<TagName, true> | { label: string; value: string }[],
-    actionMeta: ActionMeta<TagName>
-  ) => {
-    if (!option) {
+  const handleMouseLeave = () => {
+    if (resizeState) {
+      setResizeState(null);
+      setResizeCurrentPosX(null);
+    }
+  };
+
+  const handleTagNameChange = async (newValue: TagName | null) => {
+    if (!newValue || !selectionPercentages) {
       return;
     }
-    switch (actionMeta.action) {
-      case 'create-option': {
-        if (!selectionPercentages) {
-          return;
-        }
-        const newTagName: TagName = await onCreateTagName(
-          (option as { label: string; value: string }[])?.[0]?.value
-        );
-        await onCreateTag(newTagName.id);
-        break;
-      }
-
-      case 'select-option': {
-        const tagNameId = (option as MultiValue<TagName>)?.[0]?.id;
-        await onCreateTag(tagNameId);
-        break;
-      }
+    if ((newValue as unknown as { __isNew__: boolean }).__isNew__) {
+      // User typed a new tag name — create it first, then create the tag
+      const createdTagName = await onCreateTagName(
+        (newValue as unknown as { value: string }).value
+      );
+      await onCreateTag(createdTagName.id);
+    } else {
+      await onCreateTag(newValue.id);
     }
   };
 
@@ -135,10 +176,11 @@ function Timeline({
   const quarterTicks = getTicks(minTime, maxTime, 15);
   return (
     <div
-      className={'c-timeline ' + (isActive ? 'c-timeline--active' : '')}
+      className={'c-timeline ' + (isActive ? 'c-timeline--active' : '') + (resizeState ? ' c-timeline--resizing' : '')}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
     >
       <div className="c-timeline__title cursor-pointer">
         <span className="c-timeline__dot" style={{ backgroundColor: timelineDotColor }} />
@@ -181,10 +223,27 @@ function Timeline({
 
         {/* Events */}
         {events.map((event) => {
-          const widthPercent =
-            (differenceInMilliseconds(parseISO(event.endedAt), parseISO(event.startedAt)) /
+          const startPercent =
+            (differenceInMilliseconds(parseISO(event.startedAt), minTime) /
               windowInMilliseconds) *
             100;
+          const endPercent =
+            (differenceInMilliseconds(parseISO(event.endedAt), minTime) /
+              windowInMilliseconds) *
+            100;
+
+          // Apply visual override when this event is being resized
+          let effectiveLeft = startPercent;
+          let effectiveRight = endPercent;
+          if (resizeState?.tagId === event.id && resizeCurrentPosX !== null) {
+            if (resizeState.side === 'start') {
+              effectiveLeft = Math.min(resizeCurrentPosX, endPercent - 0.1);
+            } else {
+              effectiveRight = Math.max(resizeCurrentPosX, startPercent + 0.1);
+            }
+          }
+
+          const widthPercent = effectiveRight - effectiveLeft;
           const width = widthPercent + '%';
           const isNarrow = widthPercent < 5;
 
@@ -192,6 +251,8 @@ function Timeline({
           const label = getEventLabel(timelineInfo, event);
           const timeRange = `${format(parseISO(event.startedAt), 'HH:mm')} - ${format(parseISO(event.endedAt), 'HH:mm')}`;
           const color = getColorForEvent(timelineInfo, event);
+          const isTagTimeline =
+            timelineInfo.timelineType === TimelineType.Tag && !!onTagResized;
 
           return (
             <Tooltip
@@ -235,11 +296,7 @@ function Timeline({
                 data-event-id={event.id}
                 key={'c-timeline__' + timelineInfo.title + '__event__div__' + event.startedAt}
                 style={{
-                  left:
-                    (differenceInMilliseconds(parseISO(event.startedAt), minTime) /
-                      windowInMilliseconds) *
-                      100 +
-                    '%',
+                  left: effectiveLeft + '%',
                   width,
                   backgroundColor: color + '33',
                   borderLeft: `3px solid ${color}`,
@@ -255,6 +312,36 @@ function Timeline({
                     </span>
                     <span className="c-timeline__event-time">{timeRange}</span>
                   </div>
+                )}
+                {isTagTimeline && (
+                  <>
+                    <div
+                      className="c-timeline__event-resize-handle c-timeline__event-resize-handle--start"
+                      onMouseDown={(e) => {
+                        e.stopPropagation();
+                        setResizeState({
+                          tagId: event.id,
+                          side: 'start',
+                          originalStartedAt: event.startedAt,
+                          originalEndedAt: event.endedAt,
+                        });
+                        setResizeCurrentPosX(startPercent);
+                      }}
+                    />
+                    <div
+                      className="c-timeline__event-resize-handle c-timeline__event-resize-handle--end"
+                      onMouseDown={(e) => {
+                        e.stopPropagation();
+                        setResizeState({
+                          tagId: event.id,
+                          side: 'end',
+                          originalStartedAt: event.startedAt,
+                          originalEndedAt: event.endedAt,
+                        });
+                        setResizeCurrentPosX(endPercent);
+                      }}
+                    />
+                  </>
                 )}
               </div>
             </Tooltip>
@@ -277,7 +364,7 @@ function Timeline({
                   {format(selectionStartTime, 'HH:mm:ss')} - {format(selectionEndTime, 'HH:mm:ss')}
                 </li>
                 <li>{formatDuration(differenceInSeconds(selectionEndTime, selectionStartTime))}</li>
-                <TagSelectMulti onChange={handleTagNameChange} />
+                <TagSelectSingle value={null} onChange={handleTagNameChange} autoFocus />
               </ul>
             }
             visible={!!selectionPercentages.start && !!selectionPercentages.end && !selectedEvent}

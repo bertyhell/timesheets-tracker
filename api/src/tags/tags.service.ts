@@ -10,6 +10,7 @@ import { findAllTags } from './queries/findAllTags';
 import { findOneTag } from './queries/findOneTag';
 import { createTag } from './queries/createTag';
 import { updateTag } from './queries/updateTag';
+import { updateTagTime } from './queries/updateTagTime';
 import { deleteTag } from './queries/deleteTag';
 
 @Injectable()
@@ -54,16 +55,28 @@ export class TagsService {
   }
 
   async update(id: string, updateTagDto: UpdateTagDto): Promise<Tag> {
-    await updateTag(
-      this.databaseService.getDb(),
-      {
-        tagNameId: updateTagDto.tagNameId,
-        startedAt: updateTagDto.startedAt,
-        endedAt: updateTagDto.endedAt,
-        note: null,
-      },
-      { id }
-    );
+    if (updateTagDto.tagNameId == null) {
+      // Only time fields are being updated (e.g. from a resize drag)
+      await updateTagTime(
+        this.databaseService.getDb(),
+        {
+          startedAt: updateTagDto.startedAt,
+          endedAt: updateTagDto.endedAt,
+        },
+        { id }
+      );
+    } else {
+      await updateTag(
+        this.databaseService.getDb(),
+        {
+          tagNameId: updateTagDto.tagNameId,
+          startedAt: updateTagDto.startedAt,
+          endedAt: updateTagDto.endedAt,
+          note: null,
+        },
+        { id }
+      );
+    }
 
     return await this.findOne(id);
   }

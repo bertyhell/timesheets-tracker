@@ -57,7 +57,7 @@ function getCellValue(event: TimelineEventDto, columnKey: string): string {
     case 'isActive':
       return info['isActive'] ? 'Active' : 'Inactive';
     case 'tagName':
-      return String(info['tagNameName'] ?? info['name'] ?? '');
+      return String(info['tagNameName'] ?? info['tagNameTitle'] ?? info['name'] ?? '');
     case 'websiteName':
       return String(info['websiteTitle'] ?? info['title'] ?? '');
     case 'summary':
@@ -119,7 +119,7 @@ export function EventsTable({ timeline, events, className }: EventsTableProps) {
             case 'isActive':
               return (event.info as any)['isActive'];
             case 'tagName':
-              return (event.info as any)['tagNameName'];
+              return (event.info as any)['tagNameName'] ?? (event.info as any)['tagNameTitle'];
             case 'websiteName':
               return (event.info as any)['websiteTitle'];
             case 'summary':

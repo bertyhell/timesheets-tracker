@@ -10,7 +10,7 @@ export function getEventLabel(timelineInfo: TimelineDto, event: TimelineEventDto
       return String(info['websiteTitle'] ?? info['websiteUrl'] ?? '');
     case TimelineType.Tag:
     case TimelineType.AutoTag:
-      return String(info['tagNameName'] ?? info['name'] ?? '');
+      return String(info['tagNameName'] ?? info['tagNameTitle'] ?? info['name'] ?? '');
     case TimelineType.Calendar:
       return String(info['summary'] ?? '');
     case TimelineType.ActiveState:

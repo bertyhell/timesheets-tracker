@@ -4,6 +4,7 @@ import React from 'react';
 import AsyncCreatableSelect from 'react-select/async-creatable';
 import { tagNamesControllerFindAll } from '../../generated/api/sdk.gen';
 import type { TagName } from '../../types/types';
+import { tagSelectStyles } from './tagSelectStyles';
 
 interface TagSelectProps {
   value: TagName | null;
@@ -31,6 +32,7 @@ function TagSelectSingle({ className, value, onChange, autoFocus }: TagSelectPro
       onChange={(newValue) => onChange(newValue)}
       cacheOptions
       defaultOptions
+      styles={tagSelectStyles}
     ></AsyncCreatableSelect>
   );
 }

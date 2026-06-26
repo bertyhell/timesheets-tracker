@@ -7,3 +7,10 @@
     color: black !important;
   }
 }
+
+.c-tag-input,
+.c-tag-select {
+  [class$='-option'][aria-selected='true'] {
+    color: white !important;
+  }
+}

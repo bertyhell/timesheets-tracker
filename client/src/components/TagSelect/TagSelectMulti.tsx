@@ -6,6 +6,7 @@ import AsyncCreatableSelect from 'react-select/async-creatable';
 
 import { tagNamesControllerFindAll } from '../../generated/api/sdk.gen';
 import type { TagName } from '../../types/types';
+import { tagSelectStyles } from './tagSelectStyles';
 
 interface TagSelectProps {
   className?: string;
@@ -33,6 +34,7 @@ function TagSelectMulti({ className, selectedValues, onChange }: TagSelectProps)
       isMulti
       isSearchable
       onChange={onChange}
+      styles={tagSelectStyles}
     ></AsyncCreatableSelect>
   );
 }

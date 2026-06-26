@@ -40,6 +40,7 @@ interface TimelineProps {
   selectedEvent: TimelineEventDto | null;
   setSelectedEvent: (event: TimelineEventDto, timeline: TimelineDto) => void;
   isActive: boolean;
+  onSelectTimeline: () => void;
   onTagResized?: (tagId: string, newStartedAt: string, newEndedAt: string) => void;
 }
 
@@ -57,6 +58,7 @@ function Timeline({
   selectedEvent,
   setSelectedEvent,
   isActive,
+  onSelectTimeline,
   onTagResized,
 }: TimelineProps) {
   const [resizeState, setResizeState] = useState<ResizeState | null>(null);
@@ -182,7 +184,7 @@ function Timeline({
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
-      <div className="c-timeline__title cursor-pointer">
+      <div className="c-timeline__title cursor-pointer" onClick={onSelectTimeline}>
         <span className="c-timeline__dot" style={{ backgroundColor: timelineDotColor }} />
         <span className="c-timeline__label">{timelineInfo.title}</span>
       </div>
@@ -281,7 +283,12 @@ function Timeline({
                         eventInfo[key]
                       }
                     >
-                      <b>{key}</b>: {eventInfo[key]}
+                      <b>{key}</b>:{' '}
+                      {typeof eventInfo[key] === 'boolean'
+                        ? eventInfo[key]
+                          ? 'active'
+                          : 'inactive'
+                        : eventInfo[key]}
                     </li>
                   ))}
                 </ul>

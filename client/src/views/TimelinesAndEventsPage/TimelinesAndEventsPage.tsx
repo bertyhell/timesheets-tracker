@@ -72,7 +72,36 @@ export function TimelinesAndEventsPage() {
   const { data: tagNamesCount, refetch: refetchTagNamesCount } = useQuery({
     ...tagNamesControllerCountOptions(),
   });
-  const { mutateAsync: deleteTag } = useMutation({ ...tagsControllerRemoveMutation() });
+  const eventsQueryKey = timelinesControllerFindAllEventsQueryKey({
+    query: {
+      startedAt: startOfDay(viewDate).toISOString(),
+      endedAt: endOfDay(viewDate).toISOString(),
+    },
+  });
+
+  const { mutateAsync: deleteTag } = useMutation({
+    ...tagsControllerRemoveMutation(),
+    onMutate: async ({ path: { id: tagId } }) => {
+      await queryClient.cancelQueries({ queryKey: eventsQueryKey });
+      const previous = queryClient.getQueryData<TimelinesControllerFindAllEventsResponse>(eventsQueryKey);
+      queryClient.setQueryData<TimelinesControllerFindAllEventsResponse>(eventsQueryKey, (old) =>
+        old?.map((timeline) => ({
+          ...timeline,
+          events: timeline.events?.filter((e) => e.id !== tagId) ?? [],
+        })) ?? []
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(eventsQueryKey, context.previous);
+      }
+      toast('Failed to delete tag', { type: 'error' });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: eventsQueryKey });
+    },
+  });
   const { mutateAsync: updateTag } = useMutation({ ...tagsControllerUpdateMutation() });
 
   const { mutateAsync: createTagName } = useMutation({ ...tagNamesControllerCreateMutation() });
@@ -151,7 +180,6 @@ export function TimelinesAndEventsPage() {
             await deleteTag({
               path: { id: selectedEvent?.id as string },
             });
-            await refetchTimelinesWithEvents();
             toast('Tag was deleted', { type: 'success' });
           })();
         } else {
@@ -321,12 +349,29 @@ export function TimelinesAndEventsPage() {
             })
           }
           onTagResized={handleTagResized}
+          onDeleteTag={async (tagId: string) => {
+            await deleteTag({ path: { id: tagId } });
+            toast('Tag was deleted', { type: 'success' });
+          }}
         ></Timeline>
       );
     });
   };
 
-  const totalEventCount = allEvents?.length ?? 0;
+  const totalEventCount = selectedTimeline?.events?.length ?? 0;
+
+  const noEventsMessageByType: Record<TimelineType, string> = {
+    [TimelineType.Calendar]: 'No calendar events',
+    [TimelineType.Program]: 'No active programs',
+    [TimelineType.ActiveState]: 'No activity logs',
+    [TimelineType.AutoTag]: 'No auto tags',
+    [TimelineType.Tag]: 'No tags',
+    [TimelineType.Website]: 'No website activity',
+  };
+
+  const noEventsMessage = selectedTimeline?.type
+    ? noEventsMessageByType[selectedTimeline.type]
+    : 'No events';
 
   const { defaultLayout: verticalDefaultLayout, onLayoutChanged: onVerticalLayoutChanged } =
     useDefaultLayout({ id: 'timelines-vertical', storage: localStorage });
@@ -369,7 +414,7 @@ export function TimelinesAndEventsPage() {
           >
             <Panel minSize="15%" defaultSize="70%">
               {!selectedTimeline?.events?.length ? (
-                <div className="u-center c-no-events">No events</div>
+                <div className="c-no-events">{noEventsMessage}</div>
               ) : (
                 <EventsTable
                   className="c-events-table"

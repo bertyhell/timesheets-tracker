@@ -151,6 +151,7 @@
 .c-no-events {
   color: var(--gray-500);
   font-size: 0.875rem;
+  padding: 0.625rem 1rem;
 }
 
 /* Resize handles */

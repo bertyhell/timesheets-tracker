@@ -1,5 +1,5 @@
 import './Timeline.css';
-import React, { type MouseEvent, useState } from 'react';
+import React, { type MouseEvent, useEffect, useRef, useState } from 'react';
 import Tooltip from '../Tooltip/Tooltip';
 import {
   addMilliseconds,
@@ -42,6 +42,7 @@ interface TimelineProps {
   isActive: boolean;
   onSelectTimeline: () => void;
   onTagResized?: (tagId: string, newStartedAt: string, newEndedAt: string) => void;
+  onDeleteTag?: (tagId: string) => void;
 }
 
 function Timeline({
@@ -60,9 +61,30 @@ function Timeline({
   isActive,
   onSelectTimeline,
   onTagResized,
+  onDeleteTag,
 }: TimelineProps) {
   const [resizeState, setResizeState] = useState<ResizeState | null>(null);
   const [resizeCurrentPosX, setResizeCurrentPosX] = useState<number | null>(null);
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; eventId: string } | null>(null);
+  const contextMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!contextMenu) return;
+    const handleClickOutside = (e: globalThis.MouseEvent) => {
+      if (contextMenuRef.current && !contextMenuRef.current.contains(e.target as Node)) {
+        setContextMenu(null);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setContextMenu(null);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [contextMenu]);
 
   const windowInMilliseconds = differenceInMilliseconds(maxTime, minTime);
 
@@ -154,6 +176,20 @@ function Timeline({
     }
   };
 
+  const handleContextMenu = (e: MouseEvent, eventId: string) => {
+    if (timelineInfo.timelineType !== TimelineType.Tag || !onDeleteTag) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setContextMenu({ x: e.clientX, y: e.clientY, eventId });
+  };
+
+  const handleDeleteFromContextMenu = () => {
+    if (contextMenu && onDeleteTag) {
+      onDeleteTag(contextMenu.eventId);
+    }
+    setContextMenu(null);
+  };
+
   const handleTagNameChange = async (newValue: TagName | null) => {
     if (!newValue || !selectionPercentages) {
       return;
@@ -177,6 +213,7 @@ function Timeline({
   const hourTicks = getTicks(minTime, maxTime, 60);
   const quarterTicks = getTicks(minTime, maxTime, 15);
   return (
+    <>
     <div
       className={'c-timeline ' + (isActive ? 'c-timeline--active' : '') + (resizeState ? ' c-timeline--resizing' : '')}
       onMouseDown={handleMouseDown}
@@ -311,6 +348,7 @@ function Timeline({
                 onClick={() => {
                   setSelectedEvent(event, timelineInfo);
                 }}
+                onContextMenu={(e) => handleContextMenu(e, event.id)}
               >
                 {!isNarrow && (
                   <div className="c-timeline__event-content">
@@ -389,6 +427,20 @@ function Timeline({
         )}
       </div>
     </div>
+
+    {/* Context menu */}
+    {contextMenu && (
+      <div
+        ref={contextMenuRef}
+        className="c-timeline__context-menu"
+        style={{ top: contextMenu.y, left: contextMenu.x }}
+      >
+        <button className="c-timeline__context-menu-item c-timeline__context-menu-item--danger" onClick={handleDeleteFromContextMenu}>
+          Delete tag
+        </button>
+      </div>
+    )}
+    </>
   );
 }
 

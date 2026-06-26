@@ -1,6 +1,9 @@
 import './Timeline.css';
 import React, { type MouseEvent, useEffect, useRef, useState } from 'react';
 
+import { useNavigate } from 'react-router-dom';
+import { ROUTE_PARTS } from '../../App';
+import { ContextMenu } from '../ContextMenu/ContextMenu';
 import { useAtom } from 'jotai';
 import { searchTermAtom } from '../../store/store';
 import Tooltip from '../Tooltip/Tooltip';
@@ -66,11 +69,12 @@ function Timeline({
   onTagResized,
   onDeleteTag,
 }: TimelineProps) {
+  const navigate = useNavigate();
   const [searchTerm] = useAtom(searchTermAtom);
   const [resizeState, setResizeState] = useState<ResizeState | null>(null);
   const [resizeCurrentPosX, setResizeCurrentPosX] = useState<number | null>(null);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; eventId: string } | null>(null);
-  const contextMenuRef = useRef<HTMLDivElement>(null);
+  const [titleContextMenu, setTitleContextMenu] = useState<{ x: number; y: number } | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const [trackWidth, setTrackWidth] = useState(0);
 
@@ -87,23 +91,17 @@ function Timeline({
 
   const lowerSearch = searchTerm.toLowerCase();
 
-  useEffect(() => {
-    if (!contextMenu) return;
-    const handleClickOutside = (e: globalThis.MouseEvent) => {
-      if (contextMenuRef.current && !contextMenuRef.current.contains(e.target as Node)) {
-        setContextMenu(null);
-      }
-    };
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setContextMenu(null);
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [contextMenu]);
+  const handleTitleContextMenu = (e: MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setTitleContextMenu({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleEditFromTitleContextMenu = () => {
+    navigate(
+      '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.timelines + '/' + timelineInfo.id + '/' + ROUTE_PARTS.edit
+    );
+  };
 
   const windowInMilliseconds = differenceInMilliseconds(maxTime, minTime);
 
@@ -202,13 +200,6 @@ function Timeline({
     setContextMenu({ x: e.clientX, y: e.clientY, eventId });
   };
 
-  const handleDeleteFromContextMenu = () => {
-    if (contextMenu && onDeleteTag) {
-      onDeleteTag(contextMenu.eventId);
-    }
-    setContextMenu(null);
-  };
-
   const handleTagNameChange = async (newValue: TagName | null) => {
     if (!newValue || !selectionPercentages) {
       return;
@@ -242,7 +233,7 @@ function Timeline({
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
-      <div className="c-timeline__title cursor-pointer" onClick={onSelectTimeline}>
+      <div className="c-timeline__title cursor-pointer" onClick={onSelectTimeline} onContextMenu={handleTitleContextMenu}>
         <span className="c-timeline__dot" style={{ backgroundColor: timelineDotColor }} />
         <span className="c-timeline__label">{timelineInfo.title}</span>
       </div>
@@ -454,15 +445,20 @@ function Timeline({
 
     {/* Context menu */}
     {contextMenu && (
-      <div
-        ref={contextMenuRef}
-        className="c-timeline__context-menu"
-        style={{ top: contextMenu.y, left: contextMenu.x }}
-      >
-        <button className="c-timeline__context-menu-item c-timeline__context-menu-item--danger" onClick={handleDeleteFromContextMenu}>
-          Delete tag
-        </button>
-      </div>
+      <ContextMenu
+        position={{ x: contextMenu.x, y: contextMenu.y }}
+        items={[{ label: 'Delete tag', onClick: () => onDeleteTag?.(contextMenu.eventId), variant: 'danger' }]}
+        onClose={() => setContextMenu(null)}
+      />
+    )}
+
+    {/* Title context menu */}
+    {titleContextMenu && (
+      <ContextMenu
+        position={titleContextMenu}
+        items={[{ label: 'Edit timeline', onClick: handleEditFromTitleContextMenu }]}
+        onClose={() => setTitleContextMenu(null)}
+      />
     )}
     </>
   );

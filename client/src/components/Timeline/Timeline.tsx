@@ -305,6 +305,8 @@ function Timeline({
           const color = getColorForEvent(timelineInfo, event);
           const isTagTimeline =
             timelineInfo.timelineType === TimelineType.Tag && !!onTagResized;
+          const isAutoTagTimeline =
+            timelineInfo.timelineType === TimelineType.AutoTag;
           const isDimmed = !!lowerSearch && !JSON.stringify(event).toLowerCase().includes(lowerSearch);
 
           return (
@@ -319,29 +321,58 @@ function Timeline({
                 >
                   <li>
                     <b>Date:</b> {format(parseISO(event.startedAt), 'HH:mm:ss')} -{' '}
-                    {format(parseISO(event.endedAt), 'HH:mm:ss')}
+                    {format(parseISO(event.endedAt), 'HH:mm:ss')} (
+                    {formatDuration(
+                      differenceInSeconds(parseISO(event.endedAt), parseISO(event.startedAt))
+                    )}
+                    )
                   </li>
-                  {Object.keys(eventInfo).map((key) => (
-                    <li
-                      key={
-                        'c-timeline__' +
-                        timelineInfo.title +
-                        '__event__' +
-                        event.startedAt +
-                        '__info__' +
-                        key +
-                        '__' +
-                        eventInfo[key]
-                      }
-                    >
-                      <b>{key}</b>:{' '}
-                      {typeof eventInfo[key] === 'boolean'
-                        ? eventInfo[key]
-                          ? 'active'
-                          : 'inactive'
-                        : eventInfo[key]}
+                  {isTagTimeline ? (
+                    <li>
+                      <b>Name:</b> {getEventLabel(timelineInfo, event)}
                     </li>
-                  ))}
+                  ) : isAutoTagTimeline ? (
+                    <>
+                      <li>
+                        <b>Title:</b> {String(eventInfo['tagNameTitle'] ?? '')}
+                      </li>
+                      <li>
+                        <b>Code:</b> {String(eventInfo['tagNameCode'] ?? '')}
+                      </li>
+                      <li>
+                        <b>Priority:</b> {String(eventInfo['priority'] ?? '')}
+                      </li>
+                    </>
+                  ) : (
+                    Object.keys(eventInfo)
+                      .filter((key) => {
+                        const val = eventInfo[key];
+                        if (val === '' || val === null || val === undefined) return false;
+                        if (key === 'allDay' && val === false) return false;
+                        return true;
+                      })
+                      .map((key) => (
+                        <li
+                          key={
+                            'c-timeline__' +
+                            timelineInfo.title +
+                            '__event__' +
+                            event.startedAt +
+                            '__info__' +
+                            key +
+                            '__' +
+                            eventInfo[key]
+                          }
+                        >
+                          <b>{key}</b>:{' '}
+                          {typeof eventInfo[key] === 'boolean'
+                            ? eventInfo[key]
+                              ? 'active'
+                              : 'inactive'
+                            : eventInfo[key]}
+                        </li>
+                      ))
+                  )}
                 </ul>
               }
             >

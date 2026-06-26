@@ -11,6 +11,7 @@ import { findOneWebsiteByStartTime } from './queries/findOneWebsiteByStartTime';
 import { createWebsite } from './queries/createWebsite';
 import { updateWebsite } from './queries/updateWebsite';
 import { deleteWebsite } from './queries/deleteWebsite';
+import { CustomError } from '../shared/CustomError';
 
 @Injectable()
 export class WebsitesService {
@@ -21,59 +22,109 @@ export class WebsitesService {
   }
 
   async findAll(startedAt: string, endedAt: string): Promise<Website[]> {
-    const results = await findAllWebsites(this.databaseService.getDb(), {
-      startedAt,
-      endedAt,
-    });
+    try {
+      const results = await findAllWebsites(this.databaseService.getDb(), {
+        startedAt,
+        endedAt,
+      });
 
-    return results.map(this.adapt);
+      return results.map(this.adapt);
+    } catch (err) {
+      const error = new CustomError('Failed to fetch all websites from the database', err, {
+        startedAt,
+        endedAt,
+      });
+      console.error(error);
+      throw error;
+    }
   }
 
   async findOne(id: string): Promise<Website> {
-    const result = await findOneWebsite(this.databaseService.getDb(), { id });
+    try {
+      const result = await findOneWebsite(this.databaseService.getDb(), { id });
 
-    return this.adapt(result);
+      return this.adapt(result);
+    } catch (err) {
+      const error = new CustomError('Failed to fetch one website from the database', err, { id });
+      console.error(error);
+      throw error;
+    }
   }
 
   async findOneByStartTime(startedAt: string): Promise<Website | null> {
-    const result = await findOneWebsiteByStartTime(this.databaseService.getDb(), {
-      startedAt,
-    });
+    try {
+      const result = await findOneWebsiteByStartTime(this.databaseService.getDb(), {
+        startedAt,
+      });
 
-    if (!result) {
-      return null;
+      if (!result) {
+        return null;
+      }
+
+      return this.adapt(result);
+    } catch (err) {
+      const error = new CustomError(
+        'Failed to fetch website by start time from the database',
+        err,
+        { startedAt }
+      );
+      console.error(error);
+      throw error;
     }
-
-    return this.adapt(result);
   }
 
   async create(website: CreateWebsiteDto): Promise<Website> {
-    const id = uuid();
-    await createWebsite(this.databaseService.getDb(), {
-      id,
-      websiteTitle: website.websiteTitle,
-      websiteUrl: website.websiteUrl,
-      startedAt: website.startedAt,
-    });
+    let id: string | null = null;
+    try {
+      id = uuid();
+      await createWebsite(this.databaseService.getDb(), {
+        id,
+        websiteTitle: website.websiteTitle,
+        websiteUrl: website.websiteUrl,
+        startedAt: website.startedAt,
+      });
 
-    return this.findOne(id);
+      return this.findOne(id);
+    } catch (err) {
+      const error = new CustomError('Failed to create a website entry in the database', err, {
+        id,
+        website,
+      });
+      console.error(error);
+      throw error;
+    }
   }
 
   async update(id: string, updateWebsiteDto: UpdateWebsiteDto): Promise<Website> {
-    await updateWebsite(
-      this.databaseService.getDb(),
-      {
-        websiteTitle: updateWebsiteDto.websiteTitle,
-        websiteUrl: updateWebsiteDto.websiteUrl,
-        startedAt: updateWebsiteDto.startedAt,
-      },
-      { id }
-    );
+    try {
+      await updateWebsite(
+        this.databaseService.getDb(),
+        {
+          websiteTitle: updateWebsiteDto.websiteTitle,
+          websiteUrl: updateWebsiteDto.websiteUrl,
+          startedAt: updateWebsiteDto.startedAt,
+        },
+        { id }
+      );
 
-    return await this.findOne(id);
+      return await this.findOne(id);
+    } catch (err) {
+      const error = new CustomError('Failed to update website entry in the database', err, {
+        id,
+        updateWebsiteDto,
+      });
+      console.error(error);
+      throw error;
+    }
   }
 
   async delete(id: string): Promise<void> {
-    await deleteWebsite(this.databaseService.getDb(), { id });
+    try {
+      await deleteWebsite(this.databaseService.getDb(), { id });
+    } catch (err) {
+      const error = new CustomError('Failed to delete website entry from the database', err, { id });
+      console.error(error);
+      throw error;
+    }
   }
 }

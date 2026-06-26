@@ -22,35 +22,60 @@ export class ProgramsService {
   }
 
   async findAll(startedAt: string, endedAt: string): Promise<Program[]> {
-    const results = await findAllPrograms(this.databaseService.getDb(), {
-      startedAt,
-      endedAt,
-    });
+    try {
+      const results = await findAllPrograms(this.databaseService.getDb(), {
+        startedAt,
+        endedAt,
+      });
 
-    const realResults = results.filter((result) => {
-      const diff = differenceInSeconds(new Date(result.endedAt), new Date(result.startedAt));
-      return diff > MINIMUM_ACTIVITY_DURATION_SECONDS;
-    });
-    return realResults.map(this.adapt);
+      const realResults = results.filter((result) => {
+        const diff = differenceInSeconds(new Date(result.endedAt), new Date(result.startedAt));
+        return diff > MINIMUM_ACTIVITY_DURATION_SECONDS;
+      });
+      return realResults.map(this.adapt);
+    } catch (err) {
+      const error = new CustomError('Failed to fetch all programs from the database', err, {
+        startedAt,
+        endedAt,
+      });
+      console.error(error);
+      throw error;
+    }
   }
 
   async findOne(id: string): Promise<Program> {
-    const result = await findOneProgram(this.databaseService.getDb(), { id });
+    try {
+      const result = findOneProgram(this.databaseService.getDb(), { id });
 
-    return this.adapt(result);
+      return this.adapt(result);
+    } catch (err) {
+      const error = new CustomError('Failed to fetch one program from the database', err, { id });
+      console.error(error);
+      throw error;
+    }
   }
 
   async findByNextStartedAt(startedAt: string): Promise<Program> {
-    const result = await findByNextStartedAt(this.databaseService.getDb(), { startedAt });
+    try {
+      const result = findByNextStartedAt(this.databaseService.getDb(), { startedAt });
 
-    return this.adapt(result);
+      return this.adapt(result);
+    } catch (err) {
+      const error = new CustomError(
+        'Failed to fetch program by next startedAt from the database',
+        err,
+        { startedAt }
+      );
+      console.error(error);
+      throw error;
+    }
   }
 
   async create(activity: CreateProgramDto): Promise<Program> {
     let id: string | null = null;
     try {
       id = uuid();
-      await createProgram(this.databaseService.getDb(), {
+      createProgram(this.databaseService.getDb(), {
         id,
         programName: activity.programName,
         windowTitle: activity.windowTitle,
@@ -71,6 +96,12 @@ export class ProgramsService {
   }
 
   async delete(id: string): Promise<void> {
-    await deleteProgram(this.databaseService.getDb(), { id });
+    try {
+      deleteProgram(this.databaseService.getDb(), { id });
+    } catch (err) {
+      const error = new CustomError('Failed to delete program entry from the database', err, { id });
+      console.error(error);
+      throw error;
+    }
   }
 }

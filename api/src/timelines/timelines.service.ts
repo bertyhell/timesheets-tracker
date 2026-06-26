@@ -59,70 +59,117 @@ export class TimelinesService {
   }
 
   async findAllTimelines(searchTerm: string | undefined): Promise<Timeline[]> {
-    const db = this.databaseService.getDb();
-    let rawTimelines: Record<string, any>[];
-    if (searchTerm) {
-      rawTimelines = findAllTimelinesBySearchTerm(db, { searchTerm });
-    } else {
-      rawTimelines = findAllTimelines(db);
+    try {
+      const db = this.databaseService.getDb();
+      let rawTimelines: Record<string, any>[];
+      if (searchTerm) {
+        rawTimelines = findAllTimelinesBySearchTerm(db, { searchTerm });
+      } else {
+        rawTimelines = findAllTimelines(db);
+      }
+      return rawTimelines.map(this.adapt);
+    } catch (err) {
+      const error = new CustomError('Failed to fetch all timelines from the database', err, {
+        searchTerm,
+      });
+      console.error(error);
+      throw error;
     }
-    return rawTimelines.map(this.adapt);
   }
 
   async count(): Promise<number> {
-    const db = this.databaseService.getDb();
-    const result = countTimelines(db);
-    return result?.count ?? 0;
+    try {
+      const db = this.databaseService.getDb();
+      const result = countTimelines(db);
+      return result?.count ?? 0;
+    } catch (err) {
+      const error = new CustomError('Failed to count timelines in the database', err, {});
+      console.error(error);
+      throw error;
+    }
   }
 
   async findOne(id: string): Promise<Timeline> {
-    const db = this.databaseService.getDb();
-    const timeline = findOneTimeline(db, { id });
+    try {
+      const db = this.databaseService.getDb();
+      const timeline = findOneTimeline(db, { id });
 
-    return this.adapt(timeline);
+      return this.adapt(timeline);
+    } catch (err) {
+      const error = new CustomError('Failed to fetch one timeline from the database', err, { id });
+      console.error(error);
+      throw error;
+    }
   }
 
   async create(timeline: CreateTimelineDto): Promise<Timeline> {
-    const db = this.databaseService.getDb();
-    const id = uuid();
-    const now = new Date().toISOString();
-    createTimeline(db, {
-      id,
-      title: timeline.title,
-      timelineType: timeline.timelineType,
-      eventProviderInfo: timeline.eventProviderInfo
-        ? JSON.stringify(timeline.eventProviderInfo)
-        : null,
-      createdAt: now,
-      updatedAt: now,
-      visualOrder: timeline.visualOrder,
-    });
+    let id: string | null = null;
+    try {
+      const db = this.databaseService.getDb();
+      id = uuid();
+      const now = new Date().toISOString();
+      createTimeline(db, {
+        id,
+        title: timeline.title,
+        timelineType: timeline.timelineType,
+        eventProviderInfo: timeline.eventProviderInfo
+          ? JSON.stringify(timeline.eventProviderInfo)
+          : null,
+        createdAt: now,
+        updatedAt: now,
+        visualOrder: timeline.visualOrder,
+      });
 
-    return this.findOne(id);
+      return this.findOne(id);
+    } catch (err) {
+      const error = new CustomError('Failed to create a timeline entry in the database', err, {
+        id,
+        timeline,
+      });
+      console.error(error);
+      throw error;
+    }
   }
 
   async update(id: string, updateTimelineDto: UpdateTimelineDto): Promise<Timeline> {
-    const db = this.databaseService.getDb();
-    const existing = await this.findOne(id);
-    const eventProviderInfo = updateTimelineDto.eventProviderInfo ?? existing.eventProviderInfo;
-    updateTimeline(
-      db,
-      {
-        title: updateTimelineDto.title ?? existing.title,
-        timelineType: (updateTimelineDto.timelineType ?? existing.timelineType) as TimelineType,
-        eventProviderInfo: eventProviderInfo ? JSON.stringify(eventProviderInfo) : null,
-        updatedAt: new Date().toISOString(),
-        visualOrder: updateTimelineDto.visualOrder ?? existing.visualOrder,
-      },
-      { id }
-    );
+    try {
+      const db = this.databaseService.getDb();
+      const existing = await this.findOne(id);
+      const eventProviderInfo = updateTimelineDto.eventProviderInfo ?? existing.eventProviderInfo;
+      updateTimeline(
+        db,
+        {
+          title: updateTimelineDto.title ?? existing.title,
+          timelineType: (updateTimelineDto.timelineType ?? existing.timelineType) as TimelineType,
+          eventProviderInfo: eventProviderInfo ? JSON.stringify(eventProviderInfo) : null,
+          updatedAt: new Date().toISOString(),
+          visualOrder: updateTimelineDto.visualOrder ?? existing.visualOrder,
+        },
+        { id }
+      );
 
-    return this.findOne(id);
+      return this.findOne(id);
+    } catch (err) {
+      const error = new CustomError('Failed to update timeline entry in the database', err, {
+        id,
+        updateTimelineDto,
+      });
+      console.error(error);
+      throw error;
+    }
   }
 
   async delete(id: string) {
-    const db = this.databaseService.getDb();
-    await deleteTimeline(db, { id });
+    try {
+      const db = this.databaseService.getDb();
+      await deleteTimeline(db, { id });
+    } catch (err) {
+      const error = new CustomError('Failed to delete timeline entry from the database', err, {
+        id,
+      });
+      console.error(error);
+      throw error;
+    }
   }
 
   public async findAllEvents(
@@ -131,147 +178,158 @@ export class TimelinesService {
     term: string | undefined,
     timelineIds: string[] | undefined
   ): Promise<TimelineWithEventsDto[]> {
-    const timelines = await this.findAllTimelines(undefined);
-    let timelinesToFetch: TimelineDto[];
-    if (timelineIds) {
-      timelinesToFetch = timelines.filter((timeline) => timelineIds.includes(timeline.id));
-    } else {
-      timelinesToFetch = timelines;
-    }
+    try {
+      const timelines = await this.findAllTimelines(undefined);
+      let timelinesToFetch: TimelineDto[];
+      if (timelineIds) {
+        timelinesToFetch = timelines.filter((timeline) => timelineIds.includes(timeline.id));
+      } else {
+        timelinesToFetch = timelines;
+      }
 
-    if (term) {
-      timelinesToFetch = timelinesToFetch.filter((timeline) =>
-        timeline.title.toLowerCase().includes(term.toLowerCase())
-      );
-    }
-    const fetchEventPromises: Promise<TimelineEventDto[]>[] = timelinesToFetch.map(
-      (timelineInfo): Promise<TimelineEventDto[]> => {
-        switch (timelineInfo.timelineType) {
-          case TimelineType.ActiveState:
-            return (async () => {
-              const activeStates = await this.activeStatesService.findAll(startedAt, endedAt);
-              return activeStates.map((activeState: ActiveState): TimelineEventDto => {
-                return {
-                  id: activeState.id,
-                  startedAt: activeState.startedAt,
-                  endedAt: activeState.endedAt,
-                  info: {
-                    isActive: activeState.isActive,
-                  },
-                  timelineId: timelineInfo.id,
-                };
-              });
-            })();
-
-          case TimelineType.AutoTag: {
-            // Resolve autotags after fetching all other events
-            return Promise.resolve([]);
-          }
-
-          case TimelineType.Tag:
-            return (async () => {
-              const tagEvents = await this.tagsService.findAll(startedAt, endedAt);
-              return tagEvents.map((tag: Tag): TimelineEventDto => {
-                return {
-                  id: tag.id,
-                  startedAt: tag.startedAt,
-                  endedAt: tag.endedAt,
-                  info: {
-                    tagNameId: tag.tagName?.id,
-                    tagNameName: tag.tagName?.title,
-                    tagNameColor: tag.tagName?.color,
-                    tagNameCode: tag.tagName?.code,
-                  },
-                  timelineId: timelineInfo.id,
-                };
-              });
-            })();
-
-          case TimelineType.Website:
-            return (async () => {
-              const websites = await this.websitesService.findAll(startedAt, endedAt);
-              return websites.map((website: Website): TimelineEventDto => {
-                return {
-                  id: website.id,
-                  startedAt: website.startedAt,
-                  endedAt: website.endedAt,
-                  info: {
-                    websiteUrl: website.websiteUrl,
-                    websiteTitle: website.websiteTitle,
-                  },
-                  timelineId: timelineInfo.id,
-                };
-              });
-            })();
-
-          case TimelineType.Program:
-            return (async () => {
-              const programActivities = await this.programsService.findAll(startedAt, endedAt);
-              return programActivities.map((program: Program): TimelineEventDto => {
-                return {
-                  id: program.id,
-                  startedAt: program.startedAt,
-                  endedAt: program.endedAt,
-                  info: {
-                    programName: program.programName,
-                    windowTitle: program.windowTitle,
-                  },
-                  timelineId: timelineInfo.id,
-                };
-              });
-            })();
-
-          case TimelineType.Calendar:
-            return (async () => {
-              try {
-                const calendarEvents = await this.calendarsService.getEvents(
-                  timelineInfo.eventProviderInfo.icsUrl,
-                  startedAt,
-                  endedAt
-                );
-                return calendarEvents.map((calendarEvent: CalendarEvent): TimelineEventDto => {
+      if (term) {
+        timelinesToFetch = timelinesToFetch.filter((timeline) =>
+          timeline.title.toLowerCase().includes(term.toLowerCase())
+        );
+      }
+      const fetchEventPromises: Promise<TimelineEventDto[]>[] = timelinesToFetch.map(
+        (timelineInfo): Promise<TimelineEventDto[]> => {
+          switch (timelineInfo.timelineType) {
+            case TimelineType.ActiveState:
+              return (async () => {
+                const activeStates = await this.activeStatesService.findAll(startedAt, endedAt);
+                return activeStates.map((activeState: ActiveState): TimelineEventDto => {
                   return {
-                    id: calendarEvent.id,
-                    startedAt: calendarEvent.startedAt,
-                    endedAt: calendarEvent.endedAt,
+                    id: activeState.id,
+                    startedAt: activeState.startedAt,
+                    endedAt: activeState.endedAt,
                     info: {
-                      summary: calendarEvent.summary,
-                      description: calendarEvent.description,
-                      location: calendarEvent.location,
-                      allDay: calendarEvent.allDay,
+                      isActive: activeState.isActive,
                     },
                     timelineId: timelineInfo.id,
                   };
                 });
-              } catch (err) {
-                console.error(
-                  new CustomError('Failed to fetch events from calendar', err, {
-                    icsUrl: timelineInfo.eventProviderInfo.icsUrl,
+              })();
+
+            case TimelineType.AutoTag: {
+              // Resolve autotags after fetching all other events
+              return Promise.resolve([]);
+            }
+
+            case TimelineType.Tag:
+              return (async () => {
+                const tagEvents = await this.tagsService.findAll(startedAt, endedAt);
+                return tagEvents.map((tag: Tag): TimelineEventDto => {
+                  return {
+                    id: tag.id,
+                    startedAt: tag.startedAt,
+                    endedAt: tag.endedAt,
+                    info: {
+                      tagNameId: tag.tagName?.id,
+                      tagNameName: tag.tagName?.title,
+                      tagNameColor: tag.tagName?.color,
+                      tagNameCode: tag.tagName?.code,
+                    },
+                    timelineId: timelineInfo.id,
+                  };
+                });
+              })();
+
+            case TimelineType.Website:
+              return (async () => {
+                const websites = await this.websitesService.findAll(startedAt, endedAt);
+                return websites.map((website: Website): TimelineEventDto => {
+                  return {
+                    id: website.id,
+                    startedAt: website.startedAt,
+                    endedAt: website.endedAt,
+                    info: {
+                      websiteUrl: website.websiteUrl,
+                      websiteTitle: website.websiteTitle,
+                    },
+                    timelineId: timelineInfo.id,
+                  };
+                });
+              })();
+
+            case TimelineType.Program:
+              return (async () => {
+                const programActivities = await this.programsService.findAll(startedAt, endedAt);
+                return programActivities.map((program: Program): TimelineEventDto => {
+                  return {
+                    id: program.id,
+                    startedAt: program.startedAt,
+                    endedAt: program.endedAt,
+                    info: {
+                      programName: program.programName,
+                      windowTitle: program.windowTitle,
+                    },
+                    timelineId: timelineInfo.id,
+                  };
+                });
+              })();
+
+            case TimelineType.Calendar:
+              return (async () => {
+                try {
+                  const calendarEvents = await this.calendarsService.getEvents(
+                    timelineInfo.eventProviderInfo.icsUrl,
                     startedAt,
-                    endedAt,
-                  })
-                );
-                return []; // TODO pass errors to client to show as toast messages
-              }
-            })();
+                    endedAt
+                  );
+                  return calendarEvents.map((calendarEvent: CalendarEvent): TimelineEventDto => {
+                    return {
+                      id: calendarEvent.id,
+                      startedAt: calendarEvent.startedAt,
+                      endedAt: calendarEvent.endedAt,
+                      info: {
+                        summary: calendarEvent.summary,
+                        description: calendarEvent.description,
+                        location: calendarEvent.location,
+                        allDay: calendarEvent.allDay,
+                      },
+                      timelineId: timelineInfo.id,
+                    };
+                  });
+                } catch (err) {
+                  console.error(
+                    new CustomError('Failed to fetch events from calendar', err, {
+                      icsUrl: timelineInfo.eventProviderInfo.icsUrl,
+                      startedAt,
+                      endedAt,
+                    })
+                  );
+                  return []; // TODO pass errors to client to show as toast messages
+                }
+              })();
+          }
         }
-      }
-    );
-    const events = await Promise.all(fetchEventPromises);
+      );
+      const events = await Promise.all(fetchEventPromises);
 
-    const timelinesWithEvents = timelinesToFetch.map(
-      (timeline, timelineIndex): TimelineWithEventsDto => {
-        return {
-          id: timeline.id,
-          type: timeline.timelineType,
-          events: events[timelineIndex],
-        };
-      }
-    );
+      const timelinesWithEvents = timelinesToFetch.map(
+        (timeline, timelineIndex): TimelineWithEventsDto => {
+          return {
+            id: timeline.id,
+            type: timeline.timelineType,
+            events: events[timelineIndex],
+          };
+        }
+      );
 
-    // Analyze auto-tags if an autotagTimeline is present
-    const tagNames = await this.tagNamesService.findAll(undefined);
-    const autoTags = (await this.autoTagsService.findAll(undefined)) as AutoTagDto[];
-    return this.autoTagsService.analyseEvents(timelinesWithEvents, autoTags, tagNames);
+      // Analyze auto-tags if an autotagTimeline is present
+      const tagNames = await this.tagNamesService.findAll(undefined);
+      const autoTags = (await this.autoTagsService.findAll(undefined)) as AutoTagDto[];
+      return this.autoTagsService.analyseEvents(timelinesWithEvents, autoTags, tagNames);
+    } catch (err) {
+      const error = new CustomError('Failed to fetch all timeline events', err, {
+        startedAt,
+        endedAt,
+        term,
+        timelineIds,
+      });
+      console.error(error);
+      throw error;
+    }
   }
 }

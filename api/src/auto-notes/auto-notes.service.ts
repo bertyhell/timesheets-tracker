@@ -1,6 +1,7 @@
 import { CreateAutoNoteDto } from './dto/create-auto-note.dto';
 import { Inject, Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
+import { CustomError } from '../shared/CustomError';
 import { v4 as uuid } from 'uuid';
 import { type AutoNote, ConditionVariable } from '../types/types';
 import { UpdateAutoNoteDto } from './dto/update-auto-note.dto';
@@ -36,67 +37,114 @@ export class AutoNotesService {
   }
 
   async findAll(searchTerm: string | undefined): Promise<AutoNote[]> {
-    const db = this.databaseService.getDb();
-    let rawAutoNotes: FindAllAutoNotesResult[] | FindAllAutoNotesBySearchTermResult[];
-    if (searchTerm) {
-      rawAutoNotes = findAllAutoNotesBySearchTerm(db, { searchTerm });
-    } else {
-      rawAutoNotes = findAllAutoNotes(db);
-    }
+    try {
+      const db = this.databaseService.getDb();
+      let rawAutoNotes: FindAllAutoNotesResult[] | FindAllAutoNotesBySearchTermResult[];
+      if (searchTerm) {
+        rawAutoNotes = findAllAutoNotesBySearchTerm(db, { searchTerm });
+      } else {
+        rawAutoNotes = findAllAutoNotes(db);
+      }
 
-    return rawAutoNotes.map((note) => this.adapt(note));
+      return rawAutoNotes.map((note) => this.adapt(note));
+    } catch (err) {
+      const error = new CustomError('Failed to fetch all auto-notes from the database', err, {
+        searchTerm,
+      });
+      console.error(error);
+      throw error;
+    }
   }
 
   async count(): Promise<number> {
-    const db = this.databaseService.getDb();
-    const result = countAutoNotes(db);
+    try {
+      const db = this.databaseService.getDb();
+      const result = countAutoNotes(db);
 
-    return result?.count ?? 0;
+      return result?.count ?? 0;
+    } catch (err) {
+      const error = new CustomError('Failed to count auto-notes in the database', err, {});
+      console.error(error);
+      throw error;
+    }
   }
 
   async findOne(id: string): Promise<AutoNote> {
-    const db = this.databaseService.getDb();
-    const result = findOneAutoNote(db, { id });
+    try {
+      const db = this.databaseService.getDb();
+      const result = findOneAutoNote(db, { id });
 
-    return this.adapt(result);
+      return this.adapt(result);
+    } catch (err) {
+      const error = new CustomError('Failed to fetch one auto-note from the database', err, { id });
+      console.error(error);
+      throw error;
+    }
   }
 
   async create(autoNote: CreateAutoNoteDto): Promise<AutoNote> {
-    const db = this.databaseService.getDb();
-    const id = uuid();
-    createAutoNote(db, {
-      id,
-      title: autoNote.title,
-      tagNameId: autoNote.tagNameIds ? autoNote.tagNameIds.join(TAG_NAME_IDS_SEPARATOR) : null,
-      variable: autoNote.variable,
-      extractRegex: autoNote.extractRegex ?? null,
-      extractRegexReplacement: autoNote.extractRegexReplacement ?? null,
-    });
+    let id: string | null = null;
+    try {
+      const db = this.databaseService.getDb();
+      id = uuid();
+      createAutoNote(db, {
+        id,
+        title: autoNote.title,
+        tagNameId: autoNote.tagNameIds ? autoNote.tagNameIds.join(TAG_NAME_IDS_SEPARATOR) : null,
+        variable: autoNote.variable,
+        extractRegex: autoNote.extractRegex ?? null,
+        extractRegexReplacement: autoNote.extractRegexReplacement ?? null,
+      });
 
-    return this.findOne(id);
+      return this.findOne(id);
+    } catch (err) {
+      const error = new CustomError('Failed to create an auto-note entry in the database', err, {
+        id,
+        autoNote,
+      });
+      console.error(error);
+      throw error;
+    }
   }
 
   async update(id: string, updateTagDto: UpdateAutoNoteDto): Promise<AutoNote> {
-    const db = this.databaseService.getDb();
-    updateAutoNote(
-      db,
-      {
-        title: updateTagDto.title,
-        tagNameId: updateTagDto.tagNameIds
-          ? updateTagDto.tagNameIds.join(TAG_NAME_IDS_SEPARATOR)
-          : null,
-        variable: updateTagDto.variable,
-        extractRegex: updateTagDto.extractRegex ?? null,
-        extractRegexReplacement: updateTagDto.extractRegexReplacement ?? null,
-      },
-      { id }
-    );
+    try {
+      const db = this.databaseService.getDb();
+      updateAutoNote(
+        db,
+        {
+          title: updateTagDto.title,
+          tagNameId: updateTagDto.tagNameIds
+            ? updateTagDto.tagNameIds.join(TAG_NAME_IDS_SEPARATOR)
+            : null,
+          variable: updateTagDto.variable,
+          extractRegex: updateTagDto.extractRegex ?? null,
+          extractRegexReplacement: updateTagDto.extractRegexReplacement ?? null,
+        },
+        { id }
+      );
 
-    return await this.findOne(id);
+      return await this.findOne(id);
+    } catch (err) {
+      const error = new CustomError('Failed to update auto-note entry in the database', err, {
+        id,
+        updateTagDto,
+      });
+      console.error(error);
+      throw error;
+    }
   }
 
   async remove(id: string): Promise<void> {
-    const db = this.databaseService.getDb();
-    deleteAutoNote(db, { id });
+    try {
+      const db = this.databaseService.getDb();
+      deleteAutoNote(db, { id });
+    } catch (err) {
+      const error = new CustomError('Failed to delete auto-note entry from the database', err, {
+        id,
+      });
+      console.error(error);
+      throw error;
+    }
   }
 }

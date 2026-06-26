@@ -26,11 +26,20 @@ export class ActiveStatesService {
   }
 
   async findAll(startedAt: string, endedAt: string): Promise<ActiveState[]> {
-    const results = await findAllActiveStates(this.databaseService.getDb(), {
-      startedAt,
-      endedAt,
-    });
-    return results.map(this.adapt);
+    try {
+      const results = await findAllActiveStates(this.databaseService.getDb(), {
+        startedAt,
+        endedAt,
+      });
+      return results.map(this.adapt);
+    } catch (err) {
+      const error = new CustomError('Failed to fetch all active-states from the database', err, {
+        startedAt,
+        endedAt,
+      });
+      console.error(error);
+      throw error;
+    }
   }
 
   async findOne(id: string): Promise<ActiveState> {
@@ -62,20 +71,39 @@ export class ActiveStatesService {
   }
 
   async update(id: string, updateActiveStateDto: UpdateActiveStateDto): Promise<ActiveState> {
-    await updateActiveState(
-      this.databaseService.getDb(),
-      {
-        isActive: updateActiveStateDto.isActive ? 1 : 0,
-        startedAt: updateActiveStateDto.startedAt,
-        endedAt: updateActiveStateDto.endedAt,
-      },
-      { id }
-    );
+    try {
+      await updateActiveState(
+        this.databaseService.getDb(),
+        {
+          isActive: updateActiveStateDto.isActive ? 1 : 0,
+          startedAt: updateActiveStateDto.startedAt,
+          endedAt: updateActiveStateDto.endedAt,
+        },
+        { id }
+      );
 
-    return this.findOne(id);
+      return this.findOne(id);
+    } catch (err) {
+      const error = new CustomError('Failed to update active-state entry in the database', err, {
+        id,
+        updateActiveStateDto,
+      });
+      console.error(error);
+      throw error;
+    }
   }
 
   async delete(id: string): Promise<void> {
-    await deleteActiveState(this.databaseService.getDb(), { id });
+    try {
+      await deleteActiveState(this.databaseService.getDb(), { id });
+    } catch (err) {
+      const error = new CustomError(
+        'Failed to delete active-state entry from the database',
+        err,
+        { id }
+      );
+      console.error(error);
+      throw error;
+    }
   }
 }

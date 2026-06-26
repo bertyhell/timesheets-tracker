@@ -2,7 +2,7 @@ import './NotesPage.css';
 import React, { type ReactNode, useEffect, useState } from 'react';
 import Button, { ButtonVariant } from '../../../components/Button/Button';
 import { PageHeader } from '../../../components/PageHeader/PageHeader';
-import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import { ROUTE_PARTS } from '../../../App';
@@ -17,6 +17,7 @@ import { orderBy } from 'lodash-es';
 // interface NotesPageProps {}
 
 export function NotesPage() {
+  const location = useLocation();
   const navigate = useNavigate();
   const params = useParams();
   const id = params.id;
@@ -33,6 +34,11 @@ export function NotesPage() {
     ...autoNotesControllerFindAllOptions({ query: { term: searchTerm } }),
   });
   const { mutateAsync: deleteNote } = useMutation({ ...autoNotesControllerRemoveMutation() });
+
+  // Refetch notes when edit or create modal closes
+  useEffect(() => {
+    refetchNotes();
+  }, [location]);
 
   useEffect(() => {
     if (notes) {

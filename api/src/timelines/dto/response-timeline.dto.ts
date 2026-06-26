@@ -1,6 +1,6 @@
 import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEnum, IsNumber, IsObject, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
 import { type Timeline, TimelineType } from '../../types/types';
 
 export class CalendarEventProviderInfoDto {
@@ -73,6 +73,17 @@ export class TimelineDto implements Timeline {
     description: 'Visual order in which the timelines are displayed',
   })
   visualOrder: number;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Hex color code for this timeline',
+    nullable: true,
+    required: false,
+  })
+  color: string | null;
 }
 
 export class TimelineCountDto {

@@ -8,6 +8,7 @@ export type FindAllTimelinesResult = {
   createdAt: string;
   updatedAt: string;
   visualOrder: number;
+  color?: string;
 };
 
 export function findAllTimelines(db: DatabaseSync): FindAllTimelinesResult[] {
@@ -19,7 +20,8 @@ export function findAllTimelines(db: DatabaseSync): FindAllTimelinesResult[] {
 	    eventProviderInfo,
 	    createdAt,
 	    updatedAt,
-	    visualOrder
+	    visualOrder,
+	    color
 	FROM timelines
 	ORDER BY visualOrder ASC
 	`;
@@ -38,6 +40,7 @@ function mapArrayToFindAllTimelinesResult(data: any) {
     createdAt: data.createdAt,
     updatedAt: data.updatedAt,
     visualOrder: data.visualOrder,
+    color: data.color,
   };
   return result;
 }

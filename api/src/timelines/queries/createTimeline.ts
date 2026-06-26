@@ -8,6 +8,7 @@ export type CreateTimelineParams = {
   createdAt: string;
   updatedAt: string;
   visualOrder: number;
+  color: string | null;
 };
 
 export type CreateTimelineResult = {
@@ -28,9 +29,10 @@ export function createTimeline(
 	    eventProviderInfo,
 	    createdAt,
 	    updatedAt,
-	    visualOrder
+	    visualOrder,
+	    color
 	)
-	VALUES (?, ?, ?, ?, ?, ?, ?)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 	`;
   return db
     .prepare(sql)
@@ -41,6 +43,7 @@ export function createTimeline(
       params.eventProviderInfo,
       params.createdAt,
       params.updatedAt,
-      params.visualOrder
+      params.visualOrder,
+      params.color
     ) as CreateTimelineResult;
 }

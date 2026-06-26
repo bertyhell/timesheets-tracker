@@ -55,6 +55,7 @@ export class TimelinesService {
       createdAt: rawTimeline.createdAt,
       updatedAt: rawTimeline.updatedAt,
       visualOrder: rawTimeline.visualOrder,
+      color: rawTimeline.color ?? null,
     };
   }
 
@@ -118,6 +119,7 @@ export class TimelinesService {
         createdAt: now,
         updatedAt: now,
         visualOrder: timeline.visualOrder,
+        color: timeline.color ?? null,
       });
 
       return this.findOne(id);
@@ -144,6 +146,7 @@ export class TimelinesService {
           eventProviderInfo: eventProviderInfo ? JSON.stringify(eventProviderInfo) : null,
           updatedAt: new Date().toISOString(),
           visualOrder: updateTimelineDto.visualOrder ?? existing.visualOrder,
+          color: updateTimelineDto.color !== undefined ? (updateTimelineDto.color ?? null) : existing.color,
         },
         { id }
       );

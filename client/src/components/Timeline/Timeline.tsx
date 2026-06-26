@@ -224,10 +224,12 @@ function Timeline({
     }
   };
 
-  // Derive a consistent dot color for the timeline label from its title
-  const timelineDotColor = events[0]
-    ? getColorForEvent(timelineInfo, events[0])
-    : getColorFromString(timelineInfo.title);
+  // Derive a consistent dot color for the timeline label from its title (or use configured color)
+  const timelineDotColor = timelineInfo.color
+    ? timelineInfo.color
+    : events[0]
+      ? getColorForEvent(timelineInfo, events[0])
+      : getColorFromString(timelineInfo.title);
 
   const hourTicks = getTicks(minTime, maxTime, 60);
   const quarterTicks = getTicks(minTime, maxTime, 15);

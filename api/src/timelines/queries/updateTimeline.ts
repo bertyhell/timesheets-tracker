@@ -6,6 +6,7 @@ export type UpdateTimelineData = {
   eventProviderInfo: string | null;
   updatedAt: string;
   visualOrder: number;
+  color: string | null;
 };
 
 export type UpdateTimelineParams = {
@@ -28,7 +29,8 @@ export function updateTimeline(
 	    timelineType = ?,
 	    eventProviderInfo = ?,
 	    updatedAt = ?,
-	    visualOrder = ?
+	    visualOrder = ?,
+	    color = ?
 	WHERE id = ?
 	`;
   return db
@@ -39,6 +41,7 @@ export function updateTimeline(
       data.eventProviderInfo,
       data.updatedAt,
       data.visualOrder,
+      data.color,
       params.id
     ) as UpdateTimelineResult;
 }

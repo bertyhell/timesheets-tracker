@@ -70,6 +70,7 @@ export function TimelinesPage() {
       <table className="c-table w-full">
         <thead>
           <tr className="h-10 bg-white">
+            <th className="w-px"></th>
             <th
               className="text-left pl-3 cursor-pointer select-none"
               onClick={() => handleSort('title')}
@@ -114,6 +115,12 @@ export function TimelinesPage() {
                   )
                 }
               >
+                <td className="w-px py-1 pl-2">
+                  <span
+                    className="block h-5 w-5 rounded-md"
+                    style={{ backgroundColor: timeline.color ?? 'transparent' }}
+                  ></span>
+                </td>
                 <td className="pl-3">{timeline.title}</td>
                 <td className="pl-3">{timeline.timelineType}</td>
                 <td className="pl-3">{timeline.visualOrder}</td>

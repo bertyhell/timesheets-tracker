@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEnum, IsNumber, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 import { TimelineType } from '../../types/types';
 
 export class CreateTimelineDto {
@@ -39,4 +39,15 @@ export class CreateTimelineDto {
     examples: [0, 5, 200],
   })
   visualOrder: number;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Hex color code for this timeline',
+    nullable: true,
+    required: false,
+  })
+  color?: string | null;
 }

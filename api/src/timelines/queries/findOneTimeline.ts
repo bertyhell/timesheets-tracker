@@ -12,6 +12,7 @@ export type FindOneTimelineResult = {
   createdAt: string;
   updatedAt: string;
   visualOrder: number;
+  color?: string;
 };
 
 export function findOneTimeline(
@@ -26,7 +27,8 @@ export function findOneTimeline(
 	    eventProviderInfo,
 	    createdAt,
 	    updatedAt,
-	    visualOrder
+	    visualOrder,
+	    color
 	FROM timelines
 	WHERE id = ?
 	LIMIT 1

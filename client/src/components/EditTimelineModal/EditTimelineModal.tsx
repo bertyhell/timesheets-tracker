@@ -15,6 +15,8 @@ import {
 import type { TimelineType } from '../../generated/api/types.gen';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { ColorInput } from '../ColorInput/ColorInput';
+import { COLOR_LIST } from '../Timeline/helpers/getColorForEvent';
 
 const TIMELINE_TYPES: TimelineType[] = [
   'ActiveState',
@@ -32,6 +34,7 @@ export function EditTimelineModal() {
   const [timelineType, setTimelineType] = useState<TimelineType>('Program');
   const [icsUrl, setIcsUrl] = useState<string>('');
   const [visualOrder, setVisualOrder] = useState<number>(0);
+  const [color, setColor] = useState<string>(COLOR_LIST[0]);
 
   const { mutateAsync: createTimeline } = useMutation({ ...timelinesControllerCreateMutation() });
   const { mutateAsync: updateTimeline } = useMutation({ ...timelinesControllerUpdateMutation() });
@@ -52,6 +55,7 @@ export function EditTimelineModal() {
       const info = timelineResponse.eventProviderInfo as Record<string, string> | null;
       setIcsUrl(timelineResponse.timelineType === 'Calendar' ? (info?.icsUrl ?? '') : '');
       setVisualOrder(timelineResponse.visualOrder);
+      setColor(timelineResponse.color ?? COLOR_LIST[0]);
     }
   }, [timelineResponse]);
 
@@ -73,6 +77,7 @@ export function EditTimelineModal() {
           timelineType,
           eventProviderInfo: timelineType === 'Calendar' ? { icsUrl } : {},
           visualOrder,
+          color,
         },
       });
       toast('Timeline has been updated', { type: 'success' });
@@ -83,6 +88,7 @@ export function EditTimelineModal() {
           timelineType,
           eventProviderInfo: timelineType === 'Calendar' ? { icsUrl } : {},
           visualOrder,
+          color,
         },
       });
       toast('Timeline has been created', { type: 'success' });
@@ -161,6 +167,9 @@ export function EditTimelineModal() {
             setVisualOrder(Number(evt.target.value))
           }
         />
+
+        <h4 className="mt-4">Color</h4>
+        <ColorInput color={color} onChange={setColor} />
       </div>
 
       <div className="flex flex-row justify-between gap-2 mt-8">

@@ -131,4 +131,5 @@ export interface Timeline {
   createdAt: string;
   updatedAt: string;
   visualOrder: number;
+  color: string | null;
 }

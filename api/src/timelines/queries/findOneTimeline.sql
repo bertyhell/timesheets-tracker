@@ -5,7 +5,8 @@ SELECT
     eventProviderInfo,
     createdAt,
     updatedAt,
-    visualOrder
+    visualOrder,
+    color
 FROM timelines
 WHERE id = :id
 LIMIT 1

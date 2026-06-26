@@ -512,6 +512,10 @@ export type CreateTimelineDto = {
      * Order in which the timelines are displayed (lower is first)
      */
     visualOrder: number;
+    /**
+     * Hex color code for this timeline
+     */
+    color?: string | null;
 };
 
 export type TimelineDto = {
@@ -543,6 +547,10 @@ export type TimelineDto = {
      * Visual order in which the timelines are displayed
      */
     visualOrder: number;
+    /**
+     * Hex color code for this timeline
+     */
+    color?: string | null;
 };
 
 export type TimelineEventDto = {
@@ -613,6 +621,10 @@ export type UpdateTimelineDto = {
      * Order in which the timelines are displayed (lower is first)
      */
     visualOrder?: number;
+    /**
+     * Hex color code for this timeline
+     */
+    color?: string | null;
 };
 
 export type AppControllerStatusData = {

@@ -5,7 +5,8 @@ SELECT
     eventProviderInfo,
     createdAt,
     updatedAt,
-    visualOrder
+    visualOrder,
+    color
 FROM timelines
 WHERE title like '%' || :searchTerm || '%'
 ORDER BY visualOrder ASC

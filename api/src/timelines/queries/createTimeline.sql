@@ -6,6 +6,7 @@ INSERT INTO timelines
     eventProviderInfo,
     createdAt,
     updatedAt,
-    visualOrder
+    visualOrder,
+    color
 )
-VALUES (:id, :title, :timelineType, :eventProviderInfo, :createdAt, :updatedAt, :visualOrder)
+VALUES (:id, :title, :timelineType, :eventProviderInfo, :createdAt, :updatedAt, :visualOrder, :color)

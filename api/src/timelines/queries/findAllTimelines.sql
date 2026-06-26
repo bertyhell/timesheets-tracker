@@ -5,6 +5,7 @@ SELECT
     eventProviderInfo,
     createdAt,
     updatedAt,
-    visualOrder
+    visualOrder,
+    color
 FROM timelines
 ORDER BY visualOrder ASC

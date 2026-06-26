@@ -12,6 +12,7 @@ export type FindAllTimelinesBySearchTermResult = {
   createdAt: string;
   updatedAt: string;
   visualOrder: number;
+  color?: string;
 };
 
 export function findAllTimelinesBySearchTerm(
@@ -26,7 +27,8 @@ export function findAllTimelinesBySearchTerm(
 	    eventProviderInfo,
 	    createdAt,
 	    updatedAt,
-	    visualOrder
+	    visualOrder,
+	    color
 	FROM timelines
 	WHERE title like '%' || ? || '%'
 	ORDER BY visualOrder ASC
@@ -46,6 +48,7 @@ function mapArrayToFindAllTimelinesBySearchTermResult(data: any) {
     createdAt: data.createdAt,
     updatedAt: data.updatedAt,
     visualOrder: data.visualOrder,
+    color: data.color,
   };
   return result;
 }

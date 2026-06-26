@@ -4,5 +4,6 @@ SET
     timelineType = :timelineType,
     eventProviderInfo = :eventProviderInfo,
     updatedAt = :updatedAt,
-    visualOrder = :visualOrder
+    visualOrder = :visualOrder,
+    color = :color
 WHERE id = :id

@@ -1,5 +1,8 @@
 import './Timeline.css';
 import React, { type MouseEvent, useEffect, useRef, useState } from 'react';
+
+import { useAtom } from 'jotai';
+import { searchTermAtom } from '../../store/store';
 import Tooltip from '../Tooltip/Tooltip';
 import {
   addMilliseconds,
@@ -63,10 +66,26 @@ function Timeline({
   onTagResized,
   onDeleteTag,
 }: TimelineProps) {
+  const [searchTerm] = useAtom(searchTermAtom);
   const [resizeState, setResizeState] = useState<ResizeState | null>(null);
   const [resizeCurrentPosX, setResizeCurrentPosX] = useState<number | null>(null);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; eventId: string } | null>(null);
   const contextMenuRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [trackWidth, setTrackWidth] = useState(0);
+
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    setTrackWidth(el.offsetWidth);
+    const ro = new ResizeObserver((entries) => {
+      setTrackWidth(entries[0].contentRect.width);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const lowerSearch = searchTerm.toLowerCase();
 
   useEffect(() => {
     if (!contextMenu) return;
@@ -225,7 +244,7 @@ function Timeline({
         <span className="c-timeline__dot" style={{ backgroundColor: timelineDotColor }} />
         <span className="c-timeline__label">{timelineInfo.title}</span>
       </div>
-      <div className="c-timeline__track">
+      <div className="c-timeline__track" ref={trackRef}>
         {/* Hour and quarter ticks */}
         {quarterTicks.map((quarterTick) => (
           <div
@@ -284,7 +303,8 @@ function Timeline({
 
           const widthPercent = effectiveRight - effectiveLeft;
           const width = widthPercent + '%';
-          const isNarrow = widthPercent < 5;
+          const pixelWidth = (widthPercent / 100) * trackWidth;
+          const isNarrow = pixelWidth <= 40;
 
           const eventInfo = event.info as Record<string, string | number | boolean>;
           const label = getEventLabel(timelineInfo, event);
@@ -292,6 +312,7 @@ function Timeline({
           const color = getColorForEvent(timelineInfo, event);
           const isTagTimeline =
             timelineInfo.timelineType === TimelineType.Tag && !!onTagResized;
+          const isDimmed = !!lowerSearch && !JSON.stringify(event).toLowerCase().includes(lowerSearch);
 
           return (
             <Tooltip
@@ -335,7 +356,8 @@ function Timeline({
                 className={
                   'c-timeline__event' +
                   (selectedEvent?.id === event.id ? ' c-timeline__event--selected' : '') +
-                  (isNarrow ? ' c-timeline__event--narrow' : '')
+                  (isNarrow ? ' c-timeline__event--narrow' : '') +
+                  (isDimmed ? ' c-timeline__event--dimmed' : '')
                 }
                 data-event-id={event.id}
                 key={'c-timeline__' + timelineInfo.title + '__event__div__' + event.startedAt}

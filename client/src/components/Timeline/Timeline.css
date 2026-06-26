@@ -102,6 +102,11 @@
       outline: 2px solid var(--primary-0);
     }
 
+    &.c-timeline__event--dimmed {
+      opacity: 0.15;
+      pointer-events: none;
+    }
+
     &.c-timeline__event--narrow {
       border-radius: 2px;
     }

@@ -22,6 +22,7 @@ export function NotesPage() {
   const id = params.id;
   const [_selectedNote, setSelectedNote] = useState<AutoNote | null>(null);
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const toggleSort = () => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
   const sortIndicator = (
@@ -29,7 +30,7 @@ export function NotesPage() {
   );
 
   const { data: notes, refetch: refetchNotes } = useQuery({
-    ...autoNotesControllerFindAllOptions({ query: { term: '' } }),
+    ...autoNotesControllerFindAllOptions({ query: { term: searchTerm } }),
   });
   const { mutateAsync: deleteNote } = useMutation({ ...autoNotesControllerRemoveMutation() });
 
@@ -57,6 +58,13 @@ export function NotesPage() {
           Add auto note
         </Button>
       </PageHeader>
+      <input
+          type="search"
+          placeholder="Search..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="c-input c-input--search mb-3 ml-6 w-full max-w-sm"
+        />
       <table className="c-table w-full">
         <thead>
           <tr className="h-10 bg-white">

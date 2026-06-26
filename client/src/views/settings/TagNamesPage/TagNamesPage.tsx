@@ -22,6 +22,7 @@ export function TagNamesPage() {
   const id = params.id;
   const [_selectedTagName, setSelectedTagName] = useState<TagName | null>(null);
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const toggleSort = () => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
   const sortIndicator = (
@@ -29,7 +30,7 @@ export function TagNamesPage() {
   );
 
   const { data: tagNames, refetch: refetchTagNames } = useQuery({
-    ...tagNamesControllerFindAllOptions({ query: { term: '' } }),
+    ...tagNamesControllerFindAllOptions({ query: { term: searchTerm } }),
     refetchOnMount: true,
   });
   const { mutateAsync: deleteTagName } = useMutation({ ...tagNamesControllerRemoveMutation() });
@@ -64,6 +65,13 @@ export function TagNamesPage() {
           Add tag name
         </Button>
       </PageHeader>
+      <input
+          type="search"
+          placeholder="Search..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="c-input c-input--search mb-3 ml-6 w-full max-w-sm"
+        />
       <table className="c-table w-full">
         <thead>
           <tr className="h-10 bg-white">

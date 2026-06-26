@@ -1,20 +1,28 @@
+.c-input {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: 0 !important;
+  display: block;
+  width: 100%;
+
+  &:focus {
+    border: 1px solid var(--focus-color);
+    box-shadow: 0 0 0 1px var(--focus-color);
+  }
+
+  &.c-input--search {
+    border-color: transparent;
+
+    &:focus {
+      border-color: var(--focus-color);
+    }
+  }
+}
+
 .c-form {
   label {
     display: block;
     margin-top: 1rem;
-  }
-
-  .c-input {
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    outline: 0 !important;
-    display: block;
-    width: 100%;
-
-    &:focus {
-      border: 1px solid var(--focus-color);
-      box-shadow: 0 0 0 1px var(--focus-color);
-    }
   }
 }

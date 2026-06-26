@@ -17,6 +17,7 @@ export function TimelinesPage() {
   const navigate = useNavigate();
   const [sortCol, setSortCol] = useState<'title' | 'timelineType' | 'visualOrder'>('visualOrder');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleSort = (col: 'title' | 'timelineType' | 'visualOrder') => {
     if (sortCol === col) {
@@ -33,7 +34,7 @@ export function TimelinesPage() {
     ) : null;
 
   const { data: timelines, refetch: refetchTimelines } = useQuery({
-    ...timelinesControllerFindAllOptions(),
+    ...timelinesControllerFindAllOptions({ query: { term: searchTerm } }),
     refetchOnMount: true,
   });
   const { mutateAsync: deleteTimeline } = useMutation({ ...timelinesControllerDeleteMutation() });
@@ -59,6 +60,13 @@ export function TimelinesPage() {
           Add timeline
         </Button>
       </PageHeader>
+      <input
+          type="search"
+          placeholder="Search..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="c-input c-input--search mb-3 ml-6 w-full max-w-sm"
+        />
       <table className="c-table w-full">
         <thead>
           <tr className="h-10 bg-white">

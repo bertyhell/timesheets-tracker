@@ -26,6 +26,7 @@ export function AutoTagsPage() {
   const navigate = useNavigate();
   const [sortCol, setSortCol] = useState<'title' | 'priority'>('priority');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const toggleSort = (col: 'title' | 'priority') => {
     if (sortCol === col) {
@@ -43,7 +44,7 @@ export function AutoTagsPage() {
       <span style={{ fontSize: '0.7em', color: '#aaa' }}> ▲▼</span>
     );
   const { data: autoTagItems, refetch: refetchAutoTags } = useQuery({
-    ...autoTagsControllerFindAllOptions({ query: { term: '' } }),
+    ...autoTagsControllerFindAllOptions({ query: { term: searchTerm } }),
   });
   const { mutateAsync: insertAutoTag } = useMutation({ ...autoTagsControllerCreateMutation() });
   const autoTags = autoTagItems as AutoTagDto[];
@@ -161,7 +162,15 @@ export function AutoTagsPage() {
 
   const renderAutoTagsTable = () => {
     return (
-      <table className="c-table w-full">
+      <>
+        <input
+          type="search"
+          placeholder="Search..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="c-input c-input--search mb-3 ml-6 w-full max-w-sm"
+        />
+        <table className="c-table w-full">
         <thead>
           <tr className="h-10 bg-white">
             <th className="w-px"></th>
@@ -218,6 +227,7 @@ export function AutoTagsPage() {
           )}
         </tbody>
       </table>
+      </>
     );
   };
 

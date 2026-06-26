@@ -148,7 +148,7 @@ export function EditAutoTagModal() {
       onClose={handleClose}
       classNames={{ modal: 'c-edit-auto-tag-modal', closeButton: 'c-button c-button--small' }}
     >
-      <h3>Add auto tag</h3>
+      <h3>{id ? 'Edit auto tag' : 'Add auto tag'}</h3>
 
       <div className="c-form">
         <label>Program Tag</label>

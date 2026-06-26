@@ -1,5 +1,6 @@
 .react-responsive-modal-modal {
   padding: 2rem;
+  border-radius: 0.5rem;
 
   .react-responsive-modal-closeButton {
     background-color: white;

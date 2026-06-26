@@ -460,6 +460,10 @@ export type TagEventInfoDto = {
 
 export type AutoTagEventInfoDto = {
     /**
+     * Id of the auto tag rule that produced this event
+     */
+    autoTagId: string;
+    /**
      * Id of the tag name associated with this tag event
      */
     tagNameId: string;

@@ -50,6 +50,7 @@ interface TimelineProps {
   onTagResized?: (tagId: string, newStartedAt: string, newEndedAt: string) => void;
   onDeleteTag?: (tagId: string) => void;
   onEditTag?: (tagId: string) => void;
+  onEditAutoTagRule?: (autoTagId: string) => void;
 }
 
 function Timeline({
@@ -70,6 +71,7 @@ function Timeline({
   onTagResized,
   onDeleteTag,
   onEditTag,
+  onEditAutoTagRule,
 }: TimelineProps) {
   const navigate = useNavigate();
   const [searchTerm] = useAtom(searchTermAtom);
@@ -196,9 +198,19 @@ function Timeline({
   };
 
   const handleContextMenu = (e: MouseEvent, eventId: string) => {
-    if (timelineInfo.timelineType !== TimelineType.Tag || (!onDeleteTag && !onEditTag)) return;
+    const isTag = timelineInfo.timelineType === TimelineType.Tag && (!!onDeleteTag || !!onEditTag);
+    const isAutoTag = timelineInfo.timelineType === TimelineType.AutoTag && !!onEditAutoTagRule;
+    if (!isTag && !isAutoTag) return;
     e.preventDefault();
     e.stopPropagation();
+    if (isAutoTag) {
+      const event = events.find((ev) => ev.id === eventId);
+      const autoTagId = (event?.info as { autoTagId?: string })?.autoTagId;
+      if (autoTagId) {
+        setContextMenu({ x: e.clientX, y: e.clientY, eventId: autoTagId });
+      }
+      return;
+    }
     setContextMenu({ x: e.clientX, y: e.clientY, eventId });
   };
 
@@ -480,10 +492,14 @@ function Timeline({
     {contextMenu && (
       <ContextMenu
         position={{ x: contextMenu.x, y: contextMenu.y }}
-        items={[
-          { label: 'Edit tag', onClick: () => onEditTag?.(contextMenu.eventId) },
-          { label: 'Delete tag', onClick: () => onDeleteTag?.(contextMenu.eventId), variant: 'danger' },
-        ]}
+        items={
+          timelineInfo.timelineType === TimelineType.AutoTag
+            ? [{ label: 'Edit rule', onClick: () => onEditAutoTagRule?.(contextMenu.eventId) }]
+            : [
+                { label: 'Edit tag', onClick: () => onEditTag?.(contextMenu.eventId) },
+                { label: 'Delete tag', onClick: () => onDeleteTag?.(contextMenu.eventId), variant: 'danger' },
+              ]
+        }
         onClose={() => setContextMenu(null)}
       />
     )}

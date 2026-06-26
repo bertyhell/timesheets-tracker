@@ -156,6 +156,16 @@ export class AutoTagEventInfoDto {
   @Type(() => String)
   @ApiProperty({
     type: String,
+    description: 'Id of the auto tag rule that produced this event',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+    required: true,
+  })
+  autoTagId: string;
+
+  @IsString()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
     description: 'Id of the tag name associated with this tag event',
     example: '550e8400-e29b-41d4-a716-446655440000',
     required: true,

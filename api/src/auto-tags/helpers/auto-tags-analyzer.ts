@@ -216,6 +216,7 @@ export function calculateAutoTagEvents(
         return false;
       }
       const autoTagEventInfo: AutoTagEventInfoDto = {
+        autoTagId: autoTag.id,
         tagNameId: tagName.id,
         tagNameColor: tagName.color,
         tagNameTitle: tagName.title,

@@ -359,6 +359,11 @@ export function TimelinesAndEventsPage() {
           onEditTag={(tagId: string) => {
             navigate('/' + ROUTE_PARTS.timelinesAndEvents + '/' + tagId + '/' + ROUTE_PARTS.edit);
           }}
+          onEditAutoTagRule={(autoTagId: string) => {
+            navigate(
+              '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.autoTagRules + '/' + autoTagId + '/' + ROUTE_PARTS.edit
+            );
+          }}
         ></Timeline>
       );
     });

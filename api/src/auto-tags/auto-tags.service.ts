@@ -98,9 +98,12 @@ export class AutoTagsService {
       timelines,
       (timeline) => timeline.type === TimelineType.AutoTag
     );
+    const timelinesForAutoTagAnalysis = otherTimelines.filter(
+      (timeline) => timeline.type !== TimelineType.Tag
+    );
     autoTagTimelines.forEach((autoTagTimeline) => {
       const autoTagEvents = calculateAutoTagEvents(
-        otherTimelines,
+        timelinesForAutoTagAnalysis,
         autoTags,
         autoTagTimeline,
         allTagNames

@@ -16,6 +16,7 @@ import { type AutoTag } from '../../../types/types';
 import copy from 'copy-to-clipboard';
 import { mapLimit } from 'blend-promise-utils';
 import type { AutoTagConditionDto, AutoTagDto } from '../../../generated/api/types.gen';
+import { SearchInput } from '../../../components/SearchInput/SearchInput';
 
 const AUTOTAGS_PROPERTY_NAME_FOR_PASTE_DETECTION = 'timesheetTrackerAutoTags';
 
@@ -163,12 +164,10 @@ export function AutoTagsPage() {
   const renderAutoTagsTable = () => {
     return (
       <>
-        <input
-          type="search"
-          placeholder="Search..."
+        <SearchInput
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="c-input c-input--search mb-3 ml-4 w-full max-w-sm text-sm"
+          onChange={setSearchTerm}
+          className="mb-3 ml-4 w-full max-w-sm"
         />
         <table className="c-table w-full">
         <thead>

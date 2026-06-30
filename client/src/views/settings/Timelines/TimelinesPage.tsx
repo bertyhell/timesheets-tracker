@@ -11,6 +11,7 @@ import { ROUTE_PARTS } from '../../../App';
 import { toast } from 'react-toastify';
 import { orderBy } from 'lodash-es';
 import './TimelinesPage.css';
+import { SearchInput } from '../../../components/SearchInput/SearchInput';
 
 export function TimelinesPage() {
   const location = useLocation();
@@ -60,12 +61,10 @@ export function TimelinesPage() {
           Add timeline
         </Button>
       </PageHeader>
-      <input
-          type="search"
-          placeholder="Search..."
+      <SearchInput
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="c-input c-input--search mb-3 ml-4 w-full max-w-sm text-sm"
+          onChange={setSearchTerm}
+          className="mb-3 ml-4 w-full max-w-sm"
         />
       <table className="c-table w-full">
         <thead>

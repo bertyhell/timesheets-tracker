@@ -10,10 +10,12 @@ import {
   CalendarEventInfoDto,
   ProgramEventInfoDto,
   TagEventInfoDto,
+  TimelineDto,
   TimelineEventDto,
   TimelineType,
   WebsiteEventInfoDto,
 } from '../../generated/api/types.gen';
+import { getColorForEvent } from '../Timeline/helpers/getColorForEvent';
 import { useVirtualizer } from '@tanstack/react-virtual';
 
 interface SortDescriptor {
@@ -30,6 +32,7 @@ interface EventsTotalsTableProps {
 interface TotalRow {
   id: string;
   category: string;
+  color: string;
   durationMs: number;
   duration: string;
 }
@@ -85,16 +88,20 @@ export function EventsTotalsTable({ events, timelineType, className }: EventsTot
       ? events.filter((e) => JSON.stringify(e).toLowerCase().includes(lowerSearch))
       : events;
 
-    const map = new Map<string, number>();
+    const map = new Map<string, { durationMs: number; color: string }>();
+    const fakeTimelineDto = { timelineType } as unknown as TimelineDto;
     for (const event of filtered) {
       const category = getCategoryLabel(event, timelineType);
       const durationMs = parseISO(event.endedAt).getTime() - parseISO(event.startedAt).getTime();
-      map.set(category, (map.get(category) ?? 0) + durationMs);
+      const existing = map.get(category);
+      const color = existing?.color ?? getColorForEvent(fakeTimelineDto, event);
+      map.set(category, { durationMs: (existing?.durationMs ?? 0) + durationMs, color });
     }
 
-    const rows: TotalRow[] = Array.from(map.entries()).map(([category, durationMs]) => ({
+    const rows: TotalRow[] = Array.from(map.entries()).map(([category, { durationMs, color }]) => ({
       id: category,
       category,
+      color,
       durationMs,
       duration: formatDuration(durationMs),
     }));
@@ -142,12 +149,14 @@ export function EventsTotalsTable({ events, timelineType, className }: EventsTot
     <div ref={parentRef} className={`c-events-totals-table${className ? ` ${className}` : ''}`}>
       <table className="c-table" aria-label="Timeline event totals">
         <colgroup>
+          <col style={{ width: '36px' }} />
           {columns.map((col) => (
             <col key={col.id} style={{ width: col.width ? `${col.width}px` : undefined }} />
           ))}
         </colgroup>
         <thead>
           <tr>
+            <th style={{ width: '36px' }}></th>
             {columns.map((col) => (
               <th
                 key={col.id}
@@ -180,7 +189,7 @@ export function EventsTotalsTable({ events, timelineType, className }: EventsTot
         <tbody>
           {paddingTop > 0 && (
             <tr aria-hidden="true">
-              <td colSpan={columns.length} style={{ height: paddingTop, padding: 0 }} />
+              <td colSpan={columns.length + 1} style={{ height: paddingTop, padding: 0 }} />
             </tr>
           )}
           {virtualItems.map((virtualRow) => {
@@ -193,6 +202,12 @@ export function EventsTotalsTable({ events, timelineType, className }: EventsTot
                 className={selectedKey === row.id ? 'is-selected' : undefined}
                 onClick={() => setSelectedKey(row.id)}
               >
+                <td style={{ padding: '0 0 0 8px' }}>
+                  <span
+                    className="block h-5 w-5 rounded-md"
+                    style={{ backgroundColor: row.color }}
+                  />
+                </td>
                 {columns.map((col) => (
                   <td key={col.id}>{String(row[col.id as keyof TotalRow] ?? '')}</td>
                 ))}
@@ -201,13 +216,14 @@ export function EventsTotalsTable({ events, timelineType, className }: EventsTot
           })}
           {paddingBottom > 0 && (
             <tr aria-hidden="true">
-              <td colSpan={columns.length} style={{ height: paddingBottom, padding: 0 }} />
+              <td colSpan={columns.length + 1} style={{ height: paddingBottom, padding: 0 }} />
             </tr>
           )}
         </tbody>
         {sortedTotals.length > 0 && (
           <tfoot>
             <tr className="c-table-total-row">
+              <td></td>
               <td>Total</td>
               <td>{formatDuration(grandTotalMs)}</td>
             </tr>

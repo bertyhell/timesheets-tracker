@@ -4,9 +4,10 @@ import { orderBy } from 'lodash-es';
 import { format, intervalToDuration, parseISO } from 'date-fns';
 import { useAtom } from 'jotai';
 import { searchTermAtom } from '../../store/store';
-import type { TimelineEventDto, TimelineWithEventsDto } from '../../generated/api/types.gen';
+import type { TimelineDto, TimelineEventDto, TimelineWithEventsDto } from '../../generated/api/types.gen';
 import { TimelineType } from '../Timeline/Timeline.types';
 import { ColumnDef } from './Table.types';
+import { getColorForEvent } from '../Timeline/helpers/getColorForEvent';
 
 interface SortDescriptor {
   column: string;
@@ -100,6 +101,7 @@ export function EventsTable({ timeline, events, className }: EventsTableProps) {
 
   const parentRef = useRef<HTMLDivElement>(null);
   const columns = [...getDynamicColumns(timeline?.type), ...FIXED_COLUMNS];
+  const fakeTimelineDto = timeline ? { timelineType: timeline.type } as unknown as TimelineDto : null;
 
   const sortedItems = useMemo(() => {
     const lowerSearch = searchTerm.toLowerCase();
@@ -167,12 +169,14 @@ export function EventsTable({ timeline, events, className }: EventsTableProps) {
     <div ref={parentRef} className={`c-events-table${className ? ` ${className}` : ''}`}>
       <table className="c-table" aria-label="Timeline events">
         <colgroup>
+          <col style={{ width: '36px' }} />
           {columns.map((col) => (
             <col key={col.id} style={{ width: col.width ? `${col.width}px` : undefined }} />
           ))}
         </colgroup>
         <thead>
           <tr>
+            <th style={{ width: '36px' }}></th>
             {columns.map((col) => (
               <th
                 key={col.id}
@@ -205,11 +209,12 @@ export function EventsTable({ timeline, events, className }: EventsTableProps) {
         <tbody>
           {paddingTop > 0 && (
             <tr aria-hidden="true">
-              <td colSpan={columns.length} style={{ height: paddingTop, padding: 0 }} />
+              <td colSpan={columns.length + 1} style={{ height: paddingTop, padding: 0 }} />
             </tr>
           )}
           {virtualItems.map((virtualRow) => {
             const event = sortedItems[virtualRow.index];
+            const color = fakeTimelineDto ? getColorForEvent(fakeTimelineDto, event) : undefined;
             return (
               <tr
                 key={virtualRow.key}
@@ -218,6 +223,12 @@ export function EventsTable({ timeline, events, className }: EventsTableProps) {
                 className={selectedKey === event.id ? 'is-selected' : undefined}
                 onClick={() => setSelectedKey(event.id)}
               >
+                <td style={{ padding: '0 0 0 8px' }}>
+                  <span
+                    className="block h-5 w-5 rounded-md"
+                    style={{ backgroundColor: color ?? 'transparent' }}
+                  />
+                </td>
                 {columns.map((col) => (
                   <td key={col.id}>{getCellValue(event, col.id)}</td>
                 ))}
@@ -226,7 +237,7 @@ export function EventsTable({ timeline, events, className }: EventsTableProps) {
           })}
           {paddingBottom > 0 && (
             <tr aria-hidden="true">
-              <td colSpan={columns.length} style={{ height: paddingBottom, padding: 0 }} />
+              <td colSpan={columns.length + 1} style={{ height: paddingBottom, padding: 0 }} />
             </tr>
           )}
         </tbody>

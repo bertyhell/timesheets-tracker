@@ -24,11 +24,11 @@
     }
   },
   "content_security_policy": {
-    "script-src": ["http://localhost:*", "http://127.0.0.1:*"]
+    "extension_pages": "script-src 'self' http://localhost:* http://127.0.0.1:*; object-src 'self'"
   },
   "host_permissions": ["http://localhost:55577/api/*"],
   "background": {
     "service_worker": "src/background/background.js"
   },
-  "permissions": ["activeTab", "tabs"]
+  "permissions": ["activeTab", "tabs", "storage"]
 }

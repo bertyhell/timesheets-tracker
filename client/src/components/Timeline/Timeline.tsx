@@ -36,6 +36,7 @@ interface ContextMenuState {
   x: number;
   y: number;
   eventId: string;
+  event: TimelineEventDto;
   eventStartedAt?: string;
   eventEndedAt?: string;
 }
@@ -209,19 +210,18 @@ function Timeline({
   };
 
   const handleContextMenu = (e: MouseEvent, eventId: string) => {
-    const isTag = timelineInfo.timelineType === TimelineType.Tag && (!!onDeleteTag || !!onEditTag);
-    const isAutoTag = timelineInfo.timelineType === TimelineType.AutoTag && !!onEditAutoTagRule;
-    const canCreateTag = !!onCreateTagFromEvent;
-    if (!isTag && !isAutoTag && !canCreateTag) return;
     e.preventDefault();
     e.stopPropagation();
+    const isAutoTag = timelineInfo.timelineType === TimelineType.AutoTag && !!onEditAutoTagRule;
     const event = events.find((ev) => ev.id === eventId);
+    if (!event) return;
     if (isAutoTag) {
       const autoTagId = (event?.info as { autoTagId?: string })?.autoTagId;
       setContextMenu({
         x: e.clientX,
         y: e.clientY,
         eventId: autoTagId ?? eventId,
+        event,
         eventStartedAt: event?.startedAt,
         eventEndedAt: event?.endedAt,
       });
@@ -231,9 +231,26 @@ function Timeline({
       x: e.clientX,
       y: e.clientY,
       eventId,
+      event,
       eventStartedAt: event?.startedAt,
       eventEndedAt: event?.endedAt,
     });
+  };
+
+  const handleCopyEventToClipboard = (event: TimelineEventDto) => {
+    const startStr = format(parseISO(event.startedAt), 'yyyy-MM-dd HH:mm:ss');
+    const endStr = format(parseISO(event.endedAt), 'HH:mm:ss');
+    const durationSec = differenceInSeconds(parseISO(event.endedAt), parseISO(event.startedAt));
+    const durationStr = formatDuration(durationSec);
+    const info = event.info as Record<string, unknown>;
+    const infoLines = Object.entries(info)
+      .filter(([, val]) => val !== '' && val !== null && val !== undefined)
+      .map(([key, val]) => `${key}: ${val}`)
+      .join('\n');
+    const text = [`Start: ${startStr}`, `End: ${endStr}`, `Duration: ${durationStr}`, '', infoLines]
+      .filter(Boolean)
+      .join('\n');
+    navigator.clipboard.writeText(text);
   };
 
   const handleTagNameChange = async (newValue: TagName | null) => {
@@ -525,6 +542,7 @@ function Timeline({
           ...(onCreateTagFromEvent && contextMenu.eventStartedAt && contextMenu.eventEndedAt
             ? [{ label: 'Create tag', onClick: () => onCreateTagFromEvent(contextMenu.eventStartedAt!, contextMenu.eventEndedAt!) }]
             : []),
+          { label: 'Copy to clipboard', onClick: () => handleCopyEventToClipboard(contextMenu.event) },
         ]}
         onClose={() => setContextMenu(null)}
       />

@@ -364,6 +364,10 @@ export function TimelinesAndEventsPage() {
               '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.autoTagRules + '/' + autoTagId + '/' + ROUTE_PARTS.edit
             );
           }}
+          onCreateTagFromEvent={(startedAt: string, endedAt: string) => {
+            const params = new URLSearchParams({ startedAt, endedAt });
+            navigate('/' + ROUTE_PARTS.timelinesAndEvents + '/' + ROUTE_PARTS.create + '?' + params.toString());
+          }}
         ></Timeline>
       );
     });

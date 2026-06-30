@@ -2,10 +2,10 @@ import './EditTagModal.css';
 
 import React, { useEffect, useState } from 'react';
 import { Modal } from 'react-responsive-modal';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { format, parseISO } from 'date-fns';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { ROUTE_PARTS } from '../../App';
 import {
@@ -23,10 +23,19 @@ import Button, { ButtonVariant } from '../Button/Button';
 export function EditTagModal() {
   const { uuid } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const queryClient = useQueryClient();
+
+  const paramStartedAt = !uuid ? searchParams.get('startedAt') : null;
+  const paramEndedAt = !uuid ? searchParams.get('endedAt') : null;
 
   const [selectedTagName, setSelectedTagName] = useState<TagName | null>(null);
-  const [startedAt, setStartedAt] = useState('');
-  const [endedAt, setEndedAt] = useState('');
+  const [startedAt, setStartedAt] = useState(
+    paramStartedAt ? format(parseISO(paramStartedAt), "yyyy-MM-dd'T'HH:mm:ss") : ''
+  );
+  const [endedAt, setEndedAt] = useState(
+    paramEndedAt ? format(parseISO(paramEndedAt), "yyyy-MM-dd'T'HH:mm:ss") : ''
+  );
 
   const { data: tag } = useQuery({
     ...tagsControllerFindOneOptions({ path: { id: uuid as string } }),
@@ -80,12 +89,14 @@ export function EditTagModal() {
       toast('Tag has been created', { type: 'success' });
     }
 
+    await queryClient.invalidateQueries({ queryKey: ['timelinesControllerFindAllEvents'] });
     handleClose();
   };
 
   const handleDelete = async () => {
     await deleteTag({ path: { id: uuid as string } });
     toast('Tag has been deleted', { type: 'success' });
+    await queryClient.invalidateQueries({ queryKey: ['timelinesControllerFindAllEvents'] });
     handleClose();
   };
 
@@ -97,50 +108,57 @@ export function EditTagModal() {
     >
       <h3>{uuid ? 'Edit tag' : 'Create tag'}</h3>
 
-      <div className="c-form">
-        <label>Tag name</label>
-        <TagSelectSingle
-          value={selectedTagName}
-          onChange={setSelectedTagName}
-          autoFocus={true}
-        />
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSave();
+        }}
+      >
+        <div className="c-form">
+          <label>Tag name</label>
+          <TagSelectSingle
+            value={selectedTagName}
+            onChange={setSelectedTagName}
+            autoFocus={true}
+          />
 
-        <label>Start time</label>
-        <input
-          className="c-input"
-          type="datetime-local"
-          step="1"
-          value={startedAt}
-          onChange={(e) => setStartedAt(e.target.value)}
-        />
+          <label>Start time</label>
+          <input
+            className="c-input"
+            type="datetime-local"
+            step="1"
+            value={startedAt}
+            onChange={(e) => setStartedAt(e.target.value)}
+          />
 
-        <label>End time</label>
-        <input
-          className="c-input"
-          type="datetime-local"
-          step="1"
-          value={endedAt}
-          onChange={(e) => setEndedAt(e.target.value)}
-        />
-      </div>
+          <label>End time</label>
+          <input
+            className="c-input"
+            type="datetime-local"
+            step="1"
+            value={endedAt}
+            onChange={(e) => setEndedAt(e.target.value)}
+          />
+        </div>
 
-      <div className="flex flex-row justify-between gap-2 mt-8">
-        <div>
-          {uuid && (
-            <Button onClick={handleDelete} className="!bg-red-100 !text-red-700 hover:!bg-red-200">
-              Delete
+        <div className="flex flex-row justify-between gap-2 mt-8">
+          <div>
+            {uuid && (
+              <Button onClick={handleDelete} className="!bg-red-100 !text-red-700 hover:!bg-red-200">
+                Delete
+              </Button>
+            )}
+          </div>
+          <div className="flex flex-row gap-2">
+            <Button onClick={handleClose} variant={ButtonVariant.Secondary}>
+              Cancel
             </Button>
-          )}
+            <Button type="submit" variant={ButtonVariant.Primary}>
+              Save
+            </Button>
+          </div>
         </div>
-        <div className="flex flex-row gap-2">
-          <Button onClick={handleClose} variant={ButtonVariant.Secondary}>
-            Cancel
-          </Button>
-          <Button onClick={handleSave} variant={ButtonVariant.Primary}>
-            Save
-          </Button>
-        </div>
-      </div>
+      </form>
     </Modal>
   );
 }

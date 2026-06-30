@@ -32,6 +32,14 @@ interface ResizeState {
   originalEndedAt: string;
 }
 
+interface ContextMenuState {
+  x: number;
+  y: number;
+  eventId: string;
+  eventStartedAt?: string;
+  eventEndedAt?: string;
+}
+
 interface TimelineProps {
   timelineInfo: TimelineDto;
   events: TimelineEventDto[];
@@ -51,6 +59,7 @@ interface TimelineProps {
   onDeleteTag?: (tagId: string) => void;
   onEditTag?: (tagId: string) => void;
   onEditAutoTagRule?: (autoTagId: string) => void;
+  onCreateTagFromEvent?: (startedAt: string, endedAt: string) => void;
 }
 
 function Timeline({
@@ -72,12 +81,13 @@ function Timeline({
   onDeleteTag,
   onEditTag,
   onEditAutoTagRule,
+  onCreateTagFromEvent,
 }: TimelineProps) {
   const navigate = useNavigate();
   const [searchTerm] = useAtom(searchTermAtom);
   const [resizeState, setResizeState] = useState<ResizeState | null>(null);
   const [resizeCurrentPosX, setResizeCurrentPosX] = useState<number | null>(null);
-  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; eventId: string } | null>(null);
+  const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const [titleContextMenu, setTitleContextMenu] = useState<{ x: number; y: number } | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const [trackWidth, setTrackWidth] = useState(0);
@@ -200,18 +210,29 @@ function Timeline({
   const handleContextMenu = (e: MouseEvent, eventId: string) => {
     const isTag = timelineInfo.timelineType === TimelineType.Tag && (!!onDeleteTag || !!onEditTag);
     const isAutoTag = timelineInfo.timelineType === TimelineType.AutoTag && !!onEditAutoTagRule;
-    if (!isTag && !isAutoTag) return;
+    const canCreateTag = !!onCreateTagFromEvent;
+    if (!isTag && !isAutoTag && !canCreateTag) return;
     e.preventDefault();
     e.stopPropagation();
+    const event = events.find((ev) => ev.id === eventId);
     if (isAutoTag) {
-      const event = events.find((ev) => ev.id === eventId);
       const autoTagId = (event?.info as { autoTagId?: string })?.autoTagId;
-      if (autoTagId) {
-        setContextMenu({ x: e.clientX, y: e.clientY, eventId: autoTagId });
-      }
+      setContextMenu({
+        x: e.clientX,
+        y: e.clientY,
+        eventId: autoTagId ?? eventId,
+        eventStartedAt: event?.startedAt,
+        eventEndedAt: event?.endedAt,
+      });
       return;
     }
-    setContextMenu({ x: e.clientX, y: e.clientY, eventId });
+    setContextMenu({
+      x: e.clientX,
+      y: e.clientY,
+      eventId,
+      eventStartedAt: event?.startedAt,
+      eventEndedAt: event?.endedAt,
+    });
   };
 
   const handleTagNameChange = async (newValue: TagName | null) => {
@@ -491,14 +512,19 @@ function Timeline({
     {contextMenu && (
       <ContextMenu
         position={{ x: contextMenu.x, y: contextMenu.y }}
-        items={
-          timelineInfo.timelineType === TimelineType.AutoTag
+        items={[
+          ...(timelineInfo.timelineType === TimelineType.AutoTag
             ? [{ label: 'Edit rule', onClick: () => onEditAutoTagRule?.(contextMenu.eventId) }]
-            : [
-                { label: 'Edit tag', onClick: () => onEditTag?.(contextMenu.eventId) },
-                { label: 'Delete tag', onClick: () => onDeleteTag?.(contextMenu.eventId), variant: 'danger' },
-              ]
-        }
+            : timelineInfo.timelineType === TimelineType.Tag
+              ? [
+                  { label: 'Edit tag', onClick: () => onEditTag?.(contextMenu.eventId) },
+                  { label: 'Delete tag', onClick: () => onDeleteTag?.(contextMenu.eventId), variant: 'danger' as const },
+                ]
+              : []),
+          ...(onCreateTagFromEvent && contextMenu.eventStartedAt && contextMenu.eventEndedAt
+            ? [{ label: 'Create tag', onClick: () => onCreateTagFromEvent(contextMenu.eventStartedAt!, contextMenu.eventEndedAt!) }]
+            : []),
+        ]}
         onClose={() => setContextMenu(null)}
       />
     )}

@@ -133,6 +133,11 @@ export function EventsTotalsTable({ events, timelineType, className }: EventsTot
     }));
   };
 
+  const grandTotalMs = useMemo(
+    () => sortedTotals.reduce((sum, row) => sum + row.durationMs, 0),
+    [sortedTotals]
+  );
+
   return (
     <div ref={parentRef} className={`c-events-totals-table${className ? ` ${className}` : ''}`}>
       <table className="c-table" aria-label="Timeline event totals">
@@ -200,6 +205,14 @@ export function EventsTotalsTable({ events, timelineType, className }: EventsTot
             </tr>
           )}
         </tbody>
+        {sortedTotals.length > 0 && (
+          <tfoot>
+            <tr className="c-table-total-row">
+              <td>Total</td>
+              <td>{formatDuration(grandTotalMs)}</td>
+            </tr>
+          </tfoot>
+        )}
       </table>
       {sortedTotals.length === 0 && <div className="c-table-empty">No events</div>}
     </div>

@@ -577,7 +577,26 @@ export function TimelinesAndEventsPage() {
             onMouseDown={handleTimelinesMiddleMouseDown}
             style={{ cursor: isDragging ? 'grabbing' : undefined }}
           >
-            <TimelineRuler minTime={visibleMinTime} maxTime={visibleMaxTime} />
+            <TimelineRuler
+              minTime={visibleMinTime}
+              maxTime={visibleMaxTime}
+              gutterContent={
+                <div className="c-timeline-controls">
+                  <button className="c-timeline-controls__btn" onClick={handleZoomIn} title="Zoom in" aria-label="Zoom in">
+                    <ZoomIn size={12} />
+                  </button>
+                  <button className="c-timeline-controls__btn" onClick={handleZoomOut} title="Zoom out" aria-label="Zoom out">
+                    <ZoomOut size={12} />
+                  </button>
+                  <button className="c-timeline-controls__btn" onClick={handlePanLeft} title="Pan left" aria-label="Pan left">
+                    <ChevronLeft size={12} />
+                  </button>
+                  <button className="c-timeline-controls__btn" onClick={handlePanRight} title="Pan right" aria-label="Pan right">
+                    <ChevronRight size={12} />
+                  </button>
+                </div>
+              }
+            />
             {renderTimelines()}
           </div>
         </Panel>
@@ -658,40 +677,6 @@ export function TimelinesAndEventsPage() {
 
         <div className="p-page-header-right">
           {isLoadingTimelineEvents && <span className="p-loading-indicator">Loading...</span>}
-          <div className="flex items-center bg-gray-100 border border-gray-200 rounded-lg overflow-hidden">
-            <button
-              className="px-2 py-1.5 text-gray-600 hover:bg-gray-200 transition-colors"
-              onClick={handleZoomIn}
-              title="Zoom in"
-              aria-label="Zoom in"
-            >
-              <ZoomIn size={15} />
-            </button>
-            <button
-              className="px-2 py-1.5 text-gray-600 hover:bg-gray-200 transition-colors border-l border-gray-200"
-              onClick={handleZoomOut}
-              title="Zoom out"
-              aria-label="Zoom out"
-            >
-              <ZoomOut size={15} />
-            </button>
-            <button
-              className="px-2 py-1.5 text-gray-600 hover:bg-gray-200 transition-colors border-l border-gray-200"
-              onClick={handlePanLeft}
-              title="Pan left"
-              aria-label="Pan left"
-            >
-              <ChevronLeft size={15} />
-            </button>
-            <button
-              className="px-2 py-1.5 text-gray-600 hover:bg-gray-200 transition-colors border-l border-gray-200"
-              onClick={handlePanRight}
-              title="Pan right"
-              aria-label="Pan right"
-            >
-              <ChevronRight size={15} />
-            </button>
-          </div>
           <div className="p-header-divider" />
           <DateSelect />
           <div className="p-header-divider" />

@@ -11,7 +11,7 @@
  *   cd client && npm run dev:client  (frontend on port 55588)
  */
 
-import { app, BrowserWindow, dialog, ipcMain, Menu, Tray, nativeImage, shell } from 'electron';
+import { app, BrowserWindow, dialog, globalShortcut, ipcMain, Menu, Tray, nativeImage, shell } from 'electron';
 import { spawn, ChildProcess } from 'child_process';
 import * as path from 'path';
 
@@ -24,7 +24,9 @@ const isDev = !app.isPackaged;
 
 const API_DIR = isDev ? path.join(__dirname, '../../api') : path.join(process.resourcesPath, 'api');
 
-const ICON_PATH = path.join(__dirname, '../../icon/icon.png');
+const ICON_PATH = isDev
+  ? path.join(__dirname, '../../icon/icon.png')
+  : path.join(process.resourcesPath, 'icon/icon.png');
 
 const PRELOAD_PATH = path.join(__dirname, 'preload.js');
 
@@ -78,6 +80,7 @@ function createWindow(): BrowserWindow {
     height: 900,
     show: true,
     icon: ICON_PATH,
+    autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -137,8 +140,20 @@ function updateTrayMenu(): void {
         updateTrayMenu();
       },
     },
+    { type: 'separator' },
+    {
+      label: 'Open Installation Dir',
+      click: () =>
+        shell.openPath(isDev ? path.join(__dirname, '../..') : app.getPath('userData')),
+    },
+    {
+      label: 'Open Database Folder',
+      click: () => shell.openPath(API_DIR),
+    },
+    { type: 'separator' },
     {
       label: 'Toggle Developer Tools',
+      accelerator: 'CmdOrCtrl+Shift+I',
       click: () => mainWindow?.webContents.toggleDevTools(),
     },
     { type: 'separator' },
@@ -153,33 +168,15 @@ function updateTrayMenu(): void {
 
 // ── Application menu ──────────────────────────────────────────────────────────
 function setAppMenu(): void {
-  const menu = Menu.buildFromTemplate([
-    {
-      label: 'App',
-      submenu: [{ label: 'Quit Timesheets Tracker', role: 'quit' }],
-    },
-    {
-      label: 'Debug',
-      submenu: [
-        {
-          label: 'Toggle Developer Tools',
-          accelerator: 'CmdOrCtrl+Shift+I',
-          click: () => mainWindow?.webContents.toggleDevTools(),
-        },
-        {
-          label: 'Open Installation Dir',
-          click: () =>
-            shell.openPath(isDev ? path.join(__dirname, '../..') : app.getPath('userData')),
-        },
-        {
-          label: 'Open Database Folder',
-          click: () => shell.openPath(API_DIR),
-        },
-      ],
-    },
-  ]);
+  // Remove the native menu bar — all options live in the tray right-click menu.
+  Menu.setApplicationMenu(null);
 
-  Menu.setApplicationMenu(menu);
+  // Keep the DevTools shortcut working without a menu bar.
+  app.whenReady().then(() => {
+    globalShortcut.register('CmdOrCtrl+Shift+I', () => {
+      mainWindow?.webContents.toggleDevTools();
+    });
+  });
 }
 
 // ── Cleanup ──────────────────────────────────────────────────────────────────
@@ -232,6 +229,7 @@ app.on('window-all-closed', () => {
 
 app.on('before-quit', () => {
   isQuitting = true;
+  globalShortcut.unregisterAll();
   if (serverProcess) {
     try {
       serverProcess.kill();

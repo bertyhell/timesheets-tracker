@@ -14,6 +14,10 @@ module.exports = {
   // API (NestJS) and built client live outside the asar so native modules work
   extraResources: [
     {
+      from: 'icon',
+      to: 'icon',
+    },
+    {
       from: 'api',
       to: 'api',
       filter: [

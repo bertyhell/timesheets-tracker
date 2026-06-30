@@ -235,26 +235,6 @@ export class GitCommitEventInfoDto {
     required: true,
   })
   commitMessage: string;
-
-  @IsString()
-  @Type(() => String)
-  @ApiProperty({
-    type: String,
-    description: 'Short commit hash (first 8 characters)',
-    example: 'a1b2c3d4',
-    required: true,
-  })
-  commitHash: string;
-
-  @IsString()
-  @Type(() => String)
-  @ApiProperty({
-    type: String,
-    description: 'Name of the commit author',
-    example: 'Jane Doe',
-    required: true,
-  })
-  commitAuthor: string;
 }
 
 export class TimelineEventDto {

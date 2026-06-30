@@ -16,8 +16,6 @@ export interface GitCommitEvent {
   id: string;
   repoName: string;
   commitMessage: string;
-  commitHash: string;
-  commitAuthor: string;
   startedAt: string;
   endedAt: string;
 }
@@ -40,8 +38,8 @@ export class GitCommitsService {
     startedAt: string,
     endedAt: string
   ): Promise<GitCommitEvent[]> {
-    // %H = full hash, %ai = author date ISO 8601, %s = subject, %an = author name
-    const command = `git log --all --since="${startedAt}" --until="${endedAt}" --pretty=format:"%H|%ai|%s|%an"`;
+    // %H = full hash, %ai = author date ISO 8601, %s = subject
+    const command = `git log --all --since="${startedAt}" --until="${endedAt}" --pretty=format:"%ai|%s"`;
     try {
       const { stdout } = await execAsync(command, { cwd: repoPath });
       const trimmed = stdout.trim();
@@ -52,17 +50,13 @@ export class GitCommitsService {
         .split('\n')
         .filter(Boolean)
         .map((line): GitCommitEvent => {
-          const [hash, dateStr, ...rest] = line.split('|');
-          // rest may contain '|' in the message or author name; last segment is author
-          const author = rest[rest.length - 1] ?? '';
-          const message = rest.slice(0, -1).join('|');
+          const [dateStr, ...rest] = line.split('|');
+          const message = rest.join('|'); // subject (may contain '|' characters)
           const commitTime = new Date(dateStr.trim()).getTime();
           return {
             id: uuid(),
             repoName,
             commitMessage: message.trim(),
-            commitHash: hash.trim().slice(0, 8),
-            commitAuthor: author.trim(),
             startedAt: new Date(commitTime).toISOString(),
             endedAt: new Date(commitTime + COMMIT_DURATION_MS).toISOString(),
           };

@@ -326,8 +326,6 @@ export class TimelinesService {
                       info: {
                         repoName: commit.repoName,
                         commitMessage: commit.commitMessage,
-                        commitHash: commit.commitHash,
-                        commitAuthor: commit.commitAuthor,
                       },
                       timelineId: timelineInfo.id,
                     };

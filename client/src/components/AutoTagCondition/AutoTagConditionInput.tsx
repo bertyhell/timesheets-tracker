@@ -76,6 +76,8 @@ function AutoTagConditionInput({
           onChange(booleanOperator, selectedOption?.value ?? null, operator, value)
         }
         isMulti={false}
+        menuPortalTarget={document.body}
+        menuPosition="fixed"
       ></Select>
       <Select<SelectOption<types.ConditionOperator>>
         className="c-auto-tag-condition__operator-select"
@@ -85,6 +87,8 @@ function AutoTagConditionInput({
           onChange(booleanOperator, variable, selectedOption?.value ?? null, value)
         }
         isMulti={false}
+        menuPortalTarget={document.body}
+        menuPosition="fixed"
       ></Select>
       <input
         className="c-input c-auto-tag-condition__value-input"

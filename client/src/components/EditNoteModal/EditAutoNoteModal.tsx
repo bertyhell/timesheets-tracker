@@ -166,6 +166,8 @@ export function EditAutoNoteModal() {
             }
           }}
           isMulti={false}
+          menuPortalTarget={document.body}
+          menuPosition="fixed"
         ></Select>
 
         <h4 className="mt-4">Note text must match regex.</h4>

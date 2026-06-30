@@ -35,6 +35,8 @@ function TagSelectMulti({ className, selectedValues, onChange }: TagSelectProps)
       isSearchable
       onChange={onChange}
       styles={tagSelectStyles}
+      menuPortalTarget={document.body}
+      menuPosition="fixed"
     ></AsyncCreatableSelect>
   );
 }

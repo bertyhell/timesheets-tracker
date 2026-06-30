@@ -89,14 +89,18 @@ export function EditTagModal() {
       toast('Tag has been created', { type: 'success' });
     }
 
-    await queryClient.invalidateQueries({ queryKey: ['timelinesControllerFindAllEvents'] });
+    await queryClient.invalidateQueries({
+      predicate: (query) => (query.queryKey[0] as { _id?: string })?._id === 'timelinesControllerFindAllEvents',
+    });
     handleClose();
   };
 
   const handleDelete = async () => {
     await deleteTag({ path: { id: uuid as string } });
     toast('Tag has been deleted', { type: 'success' });
-    await queryClient.invalidateQueries({ queryKey: ['timelinesControllerFindAllEvents'] });
+    await queryClient.invalidateQueries({
+      predicate: (query) => (query.queryKey[0] as { _id?: string })?._id === 'timelinesControllerFindAllEvents',
+    });
     handleClose();
   };
 

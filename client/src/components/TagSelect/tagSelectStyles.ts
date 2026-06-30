@@ -30,4 +30,5 @@ export const tagSelectStyles: StylesConfig<any, any> = {
       color: '#ffffff',
     },
   }),
+  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
 };

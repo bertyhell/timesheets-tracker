@@ -1,0 +1,13 @@
+.c-bulk-tag-modal {
+  min-width: 480px;
+}
+
+.c-bulk-tag-modal__event-count {
+  padding: 8px 12px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: #1d4ed8;
+  font-weight: 500;
+}

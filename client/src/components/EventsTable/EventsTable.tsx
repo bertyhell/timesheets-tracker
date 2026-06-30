@@ -8,6 +8,7 @@ import type { TimelineDto, TimelineEventDto, TimelineWithEventsDto } from '../..
 import { TimelineType } from '../Timeline/Timeline.types';
 import { ColumnDef } from './Table.types';
 import { getColorForEvent } from '../Timeline/helpers/getColorForEvent';
+import { ContextMenu } from '../ContextMenu/ContextMenu';
 
 interface SortDescriptor {
   column: string;
@@ -89,11 +90,19 @@ interface EventsTableProps {
   timeline: TimelineWithEventsDto | null;
   events: TimelineEventDto[];
   className?: string;
+  onAddBulkTag?: (events: TimelineEventDto[]) => void;
 }
 
-export function EventsTable({ timeline, events, className }: EventsTableProps) {
+interface ContextMenuState {
+  x: number;
+  y: number;
+}
+
+export function EventsTable({ timeline, events, className, onAddBulkTag }: EventsTableProps) {
   const [searchTerm] = useAtom(searchTermAtom);
-  const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [lastClickedIndex, setLastClickedIndex] = useState<number | null>(null);
+  const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: 'startedAt',
     direction: 'ascending',
@@ -165,9 +174,28 @@ export function EventsTable({ timeline, events, className }: EventsTableProps) {
     }));
   };
 
+  const handleRowClick = (e: React.MouseEvent, id: string, index: number) => {
+    if (e.shiftKey && lastClickedIndex !== null) {
+      const lo = Math.min(lastClickedIndex, index);
+      const hi = Math.max(lastClickedIndex, index);
+      const rangeIds = sortedItems.slice(lo, hi + 1).map((item) => item.id);
+      setSelectedKeys(new Set(rangeIds));
+    } else {
+      setSelectedKeys(new Set([id]));
+      setLastClickedIndex(index);
+    }
+  };
+
+  const handleRowContextMenu = (e: React.MouseEvent, id: string) => {
+    if (selectedKeys.size >= 2 && selectedKeys.has(id) && onAddBulkTag) {
+      e.preventDefault();
+      setContextMenu({ x: e.clientX, y: e.clientY });
+    }
+  };
+
   return (
     <div ref={parentRef} className={`c-events-table${className ? ` ${className}` : ''}`}>
-      <table className="c-table" aria-label="Timeline events">
+      <table className="c-table" aria-label="Timeline events" style={{ userSelect: 'none' }}>
         <colgroup>
           <col style={{ width: '36px' }} />
           {columns.map((col) => (
@@ -215,13 +243,15 @@ export function EventsTable({ timeline, events, className }: EventsTableProps) {
           {virtualItems.map((virtualRow) => {
             const event = sortedItems[virtualRow.index];
             const color = fakeTimelineDto ? getColorForEvent(fakeTimelineDto, event) : undefined;
+            const isSelected = selectedKeys.has(event.id);
             return (
               <tr
                 key={virtualRow.key}
                 style={{ height: ROW_HEIGHT }}
-                aria-selected={selectedKey === event.id}
-                className={selectedKey === event.id ? 'is-selected' : undefined}
-                onClick={() => setSelectedKey(event.id)}
+                aria-selected={isSelected}
+                className={isSelected ? 'is-selected' : undefined}
+                onClick={(e) => handleRowClick(e, event.id, virtualRow.index)}
+                onContextMenu={(e) => handleRowContextMenu(e, event.id)}
               >
                 <td style={{ padding: '0 0 0 8px' }}>
                   <span
@@ -243,6 +273,21 @@ export function EventsTable({ timeline, events, className }: EventsTableProps) {
         </tbody>
       </table>
       {sortedItems.length === 0 && <div className="c-table-empty">No events</div>}
+      {contextMenu && (
+        <ContextMenu
+          position={contextMenu}
+          items={[
+            {
+              label: `Add tag to ${selectedKeys.size} events`,
+              onClick: () => {
+                const selected = sortedItems.filter((e) => selectedKeys.has(e.id));
+                onAddBulkTag?.(selected);
+              },
+            },
+          ]}
+          onClose={() => setContextMenu(null)}
+        />
+      )}
     </div>
   );
 }

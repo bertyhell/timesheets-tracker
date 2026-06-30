@@ -30,6 +30,7 @@ export enum ROUTE_PARTS {
   calendars = 'calendars',
   create = 'create',
   edit = 'edit',
+  bulkTag = 'bulk-tag',
 }
 
 const OVERVIEW_NAV = [{ to: ROUTE_PARTS.timelinesAndEvents, label: 'Overview', icon: BarChart2 }];

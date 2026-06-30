@@ -33,6 +33,8 @@ function TagSelectSingle({ className, value, onChange, autoFocus }: TagSelectPro
       cacheOptions
       defaultOptions
       styles={tagSelectStyles}
+      menuPortalTarget={document.body}
+      menuPosition="fixed"
     ></AsyncCreatableSelect>
   );
 }

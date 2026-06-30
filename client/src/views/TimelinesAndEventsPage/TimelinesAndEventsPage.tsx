@@ -627,6 +627,11 @@ export function TimelinesAndEventsPage() {
                   className="c-events-table"
                   timeline={selectedTimeline}
                   events={selectedTimeline.events}
+                  onAddBulkTag={(bulkEvents) =>
+                    navigate('/' + ROUTE_PARTS.timelinesAndEvents + '/' + ROUTE_PARTS.bulkTag, {
+                      state: { events: bulkEvents },
+                    })
+                  }
                 />
               )}
             </Panel>

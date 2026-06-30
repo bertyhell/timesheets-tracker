@@ -3,6 +3,7 @@ import { TimelinesAndEventsPage } from './views/TimelinesAndEventsPage/Timelines
 import { AutoTagsPage } from './views/settings/AutoTagsPage/AutoTagsPage';
 import { EditAutoTagModal } from './components/EditAutoTagModal/EditAutoTagModal';
 import { EditTagModal } from './components/EditTagModal/EditTagModal';
+import { BulkTagModal } from './components/BulkTagModal/BulkTagModal';
 import { TagNamesPage } from './views/settings/TagNamesPage/TagNamesPage';
 import { EditTagNameModal } from './components/EditTagNameModal/EditTagNameModal';
 import React from 'react';
@@ -33,6 +34,10 @@ export const routes: RouteObject[] = [
           {
             path: ':uuid/' + ROUTE_PARTS.edit,
             element: <EditTagModal />,
+          },
+          {
+            path: ROUTE_PARTS.bulkTag,
+            element: <BulkTagModal />,
           },
         ],
       },

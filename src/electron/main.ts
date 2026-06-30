@@ -126,44 +126,76 @@ function updateTrayMenu(): void {
   if (!tray) return;
 
   const isVisible = mainWindow?.isVisible() ?? false;
+  const isAutoStart = app.getLoginItemSettings().openAtLogin;
 
-  const menu = Menu.buildFromTemplate([
-    {
-      label: isVisible ? 'Hide Window' : 'Show Window',
-      click: () => {
-        if (isVisible) {
-          mainWindow?.hide();
-        } else {
-          mainWindow?.show();
-          mainWindow?.focus();
-        }
-        updateTrayMenu();
-      },
-    },
-    { type: 'separator' },
-    {
-      label: 'Open Installation Dir',
-      click: () =>
-        shell.openPath(isDev ? path.join(__dirname, '../..') : app.getPath('userData')),
-    },
-    {
-      label: 'Open Database Folder',
-      click: () => shell.openPath(API_DIR),
-    },
-    { type: 'separator' },
-    {
-      label: 'Toggle Developer Tools',
-      accelerator: 'CmdOrCtrl+Shift+I',
-      click: () => mainWindow?.webContents.toggleDevTools(),
-    },
-    { type: 'separator' },
-    {
-      label: 'Quit',
-      click: () => quit(),
-    },
-  ]);
+  // Fetch tracking state then rebuild menu
+  fetch(`${APP_URL}/api/programs/tracking`)
+    .then((r) => r.json())
+    .catch(() => ({ isTracking: false }))
+    .then(({ isTracking }: { isTracking: boolean }) => {
+      if (!tray) return;
 
-  tray.setContextMenu(menu);
+      const menu = Menu.buildFromTemplate([
+        {
+          label: isVisible ? 'Hide Window' : 'Show Window',
+          click: () => {
+            if (isVisible) {
+              mainWindow?.hide();
+            } else {
+              mainWindow?.show();
+              mainWindow?.focus();
+            }
+            updateTrayMenu();
+          },
+        },
+        { type: 'separator' },
+        {
+          label: 'Auto Start',
+          type: 'checkbox',
+          checked: isAutoStart,
+          click: () => {
+            const next = !isAutoStart;
+            app.setLoginItemSettings({ openAtLogin: next });
+            updateTrayMenu();
+          },
+        },
+        {
+          label: 'Track Activity',
+          type: 'checkbox',
+          checked: isTracking,
+          click: () => {
+            fetch(`${APP_URL}/api/programs/tracking`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ enabled: !isTracking }),
+            }).then(() => updateTrayMenu());
+          },
+        },
+        { type: 'separator' },
+        {
+          label: 'Open Installation Dir',
+          click: () =>
+            shell.openPath(isDev ? path.join(__dirname, '../..') : app.getPath('userData')),
+        },
+        {
+          label: 'Open Database Folder',
+          click: () => shell.openPath(API_DIR),
+        },
+        { type: 'separator' },
+        {
+          label: 'Toggle Developer Tools',
+          accelerator: 'CmdOrCtrl+Shift+I',
+          click: () => mainWindow?.webContents.toggleDevTools(),
+        },
+        { type: 'separator' },
+        {
+          label: 'Quit',
+          click: () => quit(),
+        },
+      ]);
+
+      tray.setContextMenu(menu);
+    });
 }
 
 // ── Application menu ──────────────────────────────────────────────────────────

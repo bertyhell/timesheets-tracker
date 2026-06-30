@@ -10,6 +10,7 @@ import { type IWindowListener } from './helpers/window-listener.types';
 export class ProgramsListener implements OnApplicationBootstrap {
   private windowListener: IWindowListener | null = null;
   private lastProgram: CreateProgramDto | null = null;
+  private _isTracking = false;
 
   constructor(@Inject(ProgramsService) private programsService: ProgramsService) {}
 
@@ -17,7 +18,13 @@ export class ProgramsListener implements OnApplicationBootstrap {
     await this.startListening();
   }
 
+  get isTracking(): boolean {
+    return this._isTracking;
+  }
+
   async startListening() {
+    if (this._isTracking) return;
+    this._isTracking = true;
     this.windowListener = createWindowListener();
     const initial = await this.windowListener.start(async ({ program, icon }) => {
       await this.handleProgramChange(program, icon);
@@ -28,6 +35,7 @@ export class ProgramsListener implements OnApplicationBootstrap {
   }
 
   async stopListening() {
+    this._isTracking = false;
     this.windowListener?.stop();
     this.windowListener = null;
     this.lastProgram = null;

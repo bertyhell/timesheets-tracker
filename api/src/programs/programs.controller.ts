@@ -1,5 +1,6 @@
-import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { ProgramsService } from './programs.service';
+import { ProgramsListener } from './programs.listener';
 import type { Program } from '../types/types';
 import { ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { endOfDay, startOfDay } from 'date-fns';
@@ -8,7 +9,25 @@ import { ResponseProgramDto } from './dto/response-activity.dto';
 @ApiTags('programs')
 @Controller('api/programs')
 export class ProgramsController {
-  constructor(private readonly programsService: ProgramsService) {}
+  constructor(
+    private readonly programsService: ProgramsService,
+    private readonly programsListener: ProgramsListener
+  ) {}
+
+  @Get('tracking')
+  getTracking(): { isTracking: boolean } {
+    return { isTracking: this.programsListener.isTracking };
+  }
+
+  @Put('tracking')
+  async setTracking(@Body() body: { enabled: boolean }): Promise<{ isTracking: boolean }> {
+    if (body.enabled) {
+      await this.programsListener.startListening();
+    } else {
+      await this.programsListener.stopListening();
+    }
+    return { isTracking: this.programsListener.isTracking };
+  }
 
   @Post()
   create(@Body() createProgramDto: Program) {

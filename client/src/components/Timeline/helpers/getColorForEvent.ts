@@ -62,6 +62,10 @@ export function getColorForEvent(timelineInfo: TimelineDto, event: TimelineEvent
     case TimelineType.ActiveState: {
       return (event.info as ActiveStateEventInfoDto).isActive ? ACTIVE_COLOR : INACTIVE_COLOR;
     }
+
+    case TimelineType.GitCommit: {
+      return getColorFromString((event.info as { repoName?: string })?.repoName);
+    }
   }
   return getColorFromString(timelineInfo.title);
 }

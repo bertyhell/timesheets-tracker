@@ -382,6 +382,7 @@ export function TimelinesAndEventsPage() {
     [TimelineType.AutoTag]: 'No auto tags',
     [TimelineType.Tag]: 'No tags',
     [TimelineType.Website]: 'No website activity',
+    [TimelineType.GitCommit]: 'No git commits',
   };
 
   const noEventsMessage = selectedTimeline?.type

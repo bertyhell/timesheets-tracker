@@ -14,6 +14,17 @@ export class CalendarEventProviderInfoDto {
   icsUrl: string;
 }
 
+export class GitCommitEventProviderInfoDto {
+  @IsString()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Absolute path to the folder that contains git repositories to scan for commits',
+    example: '/home/user/projects',
+  })
+  folderPath: string;
+}
+
 export class TimelineDto implements Timeline {
   @IsString()
   @Type(() => String)
@@ -45,10 +56,13 @@ export class TimelineDto implements Timeline {
   @ApiProperty({
     description:
       'Specific info for getting events for this timeline type. eg: calendar needs a url to ics file, github needs a link to the git folder, ...',
-    oneOf: [{ $ref: getSchemaPath(CalendarEventProviderInfoDto) }],
+    oneOf: [
+      { $ref: getSchemaPath(CalendarEventProviderInfoDto) },
+      { $ref: getSchemaPath(GitCommitEventProviderInfoDto) },
+    ],
     nullable: true,
   })
-  eventProviderInfo: null | CalendarEventProviderInfoDto;
+  eventProviderInfo: null | CalendarEventProviderInfoDto | GitCommitEventProviderInfoDto;
 
   @IsString()
   @Type(() => String)

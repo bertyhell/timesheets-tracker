@@ -5,4 +5,5 @@ export enum TimelineType {
   AutoTag = 'AutoTag',
   ActiveState = 'ActiveState',
   Calendar = 'Calendar',
+  GitCommit = 'GitCommit',
 }

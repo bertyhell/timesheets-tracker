@@ -492,10 +492,17 @@ export type CalendarEventProviderInfoDto = {
     icsUrl: string;
 };
 
+export type GitCommitEventProviderInfoDto = {
+    /**
+     * Absolute path to the folder that contains git repositories to scan for commits
+     */
+    folderPath: string;
+};
+
 /**
  * Type of the timeline
  */
-export type TimelineType = 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState';
+export type TimelineType = 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit';
 
 export type CreateTimelineDto = {
     /**
@@ -538,7 +545,7 @@ export type TimelineDto = {
     /**
      * Specific info for getting events for this timeline type. eg: calendar needs a url to ics file, github needs a link to the git folder, ...
      */
-    eventProviderInfo: CalendarEventProviderInfoDto | null;
+    eventProviderInfo: CalendarEventProviderInfoDto | GitCommitEventProviderInfoDto | null;
     /**
      * ISO timestamp at which the timeline was created
      */

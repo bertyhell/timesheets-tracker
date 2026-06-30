@@ -33,6 +33,7 @@
     "dbus-next": "^0.10.2",
     "es-toolkit": "^1.44.0",
     "fast-average-color": "^9.5.2",
+    "fast-glob": "^3.3.3",
     "lodash": "^4.17.21",
     "nest-winston": "^1.10.2",
     "nested-objects-util": "^1.1.2",

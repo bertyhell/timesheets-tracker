@@ -22,6 +22,7 @@ const TIMELINE_TYPES: TimelineType[] = [
   'ActiveState',
   'AutoTag',
   'Calendar',
+  'GitCommit',
   'Program',
   'Tag',
   'Website',
@@ -34,8 +35,12 @@ export function EditTimelineModal() {
   const [title, setTitle] = useState<string>('');
   const [timelineType, setTimelineType] = useState<TimelineType>('Program');
   const [icsUrl, setIcsUrl] = useState<string>('');
+  const [folderPath, setFolderPath] = useState<string>('');
   const [visualOrder, setVisualOrder] = useState<number>(0);
   const [color, setColor] = useState<string>(COLOR_LIST[0]);
+
+  // Check if running inside Electron (preload exposes window.electron)
+  const isElectron = typeof window.electron?.selectDirectory === 'function';
 
   const { mutateAsync: createTimeline } = useMutation({ ...timelinesControllerCreateMutation() });
   const { mutateAsync: updateTimeline } = useMutation({ ...timelinesControllerUpdateMutation() });
@@ -59,6 +64,7 @@ export function EditTimelineModal() {
       setTimelineType(timelineResponse.timelineType);
       const info = timelineResponse.eventProviderInfo as Record<string, string> | null;
       setIcsUrl(timelineResponse.timelineType === 'Calendar' ? (info?.icsUrl ?? '') : '');
+      setFolderPath(timelineResponse.timelineType === 'GitCommit' ? (info?.folderPath ?? '') : '');
       setVisualOrder(timelineResponse.visualOrder);
       setColor(timelineResponse.color ?? COLOR_LIST[0]);
     }
@@ -73,6 +79,12 @@ export function EditTimelineModal() {
 
   const handleClose = () => navigate('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.timelines);
 
+  const getEventProviderInfo = () => {
+    if (timelineType === 'Calendar') return { icsUrl };
+    if (timelineType === 'GitCommit') return { folderPath };
+    return {};
+  };
+
   const handleSave = async () => {
     if (id) {
       await updateTimeline({
@@ -80,7 +92,7 @@ export function EditTimelineModal() {
         body: {
           title,
           timelineType,
-          eventProviderInfo: timelineType === 'Calendar' ? { icsUrl } : {},
+          eventProviderInfo: getEventProviderInfo(),
           visualOrder,
           color,
         },
@@ -91,7 +103,7 @@ export function EditTimelineModal() {
         body: {
           title,
           timelineType,
-          eventProviderInfo: timelineType === 'Calendar' ? { icsUrl } : {},
+          eventProviderInfo: getEventProviderInfo(),
           visualOrder,
           color,
         },
@@ -106,6 +118,11 @@ export function EditTimelineModal() {
     await deleteTimeline({ path: { id: id as string } });
     toast('Timeline has been deleted', { type: 'success' });
     handleClose();
+  };
+
+  const handleBrowseFolder = async () => {
+    const selected = await window.electron!.selectDirectory();
+    if (selected) setFolderPath(selected);
   };
 
   return (
@@ -125,6 +142,7 @@ export function EditTimelineModal() {
             const newType = evt.target.value as TimelineType;
             setTimelineType(newType);
             if (newType !== 'Calendar') setIcsUrl('');
+            if (newType !== 'GitCommit') setFolderPath('');
           }}
         >
           {TIMELINE_TYPES.map((type) => (
@@ -160,6 +178,25 @@ export function EditTimelineModal() {
               onChange={(evt: ChangeEvent<HTMLInputElement>) => setIcsUrl(evt.target.value)}
               placeholder="e.g. https://calendar.example.com/feed.ics"
             />
+          </>
+        )}
+
+        {timelineType === 'GitCommit' && (
+          <>
+            <h4 className="mt-4">Git repositories folder</h4>
+            <div className="flex gap-2">
+              <input
+                className="c-input flex-1"
+                value={folderPath}
+                onChange={(evt: ChangeEvent<HTMLInputElement>) => setFolderPath(evt.target.value)}
+                placeholder="e.g. /home/user/projects"
+              />
+              {isElectron && (
+                <Button variant={ButtonVariant.Secondary} onClick={handleBrowseFolder}>
+                  Browse…
+                </Button>
+              )}
+            </div>
           </>
         )}
 

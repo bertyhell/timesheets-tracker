@@ -1,4 +1,4 @@
-import { CalendarEventProviderInfoDto } from '../timelines/dto/response-timeline.dto';
+import { CalendarEventProviderInfoDto, GitCommitEventProviderInfoDto } from '../timelines/dto/response-timeline.dto';
 
 export interface Program {
   id: string;
@@ -121,13 +121,14 @@ export enum TimelineType {
   AutoTag = 'AutoTag',
   Calendar = 'Calendar',
   ActiveState = 'ActiveState',
+  GitCommit = 'GitCommit',
 }
 
 export interface Timeline {
   id: string;
   title: string;
   timelineType: TimelineType;
-  eventProviderInfo: CalendarEventProviderInfoDto | null;
+  eventProviderInfo: CalendarEventProviderInfoDto | GitCommitEventProviderInfoDto | null;
   createdAt: string;
   updatedAt: string;
   visualOrder: number;

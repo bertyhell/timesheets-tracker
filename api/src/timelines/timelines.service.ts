@@ -29,6 +29,7 @@ import { AutoTagsService } from '../auto-tags/auto-tags.service';
 import { ActiveStatesService } from '../activeStates/active-states.service';
 import { AutoTagDto } from '../auto-tags/dto/response-auto-tag.dto';
 import { TagNamesService } from '../tag-names/tag-names.service';
+import { GitCommitsService, GitCommitEvent } from '../git-commits/git-commits.service';
 import { CustomError } from '../shared/CustomError';
 
 @Injectable()
@@ -38,6 +39,7 @@ export class TimelinesService {
     @Inject(AutoTagsService) private autoTagsService: AutoTagsService,
     @Inject(CalendarsService) private calendarsService: CalendarsService,
     @Inject(DatabaseService) private databaseService: DatabaseService,
+    @Inject(GitCommitsService) private gitCommitsService: GitCommitsService,
     @Inject(ProgramsService) private programsService: ProgramsService,
     @Inject(TagsService) private tagsService: TagsService,
     @Inject(TagNamesService) private tagNamesService: TagNamesService,
@@ -276,7 +278,7 @@ export class TimelinesService {
               return (async () => {
                 try {
                   const calendarEvents = await this.calendarsService.getEvents(
-                    timelineInfo.eventProviderInfo.icsUrl,
+                    (timelineInfo.eventProviderInfo as { icsUrl?: string })?.icsUrl,
                     startedAt,
                     endedAt
                   );
@@ -297,7 +299,44 @@ export class TimelinesService {
                 } catch (err) {
                   console.error(
                     new CustomError('Failed to fetch events from calendar', err, {
-                      icsUrl: timelineInfo.eventProviderInfo.icsUrl,
+                      icsUrl: (timelineInfo.eventProviderInfo as { icsUrl?: string })?.icsUrl,
+                      startedAt,
+                      endedAt,
+                    })
+                  );
+                  return []; // TODO pass errors to client to show as toast messages
+                }
+              })();
+
+            case TimelineType.GitCommit:
+              return (async () => {
+                try {
+                  const folderPath = (timelineInfo.eventProviderInfo as { folderPath?: string })
+                    ?.folderPath;
+                  const gitCommits = await this.gitCommitsService.getEvents(
+                    folderPath,
+                    startedAt,
+                    endedAt
+                  );
+                  return gitCommits.map((commit: GitCommitEvent): TimelineEventDto => {
+                    return {
+                      id: commit.id,
+                      startedAt: commit.startedAt,
+                      endedAt: commit.endedAt,
+                      info: {
+                        repoName: commit.repoName,
+                        commitMessage: commit.commitMessage,
+                        commitHash: commit.commitHash,
+                        commitAuthor: commit.commitAuthor,
+                      },
+                      timelineId: timelineInfo.id,
+                    };
+                  });
+                } catch (err) {
+                  console.error(
+                    new CustomError('Failed to fetch git commit events', err, {
+                      folderPath: (timelineInfo.eventProviderInfo as { folderPath?: string })
+                        ?.folderPath,
                       startedAt,
                       endedAt,
                     })

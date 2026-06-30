@@ -9,6 +9,7 @@ import { TagsModule } from '../tags/tags.module';
 import { AutoTagsModule } from '../auto-tags/auto-tags.module';
 import { ActiveStatesModule } from '../activeStates/active-states.module';
 import { TagNamesModule } from '../tag-names/tag-names.module';
+import { GitCommitsModule } from '../git-commits/git-commits.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { TagNamesModule } from '../tag-names/tag-names.module';
     AutoTagsModule,
     CalendarsModule,
     DatabaseModule,
+    GitCommitsModule,
     ProgramsModule,
     TagsModule,
     WebsitesModule,

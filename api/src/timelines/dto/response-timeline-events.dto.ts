@@ -215,6 +215,48 @@ export class AutoTagEventInfoDto {
   priority: number;
 }
 
+export class GitCommitEventInfoDto {
+  @IsString()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Name of the git repository folder',
+    example: 'my-project',
+    required: true,
+  })
+  repoName: string;
+
+  @IsString()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Commit message / subject',
+    example: 'Fix login bug',
+    required: true,
+  })
+  commitMessage: string;
+
+  @IsString()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Short commit hash (first 8 characters)',
+    example: 'a1b2c3d4',
+    required: true,
+  })
+  commitHash: string;
+
+  @IsString()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Name of the commit author',
+    example: 'Jane Doe',
+    required: true,
+  })
+  commitAuthor: string;
+}
+
 export class TimelineEventDto {
   @IsString()
   @Type(() => String)
@@ -236,6 +278,7 @@ export class TimelineEventDto {
       { $ref: getSchemaPath(WebsiteEventInfoDto) },
       { $ref: getSchemaPath(TagEventInfoDto) },
       { $ref: getSchemaPath(AutoTagEventInfoDto) },
+      { $ref: getSchemaPath(GitCommitEventInfoDto) },
     ],
   })
   info:
@@ -244,7 +287,8 @@ export class TimelineEventDto {
     | CalendarEventInfoDto
     | WebsiteEventInfoDto
     | TagEventInfoDto
-    | AutoTagEventInfoDto;
+    | AutoTagEventInfoDto
+    | GitCommitEventInfoDto;
 
   @IsString()
   @Type(() => String)

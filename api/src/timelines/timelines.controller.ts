@@ -4,6 +4,7 @@ import { ApiExtraModels, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagge
 import { TimelinesService } from './timelines.service';
 import {
   CalendarEventProviderInfoDto,
+  GitCommitEventProviderInfoDto,
   TimelineCountDto,
   TimelineDto,
 } from './dto/response-timeline.dto';
@@ -13,6 +14,7 @@ import {
   ActiveStateEventInfoDto,
   AutoTagEventInfoDto,
   CalendarEventInfoDto,
+  GitCommitEventInfoDto,
   ProgramEventInfoDto,
   TagEventInfoDto,
   TimelineWithEventsDto,
@@ -26,7 +28,9 @@ import {
   WebsiteEventInfoDto,
   TagEventInfoDto,
   AutoTagEventInfoDto,
-  CalendarEventProviderInfoDto
+  GitCommitEventInfoDto,
+  CalendarEventProviderInfoDto,
+  GitCommitEventProviderInfoDto
 )
 @ApiTags('timelines')
 @Controller('api/timelines')

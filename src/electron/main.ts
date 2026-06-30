@@ -11,7 +11,7 @@
  *   cd client && npm run dev:client  (frontend on port 55588)
  */
 
-import { app, BrowserWindow, Menu, Tray, nativeImage, shell } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, Menu, Tray, nativeImage, shell } from 'electron';
 import { spawn, ChildProcess } from 'child_process';
 import * as path from 'path';
 
@@ -25,6 +25,8 @@ const isDev = !app.isPackaged;
 const API_DIR = isDev ? path.join(__dirname, '../../api') : path.join(process.resourcesPath, 'api');
 
 const ICON_PATH = path.join(__dirname, '../../icon/icon.png');
+
+const PRELOAD_PATH = path.join(__dirname, 'preload.js');
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
@@ -79,6 +81,7 @@ function createWindow(): BrowserWindow {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+      preload: PRELOAD_PATH,
     },
   });
 
@@ -189,6 +192,14 @@ function quit(): void {
   }
   app.quit();
 }
+
+// ── IPC handlers ─────────────────────────────────────────────────────────────
+ipcMain.handle('dialog:openDirectory', async () => {
+  const result = await dialog.showOpenDialog({
+    properties: ['openDirectory'],
+  });
+  return result.canceled ? null : (result.filePaths[0] ?? null);
+});
 
 // ── App lifecycle ─────────────────────────────────────────────────────────────
 app.whenReady().then(async () => {

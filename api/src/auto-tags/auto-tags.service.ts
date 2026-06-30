@@ -150,12 +150,17 @@ export class AutoTagsService {
       const timelinesForAutoTagAnalysis = otherTimelines.filter(
         (timeline) => timeline.type !== TimelineType.Tag
       );
+      const tagTimelines = otherTimelines.filter(
+        (timeline) => timeline.type === TimelineType.Tag
+      );
       autoTagTimelines.forEach((autoTagTimeline) => {
         const autoTagEvents = calculateAutoTagEvents(
           timelinesForAutoTagAnalysis,
           autoTags,
           autoTagTimeline,
-          allTagNames
+          allTagNames,
+          undefined,
+          tagTimelines
         );
         autoTagTimeline.events = autoTagEvents;
       });

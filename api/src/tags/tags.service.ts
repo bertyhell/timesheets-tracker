@@ -8,6 +8,7 @@ import { max, min } from 'date-fns';
 import { UpdateTagDto } from './dto/update-tag.dto';
 import { findAllTags } from './queries/findAllTags';
 import { findOneTag } from './queries/findOneTag';
+import { findOverlappingTags } from './queries/findOverlappingTags';
 import { createTag } from './queries/createTag';
 import { updateTag } from './queries/updateTag';
 import { updateTagTime } from './queries/updateTagTime';
@@ -55,18 +56,102 @@ export class TagsService {
   async create(createTagDto: CreateTagDto): Promise<Tag> {
     let id: string | null = null;
     try {
+      const db = this.databaseService.getDb();
+
+      // Normalise start/end order
+      let effectiveStart = min([
+        new Date(createTagDto.startedAt),
+        new Date(createTagDto.endedAt),
+      ]);
+      let effectiveEnd = max([
+        new Date(createTagDto.startedAt),
+        new Date(createTagDto.endedAt),
+      ]);
+
+      // ── Pass 1: iteratively merge same-tagName overlaps ──────────────────
+      // The merge may extend the range, which can uncover more same-name tags,
+      // so repeat until the range stabilises.
+      let changed = true;
+      while (changed) {
+        changed = false;
+        const overlapping = findOverlappingTags(db, {
+          startedAt: effectiveStart.toISOString(),
+          endedAt: effectiveEnd.toISOString(),
+        });
+
+        for (const existing of overlapping) {
+          if (existing.tagNameId !== createTagDto.tagNameId) continue;
+
+          const existingStart = new Date(existing.startedAt);
+          const existingEnd = new Date(existing.endedAt);
+          const newStart = min([effectiveStart, existingStart]);
+          const newEnd = max([effectiveEnd, existingEnd]);
+
+          if (newStart < effectiveStart || newEnd > effectiveEnd) {
+            effectiveStart = newStart;
+            effectiveEnd = newEnd;
+            changed = true;
+          }
+
+          deleteTag(db, { id: existing.id });
+        }
+      }
+
+      // ── Pass 2: cut different-tagName overlaps ────────────────────────────
+      const remainingOverlaps = findOverlappingTags(db, {
+        startedAt: effectiveStart.toISOString(),
+        endedAt: effectiveEnd.toISOString(),
+      });
+
+      for (const existing of remainingOverlaps) {
+        if (existing.tagNameId === createTagDto.tagNameId) continue; // already handled
+
+        const existingStart = new Date(existing.startedAt);
+        const existingEnd = new Date(existing.endedAt);
+
+        const coversLeft = existingStart < effectiveStart;
+        const coversRight = existingEnd > effectiveEnd;
+
+        if (coversLeft && coversRight) {
+          // New tag sits entirely inside the old one → split old tag in two
+          updateTagTime(
+            db,
+            { startedAt: existing.startedAt, endedAt: effectiveStart.toISOString() },
+            { id: existing.id }
+          );
+          createTag(db, {
+            id: uuid(),
+            tagNameId: existing.tagNameId,
+            startedAt: effectiveEnd.toISOString(),
+            endedAt: existing.endedAt,
+          });
+        } else if (!coversLeft && !coversRight) {
+          // Old tag sits entirely inside new tag → delete it
+          deleteTag(db, { id: existing.id });
+        } else if (coversLeft) {
+          // Old tag starts before new tag, ends inside → trim its right side
+          updateTagTime(
+            db,
+            { startedAt: existing.startedAt, endedAt: effectiveStart.toISOString() },
+            { id: existing.id }
+          );
+        } else {
+          // Old tag starts inside new tag, ends after → trim its left side
+          updateTagTime(
+            db,
+            { startedAt: effectiveEnd.toISOString(), endedAt: existing.endedAt },
+            { id: existing.id }
+          );
+        }
+      }
+
+      // ── Create the new (possibly merged) tag ─────────────────────────────
       id = uuid();
-      await createTag(this.databaseService.getDb(), {
+      await createTag(db, {
         id,
         tagNameId: createTagDto.tagNameId,
-        startedAt: min([
-          new Date(createTagDto.startedAt),
-          new Date(createTagDto.endedAt),
-        ]).toISOString(),
-        endedAt: max([
-          new Date(createTagDto.startedAt),
-          new Date(createTagDto.endedAt),
-        ]).toISOString(),
+        startedAt: effectiveStart.toISOString(),
+        endedAt: effectiveEnd.toISOString(),
       });
 
       return this.findOne(id);

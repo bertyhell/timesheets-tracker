@@ -1,6 +1,6 @@
 import './TimelinesAndEventsPage.css';
 import { toast } from 'react-toastify';
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Timeline from '../../components/Timeline/Timeline';
 import {
@@ -45,7 +45,7 @@ import {
 import { isApproxEqual } from '../../helpers/is-approx-equal';
 import Button, { ButtonSize, ButtonVariant } from '../../components/Button/Button';
 import { ROUTE_PARTS } from '../../App';
-import { Menu, Plus, Filter, List, Calendar } from 'lucide-react';
+import { Menu, Plus, Filter, List, Calendar, ZoomIn, ZoomOut, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export function TimelinesAndEventsPage() {
   const [viewDate] = useAtom(viewDateAtom);
@@ -110,6 +110,162 @@ export function TimelinesAndEventsPage() {
   const { mutateAsync: createTagName } = useMutation({ ...tagNamesControllerCreateMutation() });
   const { mutateAsync: createTag } = useMutation({ ...tagsControllerCreateMutation() });
 
+  // Zoom/pan state: fractions [0,1] of the full minTime–maxTime window
+  const [viewStart, setViewStart] = useState(0);
+  const [viewEnd, setViewEnd] = useState(1);
+  const [isDragging, setIsDragging] = useState(false);
+  const viewStartRef = useRef(0);
+  const viewEndRef = useRef(1);
+  const timelinesContainerRef = useRef<HTMLDivElement>(null);
+  const dragRef = useRef<{
+    startX: number;
+    trackWidth: number;
+    startViewStart: number;
+    startViewEnd: number;
+  } | null>(null);
+
+  const ZOOM_FACTOR = 0.7;
+  const MIN_SPAN = 0.0007; // ~60 seconds minimum visible window
+
+  const setZoom = (start: number, end: number) => {
+    viewStartRef.current = start;
+    viewEndRef.current = end;
+    setViewStart(start);
+    setViewEnd(end);
+  };
+
+  // Track whether we've already auto-zoomed to the event range for the current date
+  const initialZoomSetForDate = useRef<string | null>(null);
+
+  // Reset zoom to full day when the date changes
+  useEffect(() => {
+    initialZoomSetForDate.current = null;
+    setZoom(0, 1);
+  }, [viewDate]);
+
+  // Auto-zoom to the event range the first time events load for a date
+  useEffect(() => {
+    const hasEvents = timelinesWithEvents?.some((t) => t.events && t.events.length > 0);
+    if (!hasEvents) return;
+    const dateKey = viewDate.toISOString().slice(0, 10);
+    if (initialZoomSetForDate.current === dateKey) return;
+    initialZoomSetForDate.current = dateKey;
+    const newStart = Math.max(0, differenceInMilliseconds(minTime, dayStart) / dayWindowMs);
+    const newEnd = Math.min(1, differenceInMilliseconds(maxTime, dayStart) / dayWindowMs);
+    if (newStart < newEnd) setZoom(newStart, newEnd);
+  }, [timelinesWithEvents]);
+
+  // Non-passive wheel listener for zoom
+  useEffect(() => {
+    const el = timelinesContainerRef.current;
+    if (!el) return;
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const rect = el.getBoundingClientRect();
+      const gutterEl = el.querySelector('.c-timeline-ruler__gutter') as HTMLElement | null;
+      const gutterWidth = gutterEl ? gutterEl.offsetWidth : 112;
+      const trackWidth = rect.width - gutterWidth;
+      if (trackWidth <= 0) return;
+
+      const mouseXInTrack = e.clientX - rect.left - gutterWidth;
+      const fraction = Math.max(0, Math.min(1, mouseXInTrack / trackWidth));
+
+      const curStart = viewStartRef.current;
+      const curEnd = viewEndRef.current;
+      const focal = curStart + fraction * (curEnd - curStart);
+
+      const factor = e.deltaY < 0 ? ZOOM_FACTOR : 1 / ZOOM_FACTOR;
+      const currentSpan = curEnd - curStart;
+      let newSpan = Math.max(MIN_SPAN, Math.min(1, currentSpan * factor));
+
+      let newStart = focal - fraction * newSpan;
+      let newEnd = focal + (1 - fraction) * newSpan;
+
+      if (newStart < 0) { newEnd = Math.min(1, newEnd - newStart); newStart = 0; }
+      if (newEnd > 1) { newStart = Math.max(0, newStart - (newEnd - 1)); newEnd = 1; }
+
+      setZoom(newStart, newEnd);
+    };
+    el.addEventListener('wheel', handleWheel, { passive: false });
+    return () => el.removeEventListener('wheel', handleWheel);
+  }, []);
+
+  // Global mouse handlers for middle-mouse drag
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!dragRef.current) return;
+      const { startX, trackWidth, startViewStart, startViewEnd } = dragRef.current;
+      const span = startViewEnd - startViewStart;
+      const deltaFraction = -((e.clientX - startX) / trackWidth) * span;
+      let newStart = startViewStart + deltaFraction;
+      let newEnd = startViewEnd + deltaFraction;
+      if (newStart < 0) { newEnd = span; newStart = 0; }
+      if (newEnd > 1) { newStart = 1 - span; newEnd = 1; }
+      setZoom(newStart, newEnd);
+    };
+    const handleMouseUp = (e: MouseEvent) => {
+      if (e.button === 1) {
+        dragRef.current = null;
+        setIsDragging(false);
+      }
+    };
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, []);
+
+  const handleTimelinesMiddleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.button !== 1) return;
+    e.preventDefault();
+    const el = timelinesContainerRef.current;
+    if (!el) return;
+    const gutterEl = el.querySelector('.c-timeline-ruler__gutter') as HTMLElement | null;
+    const gutterWidth = gutterEl ? gutterEl.offsetWidth : 112;
+    const rect = el.getBoundingClientRect();
+    dragRef.current = {
+      startX: e.clientX,
+      trackWidth: rect.width - gutterWidth,
+      startViewStart: viewStartRef.current,
+      startViewEnd: viewEndRef.current,
+    };
+    setIsDragging(true);
+  };
+
+  const handleZoomIn = () => {
+    const focal = (viewStartRef.current + viewEndRef.current) / 2;
+    const newSpan = Math.max(MIN_SPAN, (viewEndRef.current - viewStartRef.current) * ZOOM_FACTOR);
+    let newStart = focal - newSpan / 2;
+    let newEnd = focal + newSpan / 2;
+    if (newStart < 0) { newEnd = Math.min(1, newEnd - newStart); newStart = 0; }
+    if (newEnd > 1) { newStart = Math.max(0, newStart - (newEnd - 1)); newEnd = 1; }
+    setZoom(newStart, newEnd);
+  };
+
+  const handleZoomOut = () => {
+    const focal = (viewStartRef.current + viewEndRef.current) / 2;
+    const newSpan = Math.min(1, (viewEndRef.current - viewStartRef.current) / ZOOM_FACTOR);
+    let newStart = focal - newSpan / 2;
+    let newEnd = focal + newSpan / 2;
+    if (newStart < 0) { newEnd = Math.min(1, newEnd - newStart); newStart = 0; }
+    if (newEnd > 1) { newStart = Math.max(0, newStart - (newEnd - 1)); newEnd = 1; }
+    setZoom(newStart, newEnd);
+  };
+
+  const handlePanLeft = () => {
+    const span = viewEndRef.current - viewStartRef.current;
+    const newStart = Math.max(0, viewStartRef.current - span * 0.2);
+    setZoom(newStart, newStart + span);
+  };
+
+  const handlePanRight = () => {
+    const span = viewEndRef.current - viewStartRef.current;
+    const newEnd = Math.min(1, viewEndRef.current + span * 0.2);
+    setZoom(newEnd - span, newEnd);
+  };
+
   const [selectionStartPercent, setSelectionStartPercent] = useState<number | null>(null);
   const [selectionMovePercent, setSelectionMovePercent] = useState<number | null>(null);
   const [selectionEndPercent, setSelectionEndPercent] = useState<number | null>(null);
@@ -144,13 +300,24 @@ export function TimelinesAndEventsPage() {
   const maxTime: Date = lastEvent ? addHours(parseISO(lastEvent.endedAt), 1) : endOfDay(viewDate);
 
   const windowInMilliseconds = differenceInMilliseconds(maxTime, minTime);
+
+  // Full day is the zoom boundary — viewStart/viewEnd are fractions of the full day
+  const dayStart = startOfDay(viewDate);
+  const dayEnd = endOfDay(viewDate);
+  const dayWindowMs = differenceInMilliseconds(dayEnd, dayStart);
+
+  // Visible (zoomed) time window
+  const visibleMinTime = addMilliseconds(dayStart, viewStart * dayWindowMs);
+  const visibleMaxTime = addMilliseconds(dayStart, viewEnd * dayWindowMs);
+  const visibleWindowMs = differenceInMilliseconds(visibleMaxTime, visibleMinTime);
+
   const selectionStartTime = addMilliseconds(
-    minTime,
-    (windowInMilliseconds / 100) * (selectionStartPercent || 0)
+    visibleMinTime,
+    (visibleWindowMs / 100) * (selectionStartPercent || 0)
   );
   const selectionEndTime = addMilliseconds(
-    minTime,
-    (windowInMilliseconds / 100) * (selectionEndPercent || 0)
+    visibleMinTime,
+    (visibleWindowMs / 100) * (selectionEndPercent || 0)
   );
 
   useEffect(() => {
@@ -327,8 +494,8 @@ export function TimelinesAndEventsPage() {
               return timelineWithEvents.id === timelineInfo.id;
             })?.events || ([] as TimelineEventDto[])
           }
-          minTime={minTime}
-          maxTime={maxTime}
+          minTime={visibleMinTime}
+          maxTime={visibleMaxTime}
           onMouseDown={(posX: number) => handleMouseDown(timelineInfo.id, posX)}
           onMouseMove={(posX: number) => handleMouseMove(timelineInfo.id, posX)}
           onMouseUp={(posX: number, eventId: string | null) =>
@@ -404,8 +571,13 @@ export function TimelinesAndEventsPage() {
         onLayoutChanged={onVerticalLayoutChanged}
       >
         <Panel defaultSize="50%" minSize="15%" className="c-timelines-panel">
-          <div className="c-timelines">
-            <TimelineRuler minTime={minTime} maxTime={maxTime} />
+          <div
+            className="c-timelines"
+            ref={timelinesContainerRef}
+            onMouseDown={handleTimelinesMiddleMouseDown}
+            style={{ cursor: isDragging ? 'grabbing' : undefined }}
+          >
+            <TimelineRuler minTime={visibleMinTime} maxTime={visibleMaxTime} />
             {renderTimelines()}
           </div>
         </Panel>
@@ -486,6 +658,41 @@ export function TimelinesAndEventsPage() {
 
         <div className="p-page-header-right">
           {isLoadingTimelineEvents && <span className="p-loading-indicator">Loading...</span>}
+          <div className="flex items-center bg-gray-100 border border-gray-200 rounded-lg overflow-hidden">
+            <button
+              className="px-2 py-1.5 text-gray-600 hover:bg-gray-200 transition-colors"
+              onClick={handleZoomIn}
+              title="Zoom in"
+              aria-label="Zoom in"
+            >
+              <ZoomIn size={15} />
+            </button>
+            <button
+              className="px-2 py-1.5 text-gray-600 hover:bg-gray-200 transition-colors border-l border-gray-200"
+              onClick={handleZoomOut}
+              title="Zoom out"
+              aria-label="Zoom out"
+            >
+              <ZoomOut size={15} />
+            </button>
+            <button
+              className="px-2 py-1.5 text-gray-600 hover:bg-gray-200 transition-colors border-l border-gray-200"
+              onClick={handlePanLeft}
+              title="Pan left"
+              aria-label="Pan left"
+            >
+              <ChevronLeft size={15} />
+            </button>
+            <button
+              className="px-2 py-1.5 text-gray-600 hover:bg-gray-200 transition-colors border-l border-gray-200"
+              onClick={handlePanRight}
+              title="Pan right"
+              aria-label="Pan right"
+            >
+              <ChevronRight size={15} />
+            </button>
+          </div>
+          <div className="p-header-divider" />
           <DateSelect />
           <div className="p-header-divider" />
           <GlobalSearchBar />

@@ -42,6 +42,7 @@
     position: relative;
     height: var(--timeline-height);
     flex-grow: 1;
+    overflow: hidden;
 
     .c-timeline__selection {
       height: var(--timeline-height);

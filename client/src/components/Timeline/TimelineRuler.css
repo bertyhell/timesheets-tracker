@@ -21,6 +21,7 @@
     position: relative;
     flex-grow: 1;
     height: var(--ruler-height);
+    overflow: hidden;
   }
 
   .c-timeline-ruler__tick {

@@ -139,6 +139,7 @@ function Timeline({
   };
 
   const handleMouseDown = (evt: MouseEvent) => {
+    if (evt.button !== 0) return; // only left-click starts a selection
     // On tag timelines, don't start a selection drag when the user presses
     // down on an existing tag event (clicking still selects via onClick).
     if (timelineInfo.timelineType === TimelineType.Tag) {

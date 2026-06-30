@@ -12,7 +12,7 @@ export function getTicks(minTime: Date, maxTime: Date, intervalMinutes?: number)
 
   const interval =
     intervalMinutes ??
-    NICE_INTERVALS_MINUTES.find((i) => i >= windowMinutes / 8) ??
+    NICE_INTERVALS_MINUTES.find((i) => i >= windowMinutes / 16) ??
     NICE_INTERVALS_MINUTES.at(-1)!;
 
   const ticks: Date[] = [];

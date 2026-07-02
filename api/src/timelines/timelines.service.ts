@@ -148,7 +148,10 @@ export class TimelinesService {
           eventProviderInfo: eventProviderInfo ? JSON.stringify(eventProviderInfo) : null,
           updatedAt: new Date().toISOString(),
           visualOrder: updateTimelineDto.visualOrder ?? existing.visualOrder,
-          color: updateTimelineDto.color !== undefined ? (updateTimelineDto.color ?? null) : existing.color,
+          color:
+            updateTimelineDto.color !== undefined
+              ? (updateTimelineDto.color ?? null)
+              : existing.color,
         },
         { id }
       );

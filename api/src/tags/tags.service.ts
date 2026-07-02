@@ -59,14 +59,8 @@ export class TagsService {
       const db = this.databaseService.getDb();
 
       // Normalise start/end order
-      let effectiveStart = min([
-        new Date(createTagDto.startedAt),
-        new Date(createTagDto.endedAt),
-      ]);
-      let effectiveEnd = max([
-        new Date(createTagDto.startedAt),
-        new Date(createTagDto.endedAt),
-      ]);
+      let effectiveStart = min([new Date(createTagDto.startedAt), new Date(createTagDto.endedAt)]);
+      let effectiveEnd = max([new Date(createTagDto.startedAt), new Date(createTagDto.endedAt)]);
 
       // ── Pass 1: iteratively merge same-tagName overlaps ──────────────────
       // The merge may extend the range, which can uncover more same-name tags,

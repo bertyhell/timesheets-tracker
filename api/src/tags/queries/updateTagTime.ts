@@ -25,7 +25,5 @@ export function updateTagTime(
 	    endedAt = ?
 	WHERE id = ?
 	`;
-  return db
-    .prepare(sql)
-    .run(data.startedAt, data.endedAt, params.id) as UpdateTagTimeResult;
+  return db.prepare(sql).run(data.startedAt, data.endedAt, params.id) as UpdateTagTimeResult;
 }

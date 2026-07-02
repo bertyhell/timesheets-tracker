@@ -70,29 +70,31 @@ export function AutoTagsPage() {
     toast(pastedAutoTags.length + ' auto tags were added');
   };
 
-  const onPasteContent = useCallback(async (evt: ClipboardEvent) => {
-    const mainRoute = '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.autoTagRules;
-    if (location.pathname !== mainRoute) {
-      return;
-    }
-
-    try {
-
-      if (evt.clipboardData && evt.clipboardData.getData) {
-        const pastedText = evt.clipboardData.getData('text/plain');
-
-        if (pastedText.includes(AUTOTAGS_PROPERTY_NAME_FOR_PASTE_DETECTION)) {
-          await handlePasteAutoTags(
-            JSON.parse(pastedText)[AUTOTAGS_PROPERTY_NAME_FOR_PASTE_DETECTION]
-          );
-        } else {
-          toast("The pasted text doesn't contain any valid auto tags", { type: 'error' });
-        }
+  const onPasteContent = useCallback(
+    async (evt: ClipboardEvent) => {
+      const mainRoute = '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.autoTagRules;
+      if (location.pathname !== mainRoute) {
+        return;
       }
-    } catch {
-      toast("The pasted text doesn't contain any valid auto tags", { type: 'error' });
-    }
-  }, [location.pathname]);
+
+      try {
+        if (evt.clipboardData && evt.clipboardData.getData) {
+          const pastedText = evt.clipboardData.getData('text/plain');
+
+          if (pastedText.includes(AUTOTAGS_PROPERTY_NAME_FOR_PASTE_DETECTION)) {
+            await handlePasteAutoTags(
+              JSON.parse(pastedText)[AUTOTAGS_PROPERTY_NAME_FOR_PASTE_DETECTION]
+            );
+          } else {
+            toast("The pasted text doesn't contain any valid auto tags", { type: 'error' });
+          }
+        }
+      } catch {
+        toast("The pasted text doesn't contain any valid auto tags", { type: 'error' });
+      }
+    },
+    [location.pathname]
+  );
 
   useEffect(() => {
     document.body.addEventListener('paste', onPasteContent);
@@ -170,62 +172,62 @@ export function AutoTagsPage() {
           className="mb-3 ml-4 w-full max-w-sm"
         />
         <table className="c-table w-full">
-        <thead>
-          <tr className="h-10 bg-white">
-            <th className="w-px"></th>
-            <th
-              className="text-left pl-3 cursor-pointer select-none"
-              onClick={() => toggleSort('title')}
-            >
-              Title{sortIndicator('title')}
-            </th>
-            <th
-              className="text-left pl-3 cursor-pointer select-none"
-              onClick={() => toggleSort('priority')}
-            >
-              Priority{sortIndicator('priority')}
-            </th>
-            <th className="w-px whitespace-nowrap"></th>
-            <th className="w-px whitespace-nowrap"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {orderBy(
-            autoTags || [],
-            (autoTag) => (sortCol === 'title' ? autoTag.title?.toLowerCase() : autoTag.priority),
-            sortDir
-          ).map(
-            (autoTag: AutoTagDto): ReactNode => (
-              <tr
-                key={'auto-tag-' + autoTag.id}
-                onClick={() =>
-                  navigate(
-                    '/' +
-                      ROUTE_PARTS.settings +
-                      '/' +
-                      ROUTE_PARTS.autoTagRules +
-                      '/' +
-                      autoTag.id +
-                      '/' +
-                      ROUTE_PARTS.edit
-                  )
-                }
+          <thead>
+            <tr className="h-10 bg-white">
+              <th className="w-px"></th>
+              <th
+                className="text-left pl-3 cursor-pointer select-none"
+                onClick={() => toggleSort('title')}
               >
-                <td className="w-px py-1 pl-2">
-                  <span
-                    className="block h-5 w-5 rounded-md"
-                    style={{ backgroundColor: autoTag.tagName?.color }}
-                  ></span>
-                </td>
-                <td className="pl-3">{autoTag.title}</td>
-                <td className="pl-3">{autoTag.priority}</td>
-                <td className="w-px whitespace-nowrap">{renderEditButton(autoTag)}</td>
-                <td className="w-px whitespace-nowrap">{renderDeleteButton(autoTag)}</td>
-              </tr>
-            )
-          )}
-        </tbody>
-      </table>
+                Title{sortIndicator('title')}
+              </th>
+              <th
+                className="text-left pl-3 cursor-pointer select-none"
+                onClick={() => toggleSort('priority')}
+              >
+                Priority{sortIndicator('priority')}
+              </th>
+              <th className="w-px whitespace-nowrap"></th>
+              <th className="w-px whitespace-nowrap"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {orderBy(
+              autoTags || [],
+              (autoTag) => (sortCol === 'title' ? autoTag.title?.toLowerCase() : autoTag.priority),
+              sortDir
+            ).map(
+              (autoTag: AutoTagDto): ReactNode => (
+                <tr
+                  key={'auto-tag-' + autoTag.id}
+                  onClick={() =>
+                    navigate(
+                      '/' +
+                        ROUTE_PARTS.settings +
+                        '/' +
+                        ROUTE_PARTS.autoTagRules +
+                        '/' +
+                        autoTag.id +
+                        '/' +
+                        ROUTE_PARTS.edit
+                    )
+                  }
+                >
+                  <td className="w-px py-1 pl-2">
+                    <span
+                      className="block h-5 w-5 rounded-md"
+                      style={{ backgroundColor: autoTag.tagName?.color }}
+                    ></span>
+                  </td>
+                  <td className="pl-3">{autoTag.title}</td>
+                  <td className="pl-3">{autoTag.priority}</td>
+                  <td className="w-px whitespace-nowrap">{renderEditButton(autoTag)}</td>
+                  <td className="w-px whitespace-nowrap">{renderDeleteButton(autoTag)}</td>
+                </tr>
+              )
+            )}
+          </tbody>
+        </table>
       </>
     );
   };

@@ -114,7 +114,14 @@ function Timeline({
 
   const handleEditFromTitleContextMenu = () => {
     navigate(
-      '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.timelines + '/' + timelineInfo.id + '/' + ROUTE_PARTS.edit
+      '/' +
+        ROUTE_PARTS.settings +
+        '/' +
+        ROUTE_PARTS.timelines +
+        '/' +
+        timelineInfo.id +
+        '/' +
+        ROUTE_PARTS.edit
     );
   };
 
@@ -279,283 +286,308 @@ function Timeline({
   const quarterTicks = getTicks(minTime, maxTime, 15);
   return (
     <>
-    <div
-      className={'c-timeline ' + (isActive ? 'c-timeline--active' : '') + (resizeState ? ' c-timeline--resizing' : '')}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-    >
-      <div className="c-timeline__title cursor-pointer" onClick={onSelectTimeline} onContextMenu={handleTitleContextMenu} style={{ borderLeft: `3px solid ${timelineDotColor}` }}>
-        <span className="c-timeline__label">{timelineInfo.title}</span>
-      </div>
-      <div className="c-timeline__track" ref={trackRef}>
-        {/* Hour and quarter ticks */}
-        {quarterTicks.map((quarterTick) => (
-          <div
-            key={'c-timeline__quarter-tick-' + quarterTick.toISOString()}
-            className="c-timeline__quarter-tick"
-            style={{
-              left:
-                (differenceInMilliseconds(quarterTick, minTime) / windowInMilliseconds) * 100 + '%',
-            }}
-          ></div>
-        ))}
-        {hourTicks.map((hourTick) => (
-          <div
-            key={'c-timeline__hour-tick-' + hourTick.toISOString()}
-            className="c-timeline__hour-tick"
-            style={{
-              left:
-                (differenceInMilliseconds(hourTick, minTime) / windowInMilliseconds) * 100 + '%',
-            }}
-          ></div>
-        ))}
-
-        {/* Current time tick */}
-        {isAfter(new Date(), minTime) && isBefore(new Date(), maxTime) && (
-          <div
-            key={'c-timeline__current-time-' + timelineInfo.title}
-            className="c-timeline__current-time"
-            style={{
-              left:
-                (differenceInMilliseconds(new Date(), minTime) / windowInMilliseconds) * 100 + '%',
-            }}
-          />
-        )}
-
-        {/* Events */}
-        {events.map((event) => {
-          const startPercent =
-            (differenceInMilliseconds(parseISO(event.startedAt), minTime) /
-              windowInMilliseconds) *
-            100;
-          const endPercent =
-            (differenceInMilliseconds(parseISO(event.endedAt), minTime) /
-              windowInMilliseconds) *
-            100;
-
-          // Apply visual override when this event is being resized
-          let effectiveLeft = startPercent;
-          let effectiveRight = endPercent;
-          if (resizeState?.tagId === event.id && resizeCurrentPosX !== null) {
-            if (resizeState.side === 'start') {
-              effectiveLeft = Math.min(resizeCurrentPosX, endPercent - 0.1);
-            } else {
-              effectiveRight = Math.max(resizeCurrentPosX, startPercent + 0.1);
-            }
-          }
-
-          const widthPercent = effectiveRight - effectiveLeft;
-          const width = widthPercent + '%';
-          const pixelWidth = (widthPercent / 100) * trackWidth;
-          const isNarrow = pixelWidth <= 40;
-
-          const eventInfo = event.info as Record<string, string | number | boolean>;
-          const label = getEventLabel(timelineInfo, event);
-          const timeRange = `${format(parseISO(event.startedAt), 'HH:mm')} - ${format(parseISO(event.endedAt), 'HH:mm')}`;
-          const color = getColorForEvent(timelineInfo, event);
-          const isTagTimeline =
-            timelineInfo.timelineType === TimelineType.Tag && !!onTagResized;
-          const isAutoTagTimeline =
-            timelineInfo.timelineType === TimelineType.AutoTag;
-          const isDimmed = !!lowerSearch && !JSON.stringify(event).toLowerCase().includes(lowerSearch);
-
-          return (
-            <Tooltip
-              key={'c-timeline__' + timelineInfo.title + '__event__tippy__' + event.startedAt}
-              content={
-                <ul
-                  className="c-timeline__event__tooltip"
-                  key={
-                    'c-timeline__' + timelineInfo.title + '__event__tippy__ul__' + event.startedAt
-                  }
-                >
-                  <li>
-                    <b>Date:</b> {format(parseISO(event.startedAt), 'HH:mm:ss')} -{' '}
-                    {format(parseISO(event.endedAt), 'HH:mm:ss')} (
-                    {formatDuration(
-                      differenceInSeconds(parseISO(event.endedAt), parseISO(event.startedAt))
-                    )}
-                    )
-                  </li>
-                  {isTagTimeline ? (
-                    <li>
-                      <b>Name:</b> {getEventLabel(timelineInfo, event)}
-                    </li>
-                  ) : isAutoTagTimeline ? (
-                    <>
-                      <li>
-                        <b>Title:</b> {String(eventInfo['tagNameTitle'] ?? '')}
-                      </li>
-                      <li>
-                        <b>Code:</b> {String(eventInfo['tagNameCode'] ?? '')}
-                      </li>
-                      <li>
-                        <b>Priority:</b> {String(eventInfo['priority'] ?? '')}
-                      </li>
-                    </>
-                  ) : (
-                    Object.keys(eventInfo)
-                      .filter((key) => {
-                        const val = eventInfo[key];
-                        if (val === '' || val === null || val === undefined) return false;
-                        if (key === 'allDay' && val === false) return false;
-                        return true;
-                      })
-                      .map((key) => (
-                        <li
-                          key={
-                            'c-timeline__' +
-                            timelineInfo.title +
-                            '__event__' +
-                            event.startedAt +
-                            '__info__' +
-                            key +
-                            '__' +
-                            eventInfo[key]
-                          }
-                        >
-                          <b>{key}</b>:{' '}
-                          {typeof eventInfo[key] === 'boolean'
-                            ? eventInfo[key]
-                              ? 'active'
-                              : 'inactive'
-                            : eventInfo[key]}
-                        </li>
-                      ))
-                  )}
-                </ul>
-              }
-            >
-              <div
-                className={
-                  'c-timeline__event' +
-                  (selectedEvent?.id === event.id ? ' c-timeline__event--selected' : '') +
-                  (isNarrow ? ' c-timeline__event--narrow' : '') +
-                  (isDimmed ? ' c-timeline__event--dimmed' : '')
-                }
-                data-event-id={event.id}
-                key={'c-timeline__' + timelineInfo.title + '__event__div__' + event.startedAt}
-                style={{
-                  left: effectiveLeft + '%',
-                  width,
-                  backgroundColor: color + '33',
-                  borderLeft: `3px solid ${color}`,
-                }}
-                onClick={() => {
-                  setSelectedEvent(event, timelineInfo);
-                }}
-                onContextMenu={(e) => handleContextMenu(e, event.id)}
-              >
-                {!isNarrow && (
-                  <div className="c-timeline__event-content">
-                    <span className="c-timeline__event-label" style={{ color }}>
-                      {label}
-                    </span>
-                    <span className="c-timeline__event-time">{timeRange}</span>
-                  </div>
-                )}
-                {isTagTimeline && (
-                  <>
-                    <div
-                      className="c-timeline__event-resize-handle c-timeline__event-resize-handle--start"
-                      onMouseDown={(e) => {
-                        e.stopPropagation();
-                        setResizeState({
-                          tagId: event.id,
-                          side: 'start',
-                          originalStartedAt: event.startedAt,
-                          originalEndedAt: event.endedAt,
-                        });
-                        setResizeCurrentPosX(startPercent);
-                      }}
-                    />
-                    <div
-                      className="c-timeline__event-resize-handle c-timeline__event-resize-handle--end"
-                      onMouseDown={(e) => {
-                        e.stopPropagation();
-                        setResizeState({
-                          tagId: event.id,
-                          side: 'end',
-                          originalStartedAt: event.startedAt,
-                          originalEndedAt: event.endedAt,
-                        });
-                        setResizeCurrentPosX(endPercent);
-                      }}
-                    />
-                  </>
-                )}
-              </div>
-            </Tooltip>
-          );
-        })}
-
-        {/* Selection */}
-        {selectionPercentages && (
-          <Tooltip
-            key={'c-timeline__' + timelineInfo.title + '__selection__tippy'}
-            className="c-timeline__selection__tooltip--ended"
-            content={
-              <ul
-                onMouseMove={(evt) => evt.stopPropagation()}
-                onMouseDown={(evt) => evt.stopPropagation()}
-                onMouseUp={(evt) => evt.stopPropagation()}
-                key={'c-timeline__' + timelineInfo.title + '__selection__tippy__ul'}
-              >
-                <li>
-                  {format(selectionStartTime, 'HH:mm:ss')} - {format(selectionEndTime, 'HH:mm:ss')}
-                </li>
-                <li>{formatDuration(differenceInSeconds(selectionEndTime, selectionStartTime))}</li>
-                <TagSelectSingle value={null} onChange={handleTagNameChange} autoFocus />
-              </ul>
-            }
-            visible={!!selectionPercentages.start && !!selectionPercentages.end && !selectedEvent}
-            placement="top-end"
-          >
+      <div
+        className={
+          'c-timeline ' +
+          (isActive ? 'c-timeline--active' : '') +
+          (resizeState ? ' c-timeline--resizing' : '')
+        }
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+      >
+        <div
+          className="c-timeline__title cursor-pointer"
+          onClick={onSelectTimeline}
+          onContextMenu={handleTitleContextMenu}
+          style={{ borderLeft: `3px solid ${timelineDotColor}` }}
+        >
+          <span className="c-timeline__label">{timelineInfo.title}</span>
+        </div>
+        <div className="c-timeline__track" ref={trackRef}>
+          {/* Hour and quarter ticks */}
+          {quarterTicks.map((quarterTick) => (
             <div
-              className="c-timeline__selection"
-              key={'c-timeline__' + timelineInfo.title + '__selection'}
+              key={'c-timeline__quarter-tick-' + quarterTick.toISOString()}
+              className="c-timeline__quarter-tick"
               style={{
-                left: selectionPercentages.start + '%',
-                right: 100 - selectionPercentages.end + '%',
+                left:
+                  (differenceInMilliseconds(quarterTick, minTime) / windowInMilliseconds) * 100 +
+                  '%',
               }}
             ></div>
-          </Tooltip>
-        )}
-      </div>
-    </div>
+          ))}
+          {hourTicks.map((hourTick) => (
+            <div
+              key={'c-timeline__hour-tick-' + hourTick.toISOString()}
+              className="c-timeline__hour-tick"
+              style={{
+                left:
+                  (differenceInMilliseconds(hourTick, minTime) / windowInMilliseconds) * 100 + '%',
+              }}
+            ></div>
+          ))}
 
-    {/* Context menu */}
-    {contextMenu && (
-      <ContextMenu
-        position={{ x: contextMenu.x, y: contextMenu.y }}
-        items={[
-          ...(timelineInfo.timelineType === TimelineType.AutoTag
-            ? [{ label: 'Edit rule', onClick: () => onEditAutoTagRule?.(contextMenu.eventId) }]
-            : timelineInfo.timelineType === TimelineType.Tag
+          {/* Current time tick */}
+          {isAfter(new Date(), minTime) && isBefore(new Date(), maxTime) && (
+            <div
+              key={'c-timeline__current-time-' + timelineInfo.title}
+              className="c-timeline__current-time"
+              style={{
+                left:
+                  (differenceInMilliseconds(new Date(), minTime) / windowInMilliseconds) * 100 +
+                  '%',
+              }}
+            />
+          )}
+
+          {/* Events */}
+          {events.map((event) => {
+            const startPercent =
+              (differenceInMilliseconds(parseISO(event.startedAt), minTime) /
+                windowInMilliseconds) *
+              100;
+            const endPercent =
+              (differenceInMilliseconds(parseISO(event.endedAt), minTime) / windowInMilliseconds) *
+              100;
+
+            // Apply visual override when this event is being resized
+            let effectiveLeft = startPercent;
+            let effectiveRight = endPercent;
+            if (resizeState?.tagId === event.id && resizeCurrentPosX !== null) {
+              if (resizeState.side === 'start') {
+                effectiveLeft = Math.min(resizeCurrentPosX, endPercent - 0.1);
+              } else {
+                effectiveRight = Math.max(resizeCurrentPosX, startPercent + 0.1);
+              }
+            }
+
+            const widthPercent = effectiveRight - effectiveLeft;
+            const width = widthPercent + '%';
+            const pixelWidth = (widthPercent / 100) * trackWidth;
+            const isNarrow = pixelWidth <= 40;
+
+            const eventInfo = event.info as Record<string, string | number | boolean>;
+            const label = getEventLabel(timelineInfo, event);
+            const timeRange = `${format(parseISO(event.startedAt), 'HH:mm')} - ${format(parseISO(event.endedAt), 'HH:mm')}`;
+            const color = getColorForEvent(timelineInfo, event);
+            const isTagTimeline = timelineInfo.timelineType === TimelineType.Tag && !!onTagResized;
+            const isAutoTagTimeline = timelineInfo.timelineType === TimelineType.AutoTag;
+            const isDimmed =
+              !!lowerSearch && !JSON.stringify(event).toLowerCase().includes(lowerSearch);
+
+            return (
+              <Tooltip
+                key={'c-timeline__' + timelineInfo.title + '__event__tippy__' + event.startedAt}
+                content={
+                  <ul
+                    className="c-timeline__event__tooltip"
+                    key={
+                      'c-timeline__' + timelineInfo.title + '__event__tippy__ul__' + event.startedAt
+                    }
+                  >
+                    <li>
+                      <b>Date:</b> {format(parseISO(event.startedAt), 'HH:mm:ss')} -{' '}
+                      {format(parseISO(event.endedAt), 'HH:mm:ss')} (
+                      {formatDuration(
+                        differenceInSeconds(parseISO(event.endedAt), parseISO(event.startedAt))
+                      )}
+                      )
+                    </li>
+                    {isTagTimeline ? (
+                      <li>
+                        <b>Name:</b> {getEventLabel(timelineInfo, event)}
+                      </li>
+                    ) : isAutoTagTimeline ? (
+                      <>
+                        <li>
+                          <b>Title:</b> {String(eventInfo['tagNameTitle'] ?? '')}
+                        </li>
+                        <li>
+                          <b>Code:</b> {String(eventInfo['tagNameCode'] ?? '')}
+                        </li>
+                        <li>
+                          <b>Priority:</b> {String(eventInfo['priority'] ?? '')}
+                        </li>
+                      </>
+                    ) : (
+                      Object.keys(eventInfo)
+                        .filter((key) => {
+                          const val = eventInfo[key];
+                          if (val === '' || val === null || val === undefined) return false;
+                          if (key === 'allDay' && val === false) return false;
+                          return true;
+                        })
+                        .map((key) => (
+                          <li
+                            key={
+                              'c-timeline__' +
+                              timelineInfo.title +
+                              '__event__' +
+                              event.startedAt +
+                              '__info__' +
+                              key +
+                              '__' +
+                              eventInfo[key]
+                            }
+                          >
+                            <b>{key}</b>:{' '}
+                            {typeof eventInfo[key] === 'boolean'
+                              ? eventInfo[key]
+                                ? 'active'
+                                : 'inactive'
+                              : eventInfo[key]}
+                          </li>
+                        ))
+                    )}
+                  </ul>
+                }
+              >
+                <div
+                  className={
+                    'c-timeline__event' +
+                    (selectedEvent?.id === event.id ? ' c-timeline__event--selected' : '') +
+                    (isNarrow ? ' c-timeline__event--narrow' : '') +
+                    (isDimmed ? ' c-timeline__event--dimmed' : '')
+                  }
+                  data-event-id={event.id}
+                  key={'c-timeline__' + timelineInfo.title + '__event__div__' + event.startedAt}
+                  style={{
+                    left: effectiveLeft + '%',
+                    width,
+                    backgroundColor: color + '33',
+                    borderLeft: `3px solid ${color}`,
+                  }}
+                  onClick={() => {
+                    setSelectedEvent(event, timelineInfo);
+                  }}
+                  onContextMenu={(e) => handleContextMenu(e, event.id)}
+                >
+                  {!isNarrow && (
+                    <div className="c-timeline__event-content">
+                      <span className="c-timeline__event-label" style={{ color }}>
+                        {label}
+                      </span>
+                      <span className="c-timeline__event-time">{timeRange}</span>
+                    </div>
+                  )}
+                  {isTagTimeline && (
+                    <>
+                      <div
+                        className="c-timeline__event-resize-handle c-timeline__event-resize-handle--start"
+                        onMouseDown={(e) => {
+                          e.stopPropagation();
+                          setResizeState({
+                            tagId: event.id,
+                            side: 'start',
+                            originalStartedAt: event.startedAt,
+                            originalEndedAt: event.endedAt,
+                          });
+                          setResizeCurrentPosX(startPercent);
+                        }}
+                      />
+                      <div
+                        className="c-timeline__event-resize-handle c-timeline__event-resize-handle--end"
+                        onMouseDown={(e) => {
+                          e.stopPropagation();
+                          setResizeState({
+                            tagId: event.id,
+                            side: 'end',
+                            originalStartedAt: event.startedAt,
+                            originalEndedAt: event.endedAt,
+                          });
+                          setResizeCurrentPosX(endPercent);
+                        }}
+                      />
+                    </>
+                  )}
+                </div>
+              </Tooltip>
+            );
+          })}
+
+          {/* Selection */}
+          {selectionPercentages && (
+            <Tooltip
+              key={'c-timeline__' + timelineInfo.title + '__selection__tippy'}
+              className="c-timeline__selection__tooltip--ended"
+              content={
+                <ul
+                  onMouseMove={(evt) => evt.stopPropagation()}
+                  onMouseDown={(evt) => evt.stopPropagation()}
+                  onMouseUp={(evt) => evt.stopPropagation()}
+                  key={'c-timeline__' + timelineInfo.title + '__selection__tippy__ul'}
+                >
+                  <li>
+                    {format(selectionStartTime, 'HH:mm:ss')} -{' '}
+                    {format(selectionEndTime, 'HH:mm:ss')}
+                  </li>
+                  <li>
+                    {formatDuration(differenceInSeconds(selectionEndTime, selectionStartTime))}
+                  </li>
+                  <TagSelectSingle value={null} onChange={handleTagNameChange} autoFocus />
+                </ul>
+              }
+              visible={!!selectionPercentages.start && !!selectionPercentages.end && !selectedEvent}
+              placement="top-end"
+            >
+              <div
+                className="c-timeline__selection"
+                key={'c-timeline__' + timelineInfo.title + '__selection'}
+                style={{
+                  left: selectionPercentages.start + '%',
+                  right: 100 - selectionPercentages.end + '%',
+                }}
+              ></div>
+            </Tooltip>
+          )}
+        </div>
+      </div>
+
+      {/* Context menu */}
+      {contextMenu && (
+        <ContextMenu
+          position={{ x: contextMenu.x, y: contextMenu.y }}
+          items={[
+            ...(timelineInfo.timelineType === TimelineType.AutoTag
+              ? [{ label: 'Edit rule', onClick: () => onEditAutoTagRule?.(contextMenu.eventId) }]
+              : timelineInfo.timelineType === TimelineType.Tag
+                ? [
+                    { label: 'Edit tag', onClick: () => onEditTag?.(contextMenu.eventId) },
+                    {
+                      label: 'Delete tag',
+                      onClick: () => onDeleteTag?.(contextMenu.eventId),
+                      variant: 'danger' as const,
+                    },
+                  ]
+                : []),
+            ...(onCreateTagFromEvent && contextMenu.eventStartedAt && contextMenu.eventEndedAt
               ? [
-                  { label: 'Edit tag', onClick: () => onEditTag?.(contextMenu.eventId) },
-                  { label: 'Delete tag', onClick: () => onDeleteTag?.(contextMenu.eventId), variant: 'danger' as const },
+                  {
+                    label: 'Create tag',
+                    onClick: () =>
+                      onCreateTagFromEvent(contextMenu.eventStartedAt!, contextMenu.eventEndedAt!),
+                  },
                 ]
               : []),
-          ...(onCreateTagFromEvent && contextMenu.eventStartedAt && contextMenu.eventEndedAt
-            ? [{ label: 'Create tag', onClick: () => onCreateTagFromEvent(contextMenu.eventStartedAt!, contextMenu.eventEndedAt!) }]
-            : []),
-          { label: 'Copy to clipboard', onClick: () => handleCopyEventToClipboard(contextMenu.event) },
-        ]}
-        onClose={() => setContextMenu(null)}
-      />
-    )}
+            {
+              label: 'Copy to clipboard',
+              onClick: () => handleCopyEventToClipboard(contextMenu.event),
+            },
+          ]}
+          onClose={() => setContextMenu(null)}
+        />
+      )}
 
-    {/* Title context menu */}
-    {titleContextMenu && (
-      <ContextMenu
-        position={titleContextMenu}
-        items={[{ label: 'Edit timeline', onClick: handleEditFromTitleContextMenu }]}
-        onClose={() => setTitleContextMenu(null)}
-      />
-    )}
+      {/* Title context menu */}
+      {titleContextMenu && (
+        <ContextMenu
+          position={titleContextMenu}
+          items={[{ label: 'Edit timeline', onClick: handleEditFromTitleContextMenu }]}
+          onClose={() => setTitleContextMenu(null)}
+        />
+      )}
     </>
   );
 }

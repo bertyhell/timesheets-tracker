@@ -99,7 +99,9 @@ export class ProgramsService {
     try {
       deleteProgram(this.databaseService.getDb(), { id });
     } catch (err) {
-      const error = new CustomError('Failed to delete program entry from the database', err, { id });
+      const error = new CustomError('Failed to delete program entry from the database', err, {
+        id,
+      });
       console.error(error);
       throw error;
     }

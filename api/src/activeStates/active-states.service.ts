@@ -97,11 +97,9 @@ export class ActiveStatesService {
     try {
       await deleteActiveState(this.databaseService.getDb(), { id });
     } catch (err) {
-      const error = new CustomError(
-        'Failed to delete active-state entry from the database',
-        err,
-        { id }
-      );
+      const error = new CustomError('Failed to delete active-state entry from the database', err, {
+        id,
+      });
       console.error(error);
       throw error;
     }

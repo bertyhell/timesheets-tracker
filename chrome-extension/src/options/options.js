@@ -9,6 +9,8 @@ chrome.storage.sync.get(['apiUrl'], (result) => {
 saveButton.addEventListener('click', () => {
   chrome.storage.sync.set({ apiUrl: apiUrlInput.value }, () => {
     statusDiv.textContent = 'Options saved.';
-    setTimeout(() => { statusDiv.textContent = ''; }, 2000);
+    setTimeout(() => {
+      statusDiv.textContent = '';
+    }, 2000);
   });
 });

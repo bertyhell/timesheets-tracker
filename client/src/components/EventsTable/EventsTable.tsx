@@ -4,7 +4,11 @@ import { orderBy } from 'lodash-es';
 import { format, intervalToDuration, parseISO } from 'date-fns';
 import { useAtom } from 'jotai';
 import { searchTermAtom } from '../../store/store';
-import type { TimelineDto, TimelineEventDto, TimelineWithEventsDto } from '../../generated/api/types.gen';
+import type {
+  TimelineDto,
+  TimelineEventDto,
+  TimelineWithEventsDto,
+} from '../../generated/api/types.gen';
 import { TimelineType } from '../Timeline/Timeline.types';
 import { ColumnDef } from './Table.types';
 import { getColorForEvent } from '../Timeline/helpers/getColorForEvent';
@@ -110,7 +114,9 @@ export function EventsTable({ timeline, events, className, onAddBulkTag }: Event
 
   const parentRef = useRef<HTMLDivElement>(null);
   const columns = [...getDynamicColumns(timeline?.type), ...FIXED_COLUMNS];
-  const fakeTimelineDto = timeline ? { timelineType: timeline.type } as unknown as TimelineDto : null;
+  const fakeTimelineDto = timeline
+    ? ({ timelineType: timeline.type } as unknown as TimelineDto)
+    : null;
 
   const sortedItems = useMemo(() => {
     const lowerSearch = searchTerm.toLowerCase();

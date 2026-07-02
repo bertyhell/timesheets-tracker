@@ -87,4 +87,3 @@ async function getIsActiveViaLogind(): Promise<boolean> {
     bus.disconnect();
   }
 }
-

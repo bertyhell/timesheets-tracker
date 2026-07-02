@@ -90,7 +90,8 @@ export function EditTagModal() {
     }
 
     await queryClient.invalidateQueries({
-      predicate: (query) => (query.queryKey[0] as { _id?: string })?._id === 'timelinesControllerFindAllEvents',
+      predicate: (query) =>
+        (query.queryKey[0] as { _id?: string })?._id === 'timelinesControllerFindAllEvents',
     });
     handleClose();
   };
@@ -99,7 +100,8 @@ export function EditTagModal() {
     await deleteTag({ path: { id: uuid as string } });
     toast('Tag has been deleted', { type: 'success' });
     await queryClient.invalidateQueries({
-      predicate: (query) => (query.queryKey[0] as { _id?: string })?._id === 'timelinesControllerFindAllEvents',
+      predicate: (query) =>
+        (query.queryKey[0] as { _id?: string })?._id === 'timelinesControllerFindAllEvents',
     });
     handleClose();
   };
@@ -120,11 +122,7 @@ export function EditTagModal() {
       >
         <div className="c-form">
           <label>Tag name</label>
-          <TagSelectSingle
-            value={selectedTagName}
-            onChange={setSelectedTagName}
-            autoFocus={true}
-          />
+          <TagSelectSingle value={selectedTagName} onChange={setSelectedTagName} autoFocus={true} />
 
           <label>Start time</label>
           <input
@@ -148,7 +146,10 @@ export function EditTagModal() {
         <div className="flex flex-row justify-between gap-2 mt-8">
           <div>
             {uuid && (
-              <Button onClick={handleDelete} className="!bg-red-100 !text-red-700 hover:!bg-red-200">
+              <Button
+                onClick={handleDelete}
+                className="!bg-red-100 !text-red-700 hover:!bg-red-200"
+              >
                 Delete
               </Button>
             )}

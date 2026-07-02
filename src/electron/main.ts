@@ -11,7 +11,17 @@
  *   cd client && npm run dev:client  (frontend on port 55588)
  */
 
-import { app, BrowserWindow, dialog, globalShortcut, ipcMain, Menu, Tray, nativeImage, shell } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  dialog,
+  globalShortcut,
+  ipcMain,
+  Menu,
+  Tray,
+  nativeImage,
+  shell,
+} from 'electron';
 import { spawn, ChildProcess } from 'child_process';
 import * as path from 'path';
 

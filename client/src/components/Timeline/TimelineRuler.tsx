@@ -15,9 +15,7 @@ export function TimelineRuler({ minTime, maxTime, gutterContent }: TimelineRuler
 
   return (
     <div className="c-timeline-ruler">
-      <div className="c-timeline-ruler__gutter">
-        {gutterContent}
-      </div>
+      <div className="c-timeline-ruler__gutter">{gutterContent}</div>
       <div className="c-timeline-ruler__track">
         {ticks.map((tick) => {
           const leftPercent = (differenceInMilliseconds(tick, minTime) / windowMs) * 100;

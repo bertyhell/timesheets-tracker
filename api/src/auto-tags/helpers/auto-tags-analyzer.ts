@@ -1,4 +1,9 @@
-import { BooleanOperator, ConditionOperator, ConditionVariable, TimelineType } from '../../types/types';
+import {
+  BooleanOperator,
+  ConditionOperator,
+  ConditionVariable,
+  TimelineType,
+} from '../../types/types';
 import { AutoTagConditionDto, AutoTagDto } from '../dto/response-auto-tag.dto';
 import {
   AutoTagEventInfoDto,
@@ -218,7 +223,6 @@ function convertTagEventsToAutoTagEvents(
   );
 }
 
-
 /**
  * Removes time ranges covered by manual tag events from auto-tag events.
  * manual tags always take precedence.
@@ -334,7 +338,10 @@ export function calculateAutoTagEvents(
 
   const clippedAutoTagEvents = clipAutoTagEventsAgainstTagEvents(grownAutoTagEvents, tagTimelines);
 
-  const manualTagsAsAutoTagEvents = convertTagEventsToAutoTagEvents(tagTimelines, autoTagTimeline.id);
+  const manualTagsAsAutoTagEvents = convertTagEventsToAutoTagEvents(
+    tagTimelines,
+    autoTagTimeline.id
+  );
 
   return [...clippedAutoTagEvents, ...manualTagsAsAutoTagEvents];
 }

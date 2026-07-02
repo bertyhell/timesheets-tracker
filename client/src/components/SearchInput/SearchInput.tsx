@@ -9,7 +9,12 @@ interface SearchInputProps {
   className?: string;
 }
 
-export function SearchInput({ value, onChange, placeholder = 'Search...', className }: SearchInputProps) {
+export function SearchInput({
+  value,
+  onChange,
+  placeholder = 'Search...',
+  className,
+}: SearchInputProps) {
   return (
     <div className={`c-search-input ${className ?? ''}`}>
       <Search size={14} className="c-search-input__icon" />

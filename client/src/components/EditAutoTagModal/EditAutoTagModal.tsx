@@ -169,16 +169,16 @@ export function EditAutoTagModal() {
         {!showCreateNewTagControls && (
           <div className="flex flex-row items-center gap-2">
             <div className="w-2/3">
-            <TagSelectSingle
-              value={selectedTagName || null}
-              onChange={(newTagName) => {
-                setSelectedTagName(newTagName);
-                if (!name) {
-                  setName(newTagName?.title || '');
-                }
-              }}
-              autoFocus={true}
-            />
+              <TagSelectSingle
+                value={selectedTagName || null}
+                onChange={(newTagName) => {
+                  setSelectedTagName(newTagName);
+                  if (!name) {
+                    setName(newTagName?.title || '');
+                  }
+                }}
+                autoFocus={true}
+              />
             </div>
             {selectedTagName && (
               <a

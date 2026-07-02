@@ -1,4 +1,7 @@
-import { CalendarEventProviderInfoDto, GitCommitEventProviderInfoDto } from '../timelines/dto/response-timeline.dto';
+import {
+  CalendarEventProviderInfoDto,
+  GitCommitEventProviderInfoDto,
+} from '../timelines/dto/response-timeline.dto';
 
 export interface Program {
   id: string;

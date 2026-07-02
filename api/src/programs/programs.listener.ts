@@ -41,10 +41,7 @@ export class ProgramsListener implements OnApplicationBootstrap {
     this.lastProgram = null;
   }
 
-  private async handleProgramChange(
-    currentProgram: CreateProgramDto,
-    icon: string | null = null
-  ) {
+  private async handleProgramChange(currentProgram: CreateProgramDto, icon: string | null = null) {
     if (!this.lastProgram) {
       this.lastProgram = currentProgram;
       return;

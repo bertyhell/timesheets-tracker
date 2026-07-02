@@ -50,7 +50,8 @@ export function BulkTagModal() {
   const location = useLocation();
   const queryClient = useQueryClient();
 
-  const events: TimelineEventDto[] = (location.state as { events?: TimelineEventDto[] })?.events ?? [];
+  const events: TimelineEventDto[] =
+    (location.state as { events?: TimelineEventDto[] })?.events ?? [];
 
   const [selectedTagName, setSelectedTagName] = useState<TagName | null>(null);
 

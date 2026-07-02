@@ -66,10 +66,10 @@ export function NotesPage() {
         </Button>
       </PageHeader>
       <SearchInput
-          value={searchTerm}
-          onChange={setSearchTerm}
-          className="mb-3 ml-4 w-full max-w-sm"
-        />
+        value={searchTerm}
+        onChange={setSearchTerm}
+        className="mb-3 ml-4 w-full max-w-sm"
+      />
       <table className="c-table w-full">
         <thead>
           <tr className="h-10 bg-white">

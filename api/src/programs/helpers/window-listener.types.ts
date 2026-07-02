@@ -6,6 +6,8 @@ export interface WindowChangeEvent {
 }
 
 export interface IWindowListener {
-  start(onWindowChange: (event: WindowChangeEvent) => Promise<void>): Promise<CreateProgramDto | null>;
+  start(
+    onWindowChange: (event: WindowChangeEvent) => Promise<void>
+  ): Promise<CreateProgramDto | null>;
   stop(): void;
 }

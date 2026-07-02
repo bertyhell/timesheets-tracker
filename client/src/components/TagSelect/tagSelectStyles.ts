@@ -7,7 +7,11 @@ const PRIMARY_LIGHT = '#ede9fe';
 export const tagSelectStyles: StylesConfig<any, any> = {
   option: (base, state) => ({
     ...base,
-    backgroundColor: state.isSelected ? PRIMARY : state.isFocused ? PRIMARY_LIGHT : base.backgroundColor,
+    backgroundColor: state.isSelected
+      ? PRIMARY
+      : state.isFocused
+        ? PRIMARY_LIGHT
+        : base.backgroundColor,
     color: state.isSelected ? '#ffffff' : base.color,
     ':active': {
       backgroundColor: PRIMARY,

@@ -34,11 +34,7 @@ export function ContextMenu({ position, items, onClose }: ContextMenuProps) {
   }, [onClose]);
 
   return (
-    <div
-      ref={menuRef}
-      className="c-context-menu"
-      style={{ top: position.y, left: position.x }}
-    >
+    <div ref={menuRef} className="c-context-menu" style={{ top: position.y, left: position.x }}>
       {items.map((item, index) => (
         <button
           key={index}

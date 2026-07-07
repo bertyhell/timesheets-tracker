@@ -55,7 +55,10 @@ module.exports = {
 
   // ── macOS ─────────────────────────────────────────────────────────────────
   mac: {
-    target: [{ target: 'dmg', arch: ['x64', 'arm64'] }],
+    target: [
+      { target: 'dmg', arch: ['x64', 'arm64', 'universal'] },
+      { target: 'pkg', arch: ['x64', 'arm64', 'universal'] },
+    ],
     icon: 'icon/icon.png',
     category: 'public.app-category.productivity',
     // Keep running in tray after closing last window
@@ -69,6 +72,10 @@ module.exports = {
       { x: 130, y: 220 },
       { x: 410, y: 220, type: 'link', path: '/Applications' },
     ],
+  },
+  pkg: {
+    allowCurrentUserHome: true,
+    allowRootDirectory: false,
   },
 
   // ── Linux ─────────────────────────────────────────────────────────────────

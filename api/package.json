@@ -64,5 +64,16 @@
   },
   "patchedDependencies": {
     "typesql-cli@0.22.0": "patches/typesql-cli@0.22.0.patch"
+  },
+  "overrides": {
+    "node-gyp": "^10.0.0"
+  },
+  "allowScripts": {
+    "@paymoapp/active-window@2.1.4": true,
+    "@paymoapp/real-idle@1.1.2": true,
+    "@scarf/scarf@1.4.0": true,
+    "better-sqlite3@12.11.1": true,
+    "fsevents@2.3.3": true,
+    "usocket@0.3.0": true
   }
 }

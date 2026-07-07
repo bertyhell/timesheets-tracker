@@ -12,7 +12,9 @@ import { resolveProjectPath } from '../shared/resolve-src-path';
 @Injectable()
 export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   private db: DatabaseSync;
-  private databasePath = path.resolve('./timesheets-tracker-database.sqlite3');
+  private databasePath = process.env.USER_DATA_PATH
+    ? path.join(process.env.USER_DATA_PATH, 'timesheets-tracker-database.sqlite3')
+    : path.resolve('./timesheets-tracker-database.sqlite3');
   private readonly logger = new Logger(DatabaseService.name);
 
   constructor(private readonly seedService: SeedService) {}

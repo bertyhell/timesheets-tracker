@@ -56,7 +56,11 @@ function startApiServer(): ChildProcess {
 
   const proc = spawn(process.execPath, [apiScript], {
     cwd: API_DIR,
-    env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' },
+    env: {
+      ...process.env,
+      ELECTRON_RUN_AS_NODE: '1',
+      USER_DATA_PATH: app.getPath('userData'),
+    },
     stdio: 'pipe',
   });
 
@@ -189,7 +193,7 @@ function updateTrayMenu(): void {
         },
         {
           label: 'Open Database Folder',
-          click: () => shell.openPath(API_DIR),
+          click: () => shell.openPath(isDev ? API_DIR : app.getPath('userData')),
         },
         { type: 'separator' },
         {

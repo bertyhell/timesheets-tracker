@@ -23,7 +23,6 @@ module.exports = {
       filter: [
         'dist/**',
         'package.json',
-        'timesheets-tracker-database.sqlite3',
         '!**/*.map',
         '!**/*.d.ts',
       ],

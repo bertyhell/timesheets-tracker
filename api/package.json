@@ -25,7 +25,7 @@
     "@nestjs/schedule": "^6.1.1",
     "@nestjs/serve-static": "^5.0.4",
     "@nestjs/swagger": "^11.2.6",
-    "@paymoapp/active-window": "^2.1.2",
+    "@paymoapp/active-window": "^2.1.4",
     "@paymoapp/real-idle": "^1.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",

@@ -10,7 +10,7 @@ export class DefaultWindowListener implements IWindowListener {
   async start(
     onWindowChange: (event: WindowChangeEvent) => Promise<void>
   ): Promise<CreateProgramDto | null> {
-    ActiveWindow.initialize();
+    ActiveWindow.initialize({ osxRunLoop: 'all' });
 
     if (!ActiveWindow.requestPermissions()) {
       console.error(

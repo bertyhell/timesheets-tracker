@@ -37,6 +37,13 @@
   margin-top: 0.125rem;
 }
 
+@media (max-width: 999px) {
+  .p-page-title,
+  .p-page-subtitle {
+    display: none;
+  }
+}
+
 .p-page-header-right {
   display: flex;
   align-items: center;

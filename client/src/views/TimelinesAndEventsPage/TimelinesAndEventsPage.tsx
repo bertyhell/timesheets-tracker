@@ -285,8 +285,9 @@ export function TimelinesAndEventsPage() {
             onClick={() =>
               navigate('/' + ROUTE_PARTS.timelinesAndEvents + '/' + ROUTE_PARTS.create)
             }
+            title="Create tag"
           >
-            Create tag
+            <span className="hidden wide:inline">Create tag</span>
           </Button>
         </div>
       </div>

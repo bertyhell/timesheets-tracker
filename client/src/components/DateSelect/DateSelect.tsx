@@ -11,13 +11,14 @@ function DateSelect({ className }: { className?: string }) {
   return (
     <div className={`flex flex-row items-center gap-1${className ? ' ' + className : ''}`}>
       <Button
+        className="hidden wide:inline-flex"
         onClick={() => setViewDate(new Date())}
         variant={ButtonVariant.Primary}
         size={ButtonSize.Small}
       >
         Today
       </Button>
-      <div className="flex flex-row bg-gray-100 border border-gray-200 rounded-lg overflow-hidden">
+      <div className="hidden wide:flex flex-row bg-gray-100 border border-gray-200 rounded-lg overflow-hidden">
         <button
           onClick={() => setViewDate((prevDate) => addDays(prevDate, -1))}
           className="px-2 py-1.5 text-gray-600 hover:bg-gray-200 transition-colors text-sm font-medium"

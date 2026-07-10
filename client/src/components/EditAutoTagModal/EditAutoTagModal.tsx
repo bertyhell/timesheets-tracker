@@ -47,6 +47,7 @@ export function EditAutoTagModal() {
   const [conditions, setConditions] = useState<AutoTagCondition[]>([NEW_CONDITION, NEW_CONDITION]);
   const [showCreateNewTagControls, setShowCreateNewTagControls] = useState<boolean>(false);
   const [newTagName, setNewTagName] = useState<string>('');
+  const [userModifiedName, setUserModifiedName] = useState<boolean>(false);
   const { data: autoTagsCount } = useQuery({ ...autoTagsControllerCountOptions() });
   const { data: autoTagResponse } = useQuery({
     ...autoTagsControllerFindOneOptions({ path: { id: id as string } }),
@@ -61,6 +62,7 @@ export function EditAutoTagModal() {
   useEffect(() => {
     if (autoTag) {
       setName(autoTag.title);
+      setUserModifiedName(true);
       if (autoTag.tagName) {
         setSelectedTagName(autoTag.tagName);
       }
@@ -173,7 +175,7 @@ export function EditAutoTagModal() {
                 value={selectedTagName || null}
                 onChange={(newTagName) => {
                   setSelectedTagName(newTagName);
-                  if (!name) {
+                  if (!userModifiedName) {
                     setName(newTagName?.title || '');
                   }
                 }}
@@ -197,7 +199,12 @@ export function EditAutoTagModal() {
             <input
               className="c-input"
               value={newTagName}
-              onChange={(evt) => setNewTagName(evt.target.value)}
+              onChange={(evt) => {
+                setNewTagName(evt.target.value);
+                if (!userModifiedName) {
+                  setName(evt.target.value);
+                }
+              }}
               placeholder={'Name of the tag that should be created'}
             />
           </div>
@@ -207,7 +214,10 @@ export function EditAutoTagModal() {
         <input
           className="c-input"
           value={name}
-          onChange={(evt: ChangeEvent<HTMLInputElement>) => setName(evt.target?.value)}
+          onChange={(evt: ChangeEvent<HTMLInputElement>) => {
+            setUserModifiedName(true);
+            setName(evt.target.value);
+          }}
         />
 
         <label>Conditions</label>

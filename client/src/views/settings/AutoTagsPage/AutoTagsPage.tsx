@@ -1,5 +1,5 @@
 import './AutoTagsPage.css';
-import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Button, { ButtonVariant } from '../../../components/Button/Button';
 import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -111,12 +111,16 @@ export function AutoTagsPage() {
 
   const renderAddAutoTagButton = () => {
     return (
-      <NavLink
-        className="c-button c-button--primary c-button--small"
-        to={'/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.autoTagRules + '/' + ROUTE_PARTS.create}
+      <Button
+        onClick={() =>
+          navigate(
+            '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.autoTagRules + '/' + ROUTE_PARTS.create
+          )
+        }
+        variant={ButtonVariant.Primary}
       >
         Add auto tag
-      </NavLink>
+      </Button>
     );
   };
 

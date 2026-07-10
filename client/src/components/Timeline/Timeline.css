@@ -171,3 +171,9 @@
     margin-top: 0.0625rem;
   }
 }
+
+.c-timeline__selection__tooltip--ended {
+  .c-tooltip__content {
+    min-width: 18rem;
+  }
+}

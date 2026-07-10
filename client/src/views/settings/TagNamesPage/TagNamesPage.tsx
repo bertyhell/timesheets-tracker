@@ -58,7 +58,7 @@ export function TagNamesPage() {
         <Button
           onClick={() =>
             navigate(
-              '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.tagNames + '/' + ROUTE_PARTS.create
+              '/' + ROUTE_PARTS.manage + '/' + ROUTE_PARTS.tagNames + '/' + ROUTE_PARTS.create
             )
           }
           variant={ButtonVariant.Primary}
@@ -90,7 +90,7 @@ export function TagNamesPage() {
                 onClick={() =>
                   navigate(
                     '/' +
-                      ROUTE_PARTS.settings +
+                      ROUTE_PARTS.manage +
                       '/' +
                       ROUTE_PARTS.tagNames +
                       '/' +
@@ -114,7 +114,7 @@ export function TagNamesPage() {
                       setSelectedTagName(tagName as unknown as TagName);
                       navigate(
                         '/' +
-                          ROUTE_PARTS.settings +
+                          ROUTE_PARTS.manage +
                           '/' +
                           ROUTE_PARTS.tagNames +
                           '/' +

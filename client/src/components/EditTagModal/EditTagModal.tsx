@@ -139,7 +139,7 @@ export function EditTagModal() {
               title="Edit tag name"
               onClick={() =>
                 navigate(
-                  `/${ROUTE_PARTS.settings}/${ROUTE_PARTS.tagNames}/${selectedTagName!.id}/${ROUTE_PARTS.edit}`
+                  `/${ROUTE_PARTS.manage}/${ROUTE_PARTS.tagNames}/${selectedTagName!.id}/${ROUTE_PARTS.edit}`
                 )
               }
             />

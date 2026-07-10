@@ -106,7 +106,7 @@ export function EditAutoTagModal() {
     setConditions(newConditions);
   };
 
-  const handleClose = () => navigate('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.autoTagRules);
+  const handleClose = () => navigate('/' + ROUTE_PARTS.manage + '/' + ROUTE_PARTS.autoTagRules);
 
   const handleSave = async () => {
     // TODO add validation
@@ -184,7 +184,7 @@ export function EditAutoTagModal() {
             </div>
             {selectedTagName && (
               <a
-                href={`/${ROUTE_PARTS.settings}/${ROUTE_PARTS.tagNames}/${selectedTagName.id}/${ROUTE_PARTS.edit}`}
+                href={`/${ROUTE_PARTS.manage}/${ROUTE_PARTS.tagNames}/${selectedTagName.id}/${ROUTE_PARTS.edit}`}
                 target="_blank"
                 rel="noreferrer"
                 className="text-blue-600 hover:text-blue-800 whitespace-nowrap text-sm"

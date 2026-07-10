@@ -23,6 +23,7 @@ import {
 export enum ROUTE_PARTS {
   timelinesAndEvents = 'timelines-and-events',
   settings = 'settings',
+  manage = 'manage',
   general = 'general',
   timelines = 'timelines',
   autoTagRules = 'auto-tag-rules',
@@ -37,10 +38,10 @@ export enum ROUTE_PARTS {
 const OVERVIEW_NAV = [{ to: ROUTE_PARTS.timelinesAndEvents, label: 'Overview', icon: BarChart2 }];
 
 const MANAGE_NAV = [
-  { to: ROUTE_PARTS.settings + '/' + ROUTE_PARTS.timelines, label: 'Timelines', icon: List },
-  { to: ROUTE_PARTS.settings + '/' + ROUTE_PARTS.tagNames, label: 'Tags', icon: Tag },
-  { to: ROUTE_PARTS.settings + '/' + ROUTE_PARTS.autoTagRules, label: 'Auto Tags', icon: Zap },
-  { to: ROUTE_PARTS.settings + '/' + ROUTE_PARTS.notes, label: 'Notes', icon: FileText },
+  { to: ROUTE_PARTS.manage + '/' + ROUTE_PARTS.timelines, label: 'Timelines', icon: List },
+  { to: ROUTE_PARTS.manage + '/' + ROUTE_PARTS.tagNames, label: 'Tags', icon: Tag },
+  { to: ROUTE_PARTS.manage + '/' + ROUTE_PARTS.autoTagRules, label: 'Auto Tags', icon: Zap },
+  { to: ROUTE_PARTS.manage + '/' + ROUTE_PARTS.notes, label: 'Notes', icon: FileText },
 ];
 
 const GENERAL_NAV = [

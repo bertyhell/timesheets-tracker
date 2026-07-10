@@ -64,8 +64,8 @@ export function GeneralSettingsPage() {
   return (
     <div className="p-general-settings">
       <PageHeader
-        title="General"
-        description="General application settings."
+        title="Database"
+        description="Manage the database file used by Timesheet Tracker."
       />
 
       <div className="px-6 mt-4 max-w-2xl">

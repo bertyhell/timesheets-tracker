@@ -483,7 +483,7 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
           onEditAutoTagRule={(autoTagId: string) => {
             navigate(
               '/' +
-                ROUTE_PARTS.settings +
+                ROUTE_PARTS.manage +
                 '/' +
                 ROUTE_PARTS.autoTagRules +
                 '/' +

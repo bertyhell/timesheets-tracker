@@ -41,7 +41,7 @@ export function EditTagNameModal() {
   }, [tagName]);
 
   const handleClose = async () => {
-    navigate('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.tagNames);
+    navigate('/' + ROUTE_PARTS.manage + '/' + ROUTE_PARTS.tagNames);
   };
 
   const handleSave = async (tagName: Omit<TagName, 'id'>) => {

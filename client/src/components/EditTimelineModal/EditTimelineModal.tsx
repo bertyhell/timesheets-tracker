@@ -77,7 +77,7 @@ export function EditTimelineModal() {
     }
   }, [id, cachedTimelines]);
 
-  const handleClose = () => navigate('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.timelines);
+  const handleClose = () => navigate('/' + ROUTE_PARTS.manage + '/' + ROUTE_PARTS.timelines);
 
   const getEventProviderInfo = () => {
     if (timelineType === 'Calendar') return { icsUrl };

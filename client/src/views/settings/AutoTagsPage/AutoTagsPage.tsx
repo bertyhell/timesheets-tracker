@@ -72,7 +72,7 @@ export function AutoTagsPage() {
 
   const onPasteContent = useCallback(
     async (evt: ClipboardEvent) => {
-      const mainRoute = '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.autoTagRules;
+      const mainRoute = '/' + ROUTE_PARTS.manage + '/' + ROUTE_PARTS.autoTagRules;
       if (location.pathname !== mainRoute) {
         return;
       }
@@ -114,7 +114,7 @@ export function AutoTagsPage() {
       <Button
         onClick={() =>
           navigate(
-            '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.autoTagRules + '/' + ROUTE_PARTS.create
+            '/' + ROUTE_PARTS.manage + '/' + ROUTE_PARTS.autoTagRules + '/' + ROUTE_PARTS.create
           )
         }
         variant={ButtonVariant.Primary}
@@ -130,7 +130,7 @@ export function AutoTagsPage() {
         className="c-button c-button--secondary c-button--small"
         to={
           '/' +
-          ROUTE_PARTS.settings +
+          ROUTE_PARTS.manage +
           '/' +
           ROUTE_PARTS.autoTagRules +
           '/' +
@@ -207,7 +207,7 @@ export function AutoTagsPage() {
                   onClick={() =>
                     navigate(
                       '/' +
-                        ROUTE_PARTS.settings +
+                        ROUTE_PARTS.manage +
                         '/' +
                         ROUTE_PARTS.autoTagRules +
                         '/' +

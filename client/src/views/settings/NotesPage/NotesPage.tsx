@@ -57,7 +57,7 @@ export function NotesPage() {
         <Button
           onClick={() =>
             navigate(
-              '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.notes + '/' + ROUTE_PARTS.create
+              '/' + ROUTE_PARTS.manage + '/' + ROUTE_PARTS.notes + '/' + ROUTE_PARTS.create
             )
           }
           variant={ButtonVariant.Primary}
@@ -88,7 +88,7 @@ export function NotesPage() {
                 onClick={() =>
                   navigate(
                     '/' +
-                      ROUTE_PARTS.settings +
+                      ROUTE_PARTS.manage +
                       '/' +
                       ROUTE_PARTS.notes +
                       '/' +
@@ -106,7 +106,7 @@ export function NotesPage() {
                       setSelectedNote(note as unknown as AutoNote);
                       navigate(
                         '/' +
-                          ROUTE_PARTS.settings +
+                          ROUTE_PARTS.manage +
                           '/' +
                           ROUTE_PARTS.notes +
                           '/' +

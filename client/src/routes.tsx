@@ -54,6 +54,11 @@ export const routes: RouteObject[] = [
             path: ROUTE_PARTS.general,
             element: <GeneralSettingsPage />,
           },
+        ],
+      },
+      {
+        path: ROUTE_PARTS.manage,
+        children: [
           {
             path: ROUTE_PARTS.timelines,
             element: <TimelinesPage />,

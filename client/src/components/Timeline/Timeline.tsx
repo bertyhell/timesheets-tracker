@@ -140,7 +140,7 @@ function Timeline({
   const handleEditFromTitleContextMenu = () => {
     navigate(
       '/' +
-        ROUTE_PARTS.settings +
+        ROUTE_PARTS.manage +
         '/' +
         ROUTE_PARTS.timelines +
         '/' +

@@ -53,7 +53,7 @@ export function TimelinesPage() {
         <Button
           onClick={() =>
             navigate(
-              '/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.timelines + '/' + ROUTE_PARTS.create
+              '/' + ROUTE_PARTS.manage + '/' + ROUTE_PARTS.timelines + '/' + ROUTE_PARTS.create
             )
           }
           variant={ButtonVariant.Primary}
@@ -104,7 +104,7 @@ export function TimelinesPage() {
                 onClick={() =>
                   navigate(
                     '/' +
-                      ROUTE_PARTS.settings +
+                      ROUTE_PARTS.manage +
                       '/' +
                       ROUTE_PARTS.timelines +
                       '/' +
@@ -129,7 +129,7 @@ export function TimelinesPage() {
                       e.stopPropagation();
                       navigate(
                         '/' +
-                          ROUTE_PARTS.settings +
+                          ROUTE_PARTS.manage +
                           '/' +
                           ROUTE_PARTS.timelines +
                           '/' +

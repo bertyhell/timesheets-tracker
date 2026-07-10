@@ -38,8 +38,9 @@ export class GitCommitsService {
     startedAt: string,
     endedAt: string
   ): Promise<GitCommitEvent[]> {
+    const { stdout: authorEmail } = await execAsync('git config user.email', { cwd: repoPath });
     // %H = full hash, %ai = author date ISO 8601, %s = subject
-    const command = `git log --all --since="${startedAt}" --until="${endedAt}" --pretty=format:"%ai|%s"`;
+    const command = `git log --all --author="${authorEmail.trim()}" --since="${startedAt}" --until="${endedAt}" --pretty=format:"%ai|%s"`;
     try {
       const { stdout } = await execAsync(command, { cwd: repoPath });
       const trimmed = stdout.trim();

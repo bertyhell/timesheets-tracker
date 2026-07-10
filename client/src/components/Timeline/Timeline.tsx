@@ -108,6 +108,26 @@ function Timeline({
     return () => ro.disconnect();
   }, []);
 
+  useEffect(() => {
+    if (timelineInfo.timelineType !== TimelineType.Tag || !onDeleteTag) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Delete' && e.key !== 'Backspace') return;
+      const activeEl = document.activeElement;
+      if (
+        activeEl &&
+        (activeEl.tagName === 'INPUT' ||
+          activeEl.tagName === 'TEXTAREA' ||
+          (activeEl as HTMLElement).isContentEditable)
+      )
+        return;
+      if (!selectedEvent) return;
+      if (!events.some((ev) => ev.id === selectedEvent.id)) return;
+      onDeleteTag(selectedEvent.id);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [timelineInfo.timelineType, onDeleteTag, selectedEvent, events]);
+
   const lowerSearch = searchTerm.toLowerCase();
 
   const handleTitleContextMenu = (e: MouseEvent) => {

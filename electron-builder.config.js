@@ -65,6 +65,11 @@ module.exports = {
       LSUIElement: false,
       NSRequiresAquaSystemAppearance: false,
     },
+    // @libsql ships pre-built arch-specific binaries as separate npm packages
+    // (@libsql/darwin-x64, @libsql/darwin-arm64). Both end up in api/node_modules
+    // for both arch builds, so @electron/universal sees identical .node files in
+    // both slices. Tell it to treat them as x64-side files and skip the fat-binary check.
+    x64ArchFiles: '**/node_modules/@libsql/**/*.node',
   },
   dmg: {
     contents: [

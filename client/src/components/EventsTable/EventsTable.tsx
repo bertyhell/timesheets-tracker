@@ -65,6 +65,12 @@ function getDynamicColumns(timelineType: string | undefined): ColumnDef[] {
     case TimelineType.Calendar:
       return [{ id: 'summary', title: 'Summary', allowsSorting: true }];
 
+    case TimelineType.GitCommit:
+      return [
+        { id: 'repoName', title: 'Repository', allowsSorting: true, width: 150 },
+        { id: 'commitMessage', title: 'Commit message', allowsSorting: true },
+      ];
+
     default:
       return [];
   }
@@ -85,6 +91,10 @@ function getCellValue(event: TimelineEventDto, columnKey: string): string {
       return String(info['websiteTitle'] ?? info['title'] ?? '');
     case 'summary':
       return String(info['summary'] ?? '');
+    case 'repoName':
+      return String(info['repoName'] ?? '');
+    case 'commitMessage':
+      return String(info['commitMessage'] ?? '');
     case 'startedAt':
       return format(roundToNearestMinutes(parseISO(event.startedAt)), 'HH:mm');
     case 'endedAt':
@@ -155,6 +165,10 @@ export function EventsTable({ timeline, events, className, onAddBulkTag, onEditT
               return (event.info as any)['websiteTitle'];
             case 'summary':
               return (event.info as any)['summary'];
+            case 'repoName':
+              return (event.info as any)['repoName'];
+            case 'commitMessage':
+              return (event.info as any)['commitMessage'];
             case 'startedAt':
               return event.startedAt;
             case 'endedAt':
@@ -285,7 +299,13 @@ export function EventsTable({ timeline, events, className, onAddBulkTag, onEditT
                   />
                 </td>
                 {columns.map((col) => (
-                  <td key={col.id}>{getCellValue(event, col.id)}</td>
+                  <td
+                    key={col.id}
+                    title={col.id === 'commitMessage' ? getCellValue(event, col.id) : undefined}
+                    style={col.id === 'commitMessage' ? { maxWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : undefined}
+                  >
+                    {getCellValue(event, col.id)}
+                  </td>
                 ))}
               </tr>
             );

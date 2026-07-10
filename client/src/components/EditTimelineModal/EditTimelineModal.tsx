@@ -16,7 +16,7 @@ import type { TimelineDto, TimelineType } from '../../generated/api/types.gen';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { ColorInput } from '../ColorInput/ColorInput';
-import { COLOR_LIST } from '../Timeline/helpers/getColorForEvent';
+import { getRandomColor } from '../Timeline/helpers/getColorForEvent';
 
 const TIMELINE_TYPES: TimelineType[] = [
   'ActiveState',
@@ -37,7 +37,7 @@ export function EditTimelineModal() {
   const [icsUrl, setIcsUrl] = useState<string>('');
   const [folderPath, setFolderPath] = useState<string>('');
   const [visualOrder, setVisualOrder] = useState<number>(0);
-  const [color, setColor] = useState<string>(COLOR_LIST[0]);
+  const [color, setColor] = useState<string>(getRandomColor());
 
   // Check if running inside Electron (preload exposes window.electron)
   const isElectron = typeof window.electron?.selectDirectory === 'function';
@@ -66,7 +66,7 @@ export function EditTimelineModal() {
       setIcsUrl(timelineResponse.timelineType === 'Calendar' ? (info?.icsUrl ?? '') : '');
       setFolderPath(timelineResponse.timelineType === 'GitCommit' ? (info?.folderPath ?? '') : '');
       setVisualOrder(timelineResponse.visualOrder);
-      setColor(timelineResponse.color ?? COLOR_LIST[0]);
+      setColor(timelineResponse.color ?? getRandomColor());
     }
   }, [timelineResponse]);
 

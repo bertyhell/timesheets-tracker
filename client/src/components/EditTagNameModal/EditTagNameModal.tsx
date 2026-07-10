@@ -15,14 +15,14 @@ import {
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { ColorInput } from '../ColorInput/ColorInput';
-import { COLOR_LIST } from '../Timeline/helpers/getColorForEvent';
+import { getRandomColor } from '../Timeline/helpers/getColorForEvent';
 
 export function EditTagNameModal() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [name, setName] = useState<string>('');
   const [code, setCode] = useState<string>('');
-  const [color, setColor] = useState<string>(COLOR_LIST[0]);
+  const [color, setColor] = useState<string>(getRandomColor());
   const { mutateAsync: createTagName } = useMutation({ ...tagNamesControllerCreateMutation() });
   const { mutateAsync: updateTagName } = useMutation({ ...tagNamesControllerUpdateMutation() });
   const { mutateAsync: deleteTagName } = useMutation({ ...tagNamesControllerRemoveMutation() });

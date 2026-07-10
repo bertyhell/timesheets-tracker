@@ -32,6 +32,9 @@ export const COLOR_LIST = [
 export const ACTIVE_COLOR = '#4caf50';
 export const INACTIVE_COLOR = '#f44336';
 
+export const getRandomColor = (): string =>
+  COLOR_LIST[Math.floor(Math.random() * COLOR_LIST.length)];
+
 export const getColorFromString = (text: string | undefined): string => {
   if (!text) return '#ffffff';
   return COLOR_LIST[stringToColorIndex(text, COLOR_LIST.length)];

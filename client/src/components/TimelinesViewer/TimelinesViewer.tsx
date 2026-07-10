@@ -22,7 +22,6 @@ import { isApproxEqual } from '../../helpers/is-approx-equal';
 import { ROUTE_PARTS } from '../../App';
 import { useNavigate } from 'react-router-dom';
 import { TagName } from '../../types/types';
-import { COLOR_LIST } from '../Timeline/helpers/getColorForEvent';
 import {
   QueryObserverResult,
   RefetchOptions,
@@ -368,11 +367,12 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
     setZoom(newEnd - span, newEnd);
   };
 
-  const handleCreateTagName = async (title: string): Promise<TagName> => {
+  const handleCreateTagName = async (data: { title: string; code: string; color: string }): Promise<TagName> => {
     return (await createTagName({
       body: {
-        title,
-        color: COLOR_LIST[(tagNamesCount || 0) % COLOR_LIST.length], // Get a new color that hasn't been recently used
+        title: data.title,
+        code: data.code || undefined,
+        color: data.color,
       },
     })) as unknown as TagName;
   };

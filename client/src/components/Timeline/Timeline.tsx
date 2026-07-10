@@ -1,5 +1,7 @@
 import './Timeline.css';
 import React, { type MouseEvent, useEffect, useRef, useState } from 'react';
+import { Modal } from 'react-responsive-modal';
+import Button, { ButtonVariant } from '../Button/Button';
 
 import { useNavigate } from 'react-router-dom';
 import { ROUTE_PARTS } from '../../App';
@@ -20,10 +22,11 @@ import { formatDuration } from '../../helpers/format-duration';
 import type { TagName } from '../../types/types';
 import TagSelectSingle from '../TagSelect/TagSelectSingle';
 import type { TimelineDto, TimelineEventDto } from '../../generated/api/types.gen';
-import { getColorForEvent, getColorFromString } from './helpers/getColorForEvent';
+import { getColorForEvent, getColorFromString, getRandomColor } from './helpers/getColorForEvent';
 import { getTicks } from './helpers/getTicks';
 import { getEventLabel } from './helpers/getEventLabel';
 import { TimelineType } from './Timeline.types';
+import { ColorInput } from '../ColorInput/ColorInput';
 
 interface ResizeState {
   tagId: string;
@@ -50,7 +53,7 @@ interface TimelineProps {
   onMouseMove: (posX: number) => void;
   onMouseUp: (posX: number, eventId: string | null) => void;
   selectionPercentages: { start: number; end: number } | null;
-  onCreateTagName: (name: string) => Promise<TagName>;
+  onCreateTagName: (data: { title: string; code: string; color: string }) => Promise<TagName>;
   onCreateTag: (tagNameId: string) => Promise<void>;
   selectedEvent: TimelineEventDto | null;
   setSelectedEvent: (event: TimelineEventDto, timeline: TimelineDto) => void;
@@ -92,6 +95,7 @@ function Timeline({
   const [titleContextMenu, setTitleContextMenu] = useState<{ x: number; y: number } | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const [trackWidth, setTrackWidth] = useState(0);
+  const [pendingCreate, setPendingCreate] = useState<{ title: string; code: string; color: string } | null>(null);
 
   useEffect(() => {
     const el = trackRef.current;
@@ -265,14 +269,19 @@ function Timeline({
       return;
     }
     if ((newValue as unknown as { __isNew__: boolean }).__isNew__) {
-      // User typed a new tag name — create it first, then create the tag
-      const createdTagName = await onCreateTagName(
-        (newValue as unknown as { value: string }).value
-      );
-      await onCreateTag(createdTagName.id);
+      const title = (newValue as unknown as { value: string }).value;
+      const color = getRandomColor();
+      setPendingCreate({ title, code: '', color });
     } else {
       await onCreateTag(newValue.id);
     }
+  };
+
+  const handleConfirmCreate = async () => {
+    if (!pendingCreate) return;
+    const createdTagName = await onCreateTagName(pendingCreate);
+    setPendingCreate(null);
+    await onCreateTag(createdTagName.id);
   };
 
   // Derive a consistent dot color for the timeline label from its title (or use configured color)
@@ -588,6 +597,48 @@ function Timeline({
           onClose={() => setTitleContextMenu(null)}
         />
       )}
+
+      {/* Create tag name modal */}
+      <Modal
+        open={!!pendingCreate}
+        onClose={() => setPendingCreate(null)}
+        classNames={{ modal: 'c-edit-tag-name-modal', closeButton: 'c-button c-button--small' }}
+      >
+        <h3>Add tag name</h3>
+        <div className="c-form">
+          <h4 className="mt-4">Name</h4>
+          <input
+            className="c-input"
+            value={pendingCreate?.title ?? ''}
+            onChange={(e) => setPendingCreate((prev) => prev && { ...prev, title: e.target.value })}
+          />
+          <h4 className="mt-4">Code</h4>
+          <input
+            className="c-input"
+            value={pendingCreate?.code ?? ''}
+            onChange={(e) => setPendingCreate((prev) => prev && { ...prev, code: e.target.value })}
+          />
+          <h4 className="mt-4">Color</h4>
+          {pendingCreate && (
+            <ColorInput
+              color={pendingCreate.color}
+              onChange={(color) => setPendingCreate((prev) => prev && { ...prev, color })}
+            />
+          )}
+        </div>
+        <div className="flex flex-row justify-end gap-2 mt-48">
+          <Button onClick={() => setPendingCreate(null)} variant={ButtonVariant.Secondary}>
+            Cancel
+          </Button>
+          <Button
+            disabled={!pendingCreate?.title || !pendingCreate?.color}
+            onClick={handleConfirmCreate}
+            variant={ButtonVariant.Primary}
+          >
+            Save
+          </Button>
+        </div>
+      </Modal>
     </>
   );
 }

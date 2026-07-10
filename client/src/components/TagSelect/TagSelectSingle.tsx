@@ -24,7 +24,11 @@ function TagSelectSingle({ className, value, onChange, autoFocus }: TagSelectPro
         return (data || []) as TagName[];
       }}
       autoFocus={autoFocus ?? false}
-      formatOptionLabel={(option: TagName) => option.title}
+      getOptionLabel={(option) => option.title}
+      getNewOptionData={(inputValue, optionLabel) =>
+        ({ title: optionLabel, value: inputValue, __isNew__: true }) as unknown as TagName
+      }
+      formatCreateLabel={(inputValue) => `create new tag "${inputValue}"?`}
       placeholder="Tag selection..."
       isClearable
       isMulti={false}

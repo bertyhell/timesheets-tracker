@@ -29,7 +29,7 @@ import {
 import AutoTagConditionInput from '../AutoTagCondition/AutoTagConditionInput';
 import TagSelectSingle from '../TagSelect/TagSelectSingle';
 import ToggleButton from '../ToggleButton/ToggleButton';
-import { COLOR_LIST } from '../Timeline/helpers/getColorForEvent';
+import { getRandomColor } from '../Timeline/helpers/getColorForEvent';
 
 const NEW_CONDITION: AutoTagCondition = {
   booleanOperator: BooleanOperator.OR,
@@ -112,7 +112,7 @@ export function EditAutoTagModal() {
     if (showCreateNewTagControls) {
       // create tag and get its id
       const createdTagName = await createTagName({
-        body: { title: newTagName, color: COLOR_LIST[0] },
+        body: { title: newTagName, color: getRandomColor() },
       });
       tagNameId = createdTagName.id as string;
     } else {

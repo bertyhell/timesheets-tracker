@@ -321,11 +321,22 @@ export class TimelinesService {
                     startedAt,
                     endedAt
                   );
-                  return gitCommits.map((commit: GitCommitEvent): TimelineEventDto => {
+
+                  // Make events 30 minutes wide, but ensure they do not overlap
+                  const sortedCommits = [...gitCommits].sort(
+                    (a, b) => new Date(a.startedAt).getTime() - new Date(b.startedAt).getTime()
+                  );
+                  const thirtyMinutesMs = 30 * 60 * 1000;
+                  return sortedCommits.map((commit: GitCommitEvent, index: number): TimelineEventDto => {
+                    const commitStart = new Date(commit.startedAt).getTime();
+                    const nextCommitStart =
+                      index < sortedCommits.length - 1
+                        ? new Date(sortedCommits[index + 1].startedAt).getTime()
+                        : Infinity;
                     return {
                       id: commit.id,
                       startedAt: commit.startedAt,
-                      endedAt: commit.endedAt,
+                      endedAt: new Date(Math.min(commitStart + thirtyMinutesMs, nextCommitStart)).toISOString(),
                       info: {
                         repoName: commit.repoName,
                         commitMessage: commit.commitMessage,

@@ -56,6 +56,7 @@
   .c-timeline__hour-tick,
   .c-timeline__quarter-tick,
   .c-timeline__current-time,
+  .c-timeline__hover-indicator,
   .c-timeline__event {
     position: absolute;
     top: 0;
@@ -76,6 +77,11 @@
     border-right: 2px solid #ef4444;
     pointer-events: none;
     z-index: 2;
+  }
+
+  .c-timeline__hover-indicator {
+    border-right: 1px solid rgba(156, 163, 175, 0.4);
+    pointer-events: none;
   }
 
   .c-timeline__event {

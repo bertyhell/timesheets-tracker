@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, useEffect, useRef, useState } from 'react';
+import React, { FC, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from 'lucide-react';
 import {
   TimelineDto,
@@ -102,6 +102,7 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
   const [selectionStartPercent, setSelectionStartPercent] = useState<number | null>(null);
   const [selectionMovePercent, setSelectionMovePercent] = useState<number | null>(null);
   const [selectionEndPercent, setSelectionEndPercent] = useState<number | null>(null);
+  const [hoverPercent, setHoverPercent] = useState<number | null>(null);
 
   // Full day is the zoom boundary — viewStart/viewEnd are fractions of the full day
   const dayStart = startOfDay(viewDate);
@@ -153,6 +154,22 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
           ),
         }
       : null;
+
+  const snapPointPercents = useMemo(() => {
+    if (!timelinesWithEvents) return [];
+    const points = new Set<number>();
+    timelinesWithEvents.forEach((twe) => {
+      twe.events.forEach((evt) => {
+        const startPct =
+          (differenceInMilliseconds(parseISO(evt.startedAt), visibleMinTime) / visibleWindowMs) * 100;
+        const endPct =
+          (differenceInMilliseconds(parseISO(evt.endedAt), visibleMinTime) / visibleWindowMs) * 100;
+        if (startPct >= 0 && startPct <= 100) points.add(startPct);
+        if (endPct >= 0 && endPct <= 100) points.add(endPct);
+      });
+    });
+    return Array.from(points);
+  }, [timelinesWithEvents, visibleMinTime, visibleWindowMs]);
 
   const { mutateAsync: updateTag } = useMutation({ ...tagsControllerUpdateMutation() });
 
@@ -295,15 +312,18 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
   };
 
   const handleMouseMove = (timelineId: string, posX: number) => {
+    setHoverPercent(posX);
     if (!selectionStartPercent) {
-      // No selection started yet
       return;
     }
     if (selectionStartPercent && selectionEndPercent) {
-      // Selection already ended
       return;
     }
     setSelectionMovePercent(posX);
+  };
+
+  const handleMouseLeave = () => {
+    setHoverPercent(null);
   };
 
   const handleMouseUp = (timelineId: string, posX: number, eventId: string | null) => {
@@ -455,7 +475,10 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
           onMouseUp={(posX: number, eventId: string | null) =>
             handleMouseUp(timelineInfo.id, posX, eventId)
           }
+          onMouseLeave={handleMouseLeave}
           selectionPercentages={activeSelectionTimeline === timelineInfo.id ? selection : null}
+          snapPointPercents={snapPointPercents}
+          hoverPercent={hoverPercent}
           onCreateTagName={handleCreateTagName}
           onCreateTag={handleCreateTag}
           selectedEvent={selectedEvent}

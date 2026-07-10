@@ -53,7 +53,10 @@ interface TimelineProps {
   onMouseDown: (posX: number) => void;
   onMouseMove: (posX: number) => void;
   onMouseUp: (posX: number, eventId: string | null) => void;
+  onMouseLeave?: () => void;
   selectionPercentages: { start: number; end: number } | null;
+  snapPointPercents: number[];
+  hoverPercent: number | null;
   onCreateTagName: (data: { title: string; code: string; color: string }) => Promise<TagName>;
   onCreateTag: (tagNameId: string) => Promise<void>;
   selectedEvent: TimelineEventDto | null;
@@ -67,6 +70,21 @@ interface TimelineProps {
   onCreateTagFromEvent?: (startedAt: string, endedAt: string) => void;
 }
 
+function applySnap(posX: number, snapPoints: number[], trackWidthPx: number): number {
+  if (trackWidthPx === 0 || snapPoints.length === 0) return posX;
+  const thresholdPercent = (20 / trackWidthPx) * 100;
+  let closestDist = Infinity;
+  let closestSnap = posX;
+  for (const snap of snapPoints) {
+    const dist = Math.abs(posX - snap);
+    if (dist < closestDist) {
+      closestDist = dist;
+      closestSnap = snap;
+    }
+  }
+  return closestDist <= thresholdPercent ? closestSnap : posX;
+}
+
 function Timeline({
   timelineInfo,
   events,
@@ -75,7 +93,10 @@ function Timeline({
   onMouseDown,
   onMouseMove,
   onMouseUp,
+  onMouseLeave: onMouseLeaveProp,
   selectionPercentages,
+  snapPointPercents,
+  hoverPercent,
   onCreateTagName,
   onCreateTag,
   selectedEvent,
@@ -183,7 +204,7 @@ function Timeline({
     if (posX < 0 || posX > 100) {
       return;
     }
-    onMouseDown(posX);
+    onMouseDown(applySnap(posX, snapPointPercents, trackWidth));
   };
 
   const handleMouseMove = (evt: MouseEvent) => {
@@ -195,7 +216,7 @@ function Timeline({
       setResizeCurrentPosX(posX);
       return;
     }
-    onMouseMove(posX);
+    onMouseMove(applySnap(posX, snapPointPercents, trackWidth));
   };
 
   const handleMouseUp = (evt: MouseEvent) => {
@@ -231,7 +252,7 @@ function Timeline({
     console.log('mouse up ', posX);
     const eventId: string | null =
       (evt.target as HTMLElement)?.getAttribute('data-event-id') || null;
-    onMouseUp(posX, eventId);
+    onMouseUp(applySnap(posX, snapPointPercents, trackWidth), eventId);
   };
 
   const handleMouseLeave = () => {
@@ -239,6 +260,7 @@ function Timeline({
       setResizeState(null);
       setResizeCurrentPosX(null);
     }
+    onMouseLeaveProp?.();
   };
 
   const handleContextMenu = (e: MouseEvent, eventId: string) => {
@@ -369,6 +391,14 @@ function Timeline({
                   (differenceInMilliseconds(new Date(), minTime) / windowInMilliseconds) * 100 +
                   '%',
               }}
+            />
+          )}
+
+          {/* Hover / snap indicator */}
+          {hoverPercent !== null && (
+            <div
+              className="c-timeline__hover-indicator"
+              style={{ left: hoverPercent + '%' }}
             />
           )}
 

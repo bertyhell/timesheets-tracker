@@ -36,6 +36,7 @@ export function EditTagModal() {
   const [endedAt, setEndedAt] = useState(
     paramEndedAt ? format(parseISO(paramEndedAt), "yyyy-MM-dd'T'HH:mm:ss") : ''
   );
+  const [note, setNote] = useState('');
 
   const { data: tag } = useQuery({
     ...tagsControllerFindOneOptions({ path: { id: uuid as string } }),
@@ -58,6 +59,7 @@ export function EditTagModal() {
       const t = tag as TagDto;
       setStartedAt(t.startedAt ? format(parseISO(t.startedAt), "yyyy-MM-dd'T'HH:mm:ss") : '');
       setEndedAt(t.endedAt ? format(parseISO(t.endedAt), "yyyy-MM-dd'T'HH:mm:ss") : '');
+      setNote(t.note ?? '');
     }
   }, [tag]);
 
@@ -79,6 +81,7 @@ export function EditTagModal() {
       tagNameId: selectedTagName.id,
       startedAt: new Date(startedAt).toISOString(),
       endedAt: new Date(endedAt).toISOString(),
+      note: note || undefined,
     };
 
     if (uuid) {
@@ -140,6 +143,14 @@ export function EditTagModal() {
             step="1"
             value={endedAt}
             onChange={(e) => setEndedAt(e.target.value)}
+          />
+
+          <label>Note</label>
+          <textarea
+            className="c-input"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            rows={3}
           />
         </div>
 

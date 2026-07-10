@@ -146,6 +146,7 @@ export class TagsService {
         tagNameId: createTagDto.tagNameId,
         startedAt: effectiveStart.toISOString(),
         endedAt: effectiveEnd.toISOString(),
+        note: createTagDto.note ?? null,
       });
 
       return this.findOne(id);
@@ -178,7 +179,7 @@ export class TagsService {
             tagNameId: updateTagDto.tagNameId,
             startedAt: updateTagDto.startedAt,
             endedAt: updateTagDto.endedAt,
-            note: null,
+            note: updateTagDto.note ?? null,
           },
           { id }
         );

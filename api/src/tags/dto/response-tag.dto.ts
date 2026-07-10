@@ -37,4 +37,13 @@ export class TagDto {
     default: undefined,
   })
   endedAt: string;
+
+  @IsString()
+  @Type(() => String)
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Optional note for this tag',
+    default: undefined,
+  })
+  note?: string;
 }

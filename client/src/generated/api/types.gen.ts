@@ -63,6 +63,10 @@ export type CreateTagDto = {
      * End time in ISO format
      */
     endedAt?: string;
+    /**
+     * Optional note for this tag
+     */
+    note?: string;
 };
 
 export type TagDto = {
@@ -82,6 +86,10 @@ export type TagDto = {
      * End time in ISO format
      */
     endedAt?: string;
+    /**
+     * Optional note for this tag
+     */
+    note?: string | null;
 };
 
 export type UpdateTagDto = {
@@ -97,6 +105,10 @@ export type UpdateTagDto = {
      * End time in ISO format
      */
     endedAt?: string;
+    /**
+     * Optional note for this tag
+     */
+    note?: string;
 };
 
 export type CreateTagNameDto = {

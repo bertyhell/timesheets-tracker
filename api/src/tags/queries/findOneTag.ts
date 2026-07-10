@@ -9,6 +9,7 @@ export type FindOneTagResult = {
   tagNameId: string;
   startedAt: string;
   endedAt: string;
+  note: string | null;
   'tagName.id': string;
   'tagName.title': string;
   'tagName.color': string;
@@ -21,6 +22,7 @@ export function findOneTag(db: DatabaseSync, params: FindOneTagParams): FindOneT
 	    tags.tagNameId as tagNameId,
 	    tags.startedAt as startedAt,
 	    tags.endedAt as endedAt,
+	    tags.note as note,
 	    tagNames.id as "tagName.id",
 	    tagNames.title as "tagName.title",
 	    tagNames.color as "tagName.color"

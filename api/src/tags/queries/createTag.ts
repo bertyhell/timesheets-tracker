@@ -5,6 +5,7 @@ export type CreateTagParams = {
   tagNameId: string;
   startedAt: string;
   endedAt: string;
+  note?: string | null;
 };
 
 export type CreateTagResult = {
@@ -15,10 +16,10 @@ export type CreateTagResult = {
 export function createTag(db: DatabaseSync, params: CreateTagParams): CreateTagResult {
   const sql = `
 	INSERT INTO tags
-	(id, tagNameId, startedAt, endedAt)
-	VALUES (?, ?, ?, ?)
+	(id, tagNameId, startedAt, endedAt, note)
+	VALUES (?, ?, ?, ?, ?)
 	`;
   return db
     .prepare(sql)
-    .run(params.id, params.tagNameId, params.startedAt, params.endedAt) as CreateTagResult;
+    .run(params.id, params.tagNameId, params.startedAt, params.endedAt, params.note ?? null) as CreateTagResult;
 }

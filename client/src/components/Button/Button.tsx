@@ -1,4 +1,5 @@
 import React, { type FC, type ReactNode } from 'react';
+import { NavLink } from 'react-router-dom';
 
 export enum ButtonVariant {
   Primary = 'primary',
@@ -17,19 +18,28 @@ export enum ButtonIconPosition {
   Right = 'right',
 }
 
-interface ButtonProps {
+type ButtonProps = {
   variant?: ButtonVariant;
   size?: ButtonSize;
   icon?: ReactNode;
   iconPosition?: ButtonIconPosition;
-  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
   className?: string;
   title?: string;
   ariaLabel?: string;
-  type?: 'button' | 'submit' | 'reset';
   children?: ReactNode;
-}
+} & (
+  | {
+      to: string;
+      onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+      type?: never;
+    }
+  | {
+      to?: never;
+      onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+      type?: 'button' | 'submit' | 'reset';
+    }
+);
 
 const BASE_CLASSES =
   'inline-flex items-center gap-1.5 py-2 px-3.5 m-0 border-0 rounded-lg font-medium text-sm whitespace-nowrap cursor-pointer outline-none transition duration-150 ease-in disabled:opacity-50 disabled:cursor-not-allowed';
@@ -61,21 +71,15 @@ const Button: FC<ButtonProps> = ({
   title,
   ariaLabel,
   type = 'button',
+  to,
   children,
 }) => {
   const classes = [BASE_CLASSES, VARIANT_CLASSES[variant], SIZE_CLASSES[size], className ?? '']
     .filter(Boolean)
     .join(' ');
 
-  return (
-    <button
-      className={classes}
-      onClick={onClick}
-      disabled={disabled}
-      type={type}
-      title={title}
-      aria-label={ariaLabel}
-    >
+  const content = (
+    <>
       {icon && iconPosition === ButtonIconPosition.Left && (
         <span className="inline-flex items-center">{icon}</span>
       )}
@@ -83,6 +87,33 @@ const Button: FC<ButtonProps> = ({
       {icon && iconPosition === ButtonIconPosition.Right && (
         <span className="inline-flex items-center">{icon}</span>
       )}
+    </>
+  );
+
+  if (to !== undefined) {
+    return (
+      <NavLink
+        className={classes}
+        to={to}
+        onClick={onClick as ((e: React.MouseEvent<HTMLAnchorElement>) => void) | undefined}
+        title={title}
+        aria-label={ariaLabel}
+      >
+        {content}
+      </NavLink>
+    );
+  }
+
+  return (
+    <button
+      className={classes}
+      onClick={onClick as ((e: React.MouseEvent<HTMLButtonElement>) => void) | undefined}
+      disabled={disabled}
+      type={type}
+      title={title}
+      aria-label={ariaLabel}
+    >
+      {content}
     </button>
   );
 };

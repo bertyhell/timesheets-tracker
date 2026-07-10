@@ -1,5 +1,5 @@
 import './AutoTagsPage.css';
-import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Button, { ButtonVariant } from '../../../components/Button/Button';
 import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -126,8 +126,8 @@ export function AutoTagsPage() {
 
   const renderEditButton = (autoTag: AutoTagDto) => {
     return (
-      <NavLink
-        className="c-button c-button--secondary c-button--small"
+      <Button
+        variant={ButtonVariant.Secondary}
         to={
           '/' +
           ROUTE_PARTS.manage +
@@ -141,7 +141,7 @@ export function AutoTagsPage() {
         onClick={(e) => e.stopPropagation()}
       >
         EDIT
-      </NavLink>
+      </Button>
     );
   };
 

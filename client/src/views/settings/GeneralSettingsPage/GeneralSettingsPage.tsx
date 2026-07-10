@@ -68,7 +68,7 @@ export function GeneralSettingsPage() {
         description="General application settings."
       />
 
-      <div className="px-4 mt-4 max-w-2xl">
+      <div className="px-6 mt-4 max-w-2xl">
         <section>
           <h3 className="font-semibold mb-1">Database</h3>
           <p className="text-gray-500 mb-3" style={{ fontSize: '0.9em' }}>

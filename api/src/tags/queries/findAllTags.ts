@@ -10,6 +10,7 @@ export type FindAllTagsResult = {
   tagNameId: string;
   startedAt: string;
   endedAt: string;
+  note?: string | null;
   'tagName.id'?: string;
   'tagName.title'?: string;
   'tagName.color'?: string;
@@ -22,6 +23,7 @@ export function findAllTags(db: DatabaseSync, params: FindAllTagsParams): FindAl
 	    tags.tagNameId as tagNameId,
 	    tags.startedAt as startedAt,
 	    tags.endedAt as endedAt,
+	    tags.note as note,
 	    tagNames.id as "tagName.id",
 	    tagNames.title as "tagName.title",
 	    tagNames.color as "tagName.color"
@@ -45,6 +47,7 @@ function mapArrayToFindAllTagsResult(data: any) {
     tagNameId: data.tagNameId,
     startedAt: data.startedAt,
     endedAt: data.endedAt,
+    note: data.note,
     'tagName.id': data['tagName.id'],
     'tagName.title': data['tagName.title'],
     'tagName.color': data['tagName.color'],

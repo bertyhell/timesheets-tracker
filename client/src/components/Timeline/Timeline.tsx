@@ -456,9 +456,16 @@ function Timeline({
                       )
                     </li>
                     {isTagTimeline ? (
-                      <li>
-                        <b>Name:</b> {getEventLabel(timelineInfo, event)}
-                      </li>
+                      <>
+                        <li>
+                          <b>Name:</b> {getEventLabel(timelineInfo, event)}
+                        </li>
+                        {(event.info as any).note && (
+                          <li>
+                            <b>Note:</b> {(event.info as any).note}
+                          </li>
+                        )}
+                      </>
                     ) : isAutoTagTimeline ? (
                       <>
                         <li>

@@ -28,6 +28,7 @@ export function EditAutoNoteModal() {
   const [name, setName] = useState<string>('');
   const [tagNames, setTagNames] = useState<TagName[]>([]);
   const [variable, setVariable] = useState<ConditionVariable>(ConditionVariable.websiteUrl);
+  const [useRegex, setUseRegex] = useState<boolean>(false);
   const [extractRegex, setExtractRegex] = useState<string>('(.*)');
   const [extractRegexReplacement, setExtractRegexReplacement] = useState<string>('$1');
 
@@ -54,6 +55,9 @@ export function EditAutoNoteModal() {
         ) as TagName[]
       );
       setVariable(autoNote.variable as ConditionVariable);
+      const isRegex =
+        autoNote.extractRegex !== '(.*)' || autoNote.extractRegexReplacement !== '$1';
+      setUseRegex(isRegex);
       setExtractRegex(autoNote.extractRegex);
       setExtractRegexReplacement(autoNote.extractRegexReplacement);
     }
@@ -168,23 +172,46 @@ export function EditAutoNoteModal() {
           isMulti={false}
           menuPortalTarget={document.body}
           menuPosition="fixed"
+          styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
         ></Select>
 
-        <h4 className="mt-4">Note text must match regex.</h4>
-        <span>eg: jira.com/issues/(ABC-[0-9]+)</span>
-        <input
-          className="c-input c-edit-note__regex-input"
-          value={extractRegex}
-          onChange={(evt) => setExtractRegex(evt.target.value)}
+        <h4 className="mt-4">Note type</h4>
+        <Select<SelectOption<boolean>>
+          value={
+            useRegex
+              ? { label: 'Extract part of text using regex', value: true }
+              : { label: 'Copy full text', value: false }
+          }
+          options={[
+            { label: 'Copy full text', value: false },
+            { label: 'Extract part of text using regex', value: true },
+          ]}
+          onChange={(selectedOption: any) => setUseRegex(selectedOption?.value ?? false)}
+          isMulti={false}
+          menuPortalTarget={document.body}
+          menuPosition="fixed"
+          styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
         />
 
-        <h4 className="mt-4">Note text extract part of regex as note.</h4>
-        <span>eg: $1</span>
-        <input
-          className="c-input c-edit-note__regex-replacement-input"
-          value={extractRegexReplacement}
-          onChange={(evt) => setExtractRegexReplacement(evt.target.value)}
-        />
+        {useRegex && (
+          <>
+            <h4 className="mt-4">Match regex</h4>
+            <span>eg: jira.com/issues/(ABC-[0-9]+)</span>
+            <input
+              className="c-input c-edit-note__regex-input"
+              value={extractRegex}
+              onChange={(evt) => setExtractRegex(evt.target.value)}
+            />
+
+            <h4 className="mt-4">Extract capture group as note</h4>
+            <span>eg: $1</span>
+            <input
+              className="c-input c-edit-note__regex-replacement-input"
+              value={extractRegexReplacement}
+              onChange={(evt) => setExtractRegexReplacement(evt.target.value)}
+            />
+          </>
+        )}
       </div>
 
       <div className="flex flex-row justify-between gap-2 mt-48">
@@ -206,8 +233,8 @@ export function EditAutoNoteModal() {
                 title: name,
                 tagNameIds: tagNames.map((tagName) => tagName.id),
                 variable,
-                extractRegex,
-                extractRegexReplacement,
+                extractRegex: useRegex ? extractRegex : '(.*)',
+                extractRegexReplacement: useRegex ? extractRegexReplacement : '$1',
               });
             }}
             variant={ButtonVariant.Primary}

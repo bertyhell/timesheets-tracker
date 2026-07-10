@@ -4,7 +4,9 @@ import { DatabaseService } from '../database/database.service';
 import { v4 as uuid } from 'uuid';
 import {
   ActiveState,
+  AutoNote,
   CalendarEvent,
+  ConditionVariable,
   Program,
   Tag,
   Timeline,
@@ -20,13 +22,14 @@ import { createTimeline } from './queries/createTimeline';
 import { updateTimeline } from './queries/updateTimeline';
 import { deleteTimeline } from './queries/deleteTimeline';
 import { reorderTimelines, type ReorderTimelineItem } from './queries/reorderTimelines';
-import { TimelineEventDto, TimelineWithEventsDto } from './dto/response-timeline-events.dto';
+import { TagEventInfoDto, TimelineEventDto, TimelineWithEventsDto } from './dto/response-timeline-events.dto';
 import { TimelineDto } from './dto/response-timeline.dto';
 import { CalendarsService } from '../calendars/calendars.service';
 import { ProgramsService } from '../programs/programs.service';
 import { WebsitesService } from '../websites/websites.service';
 import { TagsService } from '../tags/tags.service';
 import { AutoTagsService } from '../auto-tags/auto-tags.service';
+import { AutoNotesService } from '../auto-notes/auto-notes.service';
 import { ActiveStatesService } from '../activeStates/active-states.service';
 import { AutoTagDto } from '../auto-tags/dto/response-auto-tag.dto';
 import { TagNamesService } from '../tag-names/tag-names.service';
@@ -37,6 +40,7 @@ import { CustomError } from '../shared/CustomError';
 export class TimelinesService {
   constructor(
     @Inject(ActiveStatesService) private activeStatesService: ActiveStatesService,
+    @Inject(AutoNotesService) private autoNotesService: AutoNotesService,
     @Inject(AutoTagsService) private autoTagsService: AutoTagsService,
     @Inject(CalendarsService) private calendarsService: CalendarsService,
     @Inject(DatabaseService) private databaseService: DatabaseService,
@@ -249,6 +253,7 @@ export class TimelinesService {
                       tagNameName: tag.tagName?.title,
                       tagNameColor: tag.tagName?.color,
                       tagNameCode: tag.tagName?.code,
+                      note: tag.note || undefined,
                     },
                     timelineId: timelineInfo.id,
                   };
@@ -386,7 +391,13 @@ export class TimelinesService {
       // Analyze auto-tags if an autotagTimeline is present
       const tagNames = await this.tagNamesService.findAll(undefined);
       const autoTags = (await this.autoTagsService.findAll(undefined)) as AutoTagDto[];
-      return this.autoTagsService.analyseEvents(timelinesWithEvents, autoTags, tagNames);
+      const result = this.autoTagsService.analyseEvents(timelinesWithEvents, autoTags, tagNames);
+
+      // Apply auto-note rules to tag events
+      const autoNotes = await this.autoNotesService.findAll(undefined);
+      this.applyAutoNotes(result, autoNotes);
+
+      return result;
     } catch (err) {
       const error = new CustomError('Failed to fetch all timeline events', err, {
         startedAt,
@@ -397,5 +408,70 @@ export class TimelinesService {
       console.error(error);
       throw error;
     }
+  }
+
+  private applyAutoNotes(timelinesWithEvents: TimelineWithEventsDto[], autoNotes: AutoNote[]): void {
+    if (!autoNotes.length) return;
+
+    const tagTimelines = timelinesWithEvents.filter((t) => t.type === TimelineType.Tag);
+    const sourceTimelines = timelinesWithEvents.filter(
+      (t) => t.type !== TimelineType.Tag && t.type !== TimelineType.AutoTag
+    );
+
+    for (const tagTimeline of tagTimelines) {
+      for (const tagEvent of tagTimeline.events) {
+        const tagInfo = tagEvent.info as TagEventInfoDto;
+
+        // Manual note takes precedence — skip if already set
+        if (tagInfo.note) continue;
+
+        const matchingRules = autoNotes.filter(
+          (rule) => !rule.tagNameIds?.length || rule.tagNameIds.includes(tagInfo.tagNameId)
+        );
+        if (!matchingRules.length) continue;
+
+        const overlappingEvents = sourceTimelines.flatMap((timeline) =>
+          timeline.events.filter(
+            (e) => e.startedAt < tagEvent.endedAt && e.endedAt > tagEvent.startedAt
+          )
+        );
+
+        for (const rule of matchingRules) {
+          const note = this.extractNote(overlappingEvents, rule);
+          if (note) {
+            tagInfo.note = note;
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  private extractNote(events: TimelineEventDto[], autoNote: AutoNote): string | null {
+    const extractRegex = autoNote.extractRegex || '(.*)';
+    const replacement = autoNote.extractRegexReplacement || '$1';
+
+    const variablesToCheck =
+      autoNote.variable === ConditionVariable.anyVariable
+        ? Object.values(ConditionVariable).filter((v) => v !== ConditionVariable.anyVariable)
+        : [autoNote.variable];
+
+    for (const event of events) {
+      const info = event.info as unknown as Record<string, unknown>;
+      for (const variable of variablesToCheck) {
+        const rawValue = info[variable];
+        if (rawValue == null) continue;
+        const value = String(rawValue);
+        try {
+          const regex = new RegExp(extractRegex);
+          if (!regex.test(value)) continue;
+          const note = value.replace(new RegExp(extractRegex), replacement);
+          if (note) return note;
+        } catch {
+          // invalid regex — skip this rule
+        }
+      }
+    }
+    return null;
   }
 }

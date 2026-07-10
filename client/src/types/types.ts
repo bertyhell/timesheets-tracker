@@ -68,10 +68,19 @@ export enum BooleanOperator {
 
 export enum ConditionVariable {
   anyVariable = 'anyVariable',
-  windowTitle = 'windowTitle',
+  isActive = 'isActive',
   programName = 'programName',
-  websiteTitle = 'websiteTitle',
+  windowTitle = 'windowTitle',
+  summary = 'summary',
+  description = 'description',
+  location = 'location',
+  allDay = 'allDay',
   websiteUrl = 'websiteUrl',
+  websiteTitle = 'websiteTitle',
+  tagNameId = 'tagNameId',
+  tagNameName = 'tagNameName',
+  tagNameColor = 'tagNameColor',
+  tagNameCode = 'tagNameCode',
 }
 
 export enum ConditionOperator {

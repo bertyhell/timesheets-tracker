@@ -32,6 +32,7 @@ export interface Tag {
   tagNameId: string;
   startedAt: string;
   endedAt: string;
+  note?: string | null;
   tagName?: TagName;
 }
 

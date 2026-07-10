@@ -149,6 +149,18 @@ export class TagEventInfoDto {
     nullable: true,
   })
   tagNameCode?: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Optional note for this tag event, set manually or derived by an auto-note rule',
+    example: 'ABC-123',
+    required: false,
+    nullable: true,
+  })
+  note?: string;
 }
 
 export class AutoTagEventInfoDto {

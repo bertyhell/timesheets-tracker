@@ -468,6 +468,10 @@ export type TagEventInfoDto = {
      * Optional short code for the tag
      */
     tagNameCode?: string | null;
+    /**
+     * Optional note for this tag event, set manually or derived by an auto-note rule
+     */
+    note?: string | null;
 };
 
 export type AutoTagEventInfoDto = {

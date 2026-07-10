@@ -12,6 +12,113 @@ import { toast } from 'react-toastify';
 import { orderBy } from 'lodash-es';
 import './TimelinesPage.css';
 import { SearchInput } from '../../../components/SearchInput/SearchInput';
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragOverlay,
+} from '@dnd-kit/core';
+import type { DragEndEvent, DragStartEvent, DragOverEvent } from '@dnd-kit/core';
+import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
+import type { TimelineDto } from '../../../generated/api/types.gen';
+import { GripHandle } from '../../../components/GripHandle/GripHandle';
+import { reorderTimelines as reorderTimelinesApi } from '../../../api/reorder';
+
+function TimelineDragOverlay({ timeline }: { timeline: TimelineDto }) {
+  return (
+    <table style={{ width: '100%', tableLayout: 'fixed', borderCollapse: 'collapse', boxShadow: '0 4px 16px rgba(0,0,0,0.18)', background: 'white', opacity: 0.95 }}>
+      <tbody>
+        <tr>
+          <td style={{ width: 28, paddingLeft: 8, color: '#888' }}><GripHandle /></td>
+          <td style={{ width: 28, paddingLeft: 8 }}>
+            <span style={{ display: 'block', height: 20, width: 20, borderRadius: 6, backgroundColor: timeline.color ?? 'transparent' }} />
+          </td>
+          <td style={{ paddingLeft: 12 }}>{timeline.title}</td>
+          <td style={{ paddingLeft: 12 }}>{timeline.timelineType}</td>
+          <td style={{ paddingLeft: 12 }}>{timeline.visualOrder}</td>
+          <td /><td />
+        </tr>
+      </tbody>
+    </table>
+  );
+}
+
+function SortableTimelineRow({
+  timeline,
+  dragEnabled,
+  activeId,
+  overId,
+  sortedList,
+  onEdit,
+  onDelete,
+}: {
+  timeline: TimelineDto;
+  dragEnabled: boolean;
+  activeId: string | null;
+  overId: string | null;
+  sortedList: TimelineDto[];
+  onEdit: () => void;
+  onDelete: (e: React.MouseEvent) => void;
+}) {
+  const { attributes, listeners, setNodeRef, isDragging } = useSortable({ id: timeline.id });
+
+  const activeIndex = sortedList.findIndex((t) => t.id === activeId);
+  const overIndex = sortedList.findIndex((t) => t.id === overId);
+  const isOver = overId === timeline.id && activeId !== timeline.id;
+  const showBorderTop = isOver && activeIndex > overIndex;
+  const showBorderBottom = isOver && activeIndex < overIndex;
+
+  return (
+    <tr
+      ref={setNodeRef}
+      style={{ opacity: isDragging ? 0.4 : 1 }}
+      className={[
+        showBorderTop ? 'drag-drop-border-top' : '',
+        showBorderBottom ? 'drag-drop-border-bottom' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      onClick={onEdit}
+    >
+      <td
+        className="w-px py-1 pl-2"
+        style={{ color: '#aaa', cursor: dragEnabled ? 'grab' : 'default', userSelect: 'none' }}
+        onClick={(e) => e.stopPropagation()}
+        {...(dragEnabled ? listeners : {})}
+        {...(dragEnabled ? attributes : {})}
+      >
+        {dragEnabled && <GripHandle />}
+      </td>
+      <td className="w-px py-1 pl-2">
+        <span
+          className="block h-5 w-5 rounded-md"
+          style={{ backgroundColor: timeline.color ?? 'transparent' }}
+        />
+      </td>
+      <td className="pl-3">{timeline.title}</td>
+      <td className="pl-3">{timeline.timelineType}</td>
+      <td className="pl-3">{timeline.visualOrder}</td>
+      <td className="w-px whitespace-nowrap">
+        <Button
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit();
+          }}
+          variant={ButtonVariant.Secondary}
+        >
+          EDIT
+        </Button>
+      </td>
+      <td className="w-px whitespace-nowrap">
+        <Button onClick={onDelete} variant={ButtonVariant.Secondary}>
+          DELETE
+        </Button>
+      </td>
+    </tr>
+  );
+}
 
 export function TimelinesPage() {
   const location = useLocation();
@@ -19,6 +126,11 @@ export function TimelinesPage() {
   const [sortCol, setSortCol] = useState<'title' | 'timelineType' | 'visualOrder'>('visualOrder');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
   const [searchTerm, setSearchTerm] = useState('');
+  const [localTimelines, setLocalTimelines] = useState<TimelineDto[]>([]);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [overId, setOverId] = useState<string | null>(null);
+
+  const dragEnabled = sortCol === 'visualOrder' && sortDir === 'asc' && searchTerm === '';
 
   const handleSort = (col: 'title' | 'timelineType' | 'visualOrder') => {
     if (sortCol === col) {
@@ -44,6 +156,51 @@ export function TimelinesPage() {
     refetchTimelines();
   }, [location]);
 
+  useEffect(() => {
+    setLocalTimelines(timelines ?? []);
+  }, [timelines]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+  );
+
+  const sortedTimelines = orderBy(
+    localTimelines,
+    (t) => (sortCol === 'title' ? t.title?.toLowerCase() : t[sortCol]),
+    sortDir
+  );
+
+  const activeTimeline = activeId ? sortedTimelines.find((t) => t.id === activeId) ?? null : null;
+
+  const handleDragStart = ({ active }: DragStartEvent) => {
+    setActiveId(active.id as string);
+  };
+
+  const handleDragOver = ({ over }: DragOverEvent) => {
+    setOverId((over?.id as string) ?? null);
+  };
+
+  const handleDragEnd = async ({ active, over }: DragEndEvent) => {
+    setActiveId(null);
+    setOverId(null);
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = localTimelines.findIndex((t) => t.id === active.id);
+    const newIndex = localTimelines.findIndex((t) => t.id === over.id);
+    const reordered = arrayMove(localTimelines, oldIndex, newIndex);
+    const payload = reordered.map((t, i) => ({ id: t.id, visualOrder: i }));
+
+    setLocalTimelines(reordered.map((t, i) => ({ ...t, visualOrder: i })));
+
+    try {
+      await reorderTimelinesApi(payload);
+      await refetchTimelines();
+    } catch {
+      toast('Failed to save new order', { type: 'error' });
+      setLocalTimelines(timelines ?? []);
+    }
+  };
+
   return (
     <div className="p-timelines">
       <PageHeader
@@ -66,67 +223,55 @@ export function TimelinesPage() {
         onChange={setSearchTerm}
         className="mb-3 ml-4 w-full max-w-sm"
       />
-      <table className="c-table w-full">
-        <thead>
-          <tr className="h-10 bg-white">
-            <th className="w-px"></th>
-            <th
-              className="text-left pl-3 cursor-pointer select-none"
-              onClick={() => handleSort('title')}
-            >
-              Title{indicator('title')}
-            </th>
-            <th
-              className="text-left pl-3 cursor-pointer select-none"
-              onClick={() => handleSort('timelineType')}
-            >
-              Type{indicator('timelineType')}
-            </th>
-            <th
-              className="text-left pl-3 cursor-pointer select-none"
-              onClick={() => handleSort('visualOrder')}
-            >
-              Order{indicator('visualOrder')}
-            </th>
-            <th className="w-px whitespace-nowrap"></th>
-            <th className="w-px whitespace-nowrap"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {orderBy(
-            timelines || [],
-            (t) => (sortCol === 'title' ? t.title?.toLowerCase() : t[sortCol]),
-            sortDir
-          ).map(
-            (timeline): ReactNode => (
-              <tr
-                key={'timeline-' + timeline.id}
-                onClick={() =>
-                  navigate(
-                    '/' +
-                      ROUTE_PARTS.manage +
-                      '/' +
-                      ROUTE_PARTS.timelines +
-                      '/' +
-                      timeline.id +
-                      '/' +
-                      ROUTE_PARTS.edit
-                  )
-                }
-              >
-                <td className="w-px py-1 pl-2">
-                  <span
-                    className="block h-5 w-5 rounded-md"
-                    style={{ backgroundColor: timeline.color ?? 'transparent' }}
-                  ></span>
-                </td>
-                <td className="pl-3">{timeline.title}</td>
-                <td className="pl-3">{timeline.timelineType}</td>
-                <td className="pl-3">{timeline.visualOrder}</td>
-                <td className="w-px whitespace-nowrap">
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation();
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={sortedTimelines.map((t) => t.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          <table className="c-table w-full">
+            <thead>
+              <tr className="h-10 bg-white">
+                <th className="w-px" />
+                <th className="w-px" />
+                <th
+                  className="text-left pl-3 cursor-pointer select-none"
+                  onClick={() => handleSort('title')}
+                >
+                  Title{indicator('title')}
+                </th>
+                <th
+                  className="text-left pl-3 cursor-pointer select-none"
+                  onClick={() => handleSort('timelineType')}
+                >
+                  Type{indicator('timelineType')}
+                </th>
+                <th
+                  className="text-left pl-3 cursor-pointer select-none"
+                  onClick={() => handleSort('visualOrder')}
+                >
+                  Order{indicator('visualOrder')}
+                </th>
+                <th className="w-px whitespace-nowrap" />
+                <th className="w-px whitespace-nowrap" />
+              </tr>
+            </thead>
+            <tbody>
+              {sortedTimelines.map(
+                (timeline): ReactNode => (
+                  <SortableTimelineRow
+                    key={'timeline-' + timeline.id}
+                    timeline={timeline}
+                    dragEnabled={dragEnabled}
+                    activeId={activeId}
+                    overId={overId}
+                    sortedList={sortedTimelines}
+                    onEdit={() =>
                       navigate(
                         '/' +
                           ROUTE_PARTS.manage +
@@ -136,16 +281,9 @@ export function TimelinesPage() {
                           timeline.id +
                           '/' +
                           ROUTE_PARTS.edit
-                      );
-                    }}
-                    variant={ButtonVariant.Secondary}
-                  >
-                    EDIT
-                  </Button>
-                </td>
-                <td className="w-px whitespace-nowrap">
-                  <Button
-                    onClick={async (e) => {
+                      )
+                    }
+                    onDelete={async (e) => {
                       e.stopPropagation();
                       if (timeline.id) {
                         await deleteTimeline({ path: { id: timeline.id } });
@@ -157,16 +295,16 @@ export function TimelinesPage() {
                         });
                       }
                     }}
-                    variant={ButtonVariant.Secondary}
-                  >
-                    DELETE
-                  </Button>
-                </td>
-              </tr>
-            )
-          )}
-        </tbody>
-      </table>
+                  />
+                )
+              )}
+            </tbody>
+          </table>
+        </SortableContext>
+        <DragOverlay>
+          {activeTimeline && <TimelineDragOverlay timeline={activeTimeline} />}
+        </DragOverlay>
+      </DndContext>
 
       <Outlet />
     </div>

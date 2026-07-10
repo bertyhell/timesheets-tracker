@@ -12,6 +12,7 @@ import { findOneAutoTag } from './queries/findOneAutoTag';
 import { createAutoTag } from './queries/createAutoTag';
 import { updateAutoTag } from './queries/updateAutoTag';
 import { deleteAutoTag } from './queries/deleteAutoTag';
+import { reorderAutoTags, type ReorderAutoTagItem } from './queries/reorderAutoTags';
 import { TimelineDto } from '../timelines/dto/response-timeline.dto';
 import { calculateAutoTagEvents } from './helpers/auto-tags-analyzer';
 import { partition } from 'lodash';
@@ -119,6 +120,17 @@ export class AutoTagsService {
         id,
         updateAutoTagDto,
       });
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async reorder(items: ReorderAutoTagItem[]): Promise<void> {
+    try {
+      const db = this.databaseService.getDb();
+      reorderAutoTags(db, items);
+    } catch (err) {
+      const error = new CustomError('Failed to reorder auto-tags in the database', err, { items });
       console.error(error);
       throw error;
     }

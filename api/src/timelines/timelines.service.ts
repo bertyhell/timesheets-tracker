@@ -19,6 +19,7 @@ import { findOneTimeline } from './queries/findOneTimeline';
 import { createTimeline } from './queries/createTimeline';
 import { updateTimeline } from './queries/updateTimeline';
 import { deleteTimeline } from './queries/deleteTimeline';
+import { reorderTimelines, type ReorderTimelineItem } from './queries/reorderTimelines';
 import { TimelineEventDto, TimelineWithEventsDto } from './dto/response-timeline-events.dto';
 import { TimelineDto } from './dto/response-timeline.dto';
 import { CalendarsService } from '../calendars/calendars.service';
@@ -162,6 +163,17 @@ export class TimelinesService {
         id,
         updateTimelineDto,
       });
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async reorder(items: ReorderTimelineItem[]): Promise<void> {
+    try {
+      const db = this.databaseService.getDb();
+      reorderTimelines(db, items);
+    } catch (err) {
+      const error = new CustomError('Failed to reorder timelines in the database', err, { items });
       console.error(error);
       throw error;
     }

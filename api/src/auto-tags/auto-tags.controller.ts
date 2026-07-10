@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Query, Param, Patch, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Param, Patch, Delete, HttpCode } from '@nestjs/common';
 import { CreateAutoTagDto } from './dto/create-auto-tag.dto';
 import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AutoTagsService } from './auto-tags.service';
 import { AutoTagCountDto, AutoTagDto } from './dto/response-auto-tag.dto';
 import { type AutoTag } from '../types/types';
 import { UpdateAutoTagsDto } from './dto/update-auto-tags.dto';
+import { ReorderAutoTagItemDto } from './dto/reorder-auto-tags.dto';
 
 @ApiTags('auto-tags')
 @Controller('api/auto-tags')
@@ -51,6 +52,12 @@ export class AutoTagsController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.tagNamesService.findOne(id);
+  }
+
+  @Patch('reorder')
+  @HttpCode(204)
+  reorder(@Body() items: ReorderAutoTagItemDto[]): Promise<void> {
+    return this.tagNamesService.reorder(items);
   }
 
   @Patch(':id')

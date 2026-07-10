@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Query, Param, Patch, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Param, Patch, Delete, HttpCode } from '@nestjs/common';
 import { CreateTimelineDto } from './dto/create-timeline.dto';
 import { ApiExtraModels, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { TimelinesService } from './timelines.service';
@@ -10,6 +10,7 @@ import {
 } from './dto/response-timeline.dto';
 import { type Timeline } from '../types/types';
 import { UpdateTimelineDto } from './dto/update-timeline.dto';
+import { ReorderTimelineItemDto } from './dto/reorder-timelines.dto';
 import {
   ActiveStateEventInfoDto,
   AutoTagEventInfoDto,
@@ -96,6 +97,12 @@ export class TimelinesController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.timelinesService.findOne(id);
+  }
+
+  @Patch('reorder')
+  @HttpCode(204)
+  reorder(@Body() items: ReorderTimelineItemDto[]): Promise<void> {
+    return this.timelinesService.reorder(items);
   }
 
   @Patch(':id')

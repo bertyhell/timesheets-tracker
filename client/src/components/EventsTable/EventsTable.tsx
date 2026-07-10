@@ -105,6 +105,7 @@ interface EventsTableProps {
   onAddBulkTag?: (events: TimelineEventDto[]) => void;
   onEditTag?: (eventId: string) => void;
   onDeleteTag?: (eventId: string) => void;
+  onCreateTagFromEvent?: (startedAt: string, endedAt: string) => void;
 }
 
 interface ContextMenuState {
@@ -115,7 +116,7 @@ interface ContextMenuState {
   isBulk: boolean;
 }
 
-export function EventsTable({ timeline, events, className, onAddBulkTag, onEditTag, onDeleteTag }: EventsTableProps) {
+export function EventsTable({ timeline, events, className, onAddBulkTag, onEditTag, onDeleteTag, onCreateTagFromEvent }: EventsTableProps) {
   const [searchTerm] = useAtom(searchTermAtom);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [lastClickedIndex, setLastClickedIndex] = useState<number | null>(null);
@@ -212,7 +213,7 @@ export function EventsTable({ timeline, events, className, onAddBulkTag, onEditT
     const event = sortedItems.find((ev) => ev.id === id);
     if (!event) return;
     const isBulk = selectedKeys.size >= 2 && selectedKeys.has(id) && !!onAddBulkTag;
-    if (!isTagTimeline && !isBulk) return;
+    if (!isTagTimeline && !isBulk && !onCreateTagFromEvent) return;
     e.preventDefault();
     setContextMenu({ x: e.clientX, y: e.clientY, eventId: id, event, isBulk });
   };
@@ -325,7 +326,24 @@ export function EventsTable({ timeline, events, className, onAddBulkTag, onEditT
                     onClick: () => copyEventToClipboard(contextMenu.event),
                   },
                 ]
-              : []),
+              : [
+                  ...(onCreateTagFromEvent
+                    ? [
+                        {
+                          label: 'Create tag',
+                          onClick: () =>
+                            onCreateTagFromEvent(
+                              contextMenu.event.startedAt,
+                              contextMenu.event.endedAt
+                            ),
+                        },
+                      ]
+                    : []),
+                  {
+                    label: 'Copy to clipboard',
+                    onClick: () => copyEventToClipboard(contextMenu.event),
+                  },
+                ]),
           ]}
           onClose={() => setContextMenu(null)}
         />

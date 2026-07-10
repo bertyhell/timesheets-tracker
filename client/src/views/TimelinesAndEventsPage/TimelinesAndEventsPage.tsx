@@ -233,6 +233,17 @@ export function TimelinesAndEventsPage() {
                     await deleteTag({ path: { id: eventId } });
                     toast('Tag was deleted', { type: 'success' });
                   }}
+                  onCreateTagFromEvent={(startedAt, endedAt) => {
+                    const params = new URLSearchParams({ startedAt, endedAt });
+                    navigate(
+                      '/' +
+                        ROUTE_PARTS.timelinesAndEvents +
+                        '/' +
+                        ROUTE_PARTS.create +
+                        '?' +
+                        params.toString()
+                    );
+                  }}
                 />
               )}
             </Panel>

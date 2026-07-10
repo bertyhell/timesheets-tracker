@@ -10,6 +10,7 @@ import {
   ActiveStateEventInfoDto,
   AutoTagEventInfoDto,
   CalendarEventInfoDto,
+  GitCommitEventInfoDto,
   ProgramEventInfoDto,
   TagEventInfoDto,
   TimelineDto,
@@ -69,6 +70,8 @@ function getCategoryLabel(event: TimelineEventDto, timelineType: TimelineType): 
       return (info as WebsiteEventInfoDto).websiteTitle;
     case 'Calendar':
       return (info as CalendarEventInfoDto).summary;
+    case 'GitCommit':
+      return (info as GitCommitEventInfoDto).repoName;
     default:
       return 'Unknown';
   }

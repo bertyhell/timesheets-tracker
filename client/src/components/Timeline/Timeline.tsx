@@ -17,6 +17,7 @@ import {
   isAfter,
   isBefore,
   parseISO,
+  roundToNearestMinutes,
 } from 'date-fns';
 import { formatDuration } from '../../helpers/format-duration';
 import type { TagName } from '../../types/types';
@@ -269,8 +270,8 @@ function Timeline({
   };
 
   const handleCopyEventToClipboard = (event: TimelineEventDto) => {
-    const startStr = format(parseISO(event.startedAt), 'yyyy-MM-dd HH:mm:ss');
-    const endStr = format(parseISO(event.endedAt), 'HH:mm:ss');
+    const startStr = format(roundToNearestMinutes(parseISO(event.startedAt)), 'yyyy-MM-dd HH:mm');
+    const endStr = format(roundToNearestMinutes(parseISO(event.endedAt)), 'HH:mm');
     const durationSec = differenceInSeconds(parseISO(event.endedAt), parseISO(event.startedAt));
     const durationStr = formatDuration(durationSec);
     const info = event.info as Record<string, unknown>;
@@ -417,8 +418,8 @@ function Timeline({
                     }
                   >
                     <li>
-                      <b>Date:</b> {format(parseISO(event.startedAt), 'HH:mm:ss')} -{' '}
-                      {format(parseISO(event.endedAt), 'HH:mm:ss')} (
+                      <b>Date:</b> {format(roundToNearestMinutes(parseISO(event.startedAt)), 'HH:mm')} -{' '}
+                      {format(roundToNearestMinutes(parseISO(event.endedAt)), 'HH:mm')} (
                       {formatDuration(
                         differenceInSeconds(parseISO(event.endedAt), parseISO(event.startedAt))
                       )}
@@ -549,8 +550,8 @@ function Timeline({
                   key={'c-timeline__' + timelineInfo.title + '__selection__tippy__ul'}
                 >
                   <li>
-                    {format(selectionStartTime, 'HH:mm:ss')} -{' '}
-                    {format(selectionEndTime, 'HH:mm:ss')}
+                    {format(roundToNearestMinutes(selectionStartTime), 'HH:mm')} -{' '}
+                    {format(roundToNearestMinutes(selectionEndTime), 'HH:mm')}
                   </li>
                   <li>
                     {formatDuration(differenceInSeconds(selectionEndTime, selectionStartTime))}

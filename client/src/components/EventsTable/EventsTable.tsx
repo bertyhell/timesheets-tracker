@@ -1,7 +1,8 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { orderBy } from 'lodash-es';
-import { format, intervalToDuration, parseISO } from 'date-fns';
+import { differenceInSeconds, format, parseISO, roundToNearestMinutes } from 'date-fns';
+import { formatDuration } from '../../helpers/format-duration';
 import { useAtom } from 'jotai';
 import { searchTermAtom } from '../../store/store';
 import type {
@@ -69,20 +70,11 @@ function getCellValue(event: TimelineEventDto, columnKey: string): string {
     case 'summary':
       return String(info['summary'] ?? '');
     case 'startedAt':
-      return format(parseISO(event.startedAt), 'HH:mm:ss');
+      return format(roundToNearestMinutes(parseISO(event.startedAt)), 'HH:mm');
     case 'endedAt':
-      return format(parseISO(event.endedAt), 'HH:mm:ss');
-    case 'duration': {
-      const duration = intervalToDuration({
-        start: parseISO(event.startedAt).getTime(),
-        end: parseISO(event.endedAt).getTime(),
-      });
-      return [
-        String(duration.hours ?? 0).padStart(2, '0'),
-        String(duration.minutes ?? 0).padStart(2, '0'),
-        String(duration.seconds ?? 0).padStart(2, '0'),
-      ].join(':');
-    }
+      return format(roundToNearestMinutes(parseISO(event.endedAt)), 'HH:mm');
+    case 'duration':
+      return formatDuration(differenceInSeconds(parseISO(event.endedAt), parseISO(event.startedAt)));
     default:
       return '';
   }

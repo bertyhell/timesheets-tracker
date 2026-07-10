@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import './EventsTotalsTable.css';
 import { parseISO } from 'date-fns';
+import { formatDuration } from '../../helpers/format-duration';
 import { orderBy } from 'lodash-es';
 import { useAtom } from 'jotai';
 import { searchTermAtom } from '../../store/store';
@@ -64,13 +65,6 @@ function getCategoryLabel(event: TimelineEventDto, timelineType: TimelineType): 
   }
 }
 
-function formatDuration(ms: number): string {
-  const totalSeconds = Math.floor(ms / 1000);
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-  return [hours, minutes, seconds].map((v) => String(v).padStart(2, '0')).join(':');
-}
 
 export function EventsTotalsTable({ events, timelineType, className }: EventsTotalsTableProps) {
   const [searchTerm] = useAtom(searchTermAtom);
@@ -103,7 +97,7 @@ export function EventsTotalsTable({ events, timelineType, className }: EventsTot
       category,
       color,
       durationMs,
-      duration: formatDuration(durationMs),
+      duration: formatDuration(durationMs / 1000),
     }));
 
     return orderBy(
@@ -225,7 +219,7 @@ export function EventsTotalsTable({ events, timelineType, className }: EventsTot
             <tr className="c-table-total-row">
               <td></td>
               <td>Total</td>
-              <td>{formatDuration(grandTotalMs)}</td>
+              <td>{formatDuration(grandTotalMs / 1000)}</td>
             </tr>
           </tfoot>
         )}

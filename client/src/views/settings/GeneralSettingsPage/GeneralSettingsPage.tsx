@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
 import { settingsControllerGetSettingsOptions } from '../../../generated/api/@tanstack/react-query.gen';
 import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import Button, { ButtonVariant } from '../../../components/Button/Button';
@@ -35,9 +36,14 @@ export function GeneralSettingsPage() {
               className="c-input flex-1"
               value={settings?.databasePath ?? ''}
               readOnly
+              onClick={() => {
+                if (!settings?.databasePath) return;
+                navigator.clipboard.writeText(settings.databasePath);
+                toast('Path copied to clipboard', { type: 'success' });
+              }}
             />
             <Button variant={ButtonVariant.Secondary} onClick={() => setSwitchOpen(true)}>
-              Switch
+              Open
             </Button>
             <Button variant={ButtonVariant.Secondary} onClick={() => setMoveOpen(true)}>
               Move

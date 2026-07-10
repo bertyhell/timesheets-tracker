@@ -100,6 +100,8 @@ export enum ConditionVariable {
   tagNameName = 'tagNameName',
   tagNameColor = 'tagNameColor',
   tagNameCode = 'tagNameCode',
+  repoName = 'repoName',
+  commitMessage = 'commitMessage',
 }
 
 export enum ConditionOperator {

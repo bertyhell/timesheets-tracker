@@ -4,7 +4,7 @@ import React, { type ChangeEvent, useEffect, useState } from 'react';
 import Button, { ButtonVariant } from '../Button/Button';
 import { Modal } from 'react-responsive-modal';
 import { useNavigate, useParams } from 'react-router-dom';
-import Select, { type ActionMeta, type MultiValue, type OnChangeValue } from 'react-select';
+import Select, { type ActionMeta, type OnChangeValue } from 'react-select';
 import { toast } from 'react-toastify';
 
 import * as types from '../../../../types/types';
@@ -42,9 +42,28 @@ export function EditAutoNoteModal() {
   });
   const autoNote = autoNoteResponse as AutoNote | undefined;
 
+  const VARIABLE_LABELS: Record<types.ConditionVariable, string> = {
+    [types.ConditionVariable.anyVariable]: 'any variable',
+    [types.ConditionVariable.isActive]: 'activeState.isActive',
+    [types.ConditionVariable.programName]: 'program.name',
+    [types.ConditionVariable.windowTitle]: 'program.windowTitle',
+    [types.ConditionVariable.summary]: 'calendar.summary',
+    [types.ConditionVariable.description]: 'calendar.description',
+    [types.ConditionVariable.location]: 'calendar.location',
+    [types.ConditionVariable.allDay]: 'calendar.allDay',
+    [types.ConditionVariable.websiteUrl]: 'website.url',
+    [types.ConditionVariable.websiteTitle]: 'website.title',
+    [types.ConditionVariable.tagNameId]: 'tag.nameId',
+    [types.ConditionVariable.tagNameName]: 'tag.name',
+    [types.ConditionVariable.tagNameColor]: 'tag.color',
+    [types.ConditionVariable.tagNameCode]: 'tag.code',
+    [types.ConditionVariable.repoName]: 'gitCommit.repoName',
+    [types.ConditionVariable.commitMessage]: 'gitCommit.commitMessage',
+  };
+
   const variableOptions: SelectOption<types.ConditionVariable>[] = Object.values(
     types.ConditionVariable
-  ).map((condition) => ({ label: condition, value: condition }));
+  ).map((condition) => ({ label: VARIABLE_LABELS[condition] ?? condition, value: condition }));
 
   useEffect(() => {
     if (autoNote) {
@@ -100,32 +119,11 @@ export function EditAutoNoteModal() {
     handleClose();
   };
 
-  const handleTagNameChange = async (
+  const handleTagNameChange = (
     option: OnChangeValue<TagName, true> | { label: string; value: string }[],
-    actionMeta: ActionMeta<TagName>
+    _actionMeta: ActionMeta<TagName>
   ) => {
-    if (!option) {
-      return;
-    }
-    const tagName = (option as MultiValue<TagName>)?.[0];
-    switch (actionMeta.action) {
-      case 'select-option': {
-        setTagNames((oldTagNames) => {
-          return [...oldTagNames, (option as MultiValue<TagName>)?.[0]];
-        });
-        break;
-      }
-      case 'deselect-option': {
-        setTagNames((oldTagNames) => {
-          return oldTagNames.filter((tag) => tag.id === tagName?.id);
-        });
-        break;
-      }
-
-      case 'clear':
-        setTagNames([]);
-        break;
-    }
+    setTagNames((option as TagName[]) ?? []);
   };
 
   const handleDelete = async () => {

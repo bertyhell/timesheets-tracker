@@ -3,8 +3,8 @@
 import { type DefaultError, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { activeStatesControllerCreate, activeStatesControllerDelete, activeStatesControllerFindAll, activeStatesControllerFindOne, appControllerStatus, autoNotesControllerCount, autoNotesControllerCreate, autoNotesControllerFindAll, autoNotesControllerFindOne, autoNotesControllerRemove, autoNotesControllerUpdate, autoTagsControllerCount, autoTagsControllerCreate, autoTagsControllerDelete, autoTagsControllerFindAll, autoTagsControllerFindOne, autoTagsControllerUpdate, calendarsControllerGetEvents, type Options, programsControllerCreate, programsControllerDelete, programsControllerFindAll, programsControllerFindOne, tagNamesControllerCount, tagNamesControllerCreate, tagNamesControllerFindAll, tagNamesControllerFindOne, tagNamesControllerRemove, tagNamesControllerUpdate, tagsControllerCreate, tagsControllerFindAll, tagsControllerFindOne, tagsControllerRemove, tagsControllerUpdate, timelinesControllerCount, timelinesControllerCreate, timelinesControllerDelete, timelinesControllerFindAll, timelinesControllerFindAllEvents, timelinesControllerFindOne, timelinesControllerUpdate, websitesControllerCreate, websitesControllerDelete, websitesControllerFindAll, websitesControllerFindOne } from '../sdk.gen';
-import type { ActiveStatesControllerCreateData, ActiveStatesControllerDeleteData, ActiveStatesControllerFindAllData, ActiveStatesControllerFindAllResponse, ActiveStatesControllerFindOneData, AppControllerStatusData, AutoNotesControllerCountData, AutoNotesControllerCountResponse, AutoNotesControllerCreateData, AutoNotesControllerCreateResponse, AutoNotesControllerFindAllData, AutoNotesControllerFindAllResponse, AutoNotesControllerFindOneData, AutoNotesControllerFindOneResponse, AutoNotesControllerRemoveData, AutoNotesControllerUpdateData, AutoTagsControllerCountData, AutoTagsControllerCountResponse, AutoTagsControllerCreateData, AutoTagsControllerCreateResponse, AutoTagsControllerDeleteData, AutoTagsControllerFindAllData, AutoTagsControllerFindAllResponse, AutoTagsControllerFindOneData, AutoTagsControllerFindOneResponse, AutoTagsControllerUpdateData, CalendarsControllerGetEventsData, CalendarsControllerGetEventsResponse, ProgramsControllerCreateData, ProgramsControllerDeleteData, ProgramsControllerFindAllData, ProgramsControllerFindAllResponse, ProgramsControllerFindOneData, TagNamesControllerCountData, TagNamesControllerCountResponse, TagNamesControllerCreateData, TagNamesControllerCreateResponse, TagNamesControllerFindAllData, TagNamesControllerFindAllResponse, TagNamesControllerFindOneData, TagNamesControllerFindOneResponse, TagNamesControllerRemoveData, TagNamesControllerUpdateData, TagsControllerCreateData, TagsControllerCreateResponse, TagsControllerFindAllData, TagsControllerFindAllResponse, TagsControllerFindOneData, TagsControllerRemoveData, TagsControllerUpdateData, TimelinesControllerCountData, TimelinesControllerCountResponse, TimelinesControllerCreateData, TimelinesControllerCreateResponse, TimelinesControllerDeleteData, TimelinesControllerFindAllData, TimelinesControllerFindAllEventsData, TimelinesControllerFindAllEventsResponse, TimelinesControllerFindAllResponse, TimelinesControllerFindOneData, TimelinesControllerFindOneResponse, TimelinesControllerUpdateData, WebsitesControllerCreateData, WebsitesControllerDeleteData, WebsitesControllerFindAllData, WebsitesControllerFindAllResponse, WebsitesControllerFindOneData } from '../types.gen';
+import { activeStatesControllerCreate, activeStatesControllerDelete, activeStatesControllerFindAll, activeStatesControllerFindOne, appControllerStatus, autoNotesControllerCount, autoNotesControllerCreate, autoNotesControllerFindAll, autoNotesControllerFindOne, autoNotesControllerRemove, autoNotesControllerUpdate, autoTagsControllerCount, autoTagsControllerCreate, autoTagsControllerDelete, autoTagsControllerFindAll, autoTagsControllerFindOne, autoTagsControllerUpdate, calendarsControllerGetEvents, type Options, programsControllerCreate, programsControllerDelete, programsControllerFindAll, programsControllerFindOne, programsControllerGetTracking, programsControllerSetTracking, settingsControllerGetSettings, settingsControllerMoveDatabase, settingsControllerSwitchDatabase, tagNamesControllerCount, tagNamesControllerCreate, tagNamesControllerFindAll, tagNamesControllerFindOne, tagNamesControllerRemove, tagNamesControllerUpdate, tagsControllerCreate, tagsControllerFindAll, tagsControllerFindOne, tagsControllerRemove, tagsControllerUpdate, timelinesControllerCount, timelinesControllerCreate, timelinesControllerDelete, timelinesControllerFindAll, timelinesControllerFindAllEvents, timelinesControllerFindOne, timelinesControllerUpdate, websitesControllerCreate, websitesControllerDelete, websitesControllerFindAll, websitesControllerFindOne } from '../sdk.gen';
+import type { ActiveStatesControllerCreateData, ActiveStatesControllerDeleteData, ActiveStatesControllerFindAllData, ActiveStatesControllerFindAllResponse, ActiveStatesControllerFindOneData, AppControllerStatusData, AutoNotesControllerCountData, AutoNotesControllerCountResponse, AutoNotesControllerCreateData, AutoNotesControllerCreateResponse, AutoNotesControllerFindAllData, AutoNotesControllerFindAllResponse, AutoNotesControllerFindOneData, AutoNotesControllerFindOneResponse, AutoNotesControllerRemoveData, AutoNotesControllerUpdateData, AutoTagsControllerCountData, AutoTagsControllerCountResponse, AutoTagsControllerCreateData, AutoTagsControllerCreateResponse, AutoTagsControllerDeleteData, AutoTagsControllerFindAllData, AutoTagsControllerFindAllResponse, AutoTagsControllerFindOneData, AutoTagsControllerFindOneResponse, AutoTagsControllerUpdateData, CalendarsControllerGetEventsData, CalendarsControllerGetEventsResponse, ProgramsControllerCreateData, ProgramsControllerDeleteData, ProgramsControllerFindAllData, ProgramsControllerFindAllResponse, ProgramsControllerFindOneData, ProgramsControllerGetTrackingData, ProgramsControllerSetTrackingData, SettingsControllerGetSettingsData, SettingsControllerGetSettingsResponse, SettingsControllerMoveDatabaseData, SettingsControllerMoveDatabaseResponse, SettingsControllerSwitchDatabaseData, SettingsControllerSwitchDatabaseResponse, TagNamesControllerCountData, TagNamesControllerCountResponse, TagNamesControllerCreateData, TagNamesControllerCreateResponse, TagNamesControllerFindAllData, TagNamesControllerFindAllResponse, TagNamesControllerFindOneData, TagNamesControllerFindOneResponse, TagNamesControllerRemoveData, TagNamesControllerUpdateData, TagsControllerCreateData, TagsControllerCreateResponse, TagsControllerFindAllData, TagsControllerFindAllResponse, TagsControllerFindOneData, TagsControllerRemoveData, TagsControllerUpdateData, TimelinesControllerCountData, TimelinesControllerCountResponse, TimelinesControllerCreateData, TimelinesControllerCreateResponse, TimelinesControllerDeleteData, TimelinesControllerFindAllData, TimelinesControllerFindAllEventsData, TimelinesControllerFindAllEventsResponse, TimelinesControllerFindAllResponse, TimelinesControllerFindOneData, TimelinesControllerFindOneResponse, TimelinesControllerUpdateData, WebsitesControllerCreateData, WebsitesControllerDeleteData, WebsitesControllerFindAllData, WebsitesControllerFindAllResponse, WebsitesControllerFindOneData } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -53,6 +53,35 @@ export const appControllerStatusOptions = (options?: Options<AppControllerStatus
     },
     queryKey: appControllerStatusQueryKey(options)
 });
+
+export const programsControllerGetTrackingQueryKey = (options?: Options<ProgramsControllerGetTrackingData>) => createQueryKey('programsControllerGetTracking', options);
+
+export const programsControllerGetTrackingOptions = (options?: Options<ProgramsControllerGetTrackingData>) => queryOptions<unknown, DefaultError, unknown, ReturnType<typeof programsControllerGetTrackingQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await programsControllerGetTracking({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: programsControllerGetTrackingQueryKey(options)
+});
+
+export const programsControllerSetTrackingMutation = (options?: Partial<Options<ProgramsControllerSetTrackingData>>): UseMutationOptions<unknown, DefaultError, Options<ProgramsControllerSetTrackingData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<ProgramsControllerSetTrackingData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await programsControllerSetTracking({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
 
 export const programsControllerDeleteMutation = (options?: Partial<Options<ProgramsControllerDeleteData>>): UseMutationOptions<unknown, DefaultError, Options<ProgramsControllerDeleteData>> => {
     const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<ProgramsControllerDeleteData>> = {
@@ -668,6 +697,49 @@ export const timelinesControllerUpdateMutation = (options?: Partial<Options<Time
     const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<TimelinesControllerUpdateData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await timelinesControllerUpdate({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const settingsControllerGetSettingsQueryKey = (options?: Options<SettingsControllerGetSettingsData>) => createQueryKey('settingsControllerGetSettings', options);
+
+export const settingsControllerGetSettingsOptions = (options?: Options<SettingsControllerGetSettingsData>) => queryOptions<SettingsControllerGetSettingsResponse, DefaultError, SettingsControllerGetSettingsResponse, ReturnType<typeof settingsControllerGetSettingsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await settingsControllerGetSettings({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: settingsControllerGetSettingsQueryKey(options)
+});
+
+export const settingsControllerSwitchDatabaseMutation = (options?: Partial<Options<SettingsControllerSwitchDatabaseData>>): UseMutationOptions<SettingsControllerSwitchDatabaseResponse, DefaultError, Options<SettingsControllerSwitchDatabaseData>> => {
+    const mutationOptions: UseMutationOptions<SettingsControllerSwitchDatabaseResponse, DefaultError, Options<SettingsControllerSwitchDatabaseData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await settingsControllerSwitchDatabase({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const settingsControllerMoveDatabaseMutation = (options?: Partial<Options<SettingsControllerMoveDatabaseData>>): UseMutationOptions<SettingsControllerMoveDatabaseResponse, DefaultError, Options<SettingsControllerMoveDatabaseData>> => {
+    const mutationOptions: UseMutationOptions<SettingsControllerMoveDatabaseResponse, DefaultError, Options<SettingsControllerMoveDatabaseData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await settingsControllerMoveDatabase({
                 ...options,
                 ...fnOptions,
                 throwOnError: true

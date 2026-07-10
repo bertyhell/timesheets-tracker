@@ -12,17 +12,43 @@ import { resolveProjectPath } from '../shared/resolve-src-path';
 @Injectable()
 export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   private db: DatabaseSync;
-  private databasePath = process.env.USER_DATA_PATH
-    ? path.join(process.env.USER_DATA_PATH, 'timesheets-tracker-database.sqlite3')
-    : path.resolve('./timesheets-tracker-database.sqlite3');
+  private _databasePath!: string;
+  private _configPath!: string;
   private readonly logger = new Logger(DatabaseService.name);
 
   constructor(private readonly seedService: SeedService) {}
 
+  get databasePath(): string {
+    return this._databasePath;
+  }
+
+  get configPath(): string {
+    return this._configPath;
+  }
+
   async onModuleInit(): Promise<void> {
     this.logger.log('starting database module');
-    this.logger.log('databasePath: ' + this.databasePath);
-    this.db = new DatabaseSync(this.databasePath);
+
+    const configDir = process.env.USER_DATA_PATH || path.resolve('./');
+    this._configPath = path.join(configDir, 'config.json');
+
+    const defaultPath = process.env.USER_DATA_PATH
+      ? path.join(process.env.USER_DATA_PATH, 'timesheets-tracker-database.sqlite3')
+      : path.resolve('./timesheets-tracker-database.sqlite3');
+
+    let configuredPath: string | null = null;
+    if (fs.existsSync(this._configPath)) {
+      try {
+        const config = JSON.parse(fs.readFileSync(this._configPath, 'utf-8'));
+        if (config.databasePath && typeof config.databasePath === 'string') {
+          configuredPath = config.databasePath;
+        }
+      } catch {}
+    }
+
+    this._databasePath = configuredPath ?? defaultPath;
+    this.logger.log('databasePath: ' + this._databasePath);
+    this.db = new DatabaseSync(this._databasePath);
     this.logger.log('creating database tables');
     await this.createTables();
     this.logger.log('database module started successfully');
@@ -126,6 +152,13 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
 
   public getDb(): DatabaseSync {
     return this.db;
+  }
+
+  public async switchDatabase(newPath: string): Promise<void> {
+    this.db.close();
+    this._databasePath = newPath;
+    this.db = new DatabaseSync(newPath);
+    await this.createTables();
   }
 
   async onModuleDestroy() {

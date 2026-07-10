@@ -244,6 +244,22 @@ ipcMain.handle('dialog:openDirectory', async () => {
   return result.canceled ? null : (result.filePaths[0] ?? null);
 });
 
+ipcMain.handle('dialog:openFile', async () => {
+  const result = await dialog.showOpenDialog({
+    properties: ['openFile'],
+    filters: [{ name: 'SQLite Database', extensions: ['sqlite3', 'db', 'sqlite'] }],
+  });
+  return result.canceled ? null : (result.filePaths[0] ?? null);
+});
+
+ipcMain.handle('dialog:saveFile', async (_event, defaultPath?: string) => {
+  const result = await dialog.showSaveDialog({
+    defaultPath: defaultPath ?? 'timesheets-tracker-database.sqlite3',
+    filters: [{ name: 'SQLite Database', extensions: ['sqlite3', 'db', 'sqlite'] }],
+  });
+  return result.canceled ? null : (result.filePath ?? null);
+});
+
 // ── App lifecycle ─────────────────────────────────────────────────────────────
 app.whenReady().then(async () => {
   console.log('[electron] Starting NestJS API server...');

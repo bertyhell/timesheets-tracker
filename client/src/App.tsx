@@ -23,6 +23,7 @@ import {
 export enum ROUTE_PARTS {
   timelinesAndEvents = 'timelines-and-events',
   settings = 'settings',
+  general = 'general',
   timelines = 'timelines',
   autoTagRules = 'auto-tag-rules',
   tagNames = 'tag-names',
@@ -40,6 +41,10 @@ const MANAGE_NAV = [
   { to: ROUTE_PARTS.settings + '/' + ROUTE_PARTS.tagNames, label: 'Tags', icon: Tag },
   { to: ROUTE_PARTS.settings + '/' + ROUTE_PARTS.autoTagRules, label: 'Auto Tags', icon: Zap },
   { to: ROUTE_PARTS.settings + '/' + ROUTE_PARTS.notes, label: 'Notes', icon: FileText },
+];
+
+const GENERAL_NAV = [
+  { to: ROUTE_PARTS.settings + '/' + ROUTE_PARTS.general, label: 'General', icon: Settings },
 ];
 
 function App() {
@@ -75,6 +80,17 @@ function App() {
             <div className="m-nav-section">
               <div className="m-nav-section__label">Manage</div>
               {MANAGE_NAV.map(({ to, label, icon: Icon }) => (
+                <NavLink key={to} to={'/' + to} className="m-nav-item">
+                  <Icon size={16} className="m-nav-item__icon" />
+                  <span>{label}</span>
+                </NavLink>
+              ))}
+            </div>
+
+            {/* General */}
+            <div className="m-nav-section">
+              <div className="m-nav-section__label">Settings</div>
+              {GENERAL_NAV.map(({ to, label, icon: Icon }) => (
                 <NavLink key={to} to={'/' + to} className="m-nav-item">
                   <Icon size={16} className="m-nav-item__icon" />
                   <span>{label}</span>

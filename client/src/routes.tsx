@@ -13,6 +13,7 @@ import { EditAutoNoteModal } from './components/EditNoteModal/EditAutoNoteModal'
 import { TimelinesPage } from './views/settings/Timelines/TimelinesPage';
 import { EditTimelineModal } from './components/EditTimelineModal/EditTimelineModal';
 import { SettingsPage } from './views/settings/SettingsPage/SettingsPage';
+import { GeneralSettingsPage } from './views/settings/GeneralSettingsPage/GeneralSettingsPage';
 
 export const routes: RouteObject[] = [
   {
@@ -47,7 +48,11 @@ export const routes: RouteObject[] = [
         children: [
           {
             index: true,
-            loader: () => redirect('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.timelines),
+            loader: () => redirect('/' + ROUTE_PARTS.settings + '/' + ROUTE_PARTS.general),
+          },
+          {
+            path: ROUTE_PARTS.general,
+            element: <GeneralSettingsPage />,
           },
           {
             path: ROUTE_PARTS.timelines,

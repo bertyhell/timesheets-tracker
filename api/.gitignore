@@ -15,6 +15,10 @@ lerna-debug.log*
 # OS
 .DS_Store
 
+# Runtime config (user-specific, managed by the app)
+config.json
+*.sqlite3
+
 # Tests
 /coverage
 /.nyc_output

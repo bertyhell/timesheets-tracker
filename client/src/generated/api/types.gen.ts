@@ -89,7 +89,7 @@ export type TagDto = {
     /**
      * Optional note for this tag
      */
-    note?: string | null;
+    note?: string;
 };
 
 export type UpdateTagDto = {
@@ -497,6 +497,17 @@ export type AutoTagEventInfoDto = {
     priority: number;
 };
 
+export type GitCommitEventInfoDto = {
+    /**
+     * Name of the git repository folder
+     */
+    repoName: string;
+    /**
+     * Commit message / subject
+     */
+    commitMessage: string;
+};
+
 export type CalendarEventProviderInfoDto = {
     /**
      * A url pointing to the ICS file of the calendar used for fetching events from the calendar
@@ -511,11 +522,6 @@ export type GitCommitEventProviderInfoDto = {
     folderPath: string;
 };
 
-/**
- * Type of the timeline
- */
-export type TimelineType = 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit';
-
 export type CreateTimelineDto = {
     /**
      * Title of the timeline
@@ -524,7 +530,7 @@ export type CreateTimelineDto = {
     /**
      * Type of the timeline
      */
-    timelineType: TimelineType;
+    timelineType: 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit';
     /**
      * The information that is needed for this timeline to fetch events. eg: calendar needs a url to ics file, github needs a link to the git folder, ...
      */
@@ -553,7 +559,7 @@ export type TimelineDto = {
     /**
      * Type of the timeline
      */
-    timelineType: TimelineType;
+    timelineType: 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit';
     /**
      * Specific info for getting events for this timeline type. eg: calendar needs a url to ics file, github needs a link to the git folder, ...
      */
@@ -576,6 +582,11 @@ export type TimelineDto = {
     color?: string | null;
 };
 
+/**
+ * Type of the timeline
+ */
+export type TimelineType = 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit';
+
 export type TimelineEventDto = {
     /**
      * Uuid of the event
@@ -584,7 +595,7 @@ export type TimelineEventDto = {
     /**
      * Type-specific info for this event. Varies based on the timeline type.
      */
-    info: ActiveStateEventInfoDto | ProgramEventInfoDto | CalendarEventInfoDto | WebsiteEventInfoDto | TagEventInfoDto | AutoTagEventInfoDto;
+    info: ActiveStateEventInfoDto | ProgramEventInfoDto | CalendarEventInfoDto | WebsiteEventInfoDto | TagEventInfoDto | AutoTagEventInfoDto | GitCommitEventInfoDto;
     /**
      * Color of the event
      */
@@ -633,7 +644,7 @@ export type UpdateTimelineDto = {
     /**
      * Type of the timeline
      */
-    timelineType?: TimelineType;
+    timelineType?: 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit';
     /**
      * The information that is needed for this timeline to fetch events. eg: calendar needs a url to ics file, github needs a link to the git folder, ...
      */
@@ -650,6 +661,20 @@ export type UpdateTimelineDto = {
     color?: string | null;
 };
 
+export type SettingsResponseDto = {
+    /**
+     * Absolute path to the SQLite database file
+     */
+    databasePath: string;
+};
+
+export type SwitchDatabaseDto = {
+    /**
+     * Absolute path to the target SQLite database file
+     */
+    path: string;
+};
+
 export type AppControllerStatusData = {
     body?: never;
     path?: never;
@@ -658,6 +683,28 @@ export type AppControllerStatusData = {
 };
 
 export type AppControllerStatusResponses = {
+    200: unknown;
+};
+
+export type ProgramsControllerGetTrackingData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/programs/tracking';
+};
+
+export type ProgramsControllerGetTrackingResponses = {
+    200: unknown;
+};
+
+export type ProgramsControllerSetTrackingData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/programs/tracking';
+};
+
+export type ProgramsControllerSetTrackingResponses = {
     200: unknown;
 };
 
@@ -1329,3 +1376,42 @@ export type TimelinesControllerUpdateData = {
 export type TimelinesControllerUpdateResponses = {
     200: unknown;
 };
+
+export type SettingsControllerGetSettingsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/settings';
+};
+
+export type SettingsControllerGetSettingsResponses = {
+    200: SettingsResponseDto;
+};
+
+export type SettingsControllerGetSettingsResponse = SettingsControllerGetSettingsResponses[keyof SettingsControllerGetSettingsResponses];
+
+export type SettingsControllerSwitchDatabaseData = {
+    body: SwitchDatabaseDto;
+    path?: never;
+    query?: never;
+    url: '/api/settings/switch-database';
+};
+
+export type SettingsControllerSwitchDatabaseResponses = {
+    200: SettingsResponseDto;
+};
+
+export type SettingsControllerSwitchDatabaseResponse = SettingsControllerSwitchDatabaseResponses[keyof SettingsControllerSwitchDatabaseResponses];
+
+export type SettingsControllerMoveDatabaseData = {
+    body: SwitchDatabaseDto;
+    path?: never;
+    query?: never;
+    url: '/api/settings/move-database';
+};
+
+export type SettingsControllerMoveDatabaseResponses = {
+    200: SettingsResponseDto;
+};
+
+export type SettingsControllerMoveDatabaseResponse = SettingsControllerMoveDatabaseResponses[keyof SettingsControllerMoveDatabaseResponses];

@@ -22,6 +22,7 @@ import { createTimeline } from './queries/createTimeline';
 import { updateTimeline } from './queries/updateTimeline';
 import { deleteTimeline } from './queries/deleteTimeline';
 import { reorderTimelines, type ReorderTimelineItem } from './queries/reorderTimelines';
+import { incrementTimelineOrders } from './queries/incrementTimelineOrders';
 import { TagEventInfoDto, TimelineEventDto, TimelineWithEventsDto } from './dto/response-timeline-events.dto';
 import { TimelineDto } from './dto/response-timeline.dto';
 import { CalendarsService } from '../calendars/calendars.service';
@@ -116,6 +117,9 @@ export class TimelinesService {
       const db = this.databaseService.getDb();
       id = uuid();
       const now = new Date().toISOString();
+
+      incrementTimelineOrders(db, timeline.visualOrder);
+
       createTimeline(db, {
         id,
         title: timeline.title,
@@ -128,6 +132,12 @@ export class TimelinesService {
         visualOrder: timeline.visualOrder,
         color: timeline.color ?? null,
       });
+
+      const allTimelines = findAllTimelines(db);
+      reorderTimelines(
+        db,
+        allTimelines.map((t, index) => ({ id: t.id as string, visualOrder: index }))
+      );
 
       return this.findOne(id);
     } catch (err) {
@@ -187,6 +197,12 @@ export class TimelinesService {
     try {
       const db = this.databaseService.getDb();
       await deleteTimeline(db, { id });
+
+      const allTimelines = findAllTimelines(db);
+      reorderTimelines(
+        db,
+        allTimelines.map((t, index) => ({ id: t.id as string, visualOrder: index }))
+      );
     } catch (err) {
       const error = new CustomError('Failed to delete timeline entry from the database', err, {
         id,
@@ -344,6 +360,7 @@ export class TimelinesService {
                     (a, b) => new Date(a.startedAt).getTime() - new Date(b.startedAt).getTime()
                   );
                   const thirtyMinutesMs = 30 * 60 * 1000;
+                  const now = Date.now();
                   return sortedCommits.map((commit: GitCommitEvent, index: number): TimelineEventDto => {
                     const commitStart = new Date(commit.startedAt).getTime();
                     const nextCommitStart =
@@ -353,7 +370,7 @@ export class TimelinesService {
                     return {
                       id: commit.id,
                       startedAt: commit.startedAt,
-                      endedAt: new Date(Math.min(commitStart + thirtyMinutesMs, nextCommitStart)).toISOString(),
+                      endedAt: new Date(Math.min(commitStart + thirtyMinutesMs, nextCommitStart, now)).toISOString(),
                       info: {
                         repoName: commit.repoName,
                         commitMessage: commit.commitMessage,

@@ -7,6 +7,8 @@ import { toast } from 'react-toastify';
 import { format, parseISO } from 'date-fns';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { Pencil } from 'lucide-react';
+
 import { ROUTE_PARTS } from '../../App';
 import {
   tagNamesControllerFindOneOptions,
@@ -18,7 +20,7 @@ import {
 import type { TagDto } from '../../generated/api/types.gen';
 import type { TagName } from '../../types/types';
 import TagSelectSingle from '../TagSelect/TagSelectSingle';
-import Button, { ButtonVariant } from '../Button/Button';
+import Button, { ButtonSize, ButtonVariant } from '../Button/Button';
 
 export function EditTagModal() {
   const { uuid } = useParams();
@@ -125,7 +127,23 @@ export function EditTagModal() {
       >
         <div className="c-form">
           <label>Tag name</label>
-          <TagSelectSingle value={selectedTagName} onChange={setSelectedTagName} autoFocus={true} />
+          <div className="flex flex-row gap-2 items-center">
+            <div className="flex-1">
+              <TagSelectSingle value={selectedTagName} onChange={setSelectedTagName} autoFocus={true} />
+            </div>
+            <Button
+              variant={ButtonVariant.Secondary}
+              size={ButtonSize.Small}
+              icon={<Pencil size={14} />}
+              disabled={!selectedTagName}
+              title="Edit tag name"
+              onClick={() =>
+                navigate(
+                  `/${ROUTE_PARTS.settings}/${ROUTE_PARTS.tagNames}/${selectedTagName!.id}/${ROUTE_PARTS.edit}`
+                )
+              }
+            />
+          </div>
 
           <label>Start time</label>
           <input

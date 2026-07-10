@@ -26,9 +26,9 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self' http://localhost:* http://127.0.0.1:*; object-src 'self'"
   },
-  "host_permissions": ["http://localhost:55577/api/*"],
+  "host_permissions": ["http://localhost:55577/api/*", "<all_urls>"],
   "background": {
     "service_worker": "src/background/background.js"
   },
-  "permissions": ["activeTab", "tabs", "storage"]
+  "permissions": ["tabs", "storage"]
 }

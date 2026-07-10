@@ -76,6 +76,9 @@ export function NotesPage() {
             <th className="text-left pl-3 cursor-pointer select-none" onClick={toggleSort}>
               Title{sortIndicator}
             </th>
+            <th className="text-left pl-3">Variable</th>
+            <th className="text-left pl-3">Regex</th>
+            <th className="text-left pl-3">Note text</th>
             <th className="w-px whitespace-nowrap"></th>
             <th className="w-px whitespace-nowrap"></th>
           </tr>
@@ -99,6 +102,9 @@ export function NotesPage() {
                 }
               >
                 <td className="pl-3">{note.title}</td>
+                <td className="pl-3 text-sm text-gray-500">{(note as unknown as AutoNote).variable}</td>
+                <td className="pl-3 text-sm font-mono text-gray-500">{(note as unknown as AutoNote).extractRegex}</td>
+                <td className="pl-3 text-sm font-mono text-gray-500">{(note as unknown as AutoNote).extractRegexReplacement}</td>
                 <td className="w-px whitespace-nowrap">
                   <Button
                     onClick={(e) => {

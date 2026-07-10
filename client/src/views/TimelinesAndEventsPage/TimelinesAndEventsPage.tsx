@@ -288,7 +288,7 @@ export function TimelinesAndEventsPage() {
 
         <div className="p-page-header-right">
           {isLoadingTimelineEvents && <span className="p-loading-indicator">Loading...</span>}
-          <div className="p-header-divider" />
+          {isLoadingTimelineEvents && <div className="p-header-divider" />}
           <DateSelect />
           <div className="p-header-divider" />
           <GlobalSearchBar />

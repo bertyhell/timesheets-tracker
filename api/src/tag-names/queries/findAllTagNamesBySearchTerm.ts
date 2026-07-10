@@ -16,9 +16,16 @@ export function findAllTagNamesBySearchTerm(
   params: FindAllTagNamesBySearchTermParams
 ): FindAllTagNamesBySearchTermResult[] {
   const sql = `
-	SELECT id, title, code, color
-	FROM tagNames
-	WHERE title like '%' || ? || '%'
+	SELECT tn.id, tn.title, tn.code, tn.color
+	FROM tagNames tn
+	LEFT JOIN tags t ON t.tagNameId = tn.id
+	  AND t.endedAt >= datetime('now', '-14 days')
+	WHERE tn.title like '%' || ? || '%'
+	GROUP BY tn.id, tn.title, tn.code, tn.color
+	ORDER BY
+	  CASE WHEN MAX(t.endedAt) IS NOT NULL THEN 0 ELSE 1 END,
+	  MAX(t.endedAt) DESC,
+	  tn.title ASC
 	`;
   return db
     .prepare(sql)

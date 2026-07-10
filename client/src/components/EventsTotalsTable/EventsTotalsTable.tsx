@@ -5,6 +5,7 @@ import { formatDuration } from '../../helpers/format-duration';
 import { orderBy } from 'lodash-es';
 import { useAtom } from 'jotai';
 import { searchTermAtom } from '../../store/store';
+import { ContextMenu } from '../ContextMenu/ContextMenu';
 import {
   ActiveStateEventInfoDto,
   AutoTagEventInfoDto,
@@ -28,6 +29,7 @@ interface EventsTotalsTableProps {
   events: TimelineEventDto[];
   timelineType: TimelineType;
   className?: string;
+  onEditTag?: (eventId: string) => void;
 }
 
 interface TotalRow {
@@ -36,6 +38,13 @@ interface TotalRow {
   color: string;
   durationMs: number;
   duration: string;
+}
+
+interface ContextMenuState {
+  x: number;
+  y: number;
+  row: TotalRow;
+  firstEventId: string;
 }
 
 const columns = [
@@ -66,9 +75,10 @@ function getCategoryLabel(event: TimelineEventDto, timelineType: TimelineType): 
 }
 
 
-export function EventsTotalsTable({ events, timelineType, className }: EventsTotalsTableProps) {
+export function EventsTotalsTable({ events, timelineType, className, onEditTag }: EventsTotalsTableProps) {
   const [searchTerm] = useAtom(searchTermAtom);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: 'duration',
     direction: 'descending',
@@ -134,6 +144,16 @@ export function EventsTotalsTable({ events, timelineType, className }: EventsTot
     }));
   };
 
+  const isTagTimeline = timelineType === 'Tag' || timelineType === 'AutoTag';
+
+  const handleRowContextMenu = (e: React.MouseEvent, row: TotalRow) => {
+    if (!isTagTimeline) return;
+    e.preventDefault();
+    const firstEvent = events.find((ev) => getCategoryLabel(ev, timelineType) === row.category);
+    if (!firstEvent) return;
+    setContextMenu({ x: e.clientX, y: e.clientY, row, firstEventId: firstEvent.id });
+  };
+
   const grandTotalMs = useMemo(
     () => sortedTotals.reduce((sum, row) => sum + row.durationMs, 0),
     [sortedTotals]
@@ -195,6 +215,7 @@ export function EventsTotalsTable({ events, timelineType, className }: EventsTot
                 aria-selected={selectedKey === row.id}
                 className={selectedKey === row.id ? 'is-selected' : undefined}
                 onClick={() => setSelectedKey(row.id)}
+                onContextMenu={(e) => handleRowContextMenu(e, row)}
               >
                 <td style={{ padding: '0 0 0 8px' }}>
                   <span
@@ -225,6 +246,23 @@ export function EventsTotalsTable({ events, timelineType, className }: EventsTot
         )}
       </table>
       {sortedTotals.length === 0 && <div className="c-table-empty">No events</div>}
+      {contextMenu && (
+        <ContextMenu
+          position={contextMenu}
+          items={[
+            { label: 'Edit tag', onClick: () => onEditTag?.(contextMenu.firstEventId) },
+            {
+              label: 'Copy name',
+              onClick: () => navigator.clipboard.writeText(contextMenu.row.category),
+            },
+            {
+              label: 'Copy duration',
+              onClick: () => navigator.clipboard.writeText(contextMenu.row.duration),
+            },
+          ]}
+          onClose={() => setContextMenu(null)}
+        />
+      )}
     </div>
   );
 }

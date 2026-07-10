@@ -224,6 +224,15 @@ export function TimelinesAndEventsPage() {
                       state: { events: bulkEvents },
                     })
                   }
+                  onEditTag={(eventId) =>
+                    navigate(
+                      '/' + ROUTE_PARTS.timelinesAndEvents + '/' + eventId + '/' + ROUTE_PARTS.edit
+                    )
+                  }
+                  onDeleteTag={async (eventId) => {
+                    await deleteTag({ path: { id: eventId } });
+                    toast('Tag was deleted', { type: 'success' });
+                  }}
                 />
               )}
             </Panel>
@@ -236,6 +245,11 @@ export function TimelinesAndEventsPage() {
                   className="c-events-totals-table"
                   events={selectedTimeline.events}
                   timelineType={selectedTimeline.type}
+                  onEditTag={(eventId) =>
+                    navigate(
+                      '/' + ROUTE_PARTS.timelinesAndEvents + '/' + eventId + '/' + ROUTE_PARTS.edit
+                    )
+                  }
                 />
               )}
             </Panel>

@@ -15,6 +15,22 @@ import { ColumnDef } from './Table.types';
 import { getColorForEvent } from '../Timeline/helpers/getColorForEvent';
 import { ContextMenu } from '../ContextMenu/ContextMenu';
 
+function copyEventToClipboard(event: TimelineEventDto) {
+  const startStr = format(roundToNearestMinutes(parseISO(event.startedAt)), 'yyyy-MM-dd HH:mm');
+  const endStr = format(roundToNearestMinutes(parseISO(event.endedAt)), 'HH:mm');
+  const durationSec = differenceInSeconds(parseISO(event.endedAt), parseISO(event.startedAt));
+  const durationStr = formatDuration(durationSec);
+  const info = event.info as Record<string, unknown>;
+  const infoLines = Object.entries(info)
+    .filter(([, val]) => val !== '' && val !== null && val !== undefined)
+    .map(([key, val]) => `${key}: ${val}`)
+    .join('\n');
+  const text = [`Start: ${startStr}`, `End: ${endStr}`, `Duration: ${durationStr}`, '', infoLines]
+    .filter(Boolean)
+    .join('\n');
+  navigator.clipboard.writeText(text);
+}
+
 interface SortDescriptor {
   column: string;
   direction: 'ascending' | 'descending';
@@ -87,14 +103,19 @@ interface EventsTableProps {
   events: TimelineEventDto[];
   className?: string;
   onAddBulkTag?: (events: TimelineEventDto[]) => void;
+  onEditTag?: (eventId: string) => void;
+  onDeleteTag?: (eventId: string) => void;
 }
 
 interface ContextMenuState {
   x: number;
   y: number;
+  eventId: string;
+  event: TimelineEventDto;
+  isBulk: boolean;
 }
 
-export function EventsTable({ timeline, events, className, onAddBulkTag }: EventsTableProps) {
+export function EventsTable({ timeline, events, className, onAddBulkTag, onEditTag, onDeleteTag }: EventsTableProps) {
   const [searchTerm] = useAtom(searchTermAtom);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [lastClickedIndex, setLastClickedIndex] = useState<number | null>(null);
@@ -184,11 +205,16 @@ export function EventsTable({ timeline, events, className, onAddBulkTag }: Event
     }
   };
 
+  const isTagTimeline =
+    timeline?.type === TimelineType.Tag || timeline?.type === TimelineType.AutoTag;
+
   const handleRowContextMenu = (e: React.MouseEvent, id: string) => {
-    if (selectedKeys.size >= 2 && selectedKeys.has(id) && onAddBulkTag) {
-      e.preventDefault();
-      setContextMenu({ x: e.clientX, y: e.clientY });
-    }
+    const event = sortedItems.find((ev) => ev.id === id);
+    if (!event) return;
+    const isBulk = selectedKeys.size >= 2 && selectedKeys.has(id) && !!onAddBulkTag;
+    if (!isTagTimeline && !isBulk) return;
+    e.preventDefault();
+    setContextMenu({ x: e.clientX, y: e.clientY, eventId: id, event, isBulk });
   };
 
   return (
@@ -275,13 +301,31 @@ export function EventsTable({ timeline, events, className, onAddBulkTag }: Event
         <ContextMenu
           position={contextMenu}
           items={[
-            {
-              label: `Add tag to ${selectedKeys.size} events`,
-              onClick: () => {
-                const selected = sortedItems.filter((e) => selectedKeys.has(e.id));
-                onAddBulkTag?.(selected);
-              },
-            },
+            ...(contextMenu.isBulk
+              ? [
+                  {
+                    label: `Add tag to ${selectedKeys.size} events`,
+                    onClick: () => {
+                      const selected = sortedItems.filter((e) => selectedKeys.has(e.id));
+                      onAddBulkTag?.(selected);
+                    },
+                  },
+                ]
+              : []),
+            ...(isTagTimeline
+              ? [
+                  { label: 'Edit tag', onClick: () => onEditTag?.(contextMenu.eventId) },
+                  {
+                    label: 'Delete tag',
+                    onClick: () => onDeleteTag?.(contextMenu.eventId),
+                    variant: 'danger' as const,
+                  },
+                  {
+                    label: 'Copy to clipboard',
+                    onClick: () => copyEventToClipboard(contextMenu.event),
+                  },
+                ]
+              : []),
           ]}
           onClose={() => setContextMenu(null)}
         />

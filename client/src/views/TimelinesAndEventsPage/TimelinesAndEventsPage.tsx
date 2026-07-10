@@ -2,7 +2,7 @@ import './TimelinesAndEventsPage.css';
 import { toast } from 'react-toastify';
 import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { endOfDay, startOfDay } from 'date-fns';
+import { endOfDay, format, startOfDay } from 'date-fns';
 import { TimelineType } from '../../components/Timeline/Timeline.types';
 import { useAtom } from 'jotai';
 import { sidebarCollapsedAtom, viewDateAtom } from '../../store/store';
@@ -36,6 +36,7 @@ import { TimelinesViewer } from '../../components/TimelinesViewer/TimelinesViewe
 export function TimelinesAndEventsPage() {
   const [viewDate] = useAtom(viewDateAtom);
   const [sidebarCollapsed, setSidebarCollapsed] = useAtom(sidebarCollapsedAtom);
+  const dateParam = format(viewDate, 'yyyy-MM-dd');
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -220,13 +221,24 @@ export function TimelinesAndEventsPage() {
                   timeline={selectedTimeline}
                   events={selectedTimeline.events}
                   onAddBulkTag={(bulkEvents) =>
-                    navigate('/' + ROUTE_PARTS.timelinesAndEvents + '/' + ROUTE_PARTS.bulkTag, {
-                      state: { events: bulkEvents },
-                    })
+                    navigate(
+                      {
+                        pathname: '/' + ROUTE_PARTS.timelinesAndEvents + '/' + ROUTE_PARTS.bulkTag,
+                        search: '?date=' + dateParam,
+                      },
+                      { state: { events: bulkEvents } }
+                    )
                   }
                   onEditTag={(eventId) =>
                     navigate(
-                      '/' + ROUTE_PARTS.timelinesAndEvents + '/' + eventId + '/' + ROUTE_PARTS.edit
+                      '/' +
+                        ROUTE_PARTS.timelinesAndEvents +
+                        '/' +
+                        eventId +
+                        '/' +
+                        ROUTE_PARTS.edit +
+                        '?date=' +
+                        dateParam
                     )
                   }
                   onDeleteTag={async (eventId) => {
@@ -234,7 +246,7 @@ export function TimelinesAndEventsPage() {
                     toast('Tag was deleted', { type: 'success' });
                   }}
                   onCreateTagFromEvent={(startedAt, endedAt) => {
-                    const params = new URLSearchParams({ startedAt, endedAt });
+                    const params = new URLSearchParams({ startedAt, endedAt, date: dateParam });
                     navigate(
                       '/' +
                         ROUTE_PARTS.timelinesAndEvents +
@@ -258,7 +270,14 @@ export function TimelinesAndEventsPage() {
                   timelineType={selectedTimeline.type}
                   onEditTag={(eventId) =>
                     navigate(
-                      '/' + ROUTE_PARTS.timelinesAndEvents + '/' + eventId + '/' + ROUTE_PARTS.edit
+                      '/' +
+                        ROUTE_PARTS.timelinesAndEvents +
+                        '/' +
+                        eventId +
+                        '/' +
+                        ROUTE_PARTS.edit +
+                        '?date=' +
+                        dateParam
                     )
                   }
                 />
@@ -308,7 +327,9 @@ export function TimelinesAndEventsPage() {
             variant={ButtonVariant.Primary}
             icon={<Plus size={14} />}
             onClick={() =>
-              navigate('/' + ROUTE_PARTS.timelinesAndEvents + '/' + ROUTE_PARTS.create)
+              navigate(
+                '/' + ROUTE_PARTS.timelinesAndEvents + '/' + ROUTE_PARTS.create + '?date=' + dateParam
+              )
             }
             title="Create tag"
           >

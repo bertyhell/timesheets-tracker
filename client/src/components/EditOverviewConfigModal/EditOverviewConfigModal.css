@@ -1,0 +1,19 @@
+.c-edit-overview-config-modal {
+  width: 32rem;
+  max-width: 90%;
+}
+
+.c-overview-source-types {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.c-overview-source-types__option {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  color: var(--gray-700);
+}

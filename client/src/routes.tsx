@@ -14,6 +14,10 @@ import { TimelinesPage } from './views/settings/Timelines/TimelinesPage';
 import { EditTimelineModal } from './components/EditTimelineModal/EditTimelineModal';
 import { SettingsPage } from './views/settings/SettingsPage/SettingsPage';
 import { GeneralSettingsPage } from './views/settings/GeneralSettingsPage/GeneralSettingsPage';
+import { OverviewsPage } from './views/OverviewsPage/OverviewsPage';
+import { OverviewView } from './views/OverviewsPage/OverviewView/OverviewView';
+import { EditOverviewConfigModal } from './components/EditOverviewConfigModal/EditOverviewConfigModal';
+import { PREDEFINED_OVERVIEW_CONFIGS } from './views/OverviewsPage/predefined-configs';
 
 export const routes: RouteObject[] = [
   {
@@ -39,6 +43,29 @@ export const routes: RouteObject[] = [
           {
             path: ROUTE_PARTS.bulkTag,
             element: <BulkTagModal />,
+          },
+        ],
+      },
+      {
+        path: ROUTE_PARTS.overviews,
+        element: <OverviewsPage />,
+        children: [
+          {
+            index: true,
+            loader: () =>
+              redirect('/' + ROUTE_PARTS.overviews + '/' + PREDEFINED_OVERVIEW_CONFIGS[0].id),
+          },
+          {
+            path: ROUTE_PARTS.new,
+            element: <EditOverviewConfigModal />,
+          },
+          {
+            path: ':configId',
+            element: <OverviewView />,
+          },
+          {
+            path: ':id/' + ROUTE_PARTS.edit,
+            element: <EditOverviewConfigModal />,
           },
         ],
       },

@@ -93,3 +93,19 @@ export enum ConditionOperator {
   matchesRegex = 'matchesRegex',
   doesNotMatchRegex = 'doesNotMatchRegex',
 }
+
+export enum OverviewSourceType {
+  Tag = 'Tag',
+  Program = 'Program',
+  Website = 'Website',
+  ActiveState = 'ActiveState',
+}
+
+export enum DateRangeMode {
+  Today = 'today',
+  ThisWeek = 'thisWeek',
+  ThisMonth = 'thisMonth',
+  Last7Days = 'last7Days',
+  Last30Days = 'last30Days',
+  Custom = 'custom',
+}

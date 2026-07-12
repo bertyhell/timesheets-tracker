@@ -18,6 +18,7 @@ import {
   Settings,
   User,
   ChevronDown,
+  LayoutGrid,
 } from 'lucide-react';
 
 export enum ROUTE_PARTS {
@@ -33,9 +34,13 @@ export enum ROUTE_PARTS {
   create = 'create',
   edit = 'edit',
   bulkTag = 'bulk-tag',
+  overviews = 'overviews',
+  new = 'new',
 }
 
 const OVERVIEW_NAV = [{ to: ROUTE_PARTS.timelinesAndEvents, label: 'Overview', icon: BarChart2 }];
+
+const OVERVIEWS_NAV = [{ to: ROUTE_PARTS.overviews, label: 'Overviews', icon: LayoutGrid }];
 
 const MANAGE_NAV = [
   { to: ROUTE_PARTS.manage + '/' + ROUTE_PARTS.timelines, label: 'Timelines', icon: List },
@@ -50,7 +55,9 @@ const GENERAL_NAV = [
 
 function App() {
   const location = useLocation();
-  const isFullLayoutPage = location.pathname.startsWith('/' + ROUTE_PARTS.timelinesAndEvents);
+  const isFullLayoutPage =
+    location.pathname.startsWith('/' + ROUTE_PARTS.timelinesAndEvents) ||
+    location.pathname.startsWith('/' + ROUTE_PARTS.overviews);
   const [sidebarCollapsed] = useAtom(sidebarCollapsedAtom);
 
   return (
@@ -81,6 +88,17 @@ function App() {
             <div className="m-nav-section">
               <div className="m-nav-section__label">Overview</div>
               {OVERVIEW_NAV.map(({ to, label, icon: Icon }) => (
+                <NavLink key={to} to={'/' + to} className="m-nav-item">
+                  <Icon size={16} className="m-nav-item__icon" />
+                  <span>{label}</span>
+                </NavLink>
+              ))}
+            </div>
+
+            {/* Overviews */}
+            <div className="m-nav-section">
+              <div className="m-nav-section__label">Analysis</div>
+              {OVERVIEWS_NAV.map(({ to, label, icon: Icon }) => (
                 <NavLink key={to} to={'/' + to} className="m-nav-item">
                   <Icon size={16} className="m-nav-item__icon" />
                   <span>{label}</span>

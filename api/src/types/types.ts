@@ -130,6 +130,50 @@ export enum TimelineType {
   GitCommit = 'GitCommit',
 }
 
+// Database-backed timeline types that can be aggregated in Overviews.
+// Calendar and GitCommit are excluded because they are fetched live per-request
+// (an ICS feed / a git log scan) rather than stored in the database.
+export enum OverviewSourceType {
+  Tag = 'Tag',
+  Program = 'Program',
+  Website = 'Website',
+  ActiveState = 'ActiveState',
+}
+
+export enum DateRangeMode {
+  Today = 'today',
+  ThisWeek = 'thisWeek',
+  ThisMonth = 'thisMonth',
+  Last7Days = 'last7Days',
+  Last30Days = 'last30Days',
+  Custom = 'custom',
+}
+
+export interface SavedOverviewConfig {
+  id: string;
+  name: string;
+  visualOrder: number;
+  dateRangeMode: DateRangeMode;
+  customStartedAt: string | null;
+  customEndedAt: string | null;
+  sourceTypes: OverviewSourceType[];
+  pivotState: Record<string, any>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OverviewFlatRow {
+  id: string;
+  category: string;
+  sourceType: OverviewSourceType;
+  startedAt: string;
+  endedAt: string;
+  date: string;
+  week: string;
+  month: string;
+  durationHours: number;
+}
+
 export interface Timeline {
   id: string;
   title: string;

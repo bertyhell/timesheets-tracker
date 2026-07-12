@@ -1,0 +1,124 @@
+.m-overviews-page {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+
+.m-overviews-sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 16rem;
+  flex-shrink: 0;
+  background-color: #ffffff;
+  border-right: 1px solid var(--gray-100);
+  overflow-y: auto;
+}
+
+.m-overviews-sidebar__header {
+  padding: 1.25rem 1.25rem 1rem;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.m-overviews-sidebar__title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 0.25rem;
+}
+
+.m-overviews-sidebar__description {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+  margin: 0;
+}
+
+.m-overviews-sidebar__nav {
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.m-overviews-sidebar__label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--gray-500);
+  padding: 0.75rem 0.625rem 0.25rem;
+}
+
+.m-overviews-sidebar__label--custom {
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--gray-100);
+}
+
+.m-overviews-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 0.625rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--gray-700);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    background-color: var(--bg-alternative);
+    color: var(--primary-0);
+
+    .m-overviews-nav-item__icon {
+      color: var(--primary-0);
+    }
+  }
+
+  &.active {
+    background-color: var(--primary-4);
+    color: var(--primary-0);
+
+    .m-overviews-nav-item__icon {
+      color: var(--primary-0);
+    }
+  }
+}
+
+.m-overviews-nav-item__icon {
+  flex-shrink: 0;
+  color: var(--gray-500);
+  transition: color 0.15s ease;
+}
+
+.m-overviews-sidebar__add {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 0.625rem;
+  margin-top: 0.25rem;
+  border-radius: 8px;
+  border: 1px dashed var(--gray-200);
+  color: var(--gray-500);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+
+  &:hover {
+    background-color: var(--bg-alternative);
+    color: var(--primary-0);
+    border-color: var(--primary-2);
+  }
+}
+
+.m-overviews-content {
+  flex: 1;
+  overflow: hidden;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}

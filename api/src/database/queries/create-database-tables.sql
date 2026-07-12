@@ -103,3 +103,18 @@ VALUES ('614f6de5-b1e2-43fa-8da6-37b14fbc9e09', 'Programs', 'Program', NULL, dat
 
 INSERT OR IGNORE INTO timelines ("id", "title", "timelineType", "eventProviderInfo", "createdAt", "updatedAt", "visualOrder")
 VALUES ('3357ae8e-6162-4fb2-a2be-bf9499b5a3d2', 'Websites', 'Website', NULL, datetime('now'), datetime('now'), 5);
+
+
+CREATE TABLE IF NOT EXISTS savedOverviewConfigs
+(
+    "id"                text NOT NULL PRIMARY KEY,
+    "name"              text NOT NULL,
+    "visualOrder"       int NOT NULL,
+    "dateRangeMode"     text NOT NULL,
+    "customStartedAt"   text,
+    "customEndedAt"     text,
+    "sourceTypes"       text NOT NULL,
+    "pivotState"        text NOT NULL,
+    "createdAt"         text NOT NULL,
+    "updatedAt"         text NOT NULL
+);

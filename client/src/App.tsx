@@ -67,7 +67,7 @@ function App() {
           {/* Logo */}
           <div className="m-nav-logo">
             <div className="m-nav-logo__icon">
-              <svg width="20" height="20" viewBox="0 0 512 512" role="img" xmlns="http://www.w3.org/2000/svg">
+              <svg width="22" height="22" viewBox="0 0 512 512" role="img" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="256" cy="276" r="224" fill="#111"/>
                 <circle cx="256" cy="66"  r="59"  fill="#111"/>
                 <circle cx="121" cy="115" r="59"  fill="#111"/>
@@ -80,7 +80,10 @@ function App() {
                 <path d="M 256,276 L 256,96 A 180,180 0 0,1 436,276 Z" fill="#7c3aed"/>
               </svg>
             </div>
-            <span className="m-nav-logo__text">Timesheet Tracker</span>
+            <div className="m-nav-logo__text-group">
+              <span className="m-nav-logo__label">Timesheet</span>
+              <span className="m-nav-logo__title">Tracker</span>
+            </div>
           </div>
 
           <div className="m-nav-sections">

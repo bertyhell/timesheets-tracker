@@ -4,6 +4,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import PivotTableUI from 'react-pivottable/PivotTableUI';
+import TableRenderers from 'react-pivottable/TableRenderers';
+import createPlotlyRenderers from 'react-pivottable/PlotlyRenderers';
+import createPlotlyComponent from 'react-plotly.js/factory';
+import Plotly from 'plotly.js-dist-min';
 import { toast } from 'react-toastify';
 import { Download, Pencil, Save, Copy } from 'lucide-react';
 import Button, { ButtonVariant } from '../../../components/Button/Button';
@@ -14,6 +18,10 @@ import { overviewsApi } from '../../../api/overviews';
 import { PREDEFINED_OVERVIEW_CONFIGS } from '../predefined-configs';
 import { resolveDateRange } from '../helpers/resolveDateRange';
 import { pivotToCsv, downloadCsv } from '../helpers/pivotToCsv';
+
+const PlotlyComponent = createPlotlyComponent(Plotly as any);
+const PlotlyRenderers = createPlotlyRenderers(PlotlyComponent);
+const allRenderers = { ...TableRenderers, ...PlotlyRenderers };
 
 export function OverviewView() {
   const { configId } = useParams();
@@ -137,7 +145,9 @@ export function OverviewView() {
         <PivotTableUI
           data={(flatRows ?? []) as unknown as Array<{ [key: string]: string }>}
           {...pivotState}
+          renderers={allRenderers}
           onChange={(state: Record<string, any>) => setPivotState(state)}
+          plotlyOptions={{ width: null }}
         />
       </div>
     </div>

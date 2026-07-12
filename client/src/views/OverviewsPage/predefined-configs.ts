@@ -35,6 +35,7 @@ export const PREDEFINED_OVERVIEW_CONFIGS: PredefinedOverviewConfig[] = [
     sourceTypes: [OverviewSourceType.Program],
     pivotState: {
       ...BASE_PIVOT_STATE,
+      rendererName: 'Multiple Pie Chart',
       rows: ['category'],
       cols: [],
       vals: ['durationHours'],

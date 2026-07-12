@@ -47,17 +47,15 @@
 .m-overview-view__table {
   flex: 1;
   min-height: 0;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
   background-color: var(--bg-alternative);
-}
-
-.m-overview-view__table .pvtUi {
-  padding: 0.75rem 1.5rem 1.5rem;
 }
 
 /* --- react-pivottable overrides to match the app's design system --- */
 
 .m-overview-view__table .pvtUi {
+  padding: 0.75rem 1.5rem 1.5rem;
   width: 100%;
   border-collapse: collapse;
   font-family: inherit;
@@ -144,4 +142,19 @@
 
 .m-overview-view__table .pvtOutput {
   min-width: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Plotly renders its container as inline-block, which makes it size to its SVG content.
+   Force block + 100% so Plotly measures the correct cell width when it initialises. */
+.m-overview-view__table .js-plotly-plot {
+  display: block !important;
+  width: 100% !important;
+}
+
+.m-overview-view__table .pvtOutput svg,
+.m-overview-view__table .pvtOutput canvas {
+  max-width: 100% !important;
+  height: auto !important;
 }

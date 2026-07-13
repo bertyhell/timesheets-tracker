@@ -266,6 +266,22 @@ export function TimelinesAndEventsPage() {
                         params.toString()
                     );
                   }}
+                  onCreateAutoTagRuleFromEvent={(conditions) => {
+                    const params = new URLSearchParams();
+                    if (conditions.length) {
+                      params.set('conditions', JSON.stringify(conditions));
+                    }
+                    navigate(
+                      '/' +
+                        ROUTE_PARTS.manage +
+                        '/' +
+                        ROUTE_PARTS.autoTagRules +
+                        '/' +
+                        ROUTE_PARTS.create +
+                        '?' +
+                        params.toString()
+                    );
+                  }}
                 />
               )}
             </Panel>

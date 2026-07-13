@@ -4,7 +4,7 @@ import { cloneDeep } from 'lodash-es';
 import React, { type ChangeEvent, useEffect, useState } from 'react';
 import Button, { ButtonVariant } from '../Button/Button';
 import { Modal } from 'react-responsive-modal';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import { ROUTE_PARTS } from '../../App';
@@ -38,13 +38,42 @@ const NEW_CONDITION: AutoTagCondition = {
   value: '',
 };
 
+function parsePrefillConditions(raw: string | null): AutoTagCondition[] {
+  if (!raw) return [];
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return [];
+  }
+  if (!Array.isArray(parsed)) return [];
+  return parsed
+    .filter((entry): entry is { variable?: string; value?: string } => !!entry?.value)
+    .map((entry) => ({
+      ...NEW_CONDITION,
+      variable:
+        entry.variable && (Object.values(ConditionVariable) as string[]).includes(entry.variable)
+          ? (entry.variable as ConditionVariable)
+          : NEW_CONDITION.variable,
+      value: entry.value as string,
+    }));
+}
+
 export function EditAutoTagModal() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [name, setName] = useState<string>('');
   const [selectedTagName, setSelectedTagName] = useState<TagName | null>(null);
   const [_priority, setPriority] = useState<number>(0); // TODO allow drag and drop
-  const [conditions, setConditions] = useState<AutoTagCondition[]>([NEW_CONDITION, NEW_CONDITION]);
+
+  const prefillConditions = parsePrefillConditions(!id ? searchParams.get('conditions') : null);
+
+  const [conditions, setConditions] = useState<AutoTagCondition[]>(
+    prefillConditions.length
+      ? [...prefillConditions, NEW_CONDITION]
+      : [NEW_CONDITION, NEW_CONDITION]
+  );
   const [showCreateNewTagControls, setShowCreateNewTagControls] = useState<boolean>(false);
   const [newTagName, setNewTagName] = useState<string>('');
   const [userModifiedName, setUserModifiedName] = useState<boolean>(false);

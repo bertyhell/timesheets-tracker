@@ -13,6 +13,10 @@ import type {
 import { TimelineType } from '../Timeline/Timeline.types';
 import { ColumnDef } from './Table.types';
 import { getColorForEvent } from '../Timeline/helpers/getColorForEvent';
+import {
+  getMostProminentConditions,
+  type ProminentCondition,
+} from '../Timeline/helpers/getMostProminentConditions';
 import { ContextMenu } from '../ContextMenu/ContextMenu';
 
 function copyEventToClipboard(event: TimelineEventDto) {
@@ -116,6 +120,7 @@ interface EventsTableProps {
   onEditTag?: (eventId: string) => void;
   onDeleteTag?: (eventId: string) => void;
   onCreateTagFromEvent?: (startedAt: string, endedAt: string) => void;
+  onCreateAutoTagRuleFromEvent?: (conditions: ProminentCondition[]) => void;
 }
 
 interface ContextMenuState {
@@ -126,7 +131,7 @@ interface ContextMenuState {
   isBulk: boolean;
 }
 
-export function EventsTable({ timeline, events, className, onAddBulkTag, onEditTag, onDeleteTag, onCreateTagFromEvent }: EventsTableProps) {
+export function EventsTable({ timeline, events, className, onAddBulkTag, onEditTag, onDeleteTag, onCreateTagFromEvent, onCreateAutoTagRuleFromEvent }: EventsTableProps) {
   const [searchTerm] = useAtom(searchTermAtom);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [lastClickedIndex, setLastClickedIndex] = useState<number | null>(null);
@@ -227,7 +232,7 @@ export function EventsTable({ timeline, events, className, onAddBulkTag, onEditT
     const event = sortedItems.find((ev) => ev.id === id);
     if (!event) return;
     const isBulk = selectedKeys.size >= 2 && selectedKeys.has(id) && !!onAddBulkTag;
-    if (!isTagTimeline && !isBulk && !onCreateTagFromEvent) return;
+    if (!isTagTimeline && !isBulk && !onCreateTagFromEvent && !onCreateAutoTagRuleFromEvent) return;
     e.preventDefault();
     setContextMenu({ x: e.clientX, y: e.clientY, eventId: id, event, isBulk });
   };
@@ -356,6 +361,19 @@ export function EventsTable({ timeline, events, className, onAddBulkTag, onEditT
                               contextMenu.event.startedAt,
                               contextMenu.event.endedAt
                             ),
+                        },
+                      ]
+                    : []),
+                  ...(onCreateAutoTagRuleFromEvent
+                    ? [
+                        {
+                          label: 'Create autotag rule',
+                          onClick: () => {
+                            const conditions = fakeTimelineDto
+                              ? getMostProminentConditions(fakeTimelineDto, contextMenu.event)
+                              : [];
+                            onCreateAutoTagRuleFromEvent(conditions);
+                          },
                         },
                       ]
                     : []),

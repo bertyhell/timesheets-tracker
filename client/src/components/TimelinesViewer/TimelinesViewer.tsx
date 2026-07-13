@@ -22,6 +22,7 @@ import { isApproxEqual } from '../../helpers/is-approx-equal';
 import { ROUTE_PARTS } from '../../App';
 import { useNavigate } from 'react-router-dom';
 import { TagName } from '../../types/types';
+import type { ProminentCondition } from '../Timeline/helpers/getMostProminentConditions';
 import {
   QueryObserverResult,
   RefetchOptions,
@@ -544,6 +545,26 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
     [navigate]
   );
 
+  const handleCreateAutoTagRuleFromEvent = useCallback(
+    (conditions: ProminentCondition[]) => {
+      const params = new URLSearchParams();
+      if (conditions.length) {
+        params.set('conditions', JSON.stringify(conditions));
+      }
+      navigate(
+        '/' +
+          ROUTE_PARTS.manage +
+          '/' +
+          ROUTE_PARTS.autoTagRules +
+          '/' +
+          ROUTE_PARTS.create +
+          '?' +
+          params.toString()
+      );
+    },
+    [navigate]
+  );
+
   const renderTimelines = useMemo((): ReactNode | ReactNode[] => {
     if (timelineInfos?.length === 0) {
       return <div className="u-center">No timelines</div>;
@@ -578,6 +599,7 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
           onEditTag={handleEditTag}
           onEditAutoTagRule={handleEditAutoTagRule}
           onCreateTagFromEvent={handleCreateTagFromEvent}
+          onCreateAutoTagRuleFromEvent={handleCreateAutoTagRuleFromEvent}
         ></Timeline>
       );
     });
@@ -605,6 +627,7 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
     handleEditTag,
     handleEditAutoTagRule,
     handleCreateTagFromEvent,
+    handleCreateAutoTagRuleFromEvent,
   ]);
 
   return (

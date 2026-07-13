@@ -26,6 +26,10 @@ import type { TimelineDto, TimelineEventDto } from '../../generated/api/types.ge
 import { getColorForEvent, getColorFromString, getRandomColor } from './helpers/getColorForEvent';
 import { getTicks } from './helpers/getTicks';
 import { getEventLabel } from './helpers/getEventLabel';
+import {
+  getMostProminentConditions,
+  type ProminentCondition,
+} from './helpers/getMostProminentConditions';
 import { TimelineType } from './Timeline.types';
 import { ColorInput } from '../ColorInput/ColorInput';
 
@@ -68,6 +72,7 @@ interface TimelineProps {
   onEditTag?: (tagId: string) => void;
   onEditAutoTagRule?: (autoTagId: string) => void;
   onCreateTagFromEvent?: (startedAt: string, endedAt: string) => void;
+  onCreateAutoTagRuleFromEvent?: (conditions: ProminentCondition[]) => void;
 }
 
 function applySnap(posX: number, snapPoints: number[], trackWidthPx: number): number {
@@ -108,6 +113,7 @@ function Timeline({
   onEditTag,
   onEditAutoTagRule,
   onCreateTagFromEvent,
+  onCreateAutoTagRuleFromEvent,
 }: TimelineProps) {
   const navigate = useNavigate();
   const [searchTerm] = useAtom(searchTermAtom);
@@ -634,6 +640,19 @@ function Timeline({
                     label: 'Create tag',
                     onClick: () =>
                       onCreateTagFromEvent(contextMenu.eventStartedAt!, contextMenu.eventEndedAt!),
+                  },
+                ]
+              : []),
+            ...(onCreateAutoTagRuleFromEvent &&
+            timelineInfo.timelineType !== TimelineType.Tag &&
+            timelineInfo.timelineType !== TimelineType.AutoTag
+              ? [
+                  {
+                    label: 'Create autotag rule',
+                    onClick: () => {
+                      const conditions = getMostProminentConditions(timelineInfo, contextMenu.event);
+                      onCreateAutoTagRuleFromEvent(conditions);
+                    },
                   },
                 ]
               : []),

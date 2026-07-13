@@ -33,7 +33,7 @@ export class WebsitesController {
   })
   async create(@Body() createWebsiteDto: CreateWebsiteDto): Promise<Website | null> {
     logger.info('tracking website: ' + createWebsiteDto.websiteUrl);
-    const existingWebsite = this.websitesService.findOneByStartTime(createWebsiteDto.startedAt);
+    const existingWebsite = await this.websitesService.findOneByStartTime(createWebsiteDto.startedAt);
     if (existingWebsite) {
       // Do not create the same website entry twice
       return null;

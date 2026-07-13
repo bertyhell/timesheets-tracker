@@ -1,6 +1,6 @@
 {
   "name": "Timesheet tracker Beta",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "manifest_version": 3,
   "description": "Tracks which sites you visit and for how long and sends that info to the timesheet tracker application",
   "homepage_url": "https://github.com/bertyhell/timesheet-tracker",

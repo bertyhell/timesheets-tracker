@@ -279,18 +279,27 @@ export class TimelinesService {
             case TimelineType.Website:
               return (async () => {
                 const websites = await this.websitesService.findAll(startedAt, endedAt);
-                return websites.map((website: Website): TimelineEventDto => {
-                  return {
-                    id: website.id,
-                    startedAt: website.startedAt,
-                    endedAt: website.endedAt,
-                    info: {
-                      websiteUrl: website.websiteUrl,
-                      websiteTitle: website.websiteTitle,
-                    },
-                    timelineId: timelineInfo.id,
-                  };
-                });
+                const programs = await this.programsService.findAll(startedAt, endedAt);
+                return websites
+                  .map((website: Website): TimelineEventDto | null => {
+                    const nextProgram = programs.find(
+                      (program) => program.startedAt > website.startedAt
+                    );
+                    if (!nextProgram) {
+                      return null;
+                    }
+                    return {
+                      id: website.id,
+                      startedAt: website.startedAt,
+                      endedAt: nextProgram.startedAt,
+                      info: {
+                        websiteUrl: website.websiteUrl,
+                        websiteTitle: website.websiteTitle,
+                      },
+                      timelineId: timelineInfo.id,
+                    };
+                  })
+                  .filter((e): e is TimelineEventDto => e !== null);
               })();
 
             case TimelineType.Program:

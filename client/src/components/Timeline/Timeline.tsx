@@ -439,12 +439,12 @@ function Timeline({
 
             return (
               <Tooltip
-                key={'c-timeline__' + timelineInfo.title + '__event__tippy__' + event.startedAt}
+                key={'c-timeline__' + timelineInfo.title + '__event__tippy__' + event.id}
                 content={
                   <ul
                     className="c-timeline__event__tooltip"
                     key={
-                      'c-timeline__' + timelineInfo.title + '__event__tippy__ul__' + event.startedAt
+                      'c-timeline__' + timelineInfo.title + '__event__tippy__ul__' + event.id
                     }
                   >
                     <li>
@@ -519,7 +519,7 @@ function Timeline({
                     (isDimmed ? ' c-timeline__event--dimmed' : '')
                   }
                   data-event-id={event.id}
-                  key={'c-timeline__' + timelineInfo.title + '__event__div__' + event.startedAt}
+                  key={'c-timeline__' + timelineInfo.title + '__event__div__' + event.id}
                   style={{
                     left: effectiveLeft + '%',
                     width,

@@ -462,6 +462,7 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
     return (timelineInfos || []).map((timelineInfo) => {
       return (
         <Timeline
+          key={timelineInfo.id}
           timelineInfo={timelineInfo}
           events={
             timelinesWithEvents?.find((timelineWithEvents) => {

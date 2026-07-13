@@ -11,22 +11,22 @@ import { stringToColorIndex } from '../../../helpers/string-to-color-index';
 import { TimelineType } from '../Timeline.types';
 
 export const COLOR_LIST = [
-  '#2f4f4f',
-  '#800000',
-  '#191970',
-  '#006400',
-  '#d2b48c',
-  '#ff0000',
-  '#00ced1',
-  '#ffa500',
-  '#ffff00',
-  '#00ff00',
-  '#0000ff',
-  '#ff00ff',
-  '#1e90ff',
-  '#dda0dd',
-  '#ff1493',
-  '#98fb98',
+  '#4a7c7c',
+  '#8b4a4a',
+  '#4a4a8b',
+  '#3a7a4a',
+  '#b09070',
+  '#a05050',
+  '#4a9fa0',
+  '#b08030',
+  '#a0a030',
+  '#4a9a5a',
+  '#5060b0',
+  '#a050a0',
+  '#5080c0',
+  '#9070a0',
+  '#b05080',
+  '#70a878',
 ];
 
 export const ACTIVE_COLOR = '#4caf50';

@@ -3,6 +3,7 @@ import 'react-pivottable/pivottable.css';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { useSetAtom } from 'jotai';
 import PivotTableUI from 'react-pivottable/PivotTableUI';
 import TableRenderers from 'react-pivottable/TableRenderers';
 import createPlotlyRenderers from 'react-pivottable/PlotlyRenderers';
@@ -12,10 +13,13 @@ import { toast } from 'react-toastify';
 import { Download, Pencil, Save, Copy } from 'lucide-react';
 import Button, { ButtonVariant } from '../../../components/Button/Button';
 import { DateRangeSelect } from '../../../components/DateRangeSelect/DateRangeSelect';
+import { Dropdown } from '../../../components/Dropdown/Dropdown';
 import { ROUTE_PARTS } from '../../../App';
+import { headerActionsAtom } from '../../../store/store';
 import { DateRangeMode, OverviewSourceType } from '../../../types/types';
 import { overviewsApi } from '../../../api/overviews';
 import { PREDEFINED_OVERVIEW_CONFIGS } from '../predefined-configs';
+import { SOURCE_TYPE_OPTIONS } from '../source-type-options';
 import { resolveDateRange } from '../helpers/resolveDateRange';
 import { pivotToCsv, downloadCsv } from '../helpers/pivotToCsv';
 
@@ -26,6 +30,7 @@ const allRenderers = { ...TableRenderers, ...PlotlyRenderers };
 export function OverviewView() {
   const { configId } = useParams();
   const navigate = useNavigate();
+  const setHeaderActions = useSetAtom(headerActionsAtom);
 
   const predefined = useMemo(
     () => PREDEFINED_OVERVIEW_CONFIGS.find((c) => c.id === configId),
@@ -44,6 +49,7 @@ export function OverviewView() {
   const [dateRangeMode, setDateRangeMode] = useState<DateRangeMode>(DateRangeMode.ThisWeek);
   const [customStartedAt, setCustomStartedAt] = useState<string | undefined>();
   const [customEndedAt, setCustomEndedAt] = useState<string | undefined>();
+  const [sourceTypes, setSourceTypes] = useState<OverviewSourceType[]>([]);
   const [pivotState, setPivotState] = useState<Record<string, any>>({
     rows: [],
     cols: [],
@@ -61,10 +67,10 @@ export function OverviewView() {
     setDateRangeMode(resolvedConfig.dateRangeMode);
     setCustomStartedAt(('customStartedAt' in resolvedConfig && resolvedConfig.customStartedAt) || undefined);
     setCustomEndedAt(('customEndedAt' in resolvedConfig && resolvedConfig.customEndedAt) || undefined);
+    setSourceTypes(resolvedConfig.sourceTypes);
     setPivotState(resolvedConfig.pivotState);
   }, [resolvedConfig]);
 
-  const sourceTypes: OverviewSourceType[] = resolvedConfig?.sourceTypes ?? [];
   const { startedAt, endedAt } = resolveDateRange(dateRangeMode, customStartedAt, customEndedAt);
 
   const { data: flatRows } = useQuery({
@@ -79,6 +85,10 @@ export function OverviewView() {
     setCustomEndedAt(newEnd);
   };
 
+  const toggleSourceType = (value: OverviewSourceType) => {
+    setSourceTypes((prev) => (prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]));
+  };
+
   const handleExport = () => {
     if (!flatRows || !resolvedConfig) return;
     const csv = pivotToCsv(flatRows, pivotState);
@@ -88,7 +98,13 @@ export function OverviewView() {
 
   const handleSave = async () => {
     if (!configId || !isCustom) return;
-    await overviewsApi.update(configId, { pivotState, dateRangeMode, customStartedAt, customEndedAt });
+    await overviewsApi.update(configId, {
+      pivotState,
+      dateRangeMode,
+      customStartedAt,
+      customEndedAt,
+      sourceTypes,
+    });
     toast('Overview saved', { type: 'success' });
   };
 
@@ -98,49 +114,81 @@ export function OverviewView() {
     });
   };
 
+  // Publish the view's controls into the shared top bar (owned by OverviewsPage)
+  useEffect(() => {
+    if (!resolvedConfig) {
+      setHeaderActions(null);
+      return;
+    }
+
+    const sourceLabel =
+      sourceTypes.length === 0
+        ? 'Select sources'
+        : SOURCE_TYPE_OPTIONS.filter((option) => sourceTypes.includes(option.value))
+            .map((option) => option.label)
+            .join(', ');
+
+    setHeaderActions(
+      <>
+        <Dropdown label={sourceLabel} className="m-overview-view__source-dropdown">
+          {() => (
+            <div className="m-overview-view__source-options">
+              {SOURCE_TYPE_OPTIONS.map((option) => (
+                <label key={option.value} className="m-overview-view__source-option">
+                  <input
+                    type="checkbox"
+                    checked={sourceTypes.includes(option.value)}
+                    onChange={() => toggleSourceType(option.value)}
+                  />
+                  <span>{option.label}</span>
+                </label>
+              ))}
+            </div>
+          )}
+        </Dropdown>
+
+        <DateRangeSelect
+          mode={dateRangeMode}
+          customStartedAt={customStartedAt}
+          customEndedAt={customEndedAt}
+          onChange={handleDateRangeChange}
+        />
+
+        <div className="m-overview-view__actions">
+          <Button variant={ButtonVariant.Secondary} onClick={handleExport}>
+            <Download size={14} /> Export CSV
+          </Button>
+          {isCustom && (
+            <Button variant={ButtonVariant.Secondary} onClick={handleSave}>
+              <Save size={14} /> Save
+            </Button>
+          )}
+          <Button variant={ButtonVariant.Secondary} onClick={handleSaveAsNew}>
+            <Copy size={14} /> Save as new
+          </Button>
+          {isCustom && (
+            <Button
+              variant={ButtonVariant.Secondary}
+              onClick={() =>
+                navigate('/' + ROUTE_PARTS.overviews + '/' + configId + '/' + ROUTE_PARTS.edit)
+              }
+            >
+              <Pencil size={14} /> Edit details
+            </Button>
+          )}
+        </div>
+      </>
+    );
+
+    return () => setHeaderActions(null);
+  }, [resolvedConfig, sourceTypes, dateRangeMode, customStartedAt, customEndedAt, pivotState, isCustom, configId, flatRows]);
+
   if (!resolvedConfig) {
     return null;
   }
 
-  const label = 'label' in resolvedConfig ? resolvedConfig.label : resolvedConfig.name;
-
   return (
     <div className="m-overview-view">
-      <div className="m-overview-view__header">
-        <h2 className="m-overview-view__title">{label}</h2>
-        <div className="m-overview-view__controls">
-          <DateRangeSelect
-            mode={dateRangeMode}
-            customStartedAt={customStartedAt}
-            customEndedAt={customEndedAt}
-            onChange={handleDateRangeChange}
-          />
-          <div className="m-overview-view__actions">
-            <Button variant={ButtonVariant.Secondary} onClick={handleExport}>
-              <Download size={14} /> Export CSV
-            </Button>
-            {isCustom && (
-              <Button variant={ButtonVariant.Secondary} onClick={handleSave}>
-                <Save size={14} /> Save
-              </Button>
-            )}
-            <Button variant={ButtonVariant.Secondary} onClick={handleSaveAsNew}>
-              <Copy size={14} /> Save as new
-            </Button>
-            {isCustom && (
-              <Button
-                variant={ButtonVariant.Secondary}
-                onClick={() =>
-                  navigate('/' + ROUTE_PARTS.overviews + '/' + configId + '/' + ROUTE_PARTS.edit)
-                }
-              >
-                <Pencil size={14} /> Edit details
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
-
       <div className="m-overview-view__table">
         <PivotTableUI
           data={(flatRows ?? []) as unknown as Array<{ [key: string]: string }>}

@@ -9,13 +9,7 @@ import { DateRangeSelect } from '../DateRangeSelect/DateRangeSelect';
 import { ROUTE_PARTS } from '../../App';
 import { DateRangeMode, OverviewSourceType } from '../../types/types';
 import { overviewsApi } from '../../api/overviews';
-
-const SOURCE_TYPE_OPTIONS: { value: OverviewSourceType; label: string }[] = [
-  { value: OverviewSourceType.Tag, label: 'Tags' },
-  { value: OverviewSourceType.Program, label: 'Programs' },
-  { value: OverviewSourceType.Website, label: 'Websites' },
-  { value: OverviewSourceType.ActiveState, label: 'Active state' },
-];
+import { SOURCE_TYPE_OPTIONS } from '../../views/OverviewsPage/source-type-options';
 
 const BLANK_PIVOT_STATE = {
   rows: [],

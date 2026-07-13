@@ -1,5 +1,5 @@
 import './Timeline.css';
-import React, { type MouseEvent, useEffect, useRef, useState } from 'react';
+import React, { type MouseEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { Modal } from 'react-responsive-modal';
 import Button, { ButtonVariant } from '../Button/Button';
 
@@ -50,9 +50,9 @@ interface TimelineProps {
   events: TimelineEventDto[];
   minTime: Date;
   maxTime: Date;
-  onMouseDown: (posX: number) => void;
-  onMouseMove: (posX: number) => void;
-  onMouseUp: (posX: number, eventId: string | null) => void;
+  onMouseDown: (timelineId: string, posX: number) => void;
+  onMouseMove: (timelineId: string, posX: number) => void;
+  onMouseUp: (timelineId: string, posX: number, eventId: string | null) => void;
   onMouseLeave?: () => void;
   selectionPercentages: { start: number; end: number } | null;
   snapPointPercents: number[];
@@ -62,7 +62,7 @@ interface TimelineProps {
   selectedEvent: TimelineEventDto | null;
   setSelectedEvent: (event: TimelineEventDto, timeline: TimelineDto) => void;
   isActive: boolean;
-  onSelectTimeline: () => void;
+  onSelectTimeline: (timelineId: string) => void;
   onTagResized?: (tagId: string, newStartedAt: string, newEndedAt: string) => void;
   onDeleteTag?: (tagId: string) => void;
   onEditTag?: (tagId: string) => void;
@@ -204,7 +204,7 @@ function Timeline({
     if (posX < 0 || posX > 100) {
       return;
     }
-    onMouseDown(applySnap(posX, snapPointPercents, trackWidth));
+    onMouseDown(timelineInfo.id, applySnap(posX, snapPointPercents, trackWidth));
   };
 
   const handleMouseMove = (evt: MouseEvent) => {
@@ -216,7 +216,7 @@ function Timeline({
       setResizeCurrentPosX(posX);
       return;
     }
-    onMouseMove(applySnap(posX, snapPointPercents, trackWidth));
+    onMouseMove(timelineInfo.id, applySnap(posX, snapPointPercents, trackWidth));
   };
 
   const handleMouseUp = (evt: MouseEvent) => {
@@ -249,10 +249,9 @@ function Timeline({
     if (posX < 0 || posX > 100) {
       return;
     }
-    console.log('mouse up ', posX);
     const eventId: string | null =
       (evt.target as HTMLElement)?.getAttribute('data-event-id') || null;
-    onMouseUp(applySnap(posX, snapPointPercents, trackWidth), eventId);
+    onMouseUp(timelineInfo.id, applySnap(posX, snapPointPercents, trackWidth), eventId);
   };
 
   const handleMouseLeave = () => {
@@ -334,8 +333,8 @@ function Timeline({
       ? getColorForEvent(timelineInfo, events[0])
       : getColorFromString(timelineInfo.title);
 
-  const hourTicks = getTicks(minTime, maxTime, 60);
-  const quarterTicks = getTicks(minTime, maxTime, 15);
+  const hourTicks = useMemo(() => getTicks(minTime, maxTime, 60), [minTime, maxTime]);
+  const quarterTicks = useMemo(() => getTicks(minTime, maxTime, 15), [minTime, maxTime]);
   return (
     <>
       <div
@@ -351,7 +350,7 @@ function Timeline({
       >
         <div
           className="c-timeline__title cursor-pointer"
-          onClick={onSelectTimeline}
+          onClick={() => onSelectTimeline(timelineInfo.id)}
           onContextMenu={handleTitleContextMenu}
           style={{ borderLeft: `3px solid ${timelineDotColor}` }}
         >
@@ -701,4 +700,4 @@ function Timeline({
   );
 }
 
-export default Timeline;
+export default React.memo(Timeline);

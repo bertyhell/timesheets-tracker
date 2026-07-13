@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import React, { FC, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from 'lucide-react';
 import {
   TimelineDto,
@@ -79,25 +79,36 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
   const MIN_SPAN = 0.0007; // ~60 seconds minimum visible window
 
   const [activeSelectionTimeline, setActiveSelectionTimeline] = useState<string | null>(null);
-  const allEvents = timelinesWithEvents?.flatMap((timelineWithEvents) => timelineWithEvents.events);
-  const selectedTimeline: TimelineWithEventsDto | null =
-    timelinesWithEvents?.find(
-      (timelinesWithEvent) => timelinesWithEvent.id === selectedTimelineAndEvent?.selectedTimelineId
-    ) || null;
-  const selectedEvent: TimelineEventDto | null =
-    selectedTimeline?.events?.find(
-      (event) => event.id === selectedTimelineAndEvent?.selectedEventId
-    ) || null;
-  const firstEvent = minBy(allEvents || [], (event: TimelineEventDto) =>
-    new Date(event.startedAt).getTime()
+  const allEvents = useMemo(
+    () => timelinesWithEvents?.flatMap((timelineWithEvents) => timelineWithEvents.events),
+    [timelinesWithEvents]
   );
-  const lastEvent = maxBy(allEvents || [], (event: TimelineEventDto) =>
-    new Date(event.endedAt).getTime()
+  const selectedTimeline: TimelineWithEventsDto | null = useMemo(
+    () =>
+      timelinesWithEvents?.find(
+        (timelinesWithEvent) => timelinesWithEvent.id === selectedTimelineAndEvent?.selectedTimelineId
+      ) || null,
+    [timelinesWithEvents, selectedTimelineAndEvent?.selectedTimelineId]
   );
-  const minTime: Date = firstEvent
-    ? subHours(parseISO(firstEvent.startedAt), 1)
-    : startOfDay(new Date());
-  const maxTime: Date = lastEvent ? addHours(parseISO(lastEvent.endedAt), 1) : endOfDay(viewDate);
+  const selectedEvent: TimelineEventDto | null = useMemo(
+    () =>
+      selectedTimeline?.events?.find(
+        (event) => event.id === selectedTimelineAndEvent?.selectedEventId
+      ) || null,
+    [selectedTimeline, selectedTimelineAndEvent?.selectedEventId]
+  );
+  const { minTime, maxTime } = useMemo(() => {
+    const firstEvent = minBy(allEvents || [], (event: TimelineEventDto) =>
+      new Date(event.startedAt).getTime()
+    );
+    const lastEvent = maxBy(allEvents || [], (event: TimelineEventDto) =>
+      new Date(event.endedAt).getTime()
+    );
+    return {
+      minTime: firstEvent ? subHours(parseISO(firstEvent.startedAt), 1) : startOfDay(new Date()),
+      maxTime: lastEvent ? addHours(parseISO(lastEvent.endedAt), 1) : endOfDay(viewDate),
+    };
+  }, [allEvents, viewDate]);
 
   const [selectionStartPercent, setSelectionStartPercent] = useState<number | null>(null);
   const [selectionMovePercent, setSelectionMovePercent] = useState<number | null>(null);
@@ -105,17 +116,26 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
   const [hoverPercent, setHoverPercent] = useState<number | null>(null);
 
   // Full day is the zoom boundary — viewStart/viewEnd are fractions of the full day
-  const dayStart = startOfDay(viewDate);
-  const dayEnd = endOfDay(viewDate);
-  const dayWindowMs = differenceInMilliseconds(dayEnd, dayStart);
+  const dayStart = useMemo(() => startOfDay(viewDate), [viewDate]);
+  const dayEnd = useMemo(() => endOfDay(viewDate), [viewDate]);
+  const dayWindowMs = useMemo(
+    () => differenceInMilliseconds(dayEnd, dayStart),
+    [dayStart, dayEnd]
+  );
 
   // Zoom/pan state: fractions [0,1] of the full minTime–maxTime window
   const [viewStart, setViewStart] = useState(0);
   const [viewEnd, setViewEnd] = useState(1);
 
   // Visible (zoomed) time window
-  const visibleMinTime = addMilliseconds(dayStart, viewStart * dayWindowMs);
-  const visibleMaxTime = addMilliseconds(dayStart, viewEnd * dayWindowMs);
+  const visibleMinTime = useMemo(
+    () => addMilliseconds(dayStart, viewStart * dayWindowMs),
+    [dayStart, viewStart, dayWindowMs]
+  );
+  const visibleMaxTime = useMemo(
+    () => addMilliseconds(dayStart, viewEnd * dayWindowMs),
+    [dayStart, viewEnd, dayWindowMs]
+  );
   const visibleWindowMs = differenceInMilliseconds(visibleMaxTime, visibleMinTime);
 
   const selectionStartTime = addMilliseconds(
@@ -141,19 +161,22 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
   // Track whether we've already auto-zoomed to the event range for the current date
   const initialZoomSetForDate = useRef<string | null>(null);
 
-  const selection =
-    selectionStartPercent && (selectionEndPercent || selectionMovePercent)
-      ? {
-          start: Math.min(
-            selectionStartPercent,
-            (selectionEndPercent || selectionMovePercent) as number
-          ),
-          end: Math.max(
-            selectionStartPercent,
-            (selectionEndPercent || selectionMovePercent) as number
-          ),
-        }
-      : null;
+  const selection = useMemo(
+    () =>
+      selectionStartPercent && (selectionEndPercent || selectionMovePercent)
+        ? {
+            start: Math.min(
+              selectionStartPercent,
+              (selectionEndPercent || selectionMovePercent) as number
+            ),
+            end: Math.max(
+              selectionStartPercent,
+              (selectionEndPercent || selectionMovePercent) as number
+            ),
+          }
+        : null,
+    [selectionStartPercent, selectionEndPercent, selectionMovePercent]
+  );
 
   const snapPointPercents = useMemo(() => {
     if (!timelinesWithEvents) return [];
@@ -198,44 +221,54 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
     if (newStart < newEnd) setZoom(newStart, newEnd);
   }, [timelinesWithEvents]);
 
-  const handleWheel = (e: WheelEvent) => {
-    if (!timelinesContainerRef.current) {
-      return;
-    }
-    e.preventDefault();
-    const rect = timelinesContainerRef.current.getBoundingClientRect();
-    const gutterEl = timelinesContainerRef.current.querySelector(
-      '.c-timeline-ruler__gutter'
-    ) as HTMLElement | null;
-    const gutterWidth = gutterEl ? gutterEl.offsetWidth : 112;
-    const trackWidth = rect.width - gutterWidth;
-    if (trackWidth <= 0) return;
+  const setZoom = useCallback((start: number, end: number) => {
+    viewStartRef.current = start;
+    viewEndRef.current = end;
+    setViewStart(start);
+    setViewEnd(end);
+  }, []);
 
-    const mouseXInTrack = e.clientX - rect.left - gutterWidth;
-    const fraction = Math.max(0, Math.min(1, mouseXInTrack / trackWidth));
+  const handleWheel = useCallback(
+    (e: WheelEvent) => {
+      if (!timelinesContainerRef.current) {
+        return;
+      }
+      e.preventDefault();
+      const rect = timelinesContainerRef.current.getBoundingClientRect();
+      const gutterEl = timelinesContainerRef.current.querySelector(
+        '.c-timeline-ruler__gutter'
+      ) as HTMLElement | null;
+      const gutterWidth = gutterEl ? gutterEl.offsetWidth : 112;
+      const trackWidth = rect.width - gutterWidth;
+      if (trackWidth <= 0) return;
 
-    const curStart = viewStartRef.current;
-    const curEnd = viewEndRef.current;
-    const focal = curStart + fraction * (curEnd - curStart);
+      const mouseXInTrack = e.clientX - rect.left - gutterWidth;
+      const fraction = Math.max(0, Math.min(1, mouseXInTrack / trackWidth));
 
-    const factor = e.deltaY < 0 ? ZOOM_FACTOR : 1 / ZOOM_FACTOR;
-    const currentSpan = curEnd - curStart;
-    let newSpan = Math.max(MIN_SPAN, Math.min(1, currentSpan * factor));
+      const curStart = viewStartRef.current;
+      const curEnd = viewEndRef.current;
+      const focal = curStart + fraction * (curEnd - curStart);
 
-    let newStart = focal - fraction * newSpan;
-    let newEnd = focal + (1 - fraction) * newSpan;
+      const factor = e.deltaY < 0 ? ZOOM_FACTOR : 1 / ZOOM_FACTOR;
+      const currentSpan = curEnd - curStart;
+      let newSpan = Math.max(MIN_SPAN, Math.min(1, currentSpan * factor));
 
-    if (newStart < 0) {
-      newEnd = Math.min(1, newEnd - newStart);
-      newStart = 0;
-    }
-    if (newEnd > 1) {
-      newStart = Math.max(0, newStart - (newEnd - 1));
-      newEnd = 1;
-    }
+      let newStart = focal - fraction * newSpan;
+      let newEnd = focal + (1 - fraction) * newSpan;
 
-    setZoom(newStart, newEnd);
-  };
+      if (newStart < 0) {
+        newEnd = Math.min(1, newEnd - newStart);
+        newStart = 0;
+      }
+      if (newEnd > 1) {
+        newStart = Math.max(0, newStart - (newEnd - 1));
+        newEnd = 1;
+      }
+
+      setZoom(newStart, newEnd);
+    },
+    [setZoom]
+  );
 
   // Non-passive wheel listener for zoom
   useEffect(() => {
@@ -244,14 +277,7 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
 
     el.addEventListener('wheel', handleWheel, { passive: false });
     return () => el.removeEventListener('wheel', handleWheel);
-  }, []);
-
-  const setZoom = (start: number, end: number) => {
-    viewStartRef.current = start;
-    viewEndRef.current = end;
-    setViewStart(start);
-    setViewEnd(end);
-  };
+  }, [handleWheel]);
 
   // Global mouse handlers for middle-mouse drag
   useEffect(() => {
@@ -284,9 +310,9 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, []);
+  }, [setZoom]);
 
-  const handleTimelinesMiddleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleTimelinesMiddleMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (e.button !== 1) return;
     e.preventDefault();
     const el = timelinesContainerRef.current;
@@ -301,49 +327,51 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
       startViewEnd: viewEndRef.current,
     };
     setIsDragging(true);
-  };
+  }, []);
 
-  const handleMouseDown = (timelineId: string, posX: number) => {
-    console.log('mouse down: ', posX);
+  const handleMouseDown = useCallback((timelineId: string, posX: number) => {
     setSelectionStartPercent(clamp(posX, 0, 100));
     setSelectionMovePercent(null);
     setSelectionEndPercent(null);
     setActiveSelectionTimeline(timelineId);
-  };
+  }, []);
 
-  const handleMouseMove = (timelineId: string, posX: number) => {
-    setHoverPercent(posX);
-    if (!selectionStartPercent) {
-      return;
-    }
-    if (selectionStartPercent && selectionEndPercent) {
-      return;
-    }
-    setSelectionMovePercent(posX);
-  };
+  const handleMouseMove = useCallback(
+    (_timelineId: string, posX: number) => {
+      setHoverPercent(posX);
+      if (!selectionStartPercent) {
+        return;
+      }
+      if (selectionStartPercent && selectionEndPercent) {
+        return;
+      }
+      setSelectionMovePercent(posX);
+    },
+    [selectionStartPercent, selectionEndPercent]
+  );
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = useCallback(() => {
     setHoverPercent(null);
-  };
+  }, []);
 
-  const handleMouseUp = (timelineId: string, posX: number, eventId: string | null) => {
-    console.log('mouse up: ', posX);
-    if (isApproxEqual(posX, selectionStartPercent)) {
-      console.log('approx equal');
-      setSelectionStartPercent(null);
-      setSelectionEndPercent(null);
-      setActiveSelectionTimeline(null);
-      setSelectedTimelineAndEvent({
-        selectedTimelineId: timelineId,
-        selectedEventId: eventId,
-      });
-    } else if (selectionStartPercent !== null) {
-      console.log('set selection percent');
-      setSelectionEndPercent(clamp(posX, 0, 100));
-    }
-  };
+  const handleMouseUp = useCallback(
+    (timelineId: string, posX: number, eventId: string | null) => {
+      if (isApproxEqual(posX, selectionStartPercent)) {
+        setSelectionStartPercent(null);
+        setSelectionEndPercent(null);
+        setActiveSelectionTimeline(null);
+        setSelectedTimelineAndEvent({
+          selectedTimelineId: timelineId,
+          selectedEventId: eventId,
+        });
+      } else if (selectionStartPercent !== null) {
+        setSelectionEndPercent(clamp(posX, 0, 100));
+      }
+    },
+    [selectionStartPercent, setSelectedTimelineAndEvent]
+  );
 
-  const handleZoomIn = () => {
+  const handleZoomIn = useCallback(() => {
     const focal = (viewStartRef.current + viewEndRef.current) / 2;
     const newSpan = Math.max(MIN_SPAN, (viewEndRef.current - viewStartRef.current) * ZOOM_FACTOR);
     let newStart = focal - newSpan / 2;
@@ -357,9 +385,9 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
       newEnd = 1;
     }
     setZoom(newStart, newEnd);
-  };
+  }, [setZoom]);
 
-  const handleZoomOut = () => {
+  const handleZoomOut = useCallback(() => {
     const focal = (viewStartRef.current + viewEndRef.current) / 2;
     const newSpan = Math.min(1, (viewEndRef.current - viewStartRef.current) / ZOOM_FACTOR);
     let newStart = focal - newSpan / 2;
@@ -373,21 +401,21 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
       newEnd = 1;
     }
     setZoom(newStart, newEnd);
-  };
+  }, [setZoom]);
 
-  const handlePanLeft = () => {
+  const handlePanLeft = useCallback(() => {
     const span = viewEndRef.current - viewStartRef.current;
     const newStart = Math.max(0, viewStartRef.current - span * 0.2);
     setZoom(newStart, newStart + span);
-  };
+  }, [setZoom]);
 
-  const handlePanRight = () => {
+  const handlePanRight = useCallback(() => {
     const span = viewEndRef.current - viewStartRef.current;
     const newEnd = Math.min(1, viewEndRef.current + span * 0.2);
     setZoom(newEnd - span, newEnd);
-  };
+  }, [setZoom]);
 
-  const handleCreateTagName = async (data: { title: string; code: string; color: string }): Promise<TagName> => {
+  const handleCreateTagName = useCallback(async (data: { title: string; code: string; color: string }): Promise<TagName> => {
     return (await createTagName({
       body: {
         title: data.title,
@@ -395,67 +423,128 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
         color: data.color,
       },
     })) as unknown as TagName;
-  };
+  }, [createTagName]);
 
-  const handleCreateTag = async (tagNameId: string): Promise<void> => {
-    await createTag({
-      body: {
-        tagNameId,
-        startedAt: selectionStartTime.toISOString(),
-        endedAt: selectionEndTime.toISOString(),
-      },
-    });
-    await Promise.all([refetchTimelinesWithEvents(), refetchTagNamesCount()]);
-    // Close the tooltip by clearing the selection
-    setSelectionStartPercent(null);
-    setSelectionEndPercent(null);
-    setSelectionMovePercent(null);
-    setActiveSelectionTimeline(null);
-  };
-
-  const handleTagResized = async (
-    tagId: string,
-    newStartedAt: string,
-    newEndedAt: string
-  ): Promise<void> => {
-    const queryKey = timelinesControllerFindAllEventsQueryKey({
-      query: {
-        startedAt: startOfDay(viewDate).toISOString(),
-        endedAt: endOfDay(viewDate).toISOString(),
-      },
-    });
-
-    // Cancel any in-flight refetches so they don't overwrite the optimistic update
-    await queryClient.cancelQueries({ queryKey });
-
-    // Snapshot the current data for rollback on error
-    const previousData =
-      queryClient.getQueryData<TimelinesControllerFindAllEventsResponse>(queryKey);
-
-    // Immediately update the cache so the bar stays where the user dropped it
-    queryClient.setQueryData<TimelinesControllerFindAllEventsResponse>(queryKey, (old) => {
-      if (!old) return old;
-      return old.map((timeline) => ({
-        ...timeline,
-        events: timeline.events.map((event) =>
-          event.id === tagId ? { ...event, startedAt: newStartedAt, endedAt: newEndedAt } : event
-        ),
-      }));
-    });
-
-    try {
-      await updateTag({
-        path: { id: tagId },
-        body: { startedAt: newStartedAt, endedAt: newEndedAt },
+  const handleCreateTag = useCallback(
+    async (tagNameId: string): Promise<void> => {
+      await createTag({
+        body: {
+          tagNameId,
+          startedAt: selectionStartTime.toISOString(),
+          endedAt: selectionEndTime.toISOString(),
+        },
       });
-      await refetchTimelinesWithEvents();
-    } catch {
-      // Roll back the optimistic update if the save failed
-      queryClient.setQueryData(queryKey, previousData);
-    }
-  };
+      await Promise.all([refetchTimelinesWithEvents(), refetchTagNamesCount()]);
+      // Close the tooltip by clearing the selection
+      setSelectionStartPercent(null);
+      setSelectionEndPercent(null);
+      setSelectionMovePercent(null);
+      setActiveSelectionTimeline(null);
+    },
+    [createTag, selectionStartTime, selectionEndTime, refetchTimelinesWithEvents, refetchTagNamesCount]
+  );
 
-  const renderTimelines = (): ReactNode | ReactNode[] => {
+  const handleTagResized = useCallback(
+    async (tagId: string, newStartedAt: string, newEndedAt: string): Promise<void> => {
+      const queryKey = timelinesControllerFindAllEventsQueryKey({
+        query: {
+          startedAt: startOfDay(viewDate).toISOString(),
+          endedAt: endOfDay(viewDate).toISOString(),
+        },
+      });
+
+      // Cancel any in-flight refetches so they don't overwrite the optimistic update
+      await queryClient.cancelQueries({ queryKey });
+
+      // Snapshot the current data for rollback on error
+      const previousData =
+        queryClient.getQueryData<TimelinesControllerFindAllEventsResponse>(queryKey);
+
+      // Immediately update the cache so the bar stays where the user dropped it
+      queryClient.setQueryData<TimelinesControllerFindAllEventsResponse>(queryKey, (old) => {
+        if (!old) return old;
+        return old.map((timeline) => ({
+          ...timeline,
+          events: timeline.events.map((event) =>
+            event.id === tagId ? { ...event, startedAt: newStartedAt, endedAt: newEndedAt } : event
+          ),
+        }));
+      });
+
+      try {
+        await updateTag({
+          path: { id: tagId },
+          body: { startedAt: newStartedAt, endedAt: newEndedAt },
+        });
+        await refetchTimelinesWithEvents();
+      } catch {
+        // Roll back the optimistic update if the save failed
+        queryClient.setQueryData(queryKey, previousData);
+      }
+    },
+    [viewDate, queryClient, updateTag, refetchTimelinesWithEvents]
+  );
+
+  const handleSetSelectedEvent = useCallback(
+    (event: TimelineEventDto, timeline: TimelineDto) =>
+      setSelectedTimelineAndEvent({
+        selectedTimelineId: timeline.id,
+        selectedEventId: event.id,
+      }),
+    [setSelectedTimelineAndEvent]
+  );
+
+  const handleSelectTimeline = useCallback(
+    (timelineId: string) =>
+      setSelectedTimelineAndEvent({
+        selectedTimelineId: timelineId,
+        selectedEventId: null,
+      }),
+    [setSelectedTimelineAndEvent]
+  );
+
+  const handleDeleteTagWithToast = useCallback(
+    async (tagId: string) => {
+      await onDeleteTag(tagId);
+      toast('Tag was deleted', { type: 'success' });
+    },
+    [onDeleteTag]
+  );
+
+  const handleEditTag = useCallback(
+    (tagId: string) => {
+      navigate('/' + ROUTE_PARTS.timelinesAndEvents + '/' + tagId + '/' + ROUTE_PARTS.edit);
+    },
+    [navigate]
+  );
+
+  const handleEditAutoTagRule = useCallback(
+    (autoTagId: string) => {
+      navigate(
+        '/' +
+          ROUTE_PARTS.manage +
+          '/' +
+          ROUTE_PARTS.autoTagRules +
+          '/' +
+          autoTagId +
+          '/' +
+          ROUTE_PARTS.edit
+      );
+    },
+    [navigate]
+  );
+
+  const handleCreateTagFromEvent = useCallback(
+    (startedAt: string, endedAt: string) => {
+      const params = new URLSearchParams({ startedAt, endedAt });
+      navigate(
+        '/' + ROUTE_PARTS.timelinesAndEvents + '/' + ROUTE_PARTS.create + '?' + params.toString()
+      );
+    },
+    [navigate]
+  );
+
+  const renderTimelines = useMemo((): ReactNode | ReactNode[] => {
     if (timelineInfos?.length === 0) {
       return <div className="u-center">No timelines</div>;
     }
@@ -471,11 +560,9 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
           }
           minTime={visibleMinTime}
           maxTime={visibleMaxTime}
-          onMouseDown={(posX: number) => handleMouseDown(timelineInfo.id, posX)}
-          onMouseMove={(posX: number) => handleMouseMove(timelineInfo.id, posX)}
-          onMouseUp={(posX: number, eventId: string | null) =>
-            handleMouseUp(timelineInfo.id, posX, eventId)
-          }
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseLeave}
           selectionPercentages={activeSelectionTimeline === timelineInfo.id ? selection : null}
           snapPointPercents={snapPointPercents}
@@ -483,54 +570,42 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
           onCreateTagName={handleCreateTagName}
           onCreateTag={handleCreateTag}
           selectedEvent={selectedEvent}
-          setSelectedEvent={(event, timeline) =>
-            setSelectedTimelineAndEvent({
-              selectedTimelineId: timeline.id,
-              selectedEventId: event.id,
-            })
-          }
+          setSelectedEvent={handleSetSelectedEvent}
           isActive={selectedTimeline?.id === timelineInfo.id}
-          onSelectTimeline={() =>
-            setSelectedTimelineAndEvent({
-              selectedTimelineId: timelineInfo.id,
-              selectedEventId: null,
-            })
-          }
+          onSelectTimeline={handleSelectTimeline}
           onTagResized={handleTagResized}
-          onDeleteTag={async (tagId: string) => {
-            await onDeleteTag(tagId);
-            toast('Tag was deleted', { type: 'success' });
-          }}
-          onEditTag={(tagId: string) => {
-            navigate('/' + ROUTE_PARTS.timelinesAndEvents + '/' + tagId + '/' + ROUTE_PARTS.edit);
-          }}
-          onEditAutoTagRule={(autoTagId: string) => {
-            navigate(
-              '/' +
-                ROUTE_PARTS.manage +
-                '/' +
-                ROUTE_PARTS.autoTagRules +
-                '/' +
-                autoTagId +
-                '/' +
-                ROUTE_PARTS.edit
-            );
-          }}
-          onCreateTagFromEvent={(startedAt: string, endedAt: string) => {
-            const params = new URLSearchParams({ startedAt, endedAt });
-            navigate(
-              '/' +
-                ROUTE_PARTS.timelinesAndEvents +
-                '/' +
-                ROUTE_PARTS.create +
-                '?' +
-                params.toString()
-            );
-          }}
+          onDeleteTag={handleDeleteTagWithToast}
+          onEditTag={handleEditTag}
+          onEditAutoTagRule={handleEditAutoTagRule}
+          onCreateTagFromEvent={handleCreateTagFromEvent}
         ></Timeline>
       );
     });
-  };
+  }, [
+    timelineInfos,
+    timelinesWithEvents,
+    visibleMinTime,
+    visibleMaxTime,
+    handleMouseDown,
+    handleMouseMove,
+    handleMouseUp,
+    handleMouseLeave,
+    activeSelectionTimeline,
+    selection,
+    snapPointPercents,
+    hoverPercent,
+    handleCreateTagName,
+    handleCreateTag,
+    selectedEvent,
+    handleSetSelectedEvent,
+    selectedTimeline?.id,
+    handleSelectTimeline,
+    handleTagResized,
+    handleDeleteTagWithToast,
+    handleEditTag,
+    handleEditAutoTagRule,
+    handleCreateTagFromEvent,
+  ]);
 
   return (
     <div
@@ -579,7 +654,7 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
           </div>
         }
       />
-      {renderTimelines()}
+      {renderTimelines}
     </div>
   );
 };

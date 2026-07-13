@@ -1,6 +1,6 @@
 import './TimelinesAndEventsPage.css';
 import { toast } from 'react-toastify';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { TimelineType } from '../../components/Timeline/Timeline.types';
@@ -32,6 +32,16 @@ import Button, { ButtonVariant } from '../../components/Button/Button';
 import { ROUTE_PARTS } from '../../App';
 import { Menu, Plus } from 'lucide-react';
 import { TimelinesViewer } from '../../components/TimelinesViewer/TimelinesViewer';
+
+const NO_EVENTS_MESSAGE_BY_TYPE: Record<TimelineType, string> = {
+  [TimelineType.Calendar]: 'No calendar events',
+  [TimelineType.Program]: 'No active programs',
+  [TimelineType.ActiveState]: 'No activity logs',
+  [TimelineType.AutoTag]: 'No auto tags',
+  [TimelineType.Tag]: 'No tags',
+  [TimelineType.Website]: 'No website activity',
+  [TimelineType.GitCommit]: 'No git commits',
+};
 
 export function TimelinesAndEventsPage() {
   const [viewDate] = useAtom(viewDateAtom);
@@ -99,15 +109,20 @@ export function TimelinesAndEventsPage() {
     selectedTimelineId: null,
     selectedEventId: null,
   });
-  const selectedTimeline: TimelineWithEventsDto | null =
-    timelinesWithEvents?.find(
-      (timelinesWithEvent) => timelinesWithEvent.id === selectedTimelineAndEvent.selectedTimelineId
-    ) || null;
-  console.log('selected timeline: ', selectedTimeline);
-  const selectedEvent: TimelineEventDto | null =
-    selectedTimeline?.events?.find(
-      (event) => event.id === selectedTimelineAndEvent.selectedEventId
-    ) || null;
+  const selectedTimeline: TimelineWithEventsDto | null = useMemo(
+    () =>
+      timelinesWithEvents?.find(
+        (timelinesWithEvent) => timelinesWithEvent.id === selectedTimelineAndEvent.selectedTimelineId
+      ) || null,
+    [timelinesWithEvents, selectedTimelineAndEvent.selectedTimelineId]
+  );
+  const selectedEvent: TimelineEventDto | null = useMemo(
+    () =>
+      selectedTimeline?.events?.find(
+        (event) => event.id === selectedTimelineAndEvent.selectedEventId
+      ) || null,
+    [selectedTimeline, selectedTimelineAndEvent.selectedEventId]
+  );
 
   useEffect(() => {
     if (!timelineInfos?.length || selectedTimelineAndEvent.selectedTimelineId !== null) {
@@ -152,20 +167,15 @@ export function TimelinesAndEventsPage() {
     });
   };
 
+  const handleDeleteTag = useCallback(
+    (tagId: string) => deleteTag({ path: { id: tagId } }),
+    [deleteTag]
+  );
+
   const totalEventCount = selectedTimeline?.events?.length ?? 0;
 
-  const noEventsMessageByType: Record<TimelineType, string> = {
-    [TimelineType.Calendar]: 'No calendar events',
-    [TimelineType.Program]: 'No active programs',
-    [TimelineType.ActiveState]: 'No activity logs',
-    [TimelineType.AutoTag]: 'No auto tags',
-    [TimelineType.Tag]: 'No tags',
-    [TimelineType.Website]: 'No website activity',
-    [TimelineType.GitCommit]: 'No git commits',
-  };
-
   const noEventsMessage = selectedTimeline?.type
-    ? noEventsMessageByType[selectedTimeline.type]
+    ? NO_EVENTS_MESSAGE_BY_TYPE[selectedTimeline.type]
     : 'No events';
 
   const { defaultLayout: verticalDefaultLayout, onLayoutChanged: onVerticalLayoutChanged } =
@@ -190,7 +200,7 @@ export function TimelinesAndEventsPage() {
             selectedTimelineAndEvent={selectedTimelineAndEvent}
             setSelectedTimelineAndEvent={setSelectedTimelineAndEvent}
             refetchTimelinesWithEvents={refetchTimelinesWithEvents}
-            onDeleteTag={(tagId: string) => deleteTag({ path: { id: tagId } })}
+            onDeleteTag={handleDeleteTag}
           ></TimelinesViewer>
         </Panel>
 

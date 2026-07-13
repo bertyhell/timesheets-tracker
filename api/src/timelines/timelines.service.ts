@@ -251,11 +251,6 @@ export class TimelinesService {
                 });
               })();
 
-            case TimelineType.AutoTag: {
-              // Resolve autotags after fetching all other events
-              return Promise.resolve([]);
-            }
-
             case TimelineType.Tag:
               return (async () => {
                 const tagEvents = await this.tagsService.findAll(startedAt, endedAt);

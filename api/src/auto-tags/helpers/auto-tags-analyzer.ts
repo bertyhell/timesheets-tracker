@@ -141,7 +141,9 @@ export function growAutoTagEvents(
   sortedAutoTagEvents.forEach((event, index) => {
     const originalEventTime = originalEventTimes[index];
 
-    let newStartTime = originalEventTime.startTime - maxGrowTimeMs;
+    // Only grow into small gaps to bridge them with a neighbouring auto-tag event.
+    // Isolated events keep their original (already accurate) bounds.
+    let newStartTime = originalEventTime.startTime;
     const previousEventTime = originalEventTimes[index - 1];
     if (previousEventTime) {
       const gapToPreviousEvent = originalEventTime.startTime - previousEventTime.endTime;
@@ -150,7 +152,7 @@ export function growAutoTagEvents(
       }
     }
 
-    let newEndTime = originalEventTime.endTime + maxGrowTimeMs;
+    let newEndTime = originalEventTime.endTime;
     const nextEventTime = originalEventTimes[index + 1];
     if (nextEventTime) {
       const gapToNextEvent = nextEventTime.startTime - originalEventTime.endTime;
@@ -320,7 +322,7 @@ export function calculateAutoTagEvents(
       autoTagEvents.push({
         id: crypto.randomUUID(),
         startedAt: event.startedAt,
-        endedAt: event.startedAt, // zero width events for now, we'll grow them once we know all the auto tag events
+        endedAt: event.endedAt,
         timelineId: autoTagTimeline.id,
         info: autoTagEventInfo,
       });

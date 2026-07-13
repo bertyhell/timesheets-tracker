@@ -1,21 +1,41 @@
-chrome.tabs.onUpdated.addListener((tabId, _changeInfo, _tab) => {
-  getTabInfo(tabId);
+// onUpdated/onActivated/onHighlighted all fire independently for a single tab switch or
+// navigation, so debounce them into one lookup and skip re-sending the site we already
+// reported, otherwise the API ends up with several near-duplicate, overlapping entries
+// for the same visit.
+const DEBOUNCE_MS = 500;
+
+let debounceTimer = null;
+let lastSentUrl = null;
+
+chrome.tabs.onUpdated.addListener(() => {
+  scheduleGetTabInfo();
 });
 
-chrome.tabs.onActivated.addListener((info) => {
-  getTabInfo(info.tabId);
+chrome.tabs.onActivated.addListener(() => {
+  scheduleGetTabInfo();
 });
 
-chrome.tabs.onHighlighted.addListener((info) => {
-  getTabInfo(info.tabIds[0]);
+chrome.tabs.onHighlighted.addListener(() => {
+  scheduleGetTabInfo();
 });
 
-async function getTabInfo(_tabId) {
+function scheduleGetTabInfo() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(getTabInfo, DEBOUNCE_MS);
+}
+
+async function getTabInfo() {
   try {
     const tabs = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
     if (!tabs?.[0]?.url || !tabs?.[0]?.title) {
       return;
     }
+    if (tabs[0].url === lastSentUrl) {
+      // Already tracking this site, nothing actually changed
+      return;
+    }
+    lastSentUrl = tabs[0].url;
+
     const headers = new Headers({
       'Content-Type': 'application/json',
     });

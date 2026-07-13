@@ -5,6 +5,8 @@ import {
   endOfWeek,
   startOfMonth,
   endOfMonth,
+  startOfYear,
+  endOfYear,
   subDays,
 } from 'date-fns';
 import { DateRangeMode } from '../../../types/types';
@@ -31,6 +33,8 @@ export function resolveDateRange(
       };
     case DateRangeMode.ThisMonth:
       return { startedAt: startOfMonth(now).toISOString(), endedAt: endOfMonth(now).toISOString() };
+    case DateRangeMode.ThisYear:
+      return { startedAt: startOfYear(now).toISOString(), endedAt: endOfYear(now).toISOString() };
     case DateRangeMode.Last7Days:
       return { startedAt: startOfDay(subDays(now, 6)).toISOString(), endedAt: endOfDay(now).toISOString() };
     case DateRangeMode.Last30Days:

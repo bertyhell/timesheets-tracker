@@ -1,5 +1,5 @@
 import React, { FC, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Maximize, ZoomIn, ZoomOut } from 'lucide-react';
 import {
   TimelineDto,
   TimelineEventDto,
@@ -11,11 +11,13 @@ import { clamp, maxBy, minBy } from 'lodash-es';
 import {
   addHours,
   addMilliseconds,
+  addMinutes,
   differenceInMilliseconds,
   endOfDay,
   parseISO,
   startOfDay,
   subHours,
+  subMinutes,
 } from 'date-fns';
 import { TimelineRuler } from '../Timeline/TimelineRuler';
 import { isApproxEqual } from '../../helpers/is-approx-equal';
@@ -98,18 +100,24 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
       ) || null,
     [selectedTimeline, selectedTimelineAndEvent?.selectedEventId]
   );
-  const { minTime, maxTime } = useMemo(() => {
+  const eventBounds = useMemo(() => {
     const firstEvent = minBy(allEvents || [], (event: TimelineEventDto) =>
       new Date(event.startedAt).getTime()
     );
     const lastEvent = maxBy(allEvents || [], (event: TimelineEventDto) =>
       new Date(event.endedAt).getTime()
     );
-    return {
-      minTime: firstEvent ? subHours(parseISO(firstEvent.startedAt), 1) : startOfDay(new Date()),
-      maxTime: lastEvent ? addHours(parseISO(lastEvent.endedAt), 1) : endOfDay(viewDate),
-    };
-  }, [allEvents, viewDate]);
+    if (!firstEvent || !lastEvent) return null;
+    return { start: parseISO(firstEvent.startedAt), end: parseISO(lastEvent.endedAt) };
+  }, [allEvents]);
+
+  const { minTime, maxTime } = useMemo(
+    () => ({
+      minTime: eventBounds ? subHours(eventBounds.start, 1) : startOfDay(new Date()),
+      maxTime: eventBounds ? addHours(eventBounds.end, 1) : endOfDay(viewDate),
+    }),
+    [eventBounds, viewDate]
+  );
 
   const [selectionStartPercent, setSelectionStartPercent] = useState<number | null>(null);
   const [selectionMovePercent, setSelectionMovePercent] = useState<number | null>(null);
@@ -404,6 +412,15 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
     setZoom(newStart, newEnd);
   }, [setZoom]);
 
+  const handleZoomToFitEvents = useCallback(() => {
+    if (!eventBounds) return;
+    const paddedStart = subMinutes(eventBounds.start, 30);
+    const paddedEnd = addMinutes(eventBounds.end, 30);
+    const newStart = Math.max(0, differenceInMilliseconds(paddedStart, dayStart) / dayWindowMs);
+    const newEnd = Math.min(1, differenceInMilliseconds(paddedEnd, dayStart) / dayWindowMs);
+    if (newStart < newEnd) setZoom(newStart, newEnd);
+  }, [eventBounds, dayStart, dayWindowMs, setZoom]);
+
   const handlePanLeft = useCallback(() => {
     const span = viewEndRef.current - viewStartRef.current;
     const newStart = Math.max(0, viewStartRef.current - span * 0.2);
@@ -657,6 +674,15 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
               aria-label="Zoom out"
             >
               <ZoomOut size={12} />
+            </button>
+            <button
+              className="c-timeline-controls__btn"
+              onClick={handleZoomToFitEvents}
+              disabled={!eventBounds}
+              title="Zoom to fit events"
+              aria-label="Zoom to fit events"
+            >
+              <Maximize size={12} />
             </button>
             <button
               className="c-timeline-controls__btn"

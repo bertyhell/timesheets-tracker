@@ -89,6 +89,16 @@ CREATE TABLE IF NOT EXISTS timelines
 );
 
 
+CREATE TABLE IF NOT EXISTS integrations
+(
+    "type"           text NOT NULL PRIMARY KEY,
+    "baseUrl"        text NOT NULL,
+    "organisationId" text NOT NULL,
+    "userId"         text NOT NULL DEFAULT '',
+    "token"          text NOT NULL
+);
+
+
 CREATE TABLE IF NOT EXISTS savedOverviewConfigs
 (
     "id"                text NOT NULL PRIMARY KEY,

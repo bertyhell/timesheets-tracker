@@ -36,6 +36,8 @@ export enum ROUTE_PARTS {
   bulkTag = 'bulk-tag',
   overviews = 'overviews',
   new = 'new',
+  integrations = 'integrations',
+  productive = 'productive',
 }
 
 const OVERVIEW_NAV = [{ to: ROUTE_PARTS.timelinesAndEvents, label: 'Overview', icon: BarChart2 }];

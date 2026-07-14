@@ -6,4 +6,5 @@ export enum TimelineType {
   ActiveState = 'ActiveState',
   Calendar = 'Calendar',
   GitCommit = 'GitCommit',
+  Productive = 'Productive',
 }

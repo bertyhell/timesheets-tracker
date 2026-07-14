@@ -18,6 +18,7 @@ import { CalendarsModule } from './calendars/calendars.module';
 import { TimelinesModule } from './timelines/timelines.module';
 import { SettingsModule } from './settings/settings.module';
 import { OverviewsModule } from './overviews/overviews.module';
+import { IntegrationsModule } from './integrations/integrations.module';
 
 let clientDistFolder: string;
 if (fs.existsSync(resolve('./client/index.html'))) {
@@ -47,6 +48,7 @@ logger.info('client folder: ' + clientDistFolder);
     TimelinesModule,
     SettingsModule,
     OverviewsModule,
+    IntegrationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

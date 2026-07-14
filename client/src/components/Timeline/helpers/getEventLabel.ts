@@ -17,6 +17,8 @@ export function getEventLabel(timelineInfo: TimelineDto, event: TimelineEventDto
       return info['isActive'] ? 'Active' : 'Inactive';
     case TimelineType.GitCommit:
       return String(info['repoName'] ?? timelineInfo.title ?? '');
+    case TimelineType.Productive:
+      return String(info['tagNameName'] ?? '');
     default:
       return timelineInfo.title ?? '';
   }

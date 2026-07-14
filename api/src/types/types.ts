@@ -128,6 +128,7 @@ export enum TimelineType {
   Calendar = 'Calendar',
   ActiveState = 'ActiveState',
   GitCommit = 'GitCommit',
+  Productive = 'Productive',
 }
 
 // Database-backed timeline types that can be aggregated in Overviews.

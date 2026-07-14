@@ -1,10 +1,11 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { Database } from 'lucide-react';
+import { Database, Plug } from 'lucide-react';
 import './SettingsPage.css';
 
 const NAV_ITEMS = [
   { to: '/settings/general', label: 'Database', icon: Database },
+  { to: '/settings/integrations', label: 'Integrations', icon: Plug },
 ];
 
 export function SettingsPage() {

@@ -13,12 +13,13 @@ import {
   timelinesControllerUpdateMutation,
 } from '../../generated/api/@tanstack/react-query.gen';
 import type { TimelineDto, TimelineType } from '../../generated/api/types.gen';
+import { integrationsApi } from '../../api/integrations';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { ColorInput } from '../ColorInput/ColorInput';
 import { getRandomColor } from '../Timeline/helpers/getColorForEvent';
 
-const TIMELINE_TYPES: TimelineType[] = [
+const BASE_TIMELINE_TYPES: TimelineType[] = [
   'ActiveState',
   'AutoTag',
   'Calendar',
@@ -41,6 +42,15 @@ export function EditTimelineModal() {
 
   // Check if running inside Electron (preload exposes window.electron)
   const isElectron = typeof window.electron?.selectDirectory === 'function';
+
+  const { data: productiveIntegration } = useQuery({
+    queryKey: ['integrations', 'productive'],
+    queryFn: () => integrationsApi.findOne('productive'),
+  });
+
+  const timelineTypes: TimelineType[] = productiveIntegration
+    ? [...BASE_TIMELINE_TYPES, 'Productive']
+    : BASE_TIMELINE_TYPES;
 
   const { mutateAsync: createTimeline } = useMutation({ ...timelinesControllerCreateMutation() });
   const { mutateAsync: updateTimeline } = useMutation({ ...timelinesControllerUpdateMutation() });
@@ -145,7 +155,7 @@ export function EditTimelineModal() {
             if (newType !== 'GitCommit') setFolderPath('');
           }}
         >
-          {TIMELINE_TYPES.map((type) => (
+          {timelineTypes.map((type) => (
             <option key={type} value={type}>
               {type}
             </option>

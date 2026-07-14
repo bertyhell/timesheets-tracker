@@ -41,6 +41,7 @@ const NO_EVENTS_MESSAGE_BY_TYPE: Record<TimelineType, string> = {
   [TimelineType.Tag]: 'No tags',
   [TimelineType.Website]: 'No website activity',
   [TimelineType.GitCommit]: 'No git commits',
+  [TimelineType.Productive]: 'No planned time',
 };
 
 export function TimelinesAndEventsPage() {

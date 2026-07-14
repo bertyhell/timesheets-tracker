@@ -512,6 +512,13 @@ export type GitCommitEventInfoDto = {
     commitMessage: string;
 };
 
+export type ProductiveEventInfoDto = {
+    /**
+     * Name of the Productive project / deal
+     */
+    tagNameName: string;
+};
+
 export type CalendarEventProviderInfoDto = {
     /**
      * A url pointing to the ICS file of the calendar used for fetching events from the calendar
@@ -534,7 +541,7 @@ export type CreateTimelineDto = {
     /**
      * Type of the timeline
      */
-    timelineType: 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit';
+    timelineType: 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit' | 'Productive';
     /**
      * The information that is needed for this timeline to fetch events. eg: calendar needs a url to ics file, github needs a link to the git folder, ...
      */
@@ -563,7 +570,7 @@ export type TimelineDto = {
     /**
      * Type of the timeline
      */
-    timelineType: 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit';
+    timelineType: 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit' | 'Productive';
     /**
      * Specific info for getting events for this timeline type. eg: calendar needs a url to ics file, github needs a link to the git folder, ...
      */
@@ -589,7 +596,7 @@ export type TimelineDto = {
 /**
  * Type of the timeline
  */
-export type TimelineType = 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit';
+export type TimelineType = 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit' | 'Productive' | 'Productive';
 
 export type TimelineEventDto = {
     /**
@@ -599,7 +606,7 @@ export type TimelineEventDto = {
     /**
      * Type-specific info for this event. Varies based on the timeline type.
      */
-    info: ActiveStateEventInfoDto | ProgramEventInfoDto | CalendarEventInfoDto | WebsiteEventInfoDto | TagEventInfoDto | AutoTagEventInfoDto | GitCommitEventInfoDto;
+    info: ActiveStateEventInfoDto | ProgramEventInfoDto | CalendarEventInfoDto | WebsiteEventInfoDto | TagEventInfoDto | AutoTagEventInfoDto | GitCommitEventInfoDto | ProductiveEventInfoDto;
     /**
      * Color of the event
      */
@@ -648,7 +655,7 @@ export type UpdateTimelineDto = {
     /**
      * Type of the timeline
      */
-    timelineType?: 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit';
+    timelineType?: 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit' | 'Productive';
     /**
      * The information that is needed for this timeline to fetch events. eg: calendar needs a url to ics file, github needs a link to the git folder, ...
      */

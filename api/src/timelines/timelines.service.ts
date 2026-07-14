@@ -35,6 +35,7 @@ import { ActiveStatesService } from '../activeStates/active-states.service';
 import { AutoTagDto } from '../auto-tags/dto/response-auto-tag.dto';
 import { TagNamesService } from '../tag-names/tag-names.service';
 import { GitCommitsService, GitCommitEvent } from '../git-commits/git-commits.service';
+import { ProductiveService } from '../productive/productive.service';
 import { CustomError } from '../shared/CustomError';
 
 @Injectable()
@@ -49,7 +50,8 @@ export class TimelinesService {
     @Inject(ProgramsService) private programsService: ProgramsService,
     @Inject(TagsService) private tagsService: TagsService,
     @Inject(TagNamesService) private tagNamesService: TagNamesService,
-    @Inject(WebsitesService) private websitesService: WebsitesService
+    @Inject(WebsitesService) private websitesService: WebsitesService,
+    @Inject(ProductiveService) private productiveService: ProductiveService
   ) {}
 
   adapt(rawTimeline: Record<string, any>): Timeline {
@@ -392,6 +394,22 @@ export class TimelinesService {
                     })
                   );
                   return []; // TODO pass errors to client to show as toast messages
+                }
+              })();
+
+            case TimelineType.Productive:
+              return (async () => {
+                try {
+                  const date = startedAt.substring(0, 10);
+                  return await this.productiveService.getEventsForDay(date, timelineInfo.id);
+                } catch (err) {
+                  console.error(
+                    new CustomError('Failed to fetch events from Productive', err, {
+                      startedAt,
+                      endedAt,
+                    })
+                  );
+                  return [];
                 }
               })();
           }

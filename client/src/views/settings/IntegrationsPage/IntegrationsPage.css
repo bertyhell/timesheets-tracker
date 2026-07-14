@@ -1,0 +1,16 @@
+.m-integrations-dropdown__item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem 0.625rem;
+  border-radius: 8px;
+  color: var(--gray-700);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: left;
+
+  &:hover {
+    background-color: var(--bg-alternative);
+    color: var(--primary-0);
+  }
+}

@@ -227,6 +227,18 @@ export class AutoTagEventInfoDto {
   priority: number;
 }
 
+export class ProductiveEventInfoDto {
+  @IsString()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Name of the Productive project / deal',
+    example: 'My Project',
+    required: true,
+  })
+  tagNameName: string;
+}
+
 export class GitCommitEventInfoDto {
   @IsString()
   @Type(() => String)
@@ -271,6 +283,7 @@ export class TimelineEventDto {
       { $ref: getSchemaPath(TagEventInfoDto) },
       { $ref: getSchemaPath(AutoTagEventInfoDto) },
       { $ref: getSchemaPath(GitCommitEventInfoDto) },
+      { $ref: getSchemaPath(ProductiveEventInfoDto) },
     ],
   })
   info:
@@ -280,7 +293,8 @@ export class TimelineEventDto {
     | WebsiteEventInfoDto
     | TagEventInfoDto
     | AutoTagEventInfoDto
-    | GitCommitEventInfoDto;
+    | GitCommitEventInfoDto
+    | ProductiveEventInfoDto;
 
   @IsString()
   @Type(() => String)

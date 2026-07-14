@@ -84,6 +84,10 @@ export function getColorForEvent(timelineInfo: TimelineDto, event: TimelineEvent
     case TimelineType.GitCommit: {
       return getColorFromString((event.info as { repoName?: string })?.repoName);
     }
+
+    case TimelineType.Productive: {
+      return getColorFromString((event.info as { tagNameName?: string })?.tagNameName);
+    }
   }
   return getColorFromString(timelineInfo.title);
 }

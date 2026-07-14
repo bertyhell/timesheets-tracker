@@ -23,7 +23,7 @@ import { formatDuration } from '../../helpers/format-duration';
 import type { TagName } from '../../types/types';
 import TagSelectSingle from '../TagSelect/TagSelectSingle';
 import type { TimelineDto, TimelineEventDto } from '../../generated/api/types.gen';
-import { getColorForEvent, getColorFromString, getRandomColor } from './helpers/getColorForEvent';
+import { getColorForEvent, getColorFromString, getDarkerTextColor, getRandomColor } from './helpers/getColorForEvent';
 import { getTicks } from './helpers/getTicks';
 import { getEventLabel } from './helpers/getEventLabel';
 import {
@@ -538,7 +538,7 @@ function Timeline({
                 >
                   {!isNarrow && (
                     <div className="c-timeline__event-content">
-                      <span className="c-timeline__event-label" style={{ color }}>
+                      <span className="c-timeline__event-label" style={{ color: getDarkerTextColor(color) }}>
                         {label}
                       </span>
                       <span className="c-timeline__event-time">{timeRange}</span>

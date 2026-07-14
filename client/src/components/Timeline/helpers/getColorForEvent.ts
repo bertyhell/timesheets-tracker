@@ -32,6 +32,21 @@ export const COLOR_LIST = [
 export const ACTIVE_COLOR = '#4caf50';
 export const INACTIVE_COLOR = '#f44336';
 
+export function getDarkerTextColor(hexColor: string): string {
+  const hex = hexColor.replace('#', '');
+  if (hex.length !== 6) return hexColor;
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  if (luminance <= 0.55) return hexColor;
+  const factor = 0.4;
+  const dr = Math.round(r * factor);
+  const dg = Math.round(g * factor);
+  const db = Math.round(b * factor);
+  return `#${dr.toString(16).padStart(2, '0')}${dg.toString(16).padStart(2, '0')}${db.toString(16).padStart(2, '0')}`;
+}
+
 export const getRandomColor = (): string =>
   COLOR_LIST[Math.floor(Math.random() * COLOR_LIST.length)];
 

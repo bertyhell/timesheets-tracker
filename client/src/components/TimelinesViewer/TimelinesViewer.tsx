@@ -20,6 +20,7 @@ import {
   subMinutes,
 } from 'date-fns';
 import { TimelineRuler } from '../Timeline/TimelineRuler';
+import { getTicks } from '../Timeline/helpers/getTicks';
 import { isApproxEqual } from '../../helpers/is-approx-equal';
 import { ROUTE_PARTS } from '../../App';
 import { useNavigate } from 'react-router-dom';
@@ -200,8 +201,12 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
         if (endPct >= 0 && endPct <= 100) points.add(endPct);
       });
     });
+    getTicks(visibleMinTime, visibleMaxTime, 15).forEach((tick) => {
+      const pct = (differenceInMilliseconds(tick, visibleMinTime) / visibleWindowMs) * 100;
+      if (pct >= 0 && pct <= 100) points.add(pct);
+    });
     return Array.from(points);
-  }, [timelinesWithEvents, visibleMinTime, visibleWindowMs]);
+  }, [timelinesWithEvents, visibleMinTime, visibleMaxTime, visibleWindowMs]);
 
   const { mutateAsync: updateTag } = useMutation({ ...tagsControllerUpdateMutation() });
 
@@ -346,8 +351,8 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
   }, []);
 
   const handleMouseMove = useCallback(
-    (_timelineId: string, posX: number) => {
-      setHoverPercent(posX);
+    (_timelineId: string, posX: number, hoverPosX: number | null) => {
+      setHoverPercent(hoverPosX);
       if (!selectionStartPercent) {
         return;
       }

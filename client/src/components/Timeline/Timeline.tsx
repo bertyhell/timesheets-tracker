@@ -55,7 +55,7 @@ interface TimelineProps {
   minTime: Date;
   maxTime: Date;
   onMouseDown: (timelineId: string, posX: number) => void;
-  onMouseMove: (timelineId: string, posX: number) => void;
+  onMouseMove: (timelineId: string, posX: number, hoverPosX: number | null) => void;
   onMouseUp: (timelineId: string, posX: number, eventId: string | null) => void;
   onMouseLeave?: () => void;
   selectionPercentages: { start: number; end: number } | null;
@@ -75,9 +75,9 @@ interface TimelineProps {
   onCreateAutoTagRuleFromEvent?: (conditions: ProminentCondition[]) => void;
 }
 
-function applySnap(posX: number, snapPoints: number[], trackWidthPx: number): number {
-  if (trackWidthPx === 0 || snapPoints.length === 0) return posX;
-  const thresholdPercent = (20 / trackWidthPx) * 100;
+function findSnap(posX: number, snapPoints: number[], trackWidthPx: number): number | null {
+  if (trackWidthPx === 0 || snapPoints.length === 0) return null;
+  const thresholdPercent = (10 / trackWidthPx) * 100;
   let closestDist = Infinity;
   let closestSnap = posX;
   for (const snap of snapPoints) {
@@ -87,7 +87,11 @@ function applySnap(posX: number, snapPoints: number[], trackWidthPx: number): nu
       closestSnap = snap;
     }
   }
-  return closestDist <= thresholdPercent ? closestSnap : posX;
+  return closestDist <= thresholdPercent ? closestSnap : null;
+}
+
+function applySnap(posX: number, snapPoints: number[], trackWidthPx: number): number {
+  return findSnap(posX, snapPoints, trackWidthPx) ?? posX;
 }
 
 function Timeline({
@@ -219,16 +223,21 @@ function Timeline({
       return;
     }
     if (resizeState) {
-      setResizeCurrentPosX(posX);
+      setResizeCurrentPosX(applySnap(posX, snapPointPercents, trackWidth));
       return;
     }
-    onMouseMove(timelineInfo.id, applySnap(posX, snapPointPercents, trackWidth));
+    const snapped = findSnap(posX, snapPointPercents, trackWidth);
+    onMouseMove(timelineInfo.id, snapped ?? posX, snapped);
   };
 
   const handleMouseUp = (evt: MouseEvent) => {
     if (resizeState && onTagResized) {
       const rawPosX = getMousePositionXPercent(evt);
-      const posX = rawPosX >= 0 && rawPosX <= 100 ? rawPosX : (resizeCurrentPosX ?? 0);
+      const posX = applySnap(
+        rawPosX >= 0 && rawPosX <= 100 ? rawPosX : (resizeCurrentPosX ?? 0),
+        snapPointPercents,
+        trackWidth
+      );
       const originalEndMs = differenceInMilliseconds(
         parseISO(resizeState.originalEndedAt),
         minTime

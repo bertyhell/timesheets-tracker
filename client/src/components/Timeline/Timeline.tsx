@@ -448,6 +448,7 @@ function Timeline({
             const color = getColorForEvent(timelineInfo, event);
             const isTagTimeline = timelineInfo.timelineType === TimelineType.Tag && !!onTagResized;
             const isAutoTagTimeline = timelineInfo.timelineType === TimelineType.AutoTag;
+            const isProductiveTimeline = timelineInfo.timelineType === TimelineType.Productive;
             const isDimmed =
               !!lowerSearch && !JSON.stringify(event).toLowerCase().includes(lowerSearch);
 
@@ -491,6 +492,22 @@ function Timeline({
                         <li>
                           <b>Priority:</b> {String(eventInfo['priority'] ?? '')}
                         </li>
+                      </>
+                    ) : isProductiveTimeline ? (
+                      <>
+                        <li>
+                          <b>Note:</b> {String(eventInfo['tagNameName'] ?? '')}
+                        </li>
+                        {eventInfo['serviceName'] && (
+                          <li>
+                            <b>Service:</b> {String(eventInfo['serviceName'])}
+                          </li>
+                        )}
+                        {eventInfo['serviceProject'] && (
+                          <li>
+                            <b>Project:</b> {String(eventInfo['serviceProject'])}
+                          </li>
+                        )}
                       </>
                     ) : (
                       Object.keys(eventInfo)

@@ -400,7 +400,12 @@ export class TimelinesService {
             case TimelineType.Productive:
               return (async () => {
                 try {
-                  const date = startedAt.substring(0, 10);
+                  const d = new Date(startedAt);
+                  const date = [
+                    d.getFullYear(),
+                    String(d.getMonth() + 1).padStart(2, '0'),
+                    String(d.getDate()).padStart(2, '0'),
+                  ].join('-');
                   return await this.productiveService.getEventsForDay(date, timelineInfo.id);
                 } catch (err) {
                   console.error(

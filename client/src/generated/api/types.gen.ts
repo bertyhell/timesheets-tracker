@@ -517,6 +517,14 @@ export type ProductiveEventInfoDto = {
      * Name of the Productive project / deal
      */
     tagNameName: string;
+    /**
+     * Name of the Productive service associated with the booking
+     */
+    serviceName?: string;
+    /**
+     * First custom field value of the service (typically the project/deal label)
+     */
+    serviceProject?: string;
 };
 
 export type CalendarEventProviderInfoDto = {

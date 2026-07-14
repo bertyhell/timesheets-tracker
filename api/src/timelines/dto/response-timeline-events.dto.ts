@@ -237,6 +237,30 @@ export class ProductiveEventInfoDto {
     required: true,
   })
   tagNameName: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Name of the Productive service associated with the booking',
+    example: 'Support (in officehours)',
+    required: false,
+    nullable: true,
+  })
+  serviceName?: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'First custom field value of the service (typically the project/deal label)',
+    example: 'SHD-CPS (Meemoo) ARC Support 2026',
+    required: false,
+    nullable: true,
+  })
+  serviceProject?: string;
 }
 
 export class GitCommitEventInfoDto {

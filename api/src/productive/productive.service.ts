@@ -2,23 +2,27 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { IntegrationsService } from '../integrations/integrations.service';
 import { TimelineEventDto } from '../timelines/dto/response-timeline-events.dto';
 
+interface ProductiveServiceRecord {
+  id: string;
+  attributes: {
+    name: string;
+    custom_fields: Record<string, unknown> | null;
+  };
+}
+
 interface ProductiveBooking {
   id: string;
   attributes: {
     hours: number | null;
     percentage: number | null;
     total_time: number | null;
+    note: string | null;
   };
   relationships: {
-    service?: { data: { id: string; type: string } | null };
+    service?: {
+      data?: { id: string } | null;
+    };
   };
-}
-
-interface ProductiveIncluded {
-  id: string;
-  type: string;
-  attributes: Record<string, unknown>;
-  relationships?: Record<string, { data: { id: string; type: string } | null }>;
 }
 
 @Injectable()
@@ -32,58 +36,70 @@ export class ProductiveService {
     }
 
     const { baseUrl, organisationId, token, userId } = integration;
+
+    if (!userId) {
+      throw new Error('Productive user ID is not configured — fill in the User ID field in Settings → Integrations → Productive');
+    }
+
     const headers = {
-      Authorization: `Bearer ${token}`,
+      'X-Auth-Token': token,
       'X-Organization-Id': organisationId,
       'Content-Type': 'application/vnd.api+json',
     };
 
-    const bookingsUrl = new URL(`${baseUrl}/api/v2/bookings`);
-    bookingsUrl.searchParams.set('filter[person_id][eq]', userId);
-    bookingsUrl.searchParams.set('filter[started_on][lt_eq]', date);
-    bookingsUrl.searchParams.set('filter[ended_on][gt_eq]', date);
-    bookingsUrl.searchParams.set('include', 'service.deal');
+    const query = [
+      `filter[person_id][eq]=${encodeURIComponent(userId)}`,
+      `filter[started_on][lt_eq]=${encodeURIComponent(date)}`,
+      `filter[ended_on][gt_eq]=${encodeURIComponent(date)}`,
+      'include=service',
+    ].join('&');
+    const bookingsUrl = `${baseUrl}/bookings?${query}`;
 
-    const bookingsRes = await fetch(bookingsUrl.toString(), { headers });
+    console.log('[Productive] fetching:', bookingsUrl);
+    const bookingsRes = await fetch(bookingsUrl, { headers });
     if (!bookingsRes.ok) {
-      throw new Error(`Productive bookings request failed: ${bookingsRes.status}`);
+      const body = await bookingsRes.text().catch(() => '');
+      throw new Error(`Productive bookings request failed: ${bookingsRes.status} — ${body}`);
     }
 
     const bookingsJson = await bookingsRes.json() as Record<string, unknown>;
     const bookings: ProductiveBooking[] = (bookingsJson.data as ProductiveBooking[]) ?? [];
-    const included: ProductiveIncluded[] = (bookingsJson.included as ProductiveIncluded[]) ?? [];
+    const included: ProductiveServiceRecord[] = (bookingsJson.included as ProductiveServiceRecord[]) ?? [];
 
-    return this.mapBookingsToEvents(bookings, included, date, timelineId);
+    const serviceMap = new Map<string, ProductiveServiceRecord>(included.map(s => [s.id, s]));
+
+    return this.mapBookingsToEvents(bookings, serviceMap, date, timelineId);
   }
 
   private mapBookingsToEvents(
     bookings: ProductiveBooking[],
-    included: ProductiveIncluded[],
+    serviceMap: Map<string, ProductiveServiceRecord>,
     date: string,
     timelineId: string
   ): TimelineEventDto[] {
-    const workdayStartHour = 9;
-    let cursorMinutes = workdayStartHour * 60;
+    let cursorMinutes = 9 * 60;
 
     return bookings
       .map((booking): TimelineEventDto | null => {
         const hours = this.resolveHours(booking);
         if (!hours || hours <= 0) return null;
 
-        const projectName = this.resolveProjectName(booking, included);
+        const label = booking.attributes.note?.trim() || 'Unnamed booking';
         const startMinutes = cursorMinutes;
         cursorMinutes += hours * 60;
 
-        const startedAt = this.minutesToIso(date, startMinutes);
-        const endedAt = this.minutesToIso(date, cursorMinutes);
+        const serviceId = booking.relationships?.service?.data?.id;
+        const service = serviceId ? serviceMap.get(serviceId) : undefined;
+        const serviceName = service?.attributes.name;
+        const serviceProject = service?.attributes.custom_fields
+          ? (Object.values(service.attributes.custom_fields)[0] as string | undefined)
+          : undefined;
 
         return {
           id: `productive-${booking.id}`,
-          startedAt,
-          endedAt,
-          info: {
-            tagNameName: projectName,
-          },
+          startedAt: this.minutesToIso(date, startMinutes),
+          endedAt: this.minutesToIso(date, cursorMinutes),
+          info: { tagNameName: label, serviceName, serviceProject },
           timelineId,
         };
       })
@@ -98,26 +114,10 @@ export class ProductiveService {
     return 0;
   }
 
-  private resolveProjectName(booking: ProductiveBooking, included: ProductiveIncluded[]): string {
-    const serviceId = booking.relationships?.service?.data?.id;
-    if (!serviceId) return 'Unknown project';
-
-    const service = included.find((i) => i.type === 'services' && i.id === serviceId);
-    if (!service) return 'Unknown project';
-
-    const dealId = (service.relationships?.deal?.data as { id?: string } | null)?.id;
-    if (dealId) {
-      const deal = included.find((i) => i.type === 'deals' && i.id === dealId);
-      if (deal?.attributes?.name) return String(deal.attributes.name);
-    }
-
-    return String(service.attributes?.name ?? 'Unknown project');
-  }
-
   private minutesToIso(date: string, totalMinutes: number): string {
-    const hours = Math.floor(totalMinutes / 60);
-    const mins = Math.round(totalMinutes % 60);
-    const pad = (n: number) => String(n).padStart(2, '0');
-    return `${date}T${pad(hours)}:${pad(mins)}:00.000Z`;
+    const [year, month, day] = date.split('-').map(Number);
+    const d = new Date(year, month - 1, day);
+    d.setHours(Math.floor(totalMinutes / 60), Math.round(totalMinutes % 60), 0, 0);
+    return d.toISOString();
   }
 }

@@ -120,6 +120,12 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
     [eventBounds, viewDate]
   );
 
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 30_000);
+    return () => clearInterval(id);
+  }, []);
+
   const [selectionStartPercent, setSelectionStartPercent] = useState<number | null>(null);
   const [selectionMovePercent, setSelectionMovePercent] = useState<number | null>(null);
   const [selectionEndPercent, setSelectionEndPercent] = useState<number | null>(null);
@@ -205,8 +211,10 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
       const pct = (differenceInMilliseconds(tick, visibleMinTime) / visibleWindowMs) * 100;
       if (pct >= 0 && pct <= 100) points.add(pct);
     });
+    const nowPct = (differenceInMilliseconds(now, visibleMinTime) / visibleWindowMs) * 100;
+    if (nowPct >= 0 && nowPct <= 100) points.add(nowPct);
     return Array.from(points);
-  }, [timelinesWithEvents, visibleMinTime, visibleMaxTime, visibleWindowMs]);
+  }, [timelinesWithEvents, visibleMinTime, visibleMaxTime, visibleWindowMs, now]);
 
   const { mutateAsync: updateTag } = useMutation({ ...tagsControllerUpdateMutation() });
 

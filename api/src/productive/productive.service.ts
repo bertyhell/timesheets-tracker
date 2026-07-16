@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { IntegrationsService } from '../integrations/integrations.service';
+import { DatabaseService } from '../database/database.service';
 import { TimelineEventDto } from '../timelines/dto/response-timeline-events.dto';
 
 interface ProductiveServiceRecord {
@@ -27,9 +28,29 @@ interface ProductiveBooking {
 
 @Injectable()
 export class ProductiveService {
-  constructor(private readonly integrationsService: IntegrationsService) {}
+  constructor(
+    private readonly integrationsService: IntegrationsService,
+    private readonly databaseService: DatabaseService,
+  ) {}
 
-  async getEventsForDay(date: string, timelineId: string): Promise<TimelineEventDto[]> {
+  async getEventsForDay(date: string, timelineId: string, clearCache = false): Promise<TimelineEventDto[]> {
+    const db = this.databaseService.getDb();
+    const cacheKey = date; // yyyy-MM-dd
+
+    if (!clearCache) {
+      const cached = db.prepare(
+        'SELECT responseJson FROM cachedNetworkRequests WHERE cacheKey = ?'
+      ).get(cacheKey) as { responseJson: string } | undefined;
+
+      if (cached) {
+        const bookingsJson = JSON.parse(cached.responseJson) as Record<string, unknown>;
+        const bookings: ProductiveBooking[] = (bookingsJson.data as ProductiveBooking[]) ?? [];
+        const included: ProductiveServiceRecord[] = (bookingsJson.included as ProductiveServiceRecord[]) ?? [];
+        const serviceMap = new Map<string, ProductiveServiceRecord>(included.map(s => [s.id, s]));
+        return this.mapBookingsToEvents(bookings, serviceMap, date, timelineId);
+      }
+    }
+
     const integration = this.integrationsService.findOne('productive');
     if (!integration) {
       throw new NotFoundException('Productive integration not configured');
@@ -63,6 +84,11 @@ export class ProductiveService {
     }
 
     const bookingsJson = await bookingsRes.json() as Record<string, unknown>;
+
+    db.prepare(
+      'INSERT OR REPLACE INTO cachedNetworkRequests (cacheKey, responseJson) VALUES (?, ?)'
+    ).run(cacheKey, JSON.stringify(bookingsJson));
+
     const bookings: ProductiveBooking[] = (bookingsJson.data as ProductiveBooking[]) ?? [];
     const included: ProductiveServiceRecord[] = (bookingsJson.included as ProductiveServiceRecord[]) ?? [];
 

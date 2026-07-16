@@ -70,13 +70,15 @@ export class TimelinesController {
   @ApiQuery({ name: 'endedAt', required: true, type: 'string' })
   @ApiQuery({ name: 'term', required: false, type: 'string' })
   @ApiQuery({ name: 'timelineIds', required: false, type: 'string', isArray: true })
+  @ApiQuery({ name: 'clearCache', required: false, type: 'boolean' })
   findAllEvents(
     @Query('startedAt') startedAt?: string,
     @Query('endedAt') endedAt?: string,
     @Query('term') term?: string,
-    @Query('timelineIds') timelineIds?: string[]
+    @Query('timelineIds') timelineIds?: string[],
+    @Query('clearCache') clearCache?: string
   ) {
-    return this.timelinesService.findAllEvents(startedAt, endedAt, term, timelineIds);
+    return this.timelinesService.findAllEvents(startedAt, endedAt, term, timelineIds, clearCache === 'true');
   }
 
   @ApiOkResponse({

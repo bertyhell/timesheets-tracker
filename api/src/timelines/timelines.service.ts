@@ -218,7 +218,8 @@ export class TimelinesService {
     startedAt: string,
     endedAt: string,
     term: string | undefined,
-    timelineIds: string[] | undefined
+    timelineIds: string[] | undefined,
+    clearCache = false
   ): Promise<TimelineWithEventsDto[]> {
     try {
       const timelines = await this.findAllTimelines(undefined);
@@ -406,7 +407,7 @@ export class TimelinesService {
                     String(d.getMonth() + 1).padStart(2, '0'),
                     String(d.getDate()).padStart(2, '0'),
                   ].join('-');
-                  return await this.productiveService.getEventsForDay(date, timelineInfo.id);
+                  return await this.productiveService.getEventsForDay(date, timelineInfo.id, clearCache);
                 } catch (err) {
                   console.error(
                     new CustomError('Failed to fetch events from Productive', err, {

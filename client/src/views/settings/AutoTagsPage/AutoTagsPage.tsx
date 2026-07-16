@@ -8,7 +8,7 @@ import {
   autoTagsControllerCreateMutation,
   autoTagsControllerDeleteMutation,
   autoTagsControllerFindAllOptions,
-  autoTagsControllerUpdateMutation,
+  autoTagsControllerMergeDuplicatesMutation,
 } from '../../../generated/api/@tanstack/react-query.gen';
 import React, { type ReactNode, useCallback, useEffect, useState } from 'react';
 import { orderBy } from 'lodash-es';
@@ -168,7 +168,7 @@ export function AutoTagsPage() {
   const { mutateAsync: insertAutoTag } = useMutation({ ...autoTagsControllerCreateMutation() });
   const autoTags = autoTagItems as AutoTagDto[];
   const { mutateAsync: deleteAutoTag } = useMutation({ ...autoTagsControllerDeleteMutation() });
-  const { mutateAsync: updateAutoTag } = useMutation({ ...autoTagsControllerUpdateMutation() });
+  const { mutateAsync: mergeDuplicates } = useMutation({ ...autoTagsControllerMergeDuplicatesMutation() });
 
   useEffect(() => {
     refetchAutoTags();
@@ -288,28 +288,10 @@ export function AutoTagsPage() {
 
   const confirmMerge = async () => {
     if (!mergeGroups) return;
-
-    for (const group of mergeGroups) {
-      const sorted = orderBy(group, 'priority', 'asc');
-      const [base, ...rest] = sorted;
-
-      const mergedConditions: AutoTagConditionDto[] = [...(base.conditions ?? [])];
-      for (const tag of rest) {
-        const conditions = tag.conditions ?? [];
-        conditions.forEach((cond, i) => {
-          mergedConditions.push(i === 0 ? { ...cond, booleanOperator: 'OR' } : cond);
-        });
-      }
-
-      await updateAutoTag({ path: { id: base.id }, body: { conditions: mergedConditions } });
-      for (const tag of rest) {
-        await deleteAutoTag({ path: { id: tag.id } });
-      }
-    }
-
+    const result = await mergeDuplicates({});
     setMergeGroups(null);
     await refetchAutoTags();
-    toast(`Merged ${mergeGroups.length} duplicate tag group(s)`, { type: 'success' });
+    toast(`Merged ${result.mergedGroups} duplicate tag group(s)`, { type: 'success' });
   };
 
   const copyAutoTagsToClipboard = () => {
@@ -437,7 +419,7 @@ export function AutoTagsPage() {
           <ul className="mb-6" style={{ paddingLeft: '1.25rem', listStyle: 'disc' }}>
             {mergeGroups.map((group) => (
               <li key={group[0].tagNameId}>
-                <strong>{group[0].tagName?.name ?? group[0].tagNameId}</strong>
+                <strong>{group[0].tagName?.title ?? group[0].tagNameId}</strong>
                 {' — '}{group.length} rules
               </li>
             ))}

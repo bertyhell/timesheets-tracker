@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Query, Param, Patch, Delete, HttpCode } fr
 import { CreateAutoTagDto } from './dto/create-auto-tag.dto';
 import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AutoTagsService } from './auto-tags.service';
-import { AutoTagCountDto, AutoTagDto } from './dto/response-auto-tag.dto';
+import { AutoTagCountDto, AutoTagDto, AutoTagMergeResultDto } from './dto/response-auto-tag.dto';
 import { type AutoTag } from '../types/types';
 import { UpdateAutoTagsDto } from './dto/update-auto-tags.dto';
 import { ReorderAutoTagItemDto } from './dto/reorder-auto-tags.dto';
@@ -52,6 +52,12 @@ export class AutoTagsController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.tagNamesService.findOne(id);
+  }
+
+  @ApiOkResponse({ description: 'Merge all auto-tag rules that share the same tag name', type: AutoTagMergeResultDto })
+  @Post('merge-duplicates')
+  mergeDuplicates(): Promise<AutoTagMergeResultDto> {
+    return this.tagNamesService.mergeDuplicates();
   }
 
   @Patch('reorder')

@@ -113,3 +113,13 @@ export class AutoTagCountDto {
   })
   count: number;
 }
+
+export class AutoTagMergeResultDto {
+  @IsNumber()
+  @Type(() => Number)
+  @ApiProperty({
+    type: Number,
+    description: 'Number of duplicate tag name groups that were merged',
+  })
+  mergedGroups: number;
+}

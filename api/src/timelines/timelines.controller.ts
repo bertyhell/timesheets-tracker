@@ -16,6 +16,7 @@ import {
   AutoTagEventInfoDto,
   CalendarEventInfoDto,
   GitCommitEventInfoDto,
+  ProductiveEventInfoDto,
   ProgramEventInfoDto,
   TagEventInfoDto,
   TimelineWithEventsDto,
@@ -30,6 +31,7 @@ import {
   TagEventInfoDto,
   AutoTagEventInfoDto,
   GitCommitEventInfoDto,
+  ProductiveEventInfoDto,
   CalendarEventProviderInfoDto,
   GitCommitEventProviderInfoDto
 )

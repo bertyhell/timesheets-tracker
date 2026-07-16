@@ -3,8 +3,8 @@
 import { type DefaultError, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { activeStatesControllerCreate, activeStatesControllerDelete, activeStatesControllerFindAll, activeStatesControllerFindOne, appControllerStatus, autoNotesControllerCount, autoNotesControllerCreate, autoNotesControllerFindAll, autoNotesControllerFindOne, autoNotesControllerRemove, autoNotesControllerUpdate, autoTagsControllerCount, autoTagsControllerCreate, autoTagsControllerDelete, autoTagsControllerFindAll, autoTagsControllerFindOne, autoTagsControllerUpdate, calendarsControllerGetEvents, type Options, programsControllerCreate, programsControllerDelete, programsControllerFindAll, programsControllerFindOne, programsControllerGetTracking, programsControllerSetTracking, settingsControllerGetSettings, settingsControllerMoveDatabase, settingsControllerSwitchDatabase, tagNamesControllerCount, tagNamesControllerCreate, tagNamesControllerFindAll, tagNamesControllerFindOne, tagNamesControllerRemove, tagNamesControllerUpdate, tagsControllerCreate, tagsControllerFindAll, tagsControllerFindOne, tagsControllerRemove, tagsControllerUpdate, timelinesControllerCount, timelinesControllerCreate, timelinesControllerDelete, timelinesControllerFindAll, timelinesControllerFindAllEvents, timelinesControllerFindOne, timelinesControllerUpdate, websitesControllerCreate, websitesControllerDelete, websitesControllerFindAll, websitesControllerFindOne } from '../sdk.gen';
-import type { ActiveStatesControllerCreateData, ActiveStatesControllerDeleteData, ActiveStatesControllerFindAllData, ActiveStatesControllerFindAllResponse, ActiveStatesControllerFindOneData, AppControllerStatusData, AutoNotesControllerCountData, AutoNotesControllerCountResponse, AutoNotesControllerCreateData, AutoNotesControllerCreateResponse, AutoNotesControllerFindAllData, AutoNotesControllerFindAllResponse, AutoNotesControllerFindOneData, AutoNotesControllerFindOneResponse, AutoNotesControllerRemoveData, AutoNotesControllerUpdateData, AutoTagsControllerCountData, AutoTagsControllerCountResponse, AutoTagsControllerCreateData, AutoTagsControllerCreateResponse, AutoTagsControllerDeleteData, AutoTagsControllerFindAllData, AutoTagsControllerFindAllResponse, AutoTagsControllerFindOneData, AutoTagsControllerFindOneResponse, AutoTagsControllerUpdateData, CalendarsControllerGetEventsData, CalendarsControllerGetEventsResponse, ProgramsControllerCreateData, ProgramsControllerDeleteData, ProgramsControllerFindAllData, ProgramsControllerFindAllResponse, ProgramsControllerFindOneData, ProgramsControllerGetTrackingData, ProgramsControllerSetTrackingData, SettingsControllerGetSettingsData, SettingsControllerGetSettingsResponse, SettingsControllerMoveDatabaseData, SettingsControllerMoveDatabaseResponse, SettingsControllerSwitchDatabaseData, SettingsControllerSwitchDatabaseResponse, TagNamesControllerCountData, TagNamesControllerCountResponse, TagNamesControllerCreateData, TagNamesControllerCreateResponse, TagNamesControllerFindAllData, TagNamesControllerFindAllResponse, TagNamesControllerFindOneData, TagNamesControllerFindOneResponse, TagNamesControllerRemoveData, TagNamesControllerUpdateData, TagsControllerCreateData, TagsControllerCreateResponse, TagsControllerFindAllData, TagsControllerFindAllResponse, TagsControllerFindOneData, TagsControllerRemoveData, TagsControllerUpdateData, TimelinesControllerCountData, TimelinesControllerCountResponse, TimelinesControllerCreateData, TimelinesControllerCreateResponse, TimelinesControllerDeleteData, TimelinesControllerFindAllData, TimelinesControllerFindAllEventsData, TimelinesControllerFindAllEventsResponse, TimelinesControllerFindAllResponse, TimelinesControllerFindOneData, TimelinesControllerFindOneResponse, TimelinesControllerUpdateData, WebsitesControllerCreateData, WebsitesControllerDeleteData, WebsitesControllerFindAllData, WebsitesControllerFindAllResponse, WebsitesControllerFindOneData } from '../types.gen';
+import { activeStatesControllerCreate, activeStatesControllerDelete, activeStatesControllerFindAll, activeStatesControllerFindOne, appControllerStatus, autoNotesControllerCount, autoNotesControllerCreate, autoNotesControllerFindAll, autoNotesControllerFindOne, autoNotesControllerRemove, autoNotesControllerUpdate, autoTagsControllerCount, autoTagsControllerCreate, autoTagsControllerDelete, autoTagsControllerFindAll, autoTagsControllerFindOne, autoTagsControllerMergeDuplicates, autoTagsControllerReorder, autoTagsControllerUpdate, calendarsControllerGetEvents, integrationsControllerFindOne, integrationsControllerRemove, integrationsControllerUpsert, type Options, overviewsControllerCreate, overviewsControllerFindAll, overviewsControllerFindOne, overviewsControllerGetData, overviewsControllerRemove, overviewsControllerUpdate, programsControllerCreate, programsControllerDelete, programsControllerFindAll, programsControllerFindOne, programsControllerGetTracking, programsControllerSetTracking, settingsControllerGetSettings, settingsControllerMoveDatabase, settingsControllerSwitchDatabase, tagNamesControllerCount, tagNamesControllerCreate, tagNamesControllerFindAll, tagNamesControllerFindOne, tagNamesControllerRemove, tagNamesControllerUpdate, tagsControllerCreate, tagsControllerFindAll, tagsControllerFindOne, tagsControllerRemove, tagsControllerUpdate, timelinesControllerCount, timelinesControllerCreate, timelinesControllerDelete, timelinesControllerFindAll, timelinesControllerFindAllEvents, timelinesControllerFindOne, timelinesControllerReorder, timelinesControllerUpdate, websitesControllerCreate, websitesControllerDelete, websitesControllerFindAll, websitesControllerFindOne } from '../sdk.gen';
+import type { ActiveStatesControllerCreateData, ActiveStatesControllerDeleteData, ActiveStatesControllerFindAllData, ActiveStatesControllerFindAllResponse, ActiveStatesControllerFindOneData, AppControllerStatusData, AutoNotesControllerCountData, AutoNotesControllerCountResponse, AutoNotesControllerCreateData, AutoNotesControllerCreateResponse, AutoNotesControllerFindAllData, AutoNotesControllerFindAllResponse, AutoNotesControllerFindOneData, AutoNotesControllerFindOneResponse, AutoNotesControllerRemoveData, AutoNotesControllerUpdateData, AutoTagsControllerCountData, AutoTagsControllerCountResponse, AutoTagsControllerCreateData, AutoTagsControllerCreateResponse, AutoTagsControllerDeleteData, AutoTagsControllerFindAllData, AutoTagsControllerFindAllResponse, AutoTagsControllerFindOneData, AutoTagsControllerFindOneResponse, AutoTagsControllerMergeDuplicatesData, AutoTagsControllerMergeDuplicatesResponse, AutoTagsControllerReorderData, AutoTagsControllerReorderResponse, AutoTagsControllerUpdateData, CalendarsControllerGetEventsData, CalendarsControllerGetEventsResponse, IntegrationsControllerFindOneData, IntegrationsControllerFindOneResponse, IntegrationsControllerRemoveData, IntegrationsControllerRemoveResponse, IntegrationsControllerUpsertData, IntegrationsControllerUpsertResponse, OverviewsControllerCreateData, OverviewsControllerCreateResponse, OverviewsControllerFindAllData, OverviewsControllerFindAllResponse, OverviewsControllerFindOneData, OverviewsControllerFindOneResponse, OverviewsControllerGetDataData, OverviewsControllerGetDataResponse, OverviewsControllerRemoveData, OverviewsControllerUpdateData, ProgramsControllerCreateData, ProgramsControllerDeleteData, ProgramsControllerFindAllData, ProgramsControllerFindAllResponse, ProgramsControllerFindOneData, ProgramsControllerGetTrackingData, ProgramsControllerSetTrackingData, SettingsControllerGetSettingsData, SettingsControllerGetSettingsResponse, SettingsControllerMoveDatabaseData, SettingsControllerMoveDatabaseResponse, SettingsControllerSwitchDatabaseData, SettingsControllerSwitchDatabaseResponse, TagNamesControllerCountData, TagNamesControllerCountResponse, TagNamesControllerCreateData, TagNamesControllerCreateResponse, TagNamesControllerFindAllData, TagNamesControllerFindAllResponse, TagNamesControllerFindOneData, TagNamesControllerFindOneResponse, TagNamesControllerRemoveData, TagNamesControllerUpdateData, TagsControllerCreateData, TagsControllerCreateResponse, TagsControllerFindAllData, TagsControllerFindAllResponse, TagsControllerFindOneData, TagsControllerRemoveData, TagsControllerUpdateData, TimelinesControllerCountData, TimelinesControllerCountResponse, TimelinesControllerCreateData, TimelinesControllerCreateResponse, TimelinesControllerDeleteData, TimelinesControllerFindAllData, TimelinesControllerFindAllEventsData, TimelinesControllerFindAllEventsResponse, TimelinesControllerFindAllResponse, TimelinesControllerFindOneData, TimelinesControllerFindOneResponse, TimelinesControllerReorderData, TimelinesControllerReorderResponse, TimelinesControllerUpdateData, WebsitesControllerCreateData, WebsitesControllerDeleteData, WebsitesControllerFindAllData, WebsitesControllerFindAllResponse, WebsitesControllerFindOneData } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -445,6 +445,34 @@ export const autoTagsControllerUpdateMutation = (options?: Partial<Options<AutoT
     return mutationOptions;
 };
 
+export const autoTagsControllerMergeDuplicatesMutation = (options?: Partial<Options<AutoTagsControllerMergeDuplicatesData>>): UseMutationOptions<AutoTagsControllerMergeDuplicatesResponse, DefaultError, Options<AutoTagsControllerMergeDuplicatesData>> => {
+    const mutationOptions: UseMutationOptions<AutoTagsControllerMergeDuplicatesResponse, DefaultError, Options<AutoTagsControllerMergeDuplicatesData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await autoTagsControllerMergeDuplicates({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const autoTagsControllerReorderMutation = (options?: Partial<Options<AutoTagsControllerReorderData>>): UseMutationOptions<AutoTagsControllerReorderResponse, DefaultError, Options<AutoTagsControllerReorderData>> => {
+    const mutationOptions: UseMutationOptions<AutoTagsControllerReorderResponse, DefaultError, Options<AutoTagsControllerReorderData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await autoTagsControllerReorder({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
 export const websitesControllerDeleteMutation = (options?: Partial<Options<WebsitesControllerDeleteData>>): UseMutationOptions<unknown, DefaultError, Options<WebsitesControllerDeleteData>> => {
     const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<WebsitesControllerDeleteData>> = {
         mutationFn: async (fnOptions) => {
@@ -707,6 +735,63 @@ export const timelinesControllerUpdateMutation = (options?: Partial<Options<Time
     return mutationOptions;
 };
 
+export const timelinesControllerReorderMutation = (options?: Partial<Options<TimelinesControllerReorderData>>): UseMutationOptions<TimelinesControllerReorderResponse, DefaultError, Options<TimelinesControllerReorderData>> => {
+    const mutationOptions: UseMutationOptions<TimelinesControllerReorderResponse, DefaultError, Options<TimelinesControllerReorderData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await timelinesControllerReorder({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const integrationsControllerRemoveMutation = (options?: Partial<Options<IntegrationsControllerRemoveData>>): UseMutationOptions<IntegrationsControllerRemoveResponse, DefaultError, Options<IntegrationsControllerRemoveData>> => {
+    const mutationOptions: UseMutationOptions<IntegrationsControllerRemoveResponse, DefaultError, Options<IntegrationsControllerRemoveData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await integrationsControllerRemove({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const integrationsControllerFindOneQueryKey = (options: Options<IntegrationsControllerFindOneData>) => createQueryKey('integrationsControllerFindOne', options);
+
+export const integrationsControllerFindOneOptions = (options: Options<IntegrationsControllerFindOneData>) => queryOptions<IntegrationsControllerFindOneResponse, DefaultError, IntegrationsControllerFindOneResponse, ReturnType<typeof integrationsControllerFindOneQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await integrationsControllerFindOne({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: integrationsControllerFindOneQueryKey(options)
+});
+
+export const integrationsControllerUpsertMutation = (options?: Partial<Options<IntegrationsControllerUpsertData>>): UseMutationOptions<IntegrationsControllerUpsertResponse, DefaultError, Options<IntegrationsControllerUpsertData>> => {
+    const mutationOptions: UseMutationOptions<IntegrationsControllerUpsertResponse, DefaultError, Options<IntegrationsControllerUpsertData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await integrationsControllerUpsert({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
 export const settingsControllerGetSettingsQueryKey = (options?: Options<SettingsControllerGetSettingsData>) => createQueryKey('settingsControllerGetSettings', options);
 
 export const settingsControllerGetSettingsOptions = (options?: Options<SettingsControllerGetSettingsData>) => queryOptions<SettingsControllerGetSettingsResponse, DefaultError, SettingsControllerGetSettingsResponse, ReturnType<typeof settingsControllerGetSettingsQueryKey>>({
@@ -740,6 +825,93 @@ export const settingsControllerMoveDatabaseMutation = (options?: Partial<Options
     const mutationOptions: UseMutationOptions<SettingsControllerMoveDatabaseResponse, DefaultError, Options<SettingsControllerMoveDatabaseData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await settingsControllerMoveDatabase({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const overviewsControllerGetDataQueryKey = (options: Options<OverviewsControllerGetDataData>) => createQueryKey('overviewsControllerGetData', options);
+
+export const overviewsControllerGetDataOptions = (options: Options<OverviewsControllerGetDataData>) => queryOptions<OverviewsControllerGetDataResponse, DefaultError, OverviewsControllerGetDataResponse, ReturnType<typeof overviewsControllerGetDataQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await overviewsControllerGetData({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: overviewsControllerGetDataQueryKey(options)
+});
+
+export const overviewsControllerFindAllQueryKey = (options?: Options<OverviewsControllerFindAllData>) => createQueryKey('overviewsControllerFindAll', options);
+
+export const overviewsControllerFindAllOptions = (options?: Options<OverviewsControllerFindAllData>) => queryOptions<OverviewsControllerFindAllResponse, DefaultError, OverviewsControllerFindAllResponse, ReturnType<typeof overviewsControllerFindAllQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await overviewsControllerFindAll({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: overviewsControllerFindAllQueryKey(options)
+});
+
+export const overviewsControllerCreateMutation = (options?: Partial<Options<OverviewsControllerCreateData>>): UseMutationOptions<OverviewsControllerCreateResponse, DefaultError, Options<OverviewsControllerCreateData>> => {
+    const mutationOptions: UseMutationOptions<OverviewsControllerCreateResponse, DefaultError, Options<OverviewsControllerCreateData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await overviewsControllerCreate({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const overviewsControllerRemoveMutation = (options?: Partial<Options<OverviewsControllerRemoveData>>): UseMutationOptions<unknown, DefaultError, Options<OverviewsControllerRemoveData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<OverviewsControllerRemoveData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await overviewsControllerRemove({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const overviewsControllerFindOneQueryKey = (options: Options<OverviewsControllerFindOneData>) => createQueryKey('overviewsControllerFindOne', options);
+
+export const overviewsControllerFindOneOptions = (options: Options<OverviewsControllerFindOneData>) => queryOptions<OverviewsControllerFindOneResponse, DefaultError, OverviewsControllerFindOneResponse, ReturnType<typeof overviewsControllerFindOneQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await overviewsControllerFindOne({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: overviewsControllerFindOneQueryKey(options)
+});
+
+export const overviewsControllerUpdateMutation = (options?: Partial<Options<OverviewsControllerUpdateData>>): UseMutationOptions<unknown, DefaultError, Options<OverviewsControllerUpdateData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<OverviewsControllerUpdateData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await overviewsControllerUpdate({
                 ...options,
                 ...fnOptions,
                 throwOnError: true

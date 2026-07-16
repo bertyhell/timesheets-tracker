@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { ActiveStatesControllerCreateData, ActiveStatesControllerCreateResponses, ActiveStatesControllerDeleteData, ActiveStatesControllerDeleteResponses, ActiveStatesControllerFindAllData, ActiveStatesControllerFindAllResponses, ActiveStatesControllerFindOneData, ActiveStatesControllerFindOneResponses, AppControllerStatusData, AppControllerStatusResponses, AutoNotesControllerCountData, AutoNotesControllerCountResponses, AutoNotesControllerCreateData, AutoNotesControllerCreateResponses, AutoNotesControllerFindAllData, AutoNotesControllerFindAllResponses, AutoNotesControllerFindOneData, AutoNotesControllerFindOneResponses, AutoNotesControllerRemoveData, AutoNotesControllerRemoveResponses, AutoNotesControllerUpdateData, AutoNotesControllerUpdateResponses, AutoTagsControllerCountData, AutoTagsControllerCountResponses, AutoTagsControllerCreateData, AutoTagsControllerCreateResponses, AutoTagsControllerDeleteData, AutoTagsControllerDeleteResponses, AutoTagsControllerFindAllData, AutoTagsControllerFindAllResponses, AutoTagsControllerFindOneData, AutoTagsControllerFindOneResponses, AutoTagsControllerUpdateData, AutoTagsControllerUpdateResponses, CalendarsControllerGetEventsData, CalendarsControllerGetEventsResponses, ProgramsControllerCreateData, ProgramsControllerCreateResponses, ProgramsControllerDeleteData, ProgramsControllerDeleteResponses, ProgramsControllerFindAllData, ProgramsControllerFindAllResponses, ProgramsControllerFindOneData, ProgramsControllerFindOneResponses, ProgramsControllerGetTrackingData, ProgramsControllerGetTrackingResponses, ProgramsControllerSetTrackingData, ProgramsControllerSetTrackingResponses, SettingsControllerGetSettingsData, SettingsControllerGetSettingsResponses, SettingsControllerMoveDatabaseData, SettingsControllerMoveDatabaseResponses, SettingsControllerSwitchDatabaseData, SettingsControllerSwitchDatabaseResponses, TagNamesControllerCountData, TagNamesControllerCountResponses, TagNamesControllerCreateData, TagNamesControllerCreateResponses, TagNamesControllerFindAllData, TagNamesControllerFindAllResponses, TagNamesControllerFindOneData, TagNamesControllerFindOneResponses, TagNamesControllerRemoveData, TagNamesControllerRemoveResponses, TagNamesControllerUpdateData, TagNamesControllerUpdateResponses, TagsControllerCreateData, TagsControllerCreateResponses, TagsControllerFindAllData, TagsControllerFindAllResponses, TagsControllerFindOneData, TagsControllerFindOneResponses, TagsControllerRemoveData, TagsControllerRemoveResponses, TagsControllerUpdateData, TagsControllerUpdateResponses, TimelinesControllerCountData, TimelinesControllerCountResponses, TimelinesControllerCreateData, TimelinesControllerCreateResponses, TimelinesControllerDeleteData, TimelinesControllerDeleteResponses, TimelinesControllerFindAllData, TimelinesControllerFindAllEventsData, TimelinesControllerFindAllEventsResponses, TimelinesControllerFindAllResponses, TimelinesControllerFindOneData, TimelinesControllerFindOneResponses, TimelinesControllerUpdateData, TimelinesControllerUpdateResponses, WebsitesControllerCreateData, WebsitesControllerCreateResponses, WebsitesControllerDeleteData, WebsitesControllerDeleteResponses, WebsitesControllerFindAllData, WebsitesControllerFindAllResponses, WebsitesControllerFindOneData, WebsitesControllerFindOneResponses } from './types.gen';
+import type { ActiveStatesControllerCreateData, ActiveStatesControllerCreateResponses, ActiveStatesControllerDeleteData, ActiveStatesControllerDeleteResponses, ActiveStatesControllerFindAllData, ActiveStatesControllerFindAllResponses, ActiveStatesControllerFindOneData, ActiveStatesControllerFindOneResponses, AppControllerStatusData, AppControllerStatusResponses, AutoNotesControllerCountData, AutoNotesControllerCountResponses, AutoNotesControllerCreateData, AutoNotesControllerCreateResponses, AutoNotesControllerFindAllData, AutoNotesControllerFindAllResponses, AutoNotesControllerFindOneData, AutoNotesControllerFindOneResponses, AutoNotesControllerRemoveData, AutoNotesControllerRemoveResponses, AutoNotesControllerUpdateData, AutoNotesControllerUpdateResponses, AutoTagsControllerCountData, AutoTagsControllerCountResponses, AutoTagsControllerCreateData, AutoTagsControllerCreateResponses, AutoTagsControllerDeleteData, AutoTagsControllerDeleteResponses, AutoTagsControllerFindAllData, AutoTagsControllerFindAllResponses, AutoTagsControllerFindOneData, AutoTagsControllerFindOneResponses, AutoTagsControllerMergeDuplicatesData, AutoTagsControllerMergeDuplicatesResponses, AutoTagsControllerReorderData, AutoTagsControllerReorderResponses, AutoTagsControllerUpdateData, AutoTagsControllerUpdateResponses, CalendarsControllerGetEventsData, CalendarsControllerGetEventsResponses, IntegrationsControllerFindOneData, IntegrationsControllerFindOneResponses, IntegrationsControllerRemoveData, IntegrationsControllerRemoveResponses, IntegrationsControllerUpsertData, IntegrationsControllerUpsertResponses, OverviewsControllerCreateData, OverviewsControllerCreateResponses, OverviewsControllerFindAllData, OverviewsControllerFindAllResponses, OverviewsControllerFindOneData, OverviewsControllerFindOneResponses, OverviewsControllerGetDataData, OverviewsControllerGetDataResponses, OverviewsControllerRemoveData, OverviewsControllerRemoveResponses, OverviewsControllerUpdateData, OverviewsControllerUpdateResponses, ProgramsControllerCreateData, ProgramsControllerCreateResponses, ProgramsControllerDeleteData, ProgramsControllerDeleteResponses, ProgramsControllerFindAllData, ProgramsControllerFindAllResponses, ProgramsControllerFindOneData, ProgramsControllerFindOneResponses, ProgramsControllerGetTrackingData, ProgramsControllerGetTrackingResponses, ProgramsControllerSetTrackingData, ProgramsControllerSetTrackingResponses, SettingsControllerGetSettingsData, SettingsControllerGetSettingsResponses, SettingsControllerMoveDatabaseData, SettingsControllerMoveDatabaseResponses, SettingsControllerSwitchDatabaseData, SettingsControllerSwitchDatabaseResponses, TagNamesControllerCountData, TagNamesControllerCountResponses, TagNamesControllerCreateData, TagNamesControllerCreateResponses, TagNamesControllerFindAllData, TagNamesControllerFindAllResponses, TagNamesControllerFindOneData, TagNamesControllerFindOneResponses, TagNamesControllerRemoveData, TagNamesControllerRemoveResponses, TagNamesControllerUpdateData, TagNamesControllerUpdateResponses, TagsControllerCreateData, TagsControllerCreateResponses, TagsControllerFindAllData, TagsControllerFindAllResponses, TagsControllerFindOneData, TagsControllerFindOneResponses, TagsControllerRemoveData, TagsControllerRemoveResponses, TagsControllerUpdateData, TagsControllerUpdateResponses, TimelinesControllerCountData, TimelinesControllerCountResponses, TimelinesControllerCreateData, TimelinesControllerCreateResponses, TimelinesControllerDeleteData, TimelinesControllerDeleteResponses, TimelinesControllerFindAllData, TimelinesControllerFindAllEventsData, TimelinesControllerFindAllEventsResponses, TimelinesControllerFindAllResponses, TimelinesControllerFindOneData, TimelinesControllerFindOneResponses, TimelinesControllerReorderData, TimelinesControllerReorderResponses, TimelinesControllerUpdateData, TimelinesControllerUpdateResponses, WebsitesControllerCreateData, WebsitesControllerCreateResponses, WebsitesControllerDeleteData, WebsitesControllerDeleteResponses, WebsitesControllerFindAllData, WebsitesControllerFindAllResponses, WebsitesControllerFindOneData, WebsitesControllerFindOneResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -116,6 +116,17 @@ export const autoTagsControllerUpdate = <ThrowOnError extends boolean = false>(o
     }
 });
 
+export const autoTagsControllerMergeDuplicates = <ThrowOnError extends boolean = false>(options?: Options<AutoTagsControllerMergeDuplicatesData, ThrowOnError>) => (options?.client ?? client).post<AutoTagsControllerMergeDuplicatesResponses, unknown, ThrowOnError>({ url: '/api/auto-tags/merge-duplicates', ...options });
+
+export const autoTagsControllerReorder = <ThrowOnError extends boolean = false>(options: Options<AutoTagsControllerReorderData, ThrowOnError>) => (options.client ?? client).patch<AutoTagsControllerReorderResponses, unknown, ThrowOnError>({
+    url: '/api/auto-tags/reorder',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
 export const websitesControllerDelete = <ThrowOnError extends boolean = false>(options: Options<WebsitesControllerDeleteData, ThrowOnError>) => (options.client ?? client).delete<WebsitesControllerDeleteResponses, unknown, ThrowOnError>({ url: '/api/websites', ...options });
 
 export const websitesControllerFindAll = <ThrowOnError extends boolean = false>(options: Options<WebsitesControllerFindAllData, ThrowOnError>) => (options.client ?? client).get<WebsitesControllerFindAllResponses, unknown, ThrowOnError>({ url: '/api/websites', ...options });
@@ -187,6 +198,28 @@ export const timelinesControllerUpdate = <ThrowOnError extends boolean = false>(
     }
 });
 
+export const timelinesControllerReorder = <ThrowOnError extends boolean = false>(options: Options<TimelinesControllerReorderData, ThrowOnError>) => (options.client ?? client).patch<TimelinesControllerReorderResponses, unknown, ThrowOnError>({
+    url: '/api/timelines/reorder',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const integrationsControllerRemove = <ThrowOnError extends boolean = false>(options: Options<IntegrationsControllerRemoveData, ThrowOnError>) => (options.client ?? client).delete<IntegrationsControllerRemoveResponses, unknown, ThrowOnError>({ url: '/api/integrations/{type}', ...options });
+
+export const integrationsControllerFindOne = <ThrowOnError extends boolean = false>(options: Options<IntegrationsControllerFindOneData, ThrowOnError>) => (options.client ?? client).get<IntegrationsControllerFindOneResponses, unknown, ThrowOnError>({ url: '/api/integrations/{type}', ...options });
+
+export const integrationsControllerUpsert = <ThrowOnError extends boolean = false>(options: Options<IntegrationsControllerUpsertData, ThrowOnError>) => (options.client ?? client).put<IntegrationsControllerUpsertResponses, unknown, ThrowOnError>({
+    url: '/api/integrations/{type}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
 export const settingsControllerGetSettings = <ThrowOnError extends boolean = false>(options?: Options<SettingsControllerGetSettingsData, ThrowOnError>) => (options?.client ?? client).get<SettingsControllerGetSettingsResponses, unknown, ThrowOnError>({ url: '/api/settings', ...options });
 
 export const settingsControllerSwitchDatabase = <ThrowOnError extends boolean = false>(options: Options<SettingsControllerSwitchDatabaseData, ThrowOnError>) => (options.client ?? client).post<SettingsControllerSwitchDatabaseResponses, unknown, ThrowOnError>({
@@ -200,6 +233,32 @@ export const settingsControllerSwitchDatabase = <ThrowOnError extends boolean = 
 
 export const settingsControllerMoveDatabase = <ThrowOnError extends boolean = false>(options: Options<SettingsControllerMoveDatabaseData, ThrowOnError>) => (options.client ?? client).post<SettingsControllerMoveDatabaseResponses, unknown, ThrowOnError>({
     url: '/api/settings/move-database',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const overviewsControllerGetData = <ThrowOnError extends boolean = false>(options: Options<OverviewsControllerGetDataData, ThrowOnError>) => (options.client ?? client).get<OverviewsControllerGetDataResponses, unknown, ThrowOnError>({ url: '/api/overviews/data', ...options });
+
+export const overviewsControllerFindAll = <ThrowOnError extends boolean = false>(options?: Options<OverviewsControllerFindAllData, ThrowOnError>) => (options?.client ?? client).get<OverviewsControllerFindAllResponses, unknown, ThrowOnError>({ url: '/api/overviews', ...options });
+
+export const overviewsControllerCreate = <ThrowOnError extends boolean = false>(options: Options<OverviewsControllerCreateData, ThrowOnError>) => (options.client ?? client).post<OverviewsControllerCreateResponses, unknown, ThrowOnError>({
+    url: '/api/overviews',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const overviewsControllerRemove = <ThrowOnError extends boolean = false>(options: Options<OverviewsControllerRemoveData, ThrowOnError>) => (options.client ?? client).delete<OverviewsControllerRemoveResponses, unknown, ThrowOnError>({ url: '/api/overviews/{id}', ...options });
+
+export const overviewsControllerFindOne = <ThrowOnError extends boolean = false>(options: Options<OverviewsControllerFindOneData, ThrowOnError>) => (options.client ?? client).get<OverviewsControllerFindOneResponses, unknown, ThrowOnError>({ url: '/api/overviews/{id}', ...options });
+
+export const overviewsControllerUpdate = <ThrowOnError extends boolean = false>(options: Options<OverviewsControllerUpdateData, ThrowOnError>) => (options.client ?? client).patch<OverviewsControllerUpdateResponses, unknown, ThrowOnError>({
+    url: '/api/overviews/{id}',
     ...options,
     headers: {
         'Content-Type': 'application/json',

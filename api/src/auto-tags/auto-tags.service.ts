@@ -2,7 +2,7 @@ import { CreateAutoTagDto } from './dto/create-auto-tag.dto';
 import { Inject, Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { v4 as uuid } from 'uuid';
-import { AutoTag, TimelineType } from '../types/types';
+import { AutoTag, BooleanOperator, TimelineType } from '../types/types';
 import { unflatten } from 'nested-objects-util';
 import { UpdateAutoTagsDto } from './dto/update-auto-tags.dto';
 import { findAllAutoTags } from './queries/findAllAutoTags';
@@ -16,7 +16,7 @@ import { reorderAutoTags, type ReorderAutoTagItem } from './queries/reorderAutoT
 import { TimelineDto } from '../timelines/dto/response-timeline.dto';
 import { calculateAutoTagEvents } from './helpers/auto-tags-analyzer';
 import { partition } from 'lodash';
-import { AutoTagDto } from './dto/response-auto-tag.dto';
+import { AutoTagDto, AutoTagMergeResultDto } from './dto/response-auto-tag.dto';
 import { TagNameDto } from '../tag-names/dto/response-tag-name.dto';
 import { TimelineWithEventsDto } from '../timelines/dto/response-timeline-events.dto';
 import { CustomError } from '../shared/CustomError';
@@ -121,6 +121,45 @@ export class AutoTagsService {
         id,
         updateAutoTagDto,
       });
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async mergeDuplicates(): Promise<AutoTagMergeResultDto> {
+    try {
+      const autoTags = await this.findAll(undefined);
+
+      const grouped = new Map<string, AutoTag[]>();
+      for (const tag of autoTags) {
+        if (!tag.tagNameId) continue;
+        if (!grouped.has(tag.tagNameId)) grouped.set(tag.tagNameId, []);
+        grouped.get(tag.tagNameId)!.push(tag);
+      }
+
+      const duplicateGroups = Array.from(grouped.values()).filter((g) => g.length > 1);
+
+      for (const group of duplicateGroups) {
+        const sorted = group.slice().sort((a, b) => a.priority - b.priority);
+        const [base, ...rest] = sorted;
+
+        const mergedConditions = [...(base.conditions ?? [])];
+        for (const tag of rest) {
+          const conditions = tag.conditions ?? [];
+          conditions.forEach((cond, i) => {
+            mergedConditions.push(i === 0 ? { ...cond, booleanOperator: BooleanOperator.OR } : cond);
+          });
+        }
+
+        await this.update(base.id, { id: base.id, conditions: mergedConditions });
+        for (const tag of rest) {
+          await this.delete(tag.id);
+        }
+      }
+
+      return { mergedGroups: duplicateGroups.length };
+    } catch (err) {
+      const error = new CustomError('Failed to merge duplicate auto-tags', err, {});
       console.error(error);
       throw error;
     }

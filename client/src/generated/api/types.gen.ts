@@ -163,7 +163,7 @@ export type UpdateTagNameDto = {
 /**
  * Variable to check
  */
-export type ConditionVariable = 'anyVariable' | 'isActive' | 'programName' | 'windowTitle' | 'summary' | 'description' | 'location' | 'allDay' | 'websiteUrl' | 'websiteTitle' | 'tagNameId' | 'tagNameName' | 'tagNameColor' | 'tagNameCode';
+export type ConditionVariable = 'anyVariable' | 'isActive' | 'programName' | 'windowTitle' | 'summary' | 'description' | 'location' | 'allDay' | 'websiteUrl' | 'websiteTitle' | 'tagNameId' | 'tagNameName' | 'tagNameColor' | 'tagNameCode' | 'repoName' | 'commitMessage';
 
 /**
  * Operator of the condition
@@ -240,6 +240,13 @@ export type AutoTagCountDto = {
      * Number of auto tags that exist
      */
     count: number;
+};
+
+export type AutoTagMergeResultDto = {
+    /**
+     * Number of duplicate tag name groups that were merged
+     */
+    mergedGroups: number;
 };
 
 export type UpdateAutoTagsDto = {
@@ -520,11 +527,11 @@ export type ProductiveEventInfoDto = {
     /**
      * Name of the Productive service associated with the booking
      */
-    serviceName?: string;
+    serviceName?: string | null;
     /**
      * First custom field value of the service (typically the project/deal label)
      */
-    serviceProject?: string;
+    serviceProject?: string | null;
 };
 
 export type CalendarEventProviderInfoDto = {
@@ -604,7 +611,7 @@ export type TimelineDto = {
 /**
  * Type of the timeline
  */
-export type TimelineType = 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit' | 'Productive' | 'Productive';
+export type TimelineType = 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit' | 'Productive';
 
 export type TimelineEventDto = {
     /**
@@ -680,6 +687,48 @@ export type UpdateTimelineDto = {
     color?: string | null;
 };
 
+export type IntegrationDto = {
+    /**
+     * Integration type identifier (e.g. "productive")
+     */
+    type: string;
+    /**
+     * Base URL of the integration API
+     */
+    baseUrl: string;
+    /**
+     * Organisation ID
+     */
+    organisationId: string;
+    /**
+     * User ID
+     */
+    userId: string;
+    /**
+     * API token
+     */
+    token: string;
+};
+
+export type UpsertIntegrationDto = {
+    /**
+     * Base URL of the integration API
+     */
+    baseUrl: string;
+    /**
+     * Organisation ID
+     */
+    organisationId: string;
+    /**
+     * User ID
+     */
+    userId: string;
+    /**
+     * API token
+     */
+    token: string;
+};
+
 export type SettingsResponseDto = {
     /**
      * Absolute path to the SQLite database file
@@ -692,6 +741,153 @@ export type SwitchDatabaseDto = {
      * Absolute path to the target SQLite database file
      */
     path: string;
+};
+
+export type OverviewFlatRowDto = {
+    /**
+     * Id of the underlying source row (tag/program/website/active-state)
+     */
+    id: string;
+    /**
+     * Display label: tag title, program name, website title, or Active/Inactive
+     */
+    category: string;
+    /**
+     * Which database-backed timeline type this row came from
+     */
+    sourceType: 'Tag' | 'Program' | 'Website' | 'ActiveState';
+    /**
+     * ISO timestamp the underlying event started
+     */
+    startedAt: string;
+    /**
+     * ISO timestamp the underlying event ended
+     */
+    endedAt: string;
+    /**
+     * Day bucket, 'yyyy-MM-dd'
+     */
+    date: string;
+    /**
+     * Week bucket, e.g. "2026-W07"
+     */
+    week: string;
+    /**
+     * Month bucket, 'yyyy-MM'
+     */
+    month: string;
+    /**
+     * Duration of the event in hours
+     */
+    durationHours: number;
+};
+
+/**
+ * Which database-backed timeline types are included in this overview
+ */
+export type OverviewSourceType = 'Tag' | 'Program' | 'Website' | 'ActiveState';
+
+export type CreateSavedOverviewConfigDto = {
+    /**
+     * Name of this overview, shown in the Overviews nav
+     */
+    name: string;
+    /**
+     * Which date range this overview loads by default
+     */
+    dateRangeMode: 'today' | 'thisWeek' | 'thisMonth' | 'thisYear' | 'last7Days' | 'last30Days' | 'custom';
+    /**
+     * Explicit range start, only used when dateRangeMode is "custom"
+     */
+    customStartedAt?: string | null;
+    /**
+     * Explicit range end, only used when dateRangeMode is "custom"
+     */
+    customEndedAt?: string | null;
+    /**
+     * Which database-backed timeline types are included in this overview
+     */
+    sourceTypes: Array<OverviewSourceType>;
+    /**
+     * react-pivottable state (rows, cols, vals, aggregatorName, rendererName, valueFilter, sorters, derivedAttributes)
+     */
+    pivotState: {
+        [key: string]: unknown;
+    };
+};
+
+export type SavedOverviewConfigDto = {
+    /**
+     * Id of the saved overview config
+     */
+    id: string;
+    /**
+     * Name of this overview, shown in the Overviews nav
+     */
+    name: string;
+    /**
+     * Visual order in which custom overviews are listed
+     */
+    visualOrder: number;
+    /**
+     * Which date range this overview loads by default
+     */
+    dateRangeMode: 'today' | 'thisWeek' | 'thisMonth' | 'thisYear' | 'last7Days' | 'last30Days' | 'custom';
+    /**
+     * Explicit range start, only used when dateRangeMode is "custom"
+     */
+    customStartedAt: string | null;
+    /**
+     * Explicit range end, only used when dateRangeMode is "custom"
+     */
+    customEndedAt: string | null;
+    /**
+     * Which database-backed timeline types are included in this overview
+     */
+    sourceTypes: Array<OverviewSourceType>;
+    /**
+     * react-pivottable state (rows, cols, vals, aggregatorName, rendererName, valueFilter, sorters, derivedAttributes)
+     */
+    pivotState: {
+        [key: string]: unknown;
+    };
+    /**
+     * ISO timestamp at which this overview was created
+     */
+    createdAt: string;
+    /**
+     * ISO timestamp at which this overview was last updated
+     */
+    updatedAt: string;
+};
+
+export type UpdateSavedOverviewConfigDto = {
+    /**
+     * Name of this overview, shown in the Overviews nav
+     */
+    name?: string;
+    /**
+     * Which date range this overview loads by default
+     */
+    dateRangeMode?: 'today' | 'thisWeek' | 'thisMonth' | 'thisYear' | 'last7Days' | 'last30Days' | 'custom';
+    /**
+     * Explicit range start, only used when dateRangeMode is "custom"
+     */
+    customStartedAt?: string | null;
+    /**
+     * Explicit range end, only used when dateRangeMode is "custom"
+     */
+    customEndedAt?: string | null;
+    /**
+     * Which database-backed timeline types are included in this overview
+     */
+    sourceTypes?: Array<OverviewSourceType>;
+    /**
+     * react-pivottable state (rows, cols, vals, aggregatorName, rendererName, valueFilter, sorters, derivedAttributes)
+     */
+    pivotState?: {
+        [key: string]: unknown;
+    };
 };
 
 export type AppControllerStatusData = {
@@ -1104,6 +1300,35 @@ export type AutoTagsControllerUpdateResponses = {
     200: unknown;
 };
 
+export type AutoTagsControllerMergeDuplicatesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/auto-tags/merge-duplicates';
+};
+
+export type AutoTagsControllerMergeDuplicatesResponses = {
+    /**
+     * Merge all auto-tag rules that share the same tag name
+     */
+    200: AutoTagMergeResultDto;
+};
+
+export type AutoTagsControllerMergeDuplicatesResponse = AutoTagsControllerMergeDuplicatesResponses[keyof AutoTagsControllerMergeDuplicatesResponses];
+
+export type AutoTagsControllerReorderData = {
+    body: Array<string>;
+    path?: never;
+    query?: never;
+    url: '/api/auto-tags/reorder';
+};
+
+export type AutoTagsControllerReorderResponses = {
+    204: void;
+};
+
+export type AutoTagsControllerReorderResponse = AutoTagsControllerReorderResponses[keyof AutoTagsControllerReorderResponses];
+
 export type WebsitesControllerDeleteData = {
     body?: never;
     path: {
@@ -1397,6 +1622,64 @@ export type TimelinesControllerUpdateResponses = {
     200: unknown;
 };
 
+export type TimelinesControllerReorderData = {
+    body: Array<string>;
+    path?: never;
+    query?: never;
+    url: '/api/timelines/reorder';
+};
+
+export type TimelinesControllerReorderResponses = {
+    204: void;
+};
+
+export type TimelinesControllerReorderResponse = TimelinesControllerReorderResponses[keyof TimelinesControllerReorderResponses];
+
+export type IntegrationsControllerRemoveData = {
+    body?: never;
+    path: {
+        type: string;
+    };
+    query?: never;
+    url: '/api/integrations/{type}';
+};
+
+export type IntegrationsControllerRemoveResponses = {
+    204: void;
+};
+
+export type IntegrationsControllerRemoveResponse = IntegrationsControllerRemoveResponses[keyof IntegrationsControllerRemoveResponses];
+
+export type IntegrationsControllerFindOneData = {
+    body?: never;
+    path: {
+        type: string;
+    };
+    query?: never;
+    url: '/api/integrations/{type}';
+};
+
+export type IntegrationsControllerFindOneResponses = {
+    200: IntegrationDto | unknown;
+};
+
+export type IntegrationsControllerFindOneResponse = IntegrationsControllerFindOneResponses[keyof IntegrationsControllerFindOneResponses];
+
+export type IntegrationsControllerUpsertData = {
+    body: UpsertIntegrationDto;
+    path: {
+        type: string;
+    };
+    query?: never;
+    url: '/api/integrations/{type}';
+};
+
+export type IntegrationsControllerUpsertResponses = {
+    200: IntegrationDto;
+};
+
+export type IntegrationsControllerUpsertResponse = IntegrationsControllerUpsertResponses[keyof IntegrationsControllerUpsertResponses];
+
 export type SettingsControllerGetSettingsData = {
     body?: never;
     path?: never;
@@ -1435,3 +1718,99 @@ export type SettingsControllerMoveDatabaseResponses = {
 };
 
 export type SettingsControllerMoveDatabaseResponse = SettingsControllerMoveDatabaseResponses[keyof SettingsControllerMoveDatabaseResponses];
+
+export type OverviewsControllerGetDataData = {
+    body?: never;
+    path?: never;
+    query: {
+        startedAt: string;
+        endedAt: string;
+        sourceTypes: Array<string>;
+    };
+    url: '/api/overviews/data';
+};
+
+export type OverviewsControllerGetDataResponses = {
+    /**
+     * Get flat, per-event rows for the given date range and source types, ready to feed a pivot table
+     */
+    200: Array<OverviewFlatRowDto>;
+};
+
+export type OverviewsControllerGetDataResponse = OverviewsControllerGetDataResponses[keyof OverviewsControllerGetDataResponses];
+
+export type OverviewsControllerFindAllData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/overviews';
+};
+
+export type OverviewsControllerFindAllResponses = {
+    /**
+     * Get all saved custom overviews, ordered for the Overviews nav
+     */
+    200: Array<SavedOverviewConfigDto>;
+};
+
+export type OverviewsControllerFindAllResponse = OverviewsControllerFindAllResponses[keyof OverviewsControllerFindAllResponses];
+
+export type OverviewsControllerCreateData = {
+    body: CreateSavedOverviewConfigDto;
+    path?: never;
+    query?: never;
+    url: '/api/overviews';
+};
+
+export type OverviewsControllerCreateResponses = {
+    /**
+     * Create a new custom saved overview
+     */
+    200: SavedOverviewConfigDto;
+};
+
+export type OverviewsControllerCreateResponse = OverviewsControllerCreateResponses[keyof OverviewsControllerCreateResponses];
+
+export type OverviewsControllerRemoveData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/overviews/{id}';
+};
+
+export type OverviewsControllerRemoveResponses = {
+    200: unknown;
+};
+
+export type OverviewsControllerFindOneData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/overviews/{id}';
+};
+
+export type OverviewsControllerFindOneResponses = {
+    /**
+     * Get one saved overview by id
+     */
+    200: SavedOverviewConfigDto;
+};
+
+export type OverviewsControllerFindOneResponse = OverviewsControllerFindOneResponses[keyof OverviewsControllerFindOneResponses];
+
+export type OverviewsControllerUpdateData = {
+    body: UpdateSavedOverviewConfigDto;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/overviews/{id}';
+};
+
+export type OverviewsControllerUpdateResponses = {
+    200: unknown;
+};

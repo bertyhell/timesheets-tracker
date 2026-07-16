@@ -1,4 +1,5 @@
 import './AutoTagsPage.css';
+import { Modal } from 'react-responsive-modal';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Button, { ButtonVariant } from '../../../components/Button/Button';
 import { PageHeader } from '../../../components/PageHeader/PageHeader';
@@ -7,6 +8,7 @@ import {
   autoTagsControllerCreateMutation,
   autoTagsControllerDeleteMutation,
   autoTagsControllerFindAllOptions,
+  autoTagsControllerUpdateMutation,
 } from '../../../generated/api/@tanstack/react-query.gen';
 import React, { type ReactNode, useCallback, useEffect, useState } from 'react';
 import { orderBy } from 'lodash-es';
@@ -140,6 +142,7 @@ export function AutoTagsPage() {
   const [localAutoTags, setLocalAutoTags] = useState<AutoTagDto[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
+  const [mergeGroups, setMergeGroups] = useState<AutoTagDto[][] | null>(null);
 
   const dragEnabled = sortCol === 'priority' && sortDir === 'asc' && searchTerm === '';
 
@@ -165,6 +168,7 @@ export function AutoTagsPage() {
   const { mutateAsync: insertAutoTag } = useMutation({ ...autoTagsControllerCreateMutation() });
   const autoTags = autoTagItems as AutoTagDto[];
   const { mutateAsync: deleteAutoTag } = useMutation({ ...autoTagsControllerDeleteMutation() });
+  const { mutateAsync: updateAutoTag } = useMutation({ ...autoTagsControllerUpdateMutation() });
 
   useEffect(() => {
     refetchAutoTags();
@@ -264,6 +268,50 @@ export function AutoTagsPage() {
     };
   }, [onPasteContent]);
 
+  const handleMergeDuplicates = () => {
+    const grouped = new Map<string, AutoTagDto[]>();
+    for (const tag of autoTags ?? []) {
+      if (!tag.tagNameId) continue;
+      if (!grouped.has(tag.tagNameId)) grouped.set(tag.tagNameId, []);
+      grouped.get(tag.tagNameId)!.push(tag);
+    }
+
+    const duplicateGroups = Array.from(grouped.values()).filter((g) => g.length > 1);
+
+    if (duplicateGroups.length === 0) {
+      toast('No duplicate tag names found', { type: 'info' });
+      return;
+    }
+
+    setMergeGroups(duplicateGroups);
+  };
+
+  const confirmMerge = async () => {
+    if (!mergeGroups) return;
+
+    for (const group of mergeGroups) {
+      const sorted = orderBy(group, 'priority', 'asc');
+      const [base, ...rest] = sorted;
+
+      const mergedConditions: AutoTagConditionDto[] = [...(base.conditions ?? [])];
+      for (const tag of rest) {
+        const conditions = tag.conditions ?? [];
+        conditions.forEach((cond, i) => {
+          mergedConditions.push(i === 0 ? { ...cond, booleanOperator: 'OR' } : cond);
+        });
+      }
+
+      await updateAutoTag({ path: { id: base.id }, body: { conditions: mergedConditions } });
+      for (const tag of rest) {
+        await deleteAutoTag({ path: { id: tag.id } });
+      }
+    }
+
+    setMergeGroups(null);
+    await refetchAutoTags();
+    toast(`Merged ${mergeGroups.length} duplicate tag group(s)`, { type: 'success' });
+  };
+
   const copyAutoTagsToClipboard = () => {
     copy(JSON.stringify({ [AUTOTAGS_PROPERTY_NAME_FOR_PASTE_DETECTION]: autoTagItems }, null, 2));
     toast('Auto tag copied to clipboard', { type: 'success' });
@@ -285,6 +333,9 @@ export function AutoTagsPage() {
             variant={ButtonVariant.Primary}
           >
             Add auto tag
+          </Button>
+          <Button onClick={handleMergeDuplicates} variant={ButtonVariant.Transparent}>
+            Merge duplicates
           </Button>
           <Button onClick={copyAutoTagsToClipboard} variant={ButtonVariant.Transparent}>
             Copy autotags
@@ -372,6 +423,35 @@ export function AutoTagsPage() {
           {activeAutoTag && <AutoTagDragOverlay autoTag={activeAutoTag} />}
         </DragOverlay>
       </DndContext>
+      {mergeGroups && (
+        <Modal
+          open
+          onClose={() => setMergeGroups(null)}
+          classNames={{ modal: 'c-modal', closeButton: 'c-button c-button--small' }}
+        >
+          <h3>Merge duplicate tag rules</h3>
+          <p className="text-gray-500 mt-1 mb-4" style={{ fontSize: '0.85em' }}>
+            The following tag names have multiple rules. They will be merged into one rule per tag,
+            with conditions joined by OR between each original rule.
+          </p>
+          <ul className="mb-6" style={{ paddingLeft: '1.25rem', listStyle: 'disc' }}>
+            {mergeGroups.map((group) => (
+              <li key={group[0].tagNameId}>
+                <strong>{group[0].tagName?.name ?? group[0].tagNameId}</strong>
+                {' — '}{group.length} rules
+              </li>
+            ))}
+          </ul>
+          <div className="flex justify-end gap-2">
+            <Button variant={ButtonVariant.Secondary} onClick={() => setMergeGroups(null)}>
+              Cancel
+            </Button>
+            <Button variant={ButtonVariant.Primary} onClick={confirmMerge}>
+              Merge
+            </Button>
+          </div>
+        </Modal>
+      )}
       <Outlet />
     </div>
   );

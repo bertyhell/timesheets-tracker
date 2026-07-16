@@ -103,13 +103,14 @@ export class AutoTagsService {
   async update(id: string, updateAutoTagDto: UpdateAutoTagsDto): Promise<AutoTag> {
     try {
       const db = this.databaseService.getDb();
+      const existing = await this.findOne(id);
       await updateAutoTag(
         db,
         {
-          title: updateAutoTagDto.title,
-          tagNameId: updateAutoTagDto.tagNameId,
-          priority: updateAutoTagDto.priority,
-          conditions: JSON.stringify(updateAutoTagDto.conditions),
+          title: updateAutoTagDto.title ?? existing.title,
+          tagNameId: updateAutoTagDto.tagNameId ?? existing.tagNameId,
+          priority: updateAutoTagDto.priority ?? existing.priority,
+          conditions: JSON.stringify(updateAutoTagDto.conditions ?? existing.conditions),
         },
         { id }
       );

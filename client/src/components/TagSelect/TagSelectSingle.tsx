@@ -26,6 +26,23 @@ function TagSelectSingle({ className, value, onChange, onCreateOption, autoFocus
       }}
       autoFocus={autoFocus ?? false}
       getOptionLabel={(option) => option.title}
+      formatOptionLabel={(option) => (
+        <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {!option.__isNew__ && option.color && (
+            <span
+              style={{
+                display: 'block',
+                width: '14px',
+                height: '14px',
+                borderRadius: '3px',
+                backgroundColor: option.color,
+                flexShrink: 0,
+              }}
+            />
+          )}
+          {option.title}
+        </span>
+      )}
       getNewOptionData={(inputValue) =>
         ({ title: inputValue, value: inputValue, __isNew__: true }) as unknown as TagName
       }

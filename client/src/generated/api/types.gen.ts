@@ -1323,6 +1323,7 @@ export type TimelinesControllerFindAllEventsData = {
         endedAt: string;
         term?: string;
         timelineIds?: Array<string>;
+        clearCache?: boolean;
     };
     url: '/api/timelines/events';
 };

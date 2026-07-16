@@ -20,6 +20,7 @@ import {
   timelinesControllerFindAllEventsQueryKey,
   timelinesControllerFindAllOptions,
 } from '../../generated/api/@tanstack/react-query.gen';
+import { timelinesControllerFindAllEvents } from '../../generated/api/sdk.gen';
 import GlobalSearchBar from '../../components/GlobalSearchBar/GlobalSearchBar';
 import DateSelect from '../../components/DateSelect/DateSelect';
 import {
@@ -173,6 +174,16 @@ export function TimelinesAndEventsPage() {
     [deleteTag]
   );
 
+  const handleRefreshEvents = useCallback(async () => {
+    const query = {
+      startedAt: startOfDay(viewDate).toISOString(),
+      endedAt: endOfDay(viewDate).toISOString(),
+      clearCache: true,
+    };
+    const result = await timelinesControllerFindAllEvents({ query });
+    queryClient.setQueryData<TimelinesControllerFindAllEventsResponse>(eventsQueryKey, result.data);
+  }, [viewDate, eventsQueryKey, queryClient]);
+
   const totalEventCount = selectedTimeline?.events?.length ?? 0;
 
   const noEventsMessage = selectedTimeline?.type
@@ -202,6 +213,7 @@ export function TimelinesAndEventsPage() {
             setSelectedTimelineAndEvent={setSelectedTimelineAndEvent}
             refetchTimelinesWithEvents={refetchTimelinesWithEvents}
             onDeleteTag={handleDeleteTag}
+            onRefreshEvents={handleRefreshEvents}
           ></TimelinesViewer>
         </Panel>
 

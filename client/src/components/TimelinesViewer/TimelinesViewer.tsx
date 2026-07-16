@@ -65,6 +65,7 @@ interface TimelinesViewerProps {
     >
   >;
   onDeleteTag: (tagId: string) => Promise<unknown>;
+  onRefreshEvents: () => void;
 }
 
 export const TimelinesViewer: FC<TimelinesViewerProps> = ({
@@ -75,6 +76,7 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
   setSelectedTimelineAndEvent,
   refetchTimelinesWithEvents,
   onDeleteTag,
+  onRefreshEvents,
 }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -630,6 +632,7 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
           onEditAutoTagRule={handleEditAutoTagRule}
           onCreateTagFromEvent={handleCreateTagFromEvent}
           onCreateAutoTagRuleFromEvent={handleCreateAutoTagRuleFromEvent}
+          onRefreshEvents={onRefreshEvents}
         ></Timeline>
       );
     });
@@ -658,6 +661,7 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
     handleEditAutoTagRule,
     handleCreateTagFromEvent,
     handleCreateAutoTagRuleFromEvent,
+    onRefreshEvents,
   ]);
 
   return (

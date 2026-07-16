@@ -73,6 +73,7 @@ interface TimelineProps {
   onEditAutoTagRule?: (autoTagId: string) => void;
   onCreateTagFromEvent?: (startedAt: string, endedAt: string) => void;
   onCreateAutoTagRuleFromEvent?: (conditions: ProminentCondition[]) => void;
+  onRefreshEvents?: () => void;
 }
 
 function findSnap(posX: number, snapPoints: number[], trackWidthPx: number): number | null {
@@ -118,6 +119,7 @@ function Timeline({
   onEditAutoTagRule,
   onCreateTagFromEvent,
   onCreateAutoTagRuleFromEvent,
+  onRefreshEvents,
 }: TimelineProps) {
   const navigate = useNavigate();
   const [searchTerm] = useAtom(searchTermAtom);
@@ -695,7 +697,12 @@ function Timeline({
       {titleContextMenu && (
         <ContextMenu
           position={titleContextMenu}
-          items={[{ label: 'Edit timeline', onClick: handleEditFromTitleContextMenu }]}
+          items={[
+            { label: 'Edit timeline', onClick: handleEditFromTitleContextMenu },
+            ...(onRefreshEvents
+              ? [{ label: 'Refresh events', onClick: () => { setTitleContextMenu(null); onRefreshEvents(); } }]
+              : []),
+          ]}
           onClose={() => setTitleContextMenu(null)}
         />
       )}

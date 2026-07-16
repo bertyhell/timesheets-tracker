@@ -8,12 +8,13 @@ import { tagSelectStyles } from './tagSelectStyles';
 
 interface TagSelectProps {
   value: TagName | null;
-  onChange: (newTagName: TagName | null) => void;
+  onChange: (newTagName: TagName | null) => void | Promise<void>;
+  onCreateOption: (newTagName: string) => void;
   autoFocus?: boolean;
   className?: string;
 }
 
-function TagSelectSingle({ className, value, onChange, autoFocus }: TagSelectProps) {
+function TagSelectSingle({ className, value, onChange, onCreateOption, autoFocus }: TagSelectProps) {
   return (
     <AsyncCreatableSelect
       className={'c-tag-input ' + className}
@@ -25,15 +26,16 @@ function TagSelectSingle({ className, value, onChange, autoFocus }: TagSelectPro
       }}
       autoFocus={autoFocus ?? false}
       getOptionLabel={(option) => option.title}
-      getNewOptionData={(inputValue, optionLabel) =>
-        ({ title: optionLabel, value: inputValue, __isNew__: true }) as unknown as TagName
+      getNewOptionData={(inputValue) =>
+        ({ title: inputValue, value: inputValue, __isNew__: true }) as unknown as TagName
       }
-      formatCreateLabel={(inputValue) => `create new tag "${inputValue}"?`}
+      formatCreateLabel={(inputValue) => `create tag: "${inputValue}"`}
       placeholder="Tag selection..."
       isClearable
       isMulti={false}
       isSearchable
       onChange={(newValue) => onChange(newValue)}
+      onCreateOption={(newValue) => onCreateOption(newValue)}
       cacheOptions
       defaultOptions
       styles={tagSelectStyles}

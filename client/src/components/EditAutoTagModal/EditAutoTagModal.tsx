@@ -28,8 +28,8 @@ import {
 } from '../../types/types';
 import AutoTagConditionInput from '../AutoTagCondition/AutoTagConditionInput';
 import TagSelectSingle from '../TagSelect/TagSelectSingle';
-import ToggleButton from '../ToggleButton/ToggleButton';
 import { getRandomColor } from '../Timeline/helpers/getColorForEvent';
+import type { TagNameDto } from '../../generated/api/types.gen';
 
 const NEW_CONDITION: AutoTagCondition = {
   booleanOperator: BooleanOperator.OR,
@@ -74,8 +74,6 @@ export function EditAutoTagModal() {
       ? [...prefillConditions, NEW_CONDITION]
       : [NEW_CONDITION, NEW_CONDITION]
   );
-  const [showCreateNewTagControls, setShowCreateNewTagControls] = useState<boolean>(false);
-  const [newTagName, setNewTagName] = useState<string>('');
   const [userModifiedName, setUserModifiedName] = useState<boolean>(false);
   const { data: autoTagsCount } = useQuery({ ...autoTagsControllerCountOptions() });
   const { data: autoTagResponse } = useQuery({
@@ -138,17 +136,12 @@ export function EditAutoTagModal() {
   const handleClose = () => navigate('/' + ROUTE_PARTS.manage + '/' + ROUTE_PARTS.autoTagRules);
 
   const handleSave = async () => {
-    // TODO add validation
-    let tagNameId: string;
-    if (showCreateNewTagControls) {
-      // create tag and get its id
-      const createdTagName = await createTagName({
-        body: { title: newTagName, color: getRandomColor() },
-      });
-      tagNameId = createdTagName.id as string;
-    } else {
-      tagNameId = selectedTagName?.id as string;
+    if (!selectedTagName?.id) {
+      toast('Please select a tag', { type: 'warning' });
+      return;
     }
+
+    const tagNameId = selectedTagName.id;
 
     const updatedAutoTag: Omit<AutoTag, 'id'> & { id?: string } = {
       tagNameId,
@@ -181,6 +174,34 @@ export function EditAutoTagModal() {
     handleClose();
   };
 
+  const handleTagCreate = async (inputValue: string) => {
+    const created = await createTagName({
+      body: { title: inputValue, code: '', color: getRandomColor() },
+    });
+    const newTag = created as TagNameDto as unknown as TagName;
+    setSelectedTagName(newTag);
+    if (!userModifiedName) setName(newTag.title || '');
+  };
+
+  const handleTagChanged = async (option: (TagName | null)) => {
+    if (!option) {
+      setSelectedTagName(null);
+      if (!userModifiedName) setName('');
+      return;
+    }
+    if ((option as TagName & { __isNew__?: boolean }).__isNew__) {
+      const created = await createTagName({
+        body: { title: option.title, code: '', color: getRandomColor() },
+      });
+      const newTag = created as TagNameDto as unknown as TagName;
+      setSelectedTagName(newTag);
+      if (!userModifiedName) setName(newTag.title || '');
+    } else {
+      setSelectedTagName(option);
+      if (!userModifiedName) setName(option.title || '');
+    }
+  }
+
   return (
     <Modal
       open
@@ -190,54 +211,27 @@ export function EditAutoTagModal() {
       <h3>{id ? 'Edit auto tag' : 'Add auto tag'}</h3>
 
       <div className="c-form">
-        <label>Program Tag</label>
-        <ToggleButton
-          optionTwoSelected={showCreateNewTagControls}
-          onChange={setShowCreateNewTagControls}
-          label1="Existing tag"
-          label2="Create new tag"
-        />
-        {!showCreateNewTagControls && (
-          <div className="flex flex-row items-center gap-2">
-            <div className="w-2/3">
-              <TagSelectSingle
-                value={selectedTagName || null}
-                onChange={(newTagName) => {
-                  setSelectedTagName(newTagName);
-                  if (!userModifiedName) {
-                    setName(newTagName?.title || '');
-                  }
-                }}
-                autoFocus={true}
-              />
-            </div>
-            {selectedTagName && (
-              <a
-                href={`/${ROUTE_PARTS.manage}/${ROUTE_PARTS.tagNames}/${selectedTagName.id}/${ROUTE_PARTS.edit}`}
-                target="_blank"
-                rel="noreferrer"
-                className="text-blue-600 hover:text-blue-800 whitespace-nowrap text-sm"
-              >
-                Open tag
-              </a>
-            )}
-          </div>
-        )}
-        {showCreateNewTagControls && (
-          <div>
-            <input
-              className="c-input"
-              value={newTagName}
-              onChange={(evt) => {
-                setNewTagName(evt.target.value);
-                if (!userModifiedName) {
-                  setName(evt.target.value);
-                }
-              }}
-              placeholder={'Name of the tag that should be created'}
+        <label>Tag name</label>
+        <div className="flex flex-row items-center gap-2">
+          <div className="w-2/3">
+            <TagSelectSingle
+              value={selectedTagName || null}
+              onChange={handleTagChanged}
+              onCreateOption={handleTagCreate}
+              autoFocus={true}
             />
           </div>
-        )}
+          {selectedTagName?.id && (
+            <a
+              href={`/${ROUTE_PARTS.manage}/${ROUTE_PARTS.tagNames}/${selectedTagName.id}/${ROUTE_PARTS.edit}`}
+              target="_blank"
+              rel="noreferrer"
+              className="text-blue-600 hover:text-blue-800 whitespace-nowrap text-sm"
+            >
+              Open tag
+            </a>
+          )}
+        </div>
 
         <label>Auto tag Name</label>
         <input

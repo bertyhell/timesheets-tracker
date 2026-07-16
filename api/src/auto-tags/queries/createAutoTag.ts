@@ -30,7 +30,7 @@ export function createAutoTag(db: DatabaseSync, params: CreateAutoTagParams): Cr
     .run(
       params.id,
       params.title,
-      params.tagNameId,
+      params.tagNameId ?? null,
       params.priority,
       params.conditions
     ) as CreateAutoTagResult;

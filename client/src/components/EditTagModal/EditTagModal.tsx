@@ -11,13 +11,15 @@ import { Pencil } from 'lucide-react';
 
 import { ROUTE_PARTS } from '../../App';
 import {
+  tagNamesControllerCreateMutation,
   tagNamesControllerFindOneOptions,
   tagsControllerCreateMutation,
   tagsControllerFindOneOptions,
   tagsControllerRemoveMutation,
   tagsControllerUpdateMutation,
 } from '../../generated/api/@tanstack/react-query.gen';
-import type { TagDto } from '../../generated/api/types.gen';
+import type { TagDto, TagNameDto } from '../../generated/api/types.gen';
+import { getRandomColor } from '../Timeline/helpers/getColorForEvent';
 import type { TagName } from '../../types/types';
 import TagSelectSingle from '../TagSelect/TagSelectSingle';
 import Button, { ButtonSize, ButtonVariant } from '../Button/Button';
@@ -52,6 +54,7 @@ export function EditTagModal() {
     enabled: !!(tag as TagDto)?.tagNameId,
   });
 
+  const { mutateAsync: createTagName } = useMutation({ ...tagNamesControllerCreateMutation() });
   const { mutateAsync: createTag } = useMutation({ ...tagsControllerCreateMutation() });
   const { mutateAsync: updateTag } = useMutation({ ...tagsControllerUpdateMutation() });
   const { mutateAsync: deleteTag } = useMutation({ ...tagsControllerRemoveMutation() });
@@ -74,13 +77,22 @@ export function EditTagModal() {
   const handleClose = () => navigate('/' + ROUTE_PARTS.timelinesAndEvents);
 
   const handleSave = async () => {
-    if (!selectedTagName?.id || !startedAt || !endedAt) {
+    if (!selectedTagName?.title || !startedAt || !endedAt) {
       toast('Please fill in all fields', { type: 'warning' });
       return;
     }
 
+    let tagNameId = selectedTagName.id;
+
+    if ((selectedTagName as TagName & { __isNew__?: boolean }).__isNew__) {
+      const created = await createTagName({
+        body: { title: selectedTagName.title, code: '', color: getRandomColor() },
+      });
+      tagNameId = (created as TagNameDto).id;
+    }
+
     const body = {
-      tagNameId: selectedTagName.id,
+      tagNameId,
       startedAt: new Date(startedAt).toISOString(),
       endedAt: new Date(endedAt).toISOString(),
       note: note || undefined,

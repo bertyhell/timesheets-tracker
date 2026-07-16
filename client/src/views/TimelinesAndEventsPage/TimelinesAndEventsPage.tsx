@@ -182,6 +182,9 @@ export function TimelinesAndEventsPage() {
     };
     const result = await timelinesControllerFindAllEvents({ query });
     queryClient.setQueryData<TimelinesControllerFindAllEventsResponse>(eventsQueryKey, result.data);
+    // The backend cleared its cached Productive lists; drop the client caches too
+    // so the sync modal refetches them fresh.
+    await queryClient.invalidateQueries({ queryKey: ['productive'] });
   }, [viewDate, eventsQueryKey, queryClient]);
 
   const totalEventCount = selectedTimeline?.events?.length ?? 0;

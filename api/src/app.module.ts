@@ -6,7 +6,7 @@ import { DatabaseModule } from './database/database.module';
 import { TagsModule } from './tags/tags.module';
 import { TagNamesModule } from './tag-names/tag-names.module';
 import { AutoTagsModule } from './auto-tags/auto-tags.module';
-import { ActiveStatesModule } from './activeStates/active-states.module';
+import { ActiveStatesModule } from './active-states/active-states.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { WebsitesModule } from './websites/websites.module';
 import { AutoNotesModule } from './auto-notes/auto-notes.module';

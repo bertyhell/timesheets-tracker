@@ -7,7 +7,7 @@ import { DateRangeMode, OverviewFlatRow, OverviewSourceType, SavedOverviewConfig
 import { TagsService } from '../tags/tags.service';
 import { ProgramsService } from '../programs/programs.service';
 import { WebsitesService } from '../websites/websites.service';
-import { ActiveStatesService } from '../activeStates/active-states.service';
+import { ActiveStatesService } from '../active-states/active-states.service';
 import { CreateSavedOverviewConfigDto } from './dto/create-saved-overview-config.dto';
 import { UpdateSavedOverviewConfigDto } from './dto/update-saved-overview-config.dto';
 import { findAllSavedOverviewConfigs } from './queries/findAllSavedOverviewConfigs';

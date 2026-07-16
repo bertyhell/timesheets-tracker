@@ -31,7 +31,7 @@ import { WebsitesService } from '../websites/websites.service';
 import { TagsService } from '../tags/tags.service';
 import { AutoTagsService } from '../auto-tags/auto-tags.service';
 import { AutoNotesService } from '../auto-notes/auto-notes.service';
-import { ActiveStatesService } from '../activeStates/active-states.service';
+import { ActiveStatesService } from '../active-states/active-states.service';
 import { AutoTagDto } from '../auto-tags/dto/response-auto-tag.dto';
 import { TagNamesService } from '../tag-names/tag-names.service';
 import { GitCommitsService, GitCommitEvent } from '../git-commits/git-commits.service';
@@ -222,6 +222,11 @@ export class TimelinesService {
     clearCache = false
   ): Promise<TimelineWithEventsDto[]> {
     try {
+      // A refresh should also drop the cached Productive company/deal/service lists.
+      if (clearCache) {
+        this.productiveService.clearListCache();
+      }
+
       const timelines = await this.findAllTimelines(undefined);
       let timelinesToFetch: TimelineDto[];
       if (timelineIds) {

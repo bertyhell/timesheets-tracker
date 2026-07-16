@@ -99,9 +99,16 @@ export class TagNamesService {
   async update(id: string, updateTagDto: UpdateTagNameDto): Promise<TagName> {
     try {
       const db = this.databaseService.getDb();
+      // Merge with the existing row so partial updates (e.g. only `code`) don't
+      // bind `undefined` for the omitted columns.
+      const existing = await this.findOne(id);
       await updateTagName(
         db,
-        { title: updateTagDto.title, code: updateTagDto.code, color: updateTagDto.color },
+        {
+          title: updateTagDto.title ?? existing.title,
+          code: updateTagDto.code !== undefined ? updateTagDto.code : existing.code,
+          color: updateTagDto.color ?? existing.color,
+        },
         { id }
       );
 

@@ -8,7 +8,7 @@ import { WebsitesModule } from '../websites/websites.module';
 import { TagsModule } from '../tags/tags.module';
 import { AutoNotesModule } from '../auto-notes/auto-notes.module';
 import { AutoTagsModule } from '../auto-tags/auto-tags.module';
-import { ActiveStatesModule } from '../activeStates/active-states.module';
+import { ActiveStatesModule } from '../active-states/active-states.module';
 import { TagNamesModule } from '../tag-names/tag-names.module';
 import { GitCommitsModule } from '../git-commits/git-commits.module';
 import { ProductiveModule } from '../productive/productive.module';

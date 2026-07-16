@@ -687,6 +687,72 @@ export type UpdateTimelineDto = {
     color?: string | null;
 };
 
+export type ProductiveCompanyDto = {
+    /**
+     * Productive company ID
+     */
+    companyId: string;
+    /**
+     * Name of the company
+     */
+    companyName: string;
+};
+
+export type ProductiveDealDto = {
+    /**
+     * Productive deal ID
+     */
+    dealId: string;
+    /**
+     * Name of the deal
+     */
+    dealName: string;
+};
+
+export type ProductiveServiceDto = {
+    /**
+     * Productive service ID
+     */
+    serviceId: string;
+    /**
+     * Name of the service
+     */
+    serviceName: string;
+};
+
+export type SyncTimeEntryDto = {
+    /**
+     * Productive service ID to track time on
+     */
+    serviceId: string;
+    /**
+     * Duration of the entry in minutes
+     */
+    minutes: number;
+    /**
+     * Note / description for the entry
+     */
+    note?: string;
+};
+
+export type SyncTimeEntriesDto = {
+    /**
+     * Date to track the time on (yyyy-MM-dd)
+     */
+    date: string;
+    /**
+     * Time entries to create
+     */
+    entries: Array<SyncTimeEntryDto>;
+};
+
+export type SyncTimeEntriesResultDto = {
+    /**
+     * Number of time entries created in Productive
+     */
+    created: number;
+};
+
 export type IntegrationDto = {
     /**
      * Integration type identifier (e.g. "productive")
@@ -1634,6 +1700,63 @@ export type TimelinesControllerReorderResponses = {
 };
 
 export type TimelinesControllerReorderResponse = TimelinesControllerReorderResponses[keyof TimelinesControllerReorderResponses];
+
+export type ProductiveControllerGetCompaniesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/productive/companies';
+};
+
+export type ProductiveControllerGetCompaniesResponses = {
+    200: Array<ProductiveCompanyDto>;
+};
+
+export type ProductiveControllerGetCompaniesResponse = ProductiveControllerGetCompaniesResponses[keyof ProductiveControllerGetCompaniesResponses];
+
+export type ProductiveControllerGetDealsData = {
+    body?: never;
+    path?: never;
+    query: {
+        companyId: string;
+    };
+    url: '/api/productive/deals';
+};
+
+export type ProductiveControllerGetDealsResponses = {
+    200: Array<ProductiveDealDto>;
+};
+
+export type ProductiveControllerGetDealsResponse = ProductiveControllerGetDealsResponses[keyof ProductiveControllerGetDealsResponses];
+
+export type ProductiveControllerGetServicesData = {
+    body?: never;
+    path?: never;
+    query: {
+        dealId: string;
+        date: string;
+    };
+    url: '/api/productive/services';
+};
+
+export type ProductiveControllerGetServicesResponses = {
+    200: Array<ProductiveServiceDto>;
+};
+
+export type ProductiveControllerGetServicesResponse = ProductiveControllerGetServicesResponses[keyof ProductiveControllerGetServicesResponses];
+
+export type ProductiveControllerSyncData = {
+    body: SyncTimeEntriesDto;
+    path?: never;
+    query?: never;
+    url: '/api/productive/sync';
+};
+
+export type ProductiveControllerSyncResponses = {
+    200: SyncTimeEntriesResultDto;
+};
+
+export type ProductiveControllerSyncResponse = ProductiveControllerSyncResponses[keyof ProductiveControllerSyncResponses];
 
 export type IntegrationsControllerRemoveData = {
     body?: never;

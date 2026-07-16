@@ -32,6 +32,7 @@ import {
 } from './helpers/getMostProminentConditions';
 import { TimelineType } from './Timeline.types';
 import { ColorInput } from '../ColorInput/ColorInput';
+import { SyncToProductiveModal } from '../SyncToProductiveModal/SyncToProductiveModal';
 
 interface ResizeState {
   tagId: string;
@@ -127,6 +128,7 @@ function Timeline({
   const [resizeCurrentPosX, setResizeCurrentPosX] = useState<number | null>(null);
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const [titleContextMenu, setTitleContextMenu] = useState<{ x: number; y: number } | null>(null);
+  const [syncModalOpen, setSyncModalOpen] = useState(false);
   const trackRef = useRef<HTMLDivElement>(null);
   const [trackWidth, setTrackWidth] = useState(0);
   const [pendingCreate, setPendingCreate] = useState<{ title: string; code: string; color: string } | null>(null);
@@ -702,6 +704,10 @@ function Timeline({
             ...(onRefreshEvents
               ? [{ label: 'Refresh events', onClick: () => { setTitleContextMenu(null); onRefreshEvents(); } }]
               : []),
+            ...(timelineInfo.timelineType === TimelineType.Tag ||
+            timelineInfo.timelineType === TimelineType.AutoTag
+              ? [{ label: 'Sync', onClick: () => { setTitleContextMenu(null); setSyncModalOpen(true); } }]
+              : []),
           ]}
           onClose={() => setTitleContextMenu(null)}
         />
@@ -748,6 +754,15 @@ function Timeline({
           </Button>
         </div>
       </Modal>
+
+      {/* Sync to Productive modal */}
+      <SyncToProductiveModal
+        open={syncModalOpen}
+        onClose={() => setSyncModalOpen(false)}
+        date={format(minTime, 'yyyy-MM-dd')}
+        timelineType={timelineInfo.timelineType}
+        events={events}
+      />
     </>
   );
 }

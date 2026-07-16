@@ -22,6 +22,14 @@
     list-style: none;
   }
 
+  .c-timeline__event__tooltip {
+    li {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
   [id*='react-select-'] {
     color: black;
   }

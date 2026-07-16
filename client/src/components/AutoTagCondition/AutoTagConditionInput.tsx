@@ -51,7 +51,7 @@ function AutoTagConditionInput({
     >
       {showBooleanOperator && (
         <Button
-          className="c-auto-tag-condition__boolean-operator-button"
+          className="c-auto-tag-condition__boolean-operator-button !px-0 justify-center"
           size={ButtonSize.Small}
           onClick={() =>
             onChange(
@@ -78,7 +78,11 @@ function AutoTagConditionInput({
         isMulti={false}
         menuPortalTarget={document.body}
         menuPosition="fixed"
-        styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+        styles={{
+          menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+          control: (base) => ({ ...base, fontSize: '0.8rem' }),
+          option: (base) => ({ ...base, fontSize: '0.8rem' }),
+        }}
       ></Select>
       <Select<SelectOption<types.ConditionOperator>>
         className="c-auto-tag-condition__operator-select"
@@ -90,7 +94,11 @@ function AutoTagConditionInput({
         isMulti={false}
         menuPortalTarget={document.body}
         menuPosition="fixed"
-        styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+        styles={{
+          menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+          control: (base) => ({ ...base, fontSize: '0.8rem' }),
+          option: (base) => ({ ...base, fontSize: '0.8rem' }),
+        }}
       ></Select>
       <input
         className="c-input c-auto-tag-condition__value-input"

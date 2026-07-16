@@ -26,7 +26,15 @@
   transform: translateY(calc(-50% - 0.25rem));
 }
 
+.c-auto-tag-condition--and .c-auto-tag-condition__boolean-operator-button {
+  transform: translateY(calc(-50% - 0.1rem));
+}
+
 .c-auto-tag-condition__variable-select,
 .c-auto-tag-condition__operator-select {
   width: 25rem;
+}
+
+.c-auto-tag-condition__value-input {
+  font-size: 0.8rem;
 }

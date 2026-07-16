@@ -85,9 +85,18 @@ export class ProductiveService {
 
     const bookingsJson = await bookingsRes.json() as Record<string, unknown>;
 
-    db.prepare(
-      'INSERT OR REPLACE INTO cachedNetworkRequests (cacheKey, responseJson) VALUES (?, ?)'
-    ).run(cacheKey, JSON.stringify(bookingsJson));
+    const today = new Date();
+    const todayKey = [
+      today.getFullYear(),
+      String(today.getMonth() + 1).padStart(2, '0'),
+      String(today.getDate()).padStart(2, '0'),
+    ].join('-');
+
+    if (date < todayKey) {
+      db.prepare(
+        'INSERT OR REPLACE INTO cachedNetworkRequests (cacheKey, responseJson) VALUES (?, ?)'
+      ).run(cacheKey, JSON.stringify(bookingsJson));
+    }
 
     const bookings: ProductiveBooking[] = (bookingsJson.data as ProductiveBooking[]) ?? [];
     const included: ProductiveServiceRecord[] = (bookingsJson.included as ProductiveServiceRecord[]) ?? [];

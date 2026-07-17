@@ -24,6 +24,7 @@ export class TagNamesService {
       title: rawTagName.title,
       code: rawTagName.code,
       color: rawTagName.color,
+      note: rawTagName.note ?? null,
     };
   }
 
@@ -83,6 +84,7 @@ export class TagNamesService {
         title: tagName.title,
         code: tagName.code ?? null,
         color: tagName.color,
+        note: tagName.note ?? null,
       });
 
       return await this.findOne(id);
@@ -108,6 +110,7 @@ export class TagNamesService {
           title: updateTagDto.title ?? existing.title,
           code: updateTagDto.code !== undefined ? updateTagDto.code : existing.code,
           color: updateTagDto.color ?? existing.color,
+          note: updateTagDto.note !== undefined ? updateTagDto.note : (existing.note ?? null),
         },
         { id }
       );

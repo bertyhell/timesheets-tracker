@@ -272,6 +272,7 @@ export class TimelinesService {
                       tagNameName: tag.tagName?.title,
                       tagNameColor: tag.tagName?.color,
                       tagNameCode: tag.tagName?.code,
+                      tagNameNote: tag.tagName?.note || undefined,
                       note: tag.note || undefined,
                     },
                     timelineId: timelineInfo.id,

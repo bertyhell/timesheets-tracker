@@ -30,4 +30,14 @@ export class CreateTagNameDto {
     default: undefined,
   })
   color: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Optional note for this tag name, copied to all tags created with it',
+    default: undefined,
+  })
+  note?: string;
 }

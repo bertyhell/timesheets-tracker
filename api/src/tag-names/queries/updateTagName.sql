@@ -2,5 +2,6 @@ UPDATE tagNames
 SET
     title = :title,
     code = :code,
-    color = :color
+    color = :color,
+    note = :note
 WHERE id = :id

@@ -4,6 +4,7 @@ export type UpdateTagNameData = {
   title: string;
   code: string | null;
   color: string;
+  note: string | null;
 };
 
 export type UpdateTagNameParams = {
@@ -24,8 +25,9 @@ export function updateTagName(
 	SET
 	    title = ?,
 	    code = ?,
-	    color = ?
+	    color = ?,
+	    note = ?
 	WHERE id = ?
 	`;
-  return db.prepare(sql).run(data.title, data.code, data.color, params.id) as UpdateTagNameResult;
+  return db.prepare(sql).run(data.title, data.code, data.color, data.note, params.id) as UpdateTagNameResult;
 }

@@ -212,6 +212,7 @@ function convertTagEventsToAutoTagEvents(
         tagNameTitle: tagInfo.tagNameName,
         tagNameColor: tagInfo.tagNameColor,
         tagNameCode: tagInfo.tagNameCode,
+        tagNameNote: tagInfo.tagNameNote,
         priority: Infinity,
       };
       return {
@@ -317,6 +318,7 @@ export function calculateAutoTagEvents(
         tagNameColor: tagName.color,
         tagNameTitle: tagName.title,
         tagNameCode: tagName.code,
+        tagNameNote: tagName.note || undefined,
         priority: autoTag.priority,
       };
       autoTagEvents.push({

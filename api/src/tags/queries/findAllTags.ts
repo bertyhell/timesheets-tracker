@@ -14,6 +14,7 @@ export type FindAllTagsResult = {
   'tagName.id'?: string;
   'tagName.title'?: string;
   'tagName.color'?: string;
+  'tagName.note'?: string;
 };
 
 export function findAllTags(db: DatabaseSync, params: FindAllTagsParams): FindAllTagsResult[] {
@@ -26,7 +27,8 @@ export function findAllTags(db: DatabaseSync, params: FindAllTagsParams): FindAl
 	    tags.note as note,
 	    tagNames.id as "tagName.id",
 	    tagNames.title as "tagName.title",
-	    tagNames.color as "tagName.color"
+	    tagNames.color as "tagName.color",
+	    tagNames.note as "tagName.note"
 	FROM (
 	    SELECT *, ROW_NUMBER() OVER (PARTITION BY startedAt ORDER BY (julianday(endedAt) - julianday(startedAt)) DESC) as rn
 	    FROM tags
@@ -51,6 +53,7 @@ function mapArrayToFindAllTagsResult(data: any) {
     'tagName.id': data['tagName.id'],
     'tagName.title': data['tagName.title'],
     'tagName.color': data['tagName.color'],
+    'tagName.note': data['tagName.note'],
   };
   return result;
 }

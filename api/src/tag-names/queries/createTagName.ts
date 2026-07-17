@@ -5,6 +5,7 @@ export type CreateTagNameParams = {
   title: string;
   code: string | null;
   color: string;
+  note: string | null;
 };
 
 export type CreateTagNameResult = {
@@ -15,10 +16,10 @@ export type CreateTagNameResult = {
 export function createTagName(db: DatabaseSync, params: CreateTagNameParams): CreateTagNameResult {
   const sql = `
 	INSERT INTO tagNames
-	(id, title, code, color)
-	VALUES (?, ?, ?, ?)
+	(id, title, code, color, note)
+	VALUES (?, ?, ?, ?, ?)
 	`;
   return db
     .prepare(sql)
-    .run(params.id, params.title, params.code, params.color) as CreateTagNameResult;
+    .run(params.id, params.title, params.code, params.color, params.note) as CreateTagNameResult;
 }

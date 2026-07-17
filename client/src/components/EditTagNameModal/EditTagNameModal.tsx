@@ -23,6 +23,7 @@ export function EditTagNameModal() {
   const [name, setName] = useState<string>('');
   const [code, setCode] = useState<string>('');
   const [color, setColor] = useState<string>(getRandomColor());
+  const [note, setNote] = useState<string>('');
   const { mutateAsync: createTagName } = useMutation({ ...tagNamesControllerCreateMutation() });
   const { mutateAsync: updateTagName } = useMutation({ ...tagNamesControllerUpdateMutation() });
   const { mutateAsync: deleteTagName } = useMutation({ ...tagNamesControllerRemoveMutation() });
@@ -37,6 +38,7 @@ export function EditTagNameModal() {
       setName(tagName.title);
       setCode(tagName.code);
       setColor(tagName.color);
+      setNote(tagName.note ?? '');
     }
   }, [tagName]);
 
@@ -52,6 +54,7 @@ export function EditTagNameModal() {
           title: tagName.title,
           code: tagName.code,
           color: tagName.color,
+          note: tagName.note,
         },
       });
 
@@ -64,6 +67,7 @@ export function EditTagNameModal() {
           title: tagName.title,
           code: tagName.code,
           color: tagName.color,
+          note: tagName.note,
         },
       });
 
@@ -106,6 +110,14 @@ export function EditTagNameModal() {
 
         <h4 className="mt-4">Color</h4>
         <ColorInput color={color} onChange={setColor} />
+
+        <h4 className="mt-4">Note</h4>
+        <textarea
+          className="c-input"
+          value={note}
+          rows={3}
+          onChange={(evt: ChangeEvent<HTMLTextAreaElement>) => setNote(evt.target?.value)}
+        />
       </div>
 
       <div className="flex flex-row justify-between gap-2 mt-48">
@@ -127,6 +139,7 @@ export function EditTagNameModal() {
                 title: name,
                 code,
                 color,
+                note: note || undefined,
               });
             }}
             variant={ButtonVariant.Primary}

@@ -124,6 +124,10 @@ export type CreateTagNameDto = {
      * Hex code of the color to give tags with this tag name
      */
     color?: string;
+    /**
+     * Optional note for this tag name, copied to all tags created with it
+     */
+    note?: string;
 };
 
 export type TagNameDto = {
@@ -143,6 +147,10 @@ export type TagNameDto = {
      * Hex code of the color to give tags with this tag name
      */
     color?: string;
+    /**
+     * Optional note for this tag name, copied to all tags created with it
+     */
+    note?: string;
 };
 
 export type UpdateTagNameDto = {
@@ -158,6 +166,10 @@ export type UpdateTagNameDto = {
      * Hex code of the color to give tags with this tag name
      */
     color?: string;
+    /**
+     * Optional note for this tag name, copied to all tags created with it
+     */
+    note?: string;
 };
 
 /**
@@ -476,6 +488,10 @@ export type TagEventInfoDto = {
      */
     tagNameCode?: string | null;
     /**
+     * Optional note from the tag name definition
+     */
+    tagNameNote?: string | null;
+    /**
      * Optional note for this tag event, set manually or derived by an auto-note rule
      */
     note?: string | null;
@@ -502,6 +518,10 @@ export type AutoTagEventInfoDto = {
      * Optional short code for the tag
      */
     tagNameCode?: string | null;
+    /**
+     * Optional note from the tag name definition
+     */
+    tagNameNote?: string | null;
     /**
      * Priority of the auto tag that produced this event
      */

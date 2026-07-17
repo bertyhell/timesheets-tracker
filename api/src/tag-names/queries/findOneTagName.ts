@@ -9,6 +9,7 @@ export type FindOneTagNameResult = {
   title: string;
   code?: string;
   color: string;
+  note?: string;
 };
 
 export function findOneTagName(
@@ -16,7 +17,7 @@ export function findOneTagName(
   params: FindOneTagNameParams
 ): FindOneTagNameResult | null {
   const sql = `
-	SELECT id, title, code, color
+	SELECT id, title, code, color, note
 	FROM tagNames
 	WHERE id = ?
 	LIMIT 1

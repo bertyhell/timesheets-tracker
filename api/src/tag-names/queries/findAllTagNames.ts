@@ -5,15 +5,16 @@ export type FindAllTagNamesResult = {
   title: string;
   code?: string;
   color: string;
+  note?: string;
 };
 
 export function findAllTagNames(db: DatabaseSync): FindAllTagNamesResult[] {
   const sql = `
-	SELECT tn.id, tn.title, tn.code, tn.color
+	SELECT tn.id, tn.title, tn.code, tn.color, tn.note
 	FROM tagNames tn
 	LEFT JOIN tags t ON t.tagNameId = tn.id
 	  AND t.endedAt >= datetime('now', '-14 days')
-	GROUP BY tn.id, tn.title, tn.code, tn.color
+	GROUP BY tn.id, tn.title, tn.code, tn.color, tn.note
 	ORDER BY
 	  CASE WHEN MAX(t.endedAt) IS NOT NULL THEN 0 ELSE 1 END,
 	  MAX(t.endedAt) DESC,
@@ -31,6 +32,7 @@ function mapArrayToFindAllTagNamesResult(data: any) {
     title: data.title,
     code: data.code,
     color: data.color,
+    note: data.note,
   };
   return result;
 }

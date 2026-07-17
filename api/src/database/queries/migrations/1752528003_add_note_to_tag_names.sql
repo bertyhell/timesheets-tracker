@@ -1,0 +1,1 @@
+ALTER TABLE tagNames ADD COLUMN note TEXT;

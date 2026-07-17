@@ -9,6 +9,7 @@ export type FindAllTagNamesBySearchTermResult = {
   title: string;
   code?: string;
   color: string;
+  note?: string;
 };
 
 export function findAllTagNamesBySearchTerm(
@@ -16,12 +17,12 @@ export function findAllTagNamesBySearchTerm(
   params: FindAllTagNamesBySearchTermParams
 ): FindAllTagNamesBySearchTermResult[] {
   const sql = `
-	SELECT tn.id, tn.title, tn.code, tn.color
+	SELECT tn.id, tn.title, tn.code, tn.color, tn.note
 	FROM tagNames tn
 	LEFT JOIN tags t ON t.tagNameId = tn.id
 	  AND t.endedAt >= datetime('now', '-14 days')
 	WHERE tn.title like '%' || ? || '%'
-	GROUP BY tn.id, tn.title, tn.code, tn.color
+	GROUP BY tn.id, tn.title, tn.code, tn.color, tn.note
 	ORDER BY
 	  CASE WHEN MAX(t.endedAt) IS NOT NULL THEN 0 ELSE 1 END,
 	  MAX(t.endedAt) DESC,
@@ -39,6 +40,7 @@ function mapArrayToFindAllTagNamesBySearchTermResult(data: any) {
     title: data.title,
     code: data.code,
     color: data.color,
+    note: data.note,
   };
   return result;
 }

@@ -13,6 +13,7 @@ export type FindOneTagResult = {
   'tagName.id': string;
   'tagName.title': string;
   'tagName.color': string;
+  'tagName.note'?: string;
 };
 
 export function findOneTag(db: DatabaseSync, params: FindOneTagParams): FindOneTagResult | null {
@@ -25,7 +26,8 @@ export function findOneTag(db: DatabaseSync, params: FindOneTagParams): FindOneT
 	    tags.note as note,
 	    tagNames.id as "tagName.id",
 	    tagNames.title as "tagName.title",
-	    tagNames.color as "tagName.color"
+	    tagNames.color as "tagName.color",
+	    tagNames.note as "tagName.note"
 	FROM tags
 	LEFT JOIN tagNames ON tagNames.id = tags.tagNameId
 	WHERE tags.id = ?

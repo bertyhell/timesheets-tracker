@@ -34,6 +34,7 @@ export interface TagName {
   title: string;
   code: string;
   color: string;
+  note?: string | null;
 }
 
 export interface AutoNote {

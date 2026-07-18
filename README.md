@@ -23,7 +23,9 @@ This program is in alpha stage. Expect bugs and report them to make the applicat
 
 # Install
 
-Download the latest build for your platform from the [Releases page](../../releases).
+[![Download](assets/download-button.svg)](https://bertyhell.github.io/timesheets-tracker/)
+
+Or grab a specific build from the [Releases page](../../releases).
 
 ## macOS
 

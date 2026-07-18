@@ -44,3 +44,27 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: ${{ matrix.os == 'macos-latest' && 'false' || '' }}
+
+  notes:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Append macOS install note to release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          BODY="$(gh release view "$TAG" --json body -q .body)"
+          NOTE='
+
+          ## macOS install note
+
+          This app is not code-signed or notarized (no paid Apple Developer account). On first launch, macOS will say `"Timesheets Tracker.app" is damaged and can'"'"'t be opened`. This is not actual damage — it'"'"'s Gatekeeper blocking an unsigned, unnotarized download. To fix it, run once in Terminal:
+
+          ```shell
+          xattr -cr "/Applications/Timesheets Tracker.app"
+          ```
+
+          If that fails with `Operation not permitted`, your terminal app needs Full Disk Access: System Settings → Privacy & Security → Full Disk Access → enable it for your terminal app, then fully quit and reopen the terminal and try again.'
+          printf '%s%s\n' "$BODY" "$NOTE" | gh release edit "$TAG" --notes-file -

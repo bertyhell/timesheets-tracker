@@ -6,6 +6,26 @@ Track with windows are open throughout the day and configure rules to autotag th
 
 ![screenshot interface](assets/screenshot.png)
 
+# Install
+
+Download the latest build for your platform from the [Releases page](../../releases).
+
+## macOS
+
+This app is not code-signed or notarized — that requires a paid Apple Developer account, which this open-source project doesn't have. On first launch, macOS will say:
+
+> "Timesheets Tracker.app" is damaged and can't be opened. You should move it to the Bin
+
+This isn't actual damage — it's Gatekeeper blocking an unsigned, unnotarized app that was downloaded from the internet. To fix it, run this once in Terminal:
+
+```shell
+xattr -cr "/Applications/Timesheets Tracker.app"
+```
+
+Then open the app normally.
+
+If that command fails with `Operation not permitted`, your terminal app needs Full Disk Access: System Settings → Privacy & Security → Full Disk Access → enable it for your terminal app (Terminal, iTerm, etc.), then fully quit and reopen the terminal and try the command again.
+
 Still TODO:
 
 - add option to add tags

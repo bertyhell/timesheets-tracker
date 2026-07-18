@@ -43,13 +43,13 @@ module.exports = {
   // ── Windows ──────────────────────────────────────────────────────────────
   win: {
     target: [{ target: 'nsis', arch: ['x64'] }],
-    icon: 'icon/ico.ico',
+    icon: 'icon/icon.ico',
   },
   nsis: {
     oneClick: false,
     allowToChangeInstallationDirectory: true,
-    installerIcon: 'icon/ico.ico',
-    uninstallerIcon: 'icon/ico.ico',
+    installerIcon: 'icon/icon.ico',
+    uninstallerIcon: 'icon/icon.ico',
   },
 
   // ── macOS ─────────────────────────────────────────────────────────────────

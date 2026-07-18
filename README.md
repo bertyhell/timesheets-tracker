@@ -45,19 +45,9 @@ If that command fails with `Operation not permitted`, your terminal app needs Fu
 
 Still TODO:
 
-- add option to add tags
 - add export options
-- add install service for linux/mac
 
 # Build
-
-## Build first time
-
-```shell
-npm run build-service-script
-npm run copy-database
-npm run build
-```
 
 ## Build during development
 

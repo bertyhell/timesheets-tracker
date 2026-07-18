@@ -54,10 +54,7 @@ module.exports = {
 
   // ── macOS ─────────────────────────────────────────────────────────────────
   mac: {
-    target: [
-      { target: 'dmg', arch: ['x64', 'arm64', 'universal'] },
-      { target: 'pkg', arch: ['x64', 'arm64', 'universal'] },
-    ],
+    target: [{ target: 'dmg', arch: ['x64', 'arm64'] }],
     icon: 'icon/icon.png',
     category: 'public.app-category.productivity',
     // Keep running in tray after closing last window
@@ -65,21 +62,12 @@ module.exports = {
       LSUIElement: false,
       NSRequiresAquaSystemAppearance: false,
     },
-    // @libsql ships pre-built arch-specific binaries as separate npm packages
-    // (@libsql/darwin-x64, @libsql/darwin-arm64). Both end up in api/node_modules
-    // for both arch builds, so @electron/universal sees identical .node files in
-    // both slices. Tell it to treat them as x64-side files and skip the fat-binary check.
-    x64ArchFiles: '**/node_modules/@libsql/**/*.node',
   },
   dmg: {
     contents: [
       { x: 130, y: 220 },
       { x: 410, y: 220, type: 'link', path: '/Applications' },
     ],
-  },
-  pkg: {
-    allowCurrentUserHome: true,
-    allowRootDirectory: false,
   },
 
   // ── Linux ─────────────────────────────────────────────────────────────────

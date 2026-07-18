@@ -88,7 +88,7 @@ export function EditTagModal() {
       const created = await createTagName({
         body: { title: selectedTagName.title, code: '', color: getRandomColor() },
       });
-      tagNameId = (created as TagNameDto).id;
+      tagNameId = (created as TagNameDto as unknown as TagName).id;
     }
 
     const body = {

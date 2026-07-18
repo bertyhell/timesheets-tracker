@@ -9,7 +9,7 @@ import { tagSelectStyles } from './tagSelectStyles';
 interface TagSelectProps {
   value: TagName | null;
   onChange: (newTagName: TagName | null) => void | Promise<void>;
-  onCreateOption: (newTagName: string) => void;
+  onCreateOption?: (newTagName: string) => void;
   autoFocus?: boolean;
   className?: string;
 }
@@ -52,7 +52,7 @@ function TagSelectSingle({ className, value, onChange, onCreateOption, autoFocus
       isMulti={false}
       isSearchable
       onChange={(newValue) => onChange(newValue)}
-      onCreateOption={(newValue) => onCreateOption(newValue)}
+      onCreateOption={onCreateOption ? (newValue) => onCreateOption(newValue) : undefined}
       cacheOptions
       defaultOptions
       styles={tagSelectStyles}

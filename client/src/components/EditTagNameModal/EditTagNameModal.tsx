@@ -54,7 +54,7 @@ export function EditTagNameModal() {
           title: tagName.title,
           code: tagName.code,
           color: tagName.color,
-          note: tagName.note,
+          note: tagName.note ?? undefined,
         },
       });
 
@@ -67,7 +67,7 @@ export function EditTagNameModal() {
           title: tagName.title,
           code: tagName.code,
           color: tagName.color,
-          note: tagName.note,
+          note: tagName.note ?? undefined,
         },
       });
 

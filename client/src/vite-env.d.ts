@@ -1,5 +1,7 @@
 /// <reference types="vite/client" />
 
+declare module 'plotly.js-dist-min';
+
 interface Window {
   electron?: {
     selectDirectory: () => Promise<string | null>;

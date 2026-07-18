@@ -22,8 +22,11 @@ import {
   nativeImage,
   shell,
 } from 'electron';
+import { autoUpdater } from 'electron-updater';
 import { spawn, ChildProcess } from 'child_process';
 import * as path from 'path';
+
+const UPDATE_CHECK_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000; // 1 week
 
 const APP_PORT = 55577;
 const APP_URL = `http://localhost:${APP_PORT}`;
@@ -187,6 +190,12 @@ function updateTrayMenu(): void {
         },
         { type: 'separator' },
         {
+          label: 'Check for Updates…',
+          enabled: app.isPackaged,
+          click: () => checkForUpdates(true),
+        },
+        { type: 'separator' },
+        {
           label: 'Open Installation Dir',
           click: () =>
             shell.openPath(isDev ? path.join(__dirname, '../..') : app.getPath('userData')),
@@ -236,6 +245,71 @@ function quit(): void {
   app.quit();
 }
 
+// ── Auto-update (electron-updater, GitHub releases provider) ────────────────
+// Feed config is generated at build time (app-update.yml) from the `publish`
+// block in electron-builder.config.js, pointing at the GitHub releases page.
+let isManualUpdateCheck = false;
+
+function setupAutoUpdater(): void {
+  autoUpdater.autoDownload = true;
+  autoUpdater.autoInstallOnAppQuit = true;
+
+  autoUpdater.on('checking-for-update', () => {
+    console.log('[electron] Checking for update...');
+  });
+
+  autoUpdater.on('update-not-available', () => {
+    console.log('[electron] No update available');
+    if (isManualUpdateCheck) {
+      dialog.showMessageBox({
+        type: 'info',
+        title: 'No Updates',
+        message: `You're running the latest version (${app.getVersion()}).`,
+      });
+    }
+  });
+
+  autoUpdater.on('error', (err) => {
+    console.error('[electron] Auto-update error:', err);
+    if (isManualUpdateCheck) {
+      dialog.showErrorBox('Update Check Failed', err instanceof Error ? err.message : String(err));
+    }
+  });
+
+  autoUpdater.on('update-available', (info) => {
+    console.log('[electron] Update available:', info.version);
+  });
+
+  autoUpdater.on('update-downloaded', (info) => {
+    dialog
+      .showMessageBox({
+        type: 'info',
+        buttons: ['Restart Now', 'Later'],
+        defaultId: 0,
+        cancelId: 1,
+        title: 'Update Ready',
+        message: `Version ${info.version} has been downloaded.`,
+        detail: 'Restart the app to apply it now, or it will be applied automatically the next time you quit.',
+      })
+      .then(({ response }) => {
+        if (response === 0) {
+          isQuitting = true;
+          autoUpdater.quitAndInstall();
+        }
+      });
+  });
+}
+
+function checkForUpdates(manual: boolean): void {
+  isManualUpdateCheck = manual;
+  autoUpdater.checkForUpdates().catch((err) => {
+    console.error('[electron] Failed to check for updates:', err);
+    if (manual) {
+      dialog.showErrorBox('Update Check Failed', err instanceof Error ? err.message : String(err));
+    }
+  });
+}
+
 // ── IPC handlers ─────────────────────────────────────────────────────────────
 ipcMain.handle('dialog:openDirectory', async () => {
   const result = await dialog.showOpenDialog({
@@ -274,6 +348,14 @@ app.whenReady().then(async () => {
   mainWindow = createWindow();
   tray = createTray();
   updateTrayMenu();
+
+  if (app.isPackaged) {
+    setupAutoUpdater();
+    checkForUpdates(false);
+    setInterval(() => checkForUpdates(false), UPDATE_CHECK_INTERVAL_MS);
+  } else {
+    console.log('[electron] Skipping auto-update check in development');
+  }
 
   app.on('activate', () => {
     // macOS: re-show window when dock icon is clicked

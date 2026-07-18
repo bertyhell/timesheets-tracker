@@ -9,9 +9,12 @@ module.exports = {
   },
 
   // electron-builder defaults GitHub releases to releaseType: 'draft'; publish
-  // live so tagging a release immediately makes binaries available on the page.
+  // live so tagging a release immediately makes binaries available on the page,
+  // and so electron-updater can find latest-*.yml on a public, unauthenticated GET.
   publish: {
     provider: 'github',
+    owner: 'bertyhell',
+    repo: 'timesheets-tracker',
     releaseType: 'release',
   },
 
@@ -61,7 +64,13 @@ module.exports = {
 
   // ── macOS ─────────────────────────────────────────────────────────────────
   mac: {
-    target: [{ target: 'dmg', arch: ['x64', 'arm64'] }],
+    // zip is required alongside dmg: electron-updater's Mac updater downloads
+    // and applies the zip artifact, and latest-mac.yml is only generated when
+    // a zip target is present.
+    target: [
+      { target: 'dmg', arch: ['x64', 'arm64'] },
+      { target: 'zip', arch: ['x64', 'arm64'] },
+    ],
     icon: 'icon/icon.png',
     category: 'public.app-category.productivity',
     // Keep running in tray after closing last window

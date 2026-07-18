@@ -1,8 +1,23 @@
-# timesheets-tracker
+# Timesheets Tracker
 
-This is a work in progress and not ready for production
+Keep track of your activities during the day. Use activities like:
+* Open programs
+* Websites
+* Git commits
+* Calendar events
+* Active / locked computer status
+* Productive.io planned hours
 
-Track with windows are open throughout the day and configure rules to autotag them for easy tracking of timesheets
+Configure auto tags, to automatically tag activity for a specific customer or project.
+View a summed overview of tagged hours for the day
+Get basic pivot table style reports of:
+* taged time per day/week/month/year
+* most used programs
+* work day start and end times
+* average work day duration
+* ...
+
+This program is in alpha stage. Expect bugs and report them to make the application better.
 
 ![screenshot interface](assets/screenshot.png)
 

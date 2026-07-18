@@ -1,6 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEnum, IsNumber, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 import { type OverviewFlatRow, OverviewSourceType } from '../../types/types';
 
 export class OverviewFlatRowDto implements OverviewFlatRow {
@@ -56,4 +56,74 @@ export class OverviewFlatRowDto implements OverviewFlatRow {
   @Type(() => Number)
   @ApiProperty({ type: Number, description: 'Duration of the event in hours' })
   durationHours: number;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Domain (hostname) parsed from the website URL; only present for Website-sourced rows',
+    default: undefined,
+  })
+  websiteDomain?: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Title of the website page; only present for Website-sourced rows. Same value as category for Website rows, exposed under an explicit name for discoverability.',
+    default: undefined,
+  })
+  websiteTitle?: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Title of the tag name (tag.tagName.title); only present for Tag-sourced rows. Same value as category for Tag rows, exposed under an explicit name for discoverability.',
+    default: undefined,
+  })
+  tagName?: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Timesheet billing code of the tag; only present for Tag-sourced rows',
+    default: undefined,
+  })
+  tagCode?: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Name of the program; only present for Program-sourced rows. Same value as category for Program rows, exposed under an explicit name for discoverability.',
+    default: undefined,
+  })
+  programName?: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Window title of the program; only present for Program-sourced rows',
+    default: undefined,
+  })
+  windowTitle?: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiPropertyOptional({
+    type: String,
+    description: "'Active' or 'Inactive'; only present for ActiveState-sourced rows. Same value as category for ActiveState rows, exposed under an explicit name for discoverability.",
+    default: undefined,
+  })
+  activeState?: string;
 }

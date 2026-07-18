@@ -8,6 +8,7 @@ import { TagsService } from '../tags/tags.service';
 import { ProgramsService } from '../programs/programs.service';
 import { WebsitesService } from '../websites/websites.service';
 import { ActiveStatesService } from '../active-states/active-states.service';
+import { getWebsiteDomain } from './helpers/get-website-domain';
 import { CreateSavedOverviewConfigDto } from './dto/create-saved-overview-config.dto';
 import { UpdateSavedOverviewConfigDto } from './dto/update-saved-overview-config.dto';
 import { findAllSavedOverviewConfigs } from './queries/findAllSavedOverviewConfigs';
@@ -15,6 +16,20 @@ import { findOneSavedOverviewConfig } from './queries/findOneSavedOverviewConfig
 import { createSavedOverviewConfig } from './queries/createSavedOverviewConfig';
 import { updateSavedOverviewConfig } from './queries/updateSavedOverviewConfig';
 import { deleteSavedOverviewConfig } from './queries/deleteSavedOverviewConfig';
+
+const NOT_APPLICABLE = 'N/A';
+
+// Backfilled onto rows whose sourceType has no notion of a given optional field, so the
+// flatRows array stays shape-homogeneous when 2+ sourceTypes are combined in one request.
+const OPTIONAL_FIELD_DEFAULTS: Partial<OverviewFlatRow> = {
+  websiteDomain: NOT_APPLICABLE,
+  websiteTitle: NOT_APPLICABLE,
+  tagName: NOT_APPLICABLE,
+  tagCode: NOT_APPLICABLE,
+  programName: NOT_APPLICABLE,
+  windowTitle: NOT_APPLICABLE,
+  activeState: NOT_APPLICABLE,
+};
 
 @Injectable()
 export class OverviewsService {
@@ -149,12 +164,24 @@ export class OverviewsService {
   ): Promise<OverviewFlatRow[]> {
     try {
       const rows: OverviewFlatRow[] = [];
+      const extraDefaults = sourceTypes.length > 1 ? OPTIONAL_FIELD_DEFAULTS : {};
 
       if (sourceTypes.includes(OverviewSourceType.Tag)) {
         const tags = await this.tagsService.findAll(startedAt, endedAt);
         for (const tag of tags) {
           rows.push(
-            this.toFlatRow(tag.id, tag.tagName?.title ?? 'Untagged', OverviewSourceType.Tag, tag.startedAt, tag.endedAt)
+            this.toFlatRow(
+              tag.id,
+              tag.tagName?.title ?? 'Untagged',
+              OverviewSourceType.Tag,
+              tag.startedAt,
+              tag.endedAt,
+              {
+                ...extraDefaults,
+                tagName: tag.tagName?.title ?? 'Untagged',
+                tagCode: tag.tagName?.code ?? NOT_APPLICABLE,
+              }
+            )
           );
         }
       }
@@ -168,7 +195,12 @@ export class OverviewsService {
               program.programName ?? 'Unknown',
               OverviewSourceType.Program,
               program.startedAt,
-              program.endedAt
+              program.endedAt,
+              {
+                ...extraDefaults,
+                programName: program.programName ?? 'Unknown',
+                windowTitle: program.windowTitle ?? NOT_APPLICABLE,
+              }
             )
           );
         }
@@ -184,7 +216,12 @@ export class OverviewsService {
               website.websiteTitle ?? website.websiteUrl ?? 'Unknown',
               OverviewSourceType.Website,
               website.startedAt,
-              website.endedAt
+              website.endedAt,
+              {
+                ...extraDefaults,
+                websiteTitle: website.websiteTitle ?? website.websiteUrl ?? 'Unknown',
+                websiteDomain: getWebsiteDomain(website.websiteUrl),
+              }
             )
           );
         }
@@ -199,7 +236,8 @@ export class OverviewsService {
               activeState.isActive ? 'Active' : 'Inactive',
               OverviewSourceType.ActiveState,
               activeState.startedAt,
-              activeState.endedAt
+              activeState.endedAt,
+              { ...extraDefaults, activeState: activeState.isActive ? 'Active' : 'Inactive' }
             )
           );
         }
@@ -222,7 +260,8 @@ export class OverviewsService {
     category: string,
     sourceType: OverviewSourceType,
     startedAt: string,
-    endedAt: string
+    endedAt: string,
+    extra?: Partial<OverviewFlatRow>
   ): OverviewFlatRow {
     const start = new Date(startedAt);
     const end = new Date(endedAt);
@@ -236,6 +275,7 @@ export class OverviewsService {
       week: format(start, "RRRR-'W'II"),
       month: format(start, 'yyyy-MM'),
       durationHours: (end.getTime() - start.getTime()) / 3_600_000,
+      ...extra,
     };
   }
 }

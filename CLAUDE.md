@@ -1,9 +1,5 @@
 # Project Notes
 
-## Development
-
-- Never start or run the app — the user verifies changes themselves.
-
 ## Architecture
 
 - The app must always work as a standalone NestJS service + frontend client (outside of Electron), and also work inside Electron.

@@ -25,7 +25,7 @@ export const PREDEFINED_OVERVIEW_CONFIGS: PredefinedOverviewConfig[] = [
     icon: Tag,
     dateRangeMode: DateRangeMode.ThisMonth,
     sourceTypes: [OverviewSourceType.Tag],
-    pivotState: { ...BASE_PIVOT_STATE, rows: ['category'], cols: ['month'], vals: ['durationHours'] },
+    pivotState: { ...BASE_PIVOT_STATE, rows: ['tagName'], cols: ['week'], vals: ['durationHours'] },
   },
   {
     id: 'most-used-programs-month',
@@ -36,7 +36,7 @@ export const PREDEFINED_OVERVIEW_CONFIGS: PredefinedOverviewConfig[] = [
     pivotState: {
       ...BASE_PIVOT_STATE,
       rendererName: 'Multiple Pie Chart',
-      rows: ['category'],
+      rows: ['programName'],
       cols: [],
       vals: ['durationHours'],
       rowOrder: 'value_z_to_a',
@@ -48,7 +48,7 @@ export const PREDEFINED_OVERVIEW_CONFIGS: PredefinedOverviewConfig[] = [
     icon: Zap,
     dateRangeMode: DateRangeMode.ThisWeek,
     sourceTypes: [OverviewSourceType.ActiveState],
-    pivotState: { ...BASE_PIVOT_STATE, rows: ['category'], cols: ['week'], vals: ['durationHours'] },
+    pivotState: { ...BASE_PIVOT_STATE, rows: ['activeState'], cols: ['date'], vals: ['durationHours'] },
   },
   {
     id: 'website-usage-month',
@@ -56,6 +56,6 @@ export const PREDEFINED_OVERVIEW_CONFIGS: PredefinedOverviewConfig[] = [
     icon: Globe,
     dateRangeMode: DateRangeMode.ThisMonth,
     sourceTypes: [OverviewSourceType.Website],
-    pivotState: { ...BASE_PIVOT_STATE, rows: ['category'], cols: [], vals: ['durationHours'] },
+    pivotState: { ...BASE_PIVOT_STATE, rows: ['websiteDomain'], cols: [], vals: ['durationHours'] },
   },
 ];

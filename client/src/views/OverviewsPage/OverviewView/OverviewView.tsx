@@ -130,29 +130,32 @@ export function OverviewView() {
 
     setHeaderActions(
       <>
-        <Dropdown label={sourceLabel} className="m-overview-view__source-dropdown">
-          {() => (
-            <div className="m-overview-view__source-options">
-              {SOURCE_TYPE_OPTIONS.map((option) => (
-                <label key={option.value} className="m-overview-view__source-option">
-                  <input
-                    type="checkbox"
-                    checked={sourceTypes.includes(option.value)}
-                    onChange={() => toggleSourceType(option.value)}
-                  />
-                  <span>{option.label}</span>
-                </label>
-              ))}
-            </div>
-          )}
-        </Dropdown>
+        <div className="m-overview-view__filters">
+          <span className="m-overview-view__filters-label">Filters</span>
+          <Dropdown label={sourceLabel} className="m-overview-view__source-dropdown">
+            {() => (
+              <div className="m-overview-view__source-options">
+                {SOURCE_TYPE_OPTIONS.map((option) => (
+                  <label key={option.value} className="m-overview-view__source-option">
+                    <input
+                      type="checkbox"
+                      checked={sourceTypes.includes(option.value)}
+                      onChange={() => toggleSourceType(option.value)}
+                    />
+                    <span>{option.label}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </Dropdown>
 
-        <DateRangeSelect
-          mode={dateRangeMode}
-          customStartedAt={customStartedAt}
-          customEndedAt={customEndedAt}
-          onChange={handleDateRangeChange}
-        />
+          <DateRangeSelect
+            mode={dateRangeMode}
+            customStartedAt={customStartedAt}
+            customEndedAt={customEndedAt}
+            onChange={handleDateRangeChange}
+          />
+        </div>
 
         <div className="m-overview-view__actions">
           <Button variant={ButtonVariant.Secondary} onClick={handleExport}>
@@ -190,6 +193,12 @@ export function OverviewView() {
   return (
     <div className="m-overview-view">
       <div className="m-overview-view__table">
+        <div className="m-overview-view__table-header">
+          <span className="m-overview-view__table-header-label">Group &amp; display</span>
+          <span className="m-overview-view__table-header-hint">
+            Drag fields below to change how the loaded data is grouped, sorted, and charted.
+          </span>
+        </div>
         <PivotTableUI
           data={(flatRows ?? []) as unknown as Array<{ [key: string]: string }>}
           {...pivotState}

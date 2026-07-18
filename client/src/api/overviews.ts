@@ -24,6 +24,13 @@ export interface OverviewFlatRowDto {
   week: string;
   month: string;
   durationHours: number;
+  websiteDomain?: string;
+  websiteTitle?: string;
+  tagName?: string;
+  tagCode?: string;
+  programName?: string;
+  windowTitle?: string;
+  activeState?: string;
 }
 
 export interface SaveOverviewConfigPayload {

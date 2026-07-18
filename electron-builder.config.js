@@ -8,11 +8,11 @@ module.exports = {
     output: 'release',
   },
 
-  // electron-builder defaults GitHub releases to draft: true; publish live so
-  // tagging a release immediately makes binaries available on the release page.
+  // electron-builder defaults GitHub releases to releaseType: 'draft'; publish
+  // live so tagging a release immediately makes binaries available on the page.
   publish: {
     provider: 'github',
-    draft: false,
+    releaseType: 'release',
   },
 
   // Files included in the app.asar (main process only)

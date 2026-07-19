@@ -1,0 +1,14 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Timesheets Tracker//e2e fixture//EN
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:e2e-fixture-standup@timesheets-tracker
+DTSTAMP:20200101T090000Z
+DTSTART:20200101T090000Z
+DTEND:20301231T093000Z
+SUMMARY:E2E fixture: daily standup
+DESCRIPTION:Static calendar fixture used by Playwright e2e tests
+LOCATION:Remote
+END:VEVENT
+END:VCALENDAR

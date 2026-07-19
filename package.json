@@ -25,9 +25,12 @@
     "copy-chrome-extension": "cp -r chrome-extension/* ./dist/chrome-extension && rm ./dist/chrome-extension/manifest.json && mv ./dist/chrome-extension/manifest-prd.json ./dist/chrome-extension/manifest.json",
     "lint": "oxlint",
     "format": "oxfmt",
-    "type-check": "tsc"
+    "type-check": "tsc",
+    "test:e2e": "playwright test --config=e2e/playwright.config.ts",
+    "test:e2e:ui": "playwright test --config=e2e/playwright.config.ts --ui"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@types/node": "^20.4.5",
     "@types/uuid": "^9.0.2",
     "@typescript-eslint/eslint-plugin": "6.7.0",

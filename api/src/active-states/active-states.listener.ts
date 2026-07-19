@@ -7,6 +7,7 @@ import { ActiveStatesService } from './active-states.service';
 import { getIsActive } from './helpers/get-idle-state.helper';
 import { noop } from 'lodash';
 import { logger } from '../shared/logger';
+import { isActivityTrackingDisabled } from '../shared/is-activity-tracking-disabled';
 
 const ACTIVE_STATE_POLLING_INTERVAL_SECONDS = 2 * 60;
 
@@ -20,6 +21,7 @@ export class ActiveStatesListener {
 
   @Interval(ACTIVE_STATE_POLLING_INTERVAL_SECONDS * 1000)
   private async checkActiveState(): Promise<void> {
+    if (isActivityTrackingDisabled()) return;
     const currentIsActiveState = await getIsActive(ACTIVE_STATE_POLLING_INTERVAL_SECONDS);
     if (!this.lastActiveState) {
       this.lastActiveState = {

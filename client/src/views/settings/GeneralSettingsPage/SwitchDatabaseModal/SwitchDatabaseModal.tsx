@@ -2,10 +2,13 @@ import './SwitchDatabaseModal.css';
 
 import React, { useState } from 'react';
 import { Modal } from 'react-responsive-modal';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 
-import { settingsControllerSwitchDatabaseMutation } from '../../../../generated/api/@tanstack/react-query.gen';
+import {
+  settingsControllerGetSettingsQueryKey,
+  settingsControllerSwitchDatabaseMutation,
+} from '../../../../generated/api/@tanstack/react-query.gen';
 import Button, { ButtonVariant } from '../../../../components/Button/Button';
 
 const isElectron = typeof window.electron?.openFile === 'function';
@@ -16,6 +19,7 @@ interface SwitchDatabaseModalProps {
 
 export function SwitchDatabaseModal({ onClose }: SwitchDatabaseModalProps) {
   const [path, setPath] = useState('');
+  const queryClient = useQueryClient();
 
   const { mutateAsync: switchDatabase, isPending } = useMutation({
     ...settingsControllerSwitchDatabaseMutation(),
@@ -30,6 +34,7 @@ export function SwitchDatabaseModal({ onClose }: SwitchDatabaseModalProps) {
     if (!path) return;
     try {
       await switchDatabase({ body: { path } });
+      await queryClient.invalidateQueries({ queryKey: settingsControllerGetSettingsQueryKey() });
       toast('Database switched successfully', { type: 'success' });
       onClose();
     } catch (err: any) {

@@ -2,10 +2,13 @@ import './MoveDatabaseModal.css';
 
 import React, { useState } from 'react';
 import { Modal } from 'react-responsive-modal';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 
-import { settingsControllerMoveDatabaseMutation } from '../../../../generated/api/@tanstack/react-query.gen';
+import {
+  settingsControllerGetSettingsQueryKey,
+  settingsControllerMoveDatabaseMutation,
+} from '../../../../generated/api/@tanstack/react-query.gen';
 import Button, { ButtonVariant } from '../../../../components/Button/Button';
 
 const isElectron = typeof window.electron?.saveFile === 'function';
@@ -17,6 +20,7 @@ interface MoveDatabaseModalProps {
 
 export function MoveDatabaseModal({ currentPath, onClose }: MoveDatabaseModalProps) {
   const [path, setPath] = useState('');
+  const queryClient = useQueryClient();
 
   const { mutateAsync: moveDatabase, isPending } = useMutation({
     ...settingsControllerMoveDatabaseMutation(),
@@ -31,6 +35,7 @@ export function MoveDatabaseModal({ currentPath, onClose }: MoveDatabaseModalPro
     if (!path) return;
     try {
       await moveDatabase({ body: { path } });
+      await queryClient.invalidateQueries({ queryKey: settingsControllerGetSettingsQueryKey() });
       toast('Database moved successfully', { type: 'success' });
       onClose();
     } catch (err: any) {

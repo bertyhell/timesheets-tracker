@@ -5,6 +5,7 @@ import { CreateProgramDto } from './dto/create-activity.dto';
 import { extractIconColor } from './helpers/extract-icon-color';
 import { createWindowListener } from './helpers/create-window-listener';
 import { type IWindowListener } from './helpers/window-listener.types';
+import { isActivityTrackingDisabled } from '../shared/is-activity-tracking-disabled';
 
 @Injectable()
 export class ProgramsListener implements OnApplicationBootstrap {
@@ -15,6 +16,7 @@ export class ProgramsListener implements OnApplicationBootstrap {
   constructor(@Inject(ProgramsService) private programsService: ProgramsService) {}
 
   async onApplicationBootstrap() {
+    if (isActivityTrackingDisabled()) return;
     await this.startListening();
   }
 

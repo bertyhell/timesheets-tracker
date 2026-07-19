@@ -6,10 +6,9 @@
     "deleteOutDir": true,
     "assets": [
       {
-        "include": "database/queries/**/*.sql",
+        "include": "**/*.sql",
         "outDir": "dist/src"
-      },
-      "database/queries/**/*.sql"
+      }
     ],
     "watchAssets": true
   }

@@ -21,7 +21,10 @@ export const integrationsApi = {
       url: '/api/integrations/{type}',
       path: { type },
     });
-    return data ?? null;
+    // The backend sends an empty body (Content-Length: 0) for a null result, which the
+    // generated fetch client parses as `{}` rather than `null` — check for a real DTO
+    // shape (it always has a `type`) instead of relying on falsy/nullish checks.
+    return data && 'type' in data ? data : null;
   },
 
   upsert: async (type: string, payload: UpsertIntegrationPayload): Promise<IntegrationDto> => {

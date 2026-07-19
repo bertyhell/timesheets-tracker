@@ -7,5 +7,6 @@ interface Window {
     selectDirectory: () => Promise<string | null>;
     openFile: () => Promise<string | null>;
     saveFile: (defaultPath?: string) => Promise<string | null>;
+    showItemInFolder: (targetPath: string) => Promise<void>;
   };
 }

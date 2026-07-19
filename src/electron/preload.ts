@@ -5,4 +5,6 @@ contextBridge.exposeInMainWorld('electron', {
   openFile: (): Promise<string | null> => ipcRenderer.invoke('dialog:openFile'),
   saveFile: (defaultPath?: string): Promise<string | null> =>
     ipcRenderer.invoke('dialog:saveFile', defaultPath),
+  showItemInFolder: (targetPath: string): Promise<void> =>
+    ipcRenderer.invoke('shell:showItemInFolder', targetPath),
 });

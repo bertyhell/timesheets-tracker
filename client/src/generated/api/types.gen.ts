@@ -822,6 +822,65 @@ export type SettingsResponseDto = {
     databasePath: string;
 };
 
+export type SettingDto = {
+    /**
+     * Setting key
+     */
+    key: string;
+    /**
+     * Setting value
+     */
+    value: string | null;
+    /**
+     * Creation timestamp
+     */
+    createdAt: string;
+    /**
+     * Last update timestamp
+     */
+    updatedAt: string;
+};
+
+export type UpsertSettingDto = {
+    /**
+     * Setting value
+     */
+    value: string;
+};
+
+export type DeleteEventsAfterDto = {
+    /**
+     * Numeric amount, e.g. 6
+     */
+    numeric: number | null;
+    /**
+     * Unit for the numeric amount
+     */
+    unit: 'years' | 'calendarYears' | 'months' | 'calendarMonths' | 'weeks' | 'calendarWeeks' | 'days';
+    /**
+     * Computed cutoff date: events older than this will be deleted
+     */
+    cutoffDate: string | null;
+};
+
+export type UpsertDeleteEventsAfterDto = {
+    /**
+     * Numeric amount, e.g. 6
+     */
+    numeric: number;
+    /**
+     * Unit for the numeric amount
+     */
+    unit: 'years' | 'calendarYears' | 'months' | 'calendarMonths' | 'weeks' | 'calendarWeeks' | 'days';
+};
+
+export type DeleteEventsAfterPreviewDto = {
+    /**
+     * Computed cutoff date for the given (not yet saved) numeric/unit combination
+     */
+    cutoffDate: string | null;
+};
+
 export type SwitchDatabaseDto = {
     /**
      * Absolute path to the target SQLite database file
@@ -866,6 +925,34 @@ export type OverviewFlatRowDto = {
      * Duration of the event in hours
      */
     durationHours: number;
+    /**
+     * Domain (hostname) parsed from the website URL; only present for Website-sourced rows
+     */
+    websiteDomain?: string;
+    /**
+     * Title of the website page; only present for Website-sourced rows. Same value as category for Website rows, exposed under an explicit name for discoverability.
+     */
+    websiteTitle?: string;
+    /**
+     * Title of the tag name (tag.tagName.title); only present for Tag-sourced rows. Same value as category for Tag rows, exposed under an explicit name for discoverability.
+     */
+    tagName?: string;
+    /**
+     * Timesheet billing code of the tag; only present for Tag-sourced rows
+     */
+    tagCode?: string;
+    /**
+     * Name of the program; only present for Program-sourced rows. Same value as category for Program rows, exposed under an explicit name for discoverability.
+     */
+    programName?: string;
+    /**
+     * Window title of the program; only present for Program-sourced rows
+     */
+    windowTitle?: string;
+    /**
+     * 'Active' or 'Inactive'; only present for ActiveState-sourced rows. Same value as category for ActiveState rows, exposed under an explicit name for discoverability.
+     */
+    activeState?: string;
 };
 
 /**
@@ -1835,6 +1922,91 @@ export type SettingsControllerGetSettingsResponses = {
 };
 
 export type SettingsControllerGetSettingsResponse = SettingsControllerGetSettingsResponses[keyof SettingsControllerGetSettingsResponses];
+
+export type SettingsControllerGetSettingByKeyData = {
+    body?: never;
+    path: {
+        key: string;
+    };
+    query?: never;
+    url: '/api/settings/key/{key}';
+};
+
+export type SettingsControllerGetSettingByKeyResponses = {
+    200: SettingDto | unknown;
+};
+
+export type SettingsControllerGetSettingByKeyResponse = SettingsControllerGetSettingByKeyResponses[keyof SettingsControllerGetSettingByKeyResponses];
+
+export type SettingsControllerSetSettingByKeyData = {
+    body: UpsertSettingDto;
+    path: {
+        key: string;
+    };
+    query?: never;
+    url: '/api/settings/key/{key}';
+};
+
+export type SettingsControllerSetSettingByKeyResponses = {
+    200: SettingDto;
+};
+
+export type SettingsControllerSetSettingByKeyResponse = SettingsControllerSetSettingByKeyResponses[keyof SettingsControllerSetSettingByKeyResponses];
+
+export type SettingsControllerClearDeleteEventsAfterData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/settings/delete-events-after';
+};
+
+export type SettingsControllerClearDeleteEventsAfterResponses = {
+    200: DeleteEventsAfterDto;
+};
+
+export type SettingsControllerClearDeleteEventsAfterResponse = SettingsControllerClearDeleteEventsAfterResponses[keyof SettingsControllerClearDeleteEventsAfterResponses];
+
+export type SettingsControllerGetDeleteEventsAfterData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/settings/delete-events-after';
+};
+
+export type SettingsControllerGetDeleteEventsAfterResponses = {
+    200: DeleteEventsAfterDto;
+};
+
+export type SettingsControllerGetDeleteEventsAfterResponse = SettingsControllerGetDeleteEventsAfterResponses[keyof SettingsControllerGetDeleteEventsAfterResponses];
+
+export type SettingsControllerSetDeleteEventsAfterData = {
+    body: UpsertDeleteEventsAfterDto;
+    path?: never;
+    query?: never;
+    url: '/api/settings/delete-events-after';
+};
+
+export type SettingsControllerSetDeleteEventsAfterResponses = {
+    200: DeleteEventsAfterDto;
+};
+
+export type SettingsControllerSetDeleteEventsAfterResponse = SettingsControllerSetDeleteEventsAfterResponses[keyof SettingsControllerSetDeleteEventsAfterResponses];
+
+export type SettingsControllerPreviewDeleteEventsAfterData = {
+    body?: never;
+    path?: never;
+    query?: {
+        numeric?: string;
+        unit?: string;
+    };
+    url: '/api/settings/delete-events-after/preview';
+};
+
+export type SettingsControllerPreviewDeleteEventsAfterResponses = {
+    200: DeleteEventsAfterPreviewDto;
+};
+
+export type SettingsControllerPreviewDeleteEventsAfterResponse = SettingsControllerPreviewDeleteEventsAfterResponses[keyof SettingsControllerPreviewDeleteEventsAfterResponses];
 
 export type SettingsControllerSwitchDatabaseData = {
     body: SwitchDatabaseDto;

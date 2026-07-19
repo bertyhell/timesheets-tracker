@@ -334,6 +334,10 @@ ipcMain.handle('dialog:saveFile', async (_event, defaultPath?: string) => {
   return result.canceled ? null : (result.filePath ?? null);
 });
 
+ipcMain.handle('shell:showItemInFolder', (_event, targetPath: string) => {
+  shell.showItemInFolder(targetPath);
+});
+
 // ── App lifecycle ─────────────────────────────────────────────────────────────
 app.whenReady().then(async () => {
   console.log('[electron] Starting NestJS API server...');

@@ -3,6 +3,11 @@ import { test, expect } from '@playwright/test';
 // These tests are UI-only: they render and interact with the Productive settings form
 // without submitting to the real Productive API, per the agreed e2e scope.
 test.describe('Integrations settings', () => {
+  test.beforeEach(async ({ request }) => {
+    // Remove any leftover Productive integration (404 is fine — it just means it wasn't there).
+    await request.delete('/api/integrations/productive');
+  });
+
   test('integrations page offers to add Productive when unconfigured', async ({ page }) => {
     await page.goto('/settings/integrations');
     await expect(page.getByRole('heading', { name: 'Integrations' })).toBeVisible();

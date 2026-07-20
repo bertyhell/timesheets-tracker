@@ -1,4 +1,4 @@
-import ActiveWindow, { type WindowInfo } from '@paymoapp/active-window';
+import type ActiveWindowType from '@paymoapp/active-window';
 
 import { logger } from '../../shared/logger';
 import { CreateProgramDto } from '../dto/create-activity.dto';
@@ -6,20 +6,25 @@ import { type IWindowListener, type WindowChangeEvent } from './window-listener.
 
 export class DefaultWindowListener implements IWindowListener {
   private subscriptionId: number;
+  // Lazily loaded to avoid crashing headless environments at module init time.
+  private activeWindow: typeof ActiveWindowType | null = null;
 
   async start(
     onWindowChange: (event: WindowChangeEvent) => Promise<void>
   ): Promise<CreateProgramDto | null> {
-    ActiveWindow.initialize({ osxRunLoop: 'all' });
+    const mod = await import('@paymoapp/active-window');
+    this.activeWindow = mod.default;
 
-    if (!ActiveWindow.requestPermissions()) {
+    this.activeWindow.initialize({ osxRunLoop: 'all' });
+
+    if (!this.activeWindow.requestPermissions()) {
       console.error(
         'Error: You need to grant screen recording permission in System Preferences > Security & Privacy > Privacy > Screen Recording'
       );
       process.exit(0);
     }
 
-    this.subscriptionId = ActiveWindow.subscribe(async (windowInfo: WindowInfo | null) => {
+    this.subscriptionId = this.activeWindow.subscribe(async (windowInfo) => {
       if (!windowInfo) {
         return;
       }
@@ -42,6 +47,7 @@ export class DefaultWindowListener implements IWindowListener {
   }
 
   stop(): void {
-    ActiveWindow.unsubscribe(this.subscriptionId);
+    this.activeWindow?.unsubscribe(this.subscriptionId);
+    this.activeWindow = null;
   }
 }

@@ -31,7 +31,7 @@ test.describe('Overviews page', () => {
     await test.step('the new overview is selectable from the dropdown', async () => {
       await page.locator('.m-overviews-topbar__template .c-dropdown__trigger').click();
       await expect(
-        page.locator('.m-overviews-template-panel__item', { hasText: name })
+        page.locator('.m-overviews-template-panel__item').filter({ hasText: new RegExp(`^${name}$`) })
       ).toBeVisible();
       await page.keyboard.press('Escape');
     });

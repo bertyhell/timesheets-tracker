@@ -144,7 +144,17 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       if (executed.has(file)) continue;
 
       const sql = fs.readFileSync(path.join(migrationsDir, file), 'utf-8');
-      db.exec(sql);
+      try {
+        db.exec(sql);
+      } catch (err: any) {
+        // SQLite has no ADD COLUMN IF NOT EXISTS; if the column already exists in the
+        // base schema (fresh DB), treat it as a no-op rather than crashing.
+        if (err?.message?.includes('duplicate column name')) {
+          this.logger.warn(`Migration ${file}: column already exists, skipping`);
+        } else {
+          throw err;
+        }
+      }
       db.prepare('INSERT INTO executed_migrations (filename) VALUES (?)').run(file);
       this.logger.log(`Migration applied: ${file}`);
     }

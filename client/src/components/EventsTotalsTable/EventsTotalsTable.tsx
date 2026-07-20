@@ -11,6 +11,7 @@ import {
   AutoTagEventInfoDto,
   CalendarEventInfoDto,
   GitCommitEventInfoDto,
+  ProductiveEventInfoDto,
   ProgramEventInfoDto,
   TagEventInfoDto,
   TimelineDto,
@@ -72,6 +73,11 @@ function getCategoryLabel(event: TimelineEventDto, timelineType: TimelineType): 
       return (info as CalendarEventInfoDto).summary;
     case 'GitCommit':
       return (info as GitCommitEventInfoDto).repoName;
+    case 'Productive': {
+      const productive = info as ProductiveEventInfoDto;
+      const parts = [productive.serviceProject, productive.serviceName].filter(Boolean);
+      return parts.length > 0 ? parts.join(' – ') : 'Unknown';
+    }
     default:
       return 'Unknown';
   }

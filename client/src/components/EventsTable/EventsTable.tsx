@@ -75,6 +75,12 @@ function getDynamicColumns(timelineType: string | undefined): ColumnDef[] {
         { id: 'commitMessage', title: 'Commit message', allowsSorting: true },
       ];
 
+    case TimelineType.Productive:
+      return [
+        { id: 'serviceProject', title: 'Project', allowsSorting: true, width: 150 },
+        { id: 'serviceName', title: 'Service', allowsSorting: true, width: 150 },
+      ];
+
     default:
       return [];
   }
@@ -99,6 +105,10 @@ function getCellValue(event: TimelineEventDto, columnKey: string): string {
       return String(info['repoName'] ?? '');
     case 'commitMessage':
       return String(info['commitMessage'] ?? '');
+    case 'serviceProject':
+      return String(info['serviceProject'] ?? '');
+    case 'serviceName':
+      return String(info['serviceName'] ?? '');
     case 'startedAt':
       return format(roundToNearestMinutes(parseISO(event.startedAt)), 'HH:mm');
     case 'endedAt':
@@ -174,6 +184,10 @@ export function EventsTable({ timeline, events, className, onAddBulkTag, onEditT
               return (event.info as any)['repoName'];
             case 'commitMessage':
               return (event.info as any)['commitMessage'];
+            case 'serviceProject':
+              return (event.info as any)['serviceProject'];
+            case 'serviceName':
+              return (event.info as any)['serviceName'];
             case 'startedAt':
               return event.startedAt;
             case 'endedAt':

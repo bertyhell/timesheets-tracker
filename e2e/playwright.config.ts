@@ -46,7 +46,10 @@ export default defineConfig({
     command: 'node dist/src/main',
     cwd: path.join(__dirname, '..', 'api'),
     url: 'http://localhost:55577',
-    reuseExistingServer: !process.env.CI,
+    // Never reuse an already-running server on this port: the real dev/Electron app
+    // also listens on 55577, and reusing it would run tests against the real
+    // database instead of the throwaway one configured below.
+    reuseExistingServer: false,
     timeout: 30_000,
     env: {
       USER_DATA_PATH: userDataPath,

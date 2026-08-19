@@ -48,6 +48,20 @@ let tray: Tray | null = null;
 let serverProcess: ChildProcess | null = null;
 let isQuitting = false;
 
+// Prevent a second launch from spawning its own NestJS server (port conflict)
+// and its own dock icon/tray — focus the existing window instead.
+const gotSingleInstanceLock = app.requestSingleInstanceLock();
+if (!gotSingleInstanceLock) {
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    if (mainWindow) {
+      mainWindow.show();
+      mainWindow.focus();
+    }
+  });
+}
+
 // ── Spawn NestJS backend as a child process ──────────────────────────────────
 // Use Electron's bundled Node runtime (ELECTRON_RUN_AS_NODE) so no system Node
 // installation is required in the packaged app.

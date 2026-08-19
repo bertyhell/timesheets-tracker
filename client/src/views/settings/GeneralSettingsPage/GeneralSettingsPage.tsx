@@ -109,17 +109,18 @@ export function GeneralSettingsPage() {
           </p>
 
           <label className="block text-sm font-medium mb-1">Current path</label>
+          <input
+            className="c-input w-full mb-2"
+            value={settings?.databasePath ?? ''}
+            title={settings?.databasePath ?? ''}
+            readOnly
+            onClick={() => {
+              if (!settings?.databasePath) return;
+              navigator.clipboard.writeText(settings.databasePath);
+              toast('Path copied to clipboard', { type: 'success' });
+            }}
+          />
           <div className="flex gap-2">
-            <input
-              className="c-input flex-1"
-              value={settings?.databasePath ?? ''}
-              readOnly
-              onClick={() => {
-                if (!settings?.databasePath) return;
-                navigator.clipboard.writeText(settings.databasePath);
-                toast('Path copied to clipboard', { type: 'success' });
-              }}
-            />
             <Button
               variant={ButtonVariant.Secondary}
               icon={<FolderOpen size={16} />}

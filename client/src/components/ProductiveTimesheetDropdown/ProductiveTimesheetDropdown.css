@@ -33,9 +33,23 @@
 
 .c-productive-dropdown__trigger-label {
   flex: 1;
+  min-width: 0;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+/* Two-line rendering of a selected service: project · budget, then company · service. */
+.c-productive-dropdown__trigger-line {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  &.is-secondary {
+    color: var(--gray-500);
+    font-size: 0.75rem;
+  }
 }
 
 .c-productive-dropdown__clear,

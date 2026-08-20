@@ -99,12 +99,14 @@ function indexServices(
   for (const node of nodes) {
     if (node.kind === 'service') {
       const byKind = (kind: TreeNode['kind']) => ancestors.find((a) => a.kind === kind);
+      const parts = [...ancestors.filter((a) => a.kind !== 'section'), node].map((n) => n.label);
       out.set(node.id, {
         serviceId: node.id,
         companyId: byKind('company')?.id ?? '',
         projectId: byKind('project')?.id ?? '',
         dealId: byKind('budget')?.id ?? '',
-        path: [...ancestors.filter((a) => a.kind !== 'section'), node].map((n) => n.label).join(' · '),
+        parts,
+        path: parts.join(' · '),
       });
     } else {
       indexServices(node.children, [...ancestors, node], out);
@@ -129,6 +131,7 @@ export function ProductiveTimesheetDropdown({
   date,
   value,
   valuePath = '',
+  valueParts,
   onChange,
   disabled = false,
   placeholder = 'Select a service',
@@ -180,6 +183,16 @@ export function ProductiveTimesheetDropdown({
   // A remembered service can be absent from this date's tree (or the tree may
   // still be loading); fall back to the stored path so the link stays visible.
   const selectedLabel = selected?.path || (value ? valuePath : '') || '';
+  const selectedParts = selected?.parts ?? (value ? valueParts : undefined);
+  // `[company, project, budget, service]` reads better split over two lines:
+  // the project/budget on top, the company and the service itself below.
+  const twoLine =
+    selectedParts && selectedParts.length === 4
+      ? {
+          primary: selectedParts.slice(1, 3).join(' · '),
+          secondary: `${selectedParts[0]} · ${selectedParts[3]}`,
+        }
+      : undefined;
 
   const rows = useMemo(() => flattenTree(tree, expanded, isSearching), [tree, expanded, isSearching]);
 
@@ -315,7 +328,16 @@ export function ProductiveTimesheetDropdown({
         onClick={() => setOpen((prev) => !prev)}
       >
         <span className="c-productive-dropdown__trigger-label" title={selectedLabel || undefined}>
-          {selectedLabel || placeholder}
+          {twoLine ? (
+            <>
+              <span className="c-productive-dropdown__trigger-line">{twoLine.primary}</span>
+              <span className="c-productive-dropdown__trigger-line is-secondary">
+                {twoLine.secondary}
+              </span>
+            </>
+          ) : (
+            selectedLabel || placeholder
+          )}
         </span>
         {value && !disabled && (
           <span

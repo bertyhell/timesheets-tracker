@@ -7,6 +7,8 @@ export interface ProductiveServiceSelection {
   companyId: string;
   projectId: string;
   dealId: string;
+  /** `[company, project, budget, service]` labels, for the trigger label. */
+  parts: string[];
   /** `Company · Project · Budget · Service`, for the trigger label. */
   path: string;
 }
@@ -21,6 +23,11 @@ export interface ProductiveTimesheetDropdownProps {
    * service tree loads or when the service is no longer part of that tree.
    */
   valuePath?: string;
+  /**
+   * Stored label parts for `value` (`[company, project, budget, service]`),
+   * preferred over `valuePath` because it renders on two lines.
+   */
+  valueParts?: string[];
   onChange: (selection: ProductiveServiceSelection | null) => void;
   disabled?: boolean;
   placeholder?: string;

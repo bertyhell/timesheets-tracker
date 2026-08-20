@@ -48,9 +48,17 @@ interface RowSelection {
   /** `Company · Project · Budget · Service`, stored so the remembered link stays
    *  readable even when the service is missing from the current service tree. */
   path: string;
+  /** The same labels unjoined, so the dropdown can lay them out on two lines. */
+  parts: string[];
 }
 
-const EMPTY_SELECTION: RowSelection = { companyId: '', dealId: '', serviceId: '', path: '' };
+const EMPTY_SELECTION: RowSelection = {
+  companyId: '',
+  dealId: '',
+  serviceId: '',
+  path: '',
+  parts: [],
+};
 
 const OUTPUT_LOCATIONS = [{ value: 'productive', label: 'Productive' }];
 
@@ -82,7 +90,7 @@ function formatMinutes(minutes: number): string {
 
 /**
  * The tag name `code` stores the Productive target as JSON
- * `{ companyId, dealId, serviceId, path }`. Older codes held a raw service id string
+ * `{ companyId, dealId, serviceId, path, parts }`. Older codes held a raw service id string
  * or `{ serviceId, taskId }`, so fall back to whatever fields are present.
  */
 function parseCode(code: string | null): RowSelection {
@@ -90,17 +98,25 @@ function parseCode(code: string | null): RowSelection {
   try {
     const parsed = JSON.parse(code) as Partial<Record<keyof RowSelection, unknown>>;
     if (parsed && typeof parsed === 'object') {
+      const path = parsed.path != null ? String(parsed.path) : '';
+      // Codes written before `parts` existed only carry the joined path.
+      const parts = Array.isArray(parsed.parts)
+        ? parsed.parts.map((part) => String(part))
+        : path
+          ? path.split(' · ')
+          : [];
       return {
         companyId: parsed.companyId != null ? String(parsed.companyId) : '',
         dealId: parsed.dealId != null ? String(parsed.dealId) : '',
         serviceId: parsed.serviceId != null ? String(parsed.serviceId) : '',
-        path: parsed.path != null ? String(parsed.path) : '',
+        path,
+        parts,
       };
     }
   } catch {
     // legacy: code was a raw service id string
   }
-  return { companyId: '', dealId: '', serviceId: code, path: '' };
+  return { companyId: '', dealId: '', serviceId: code, path: '', parts: [] };
 }
 
 function encodeCode(selection: RowSelection): string {
@@ -109,6 +125,7 @@ function encodeCode(selection: RowSelection): string {
     dealId: selection.dealId,
     serviceId: selection.serviceId,
     path: selection.path,
+    parts: selection.parts,
   });
 }
 
@@ -158,6 +175,7 @@ function SyncRowItem({ row, date, selection, onChange }: SyncRowItemProps) {
           date={date}
           value={selection.serviceId}
           valuePath={selection.path}
+          valueParts={selection.parts}
           onChange={(picked) =>
             onChange(
               row.tagNameId,
@@ -167,6 +185,7 @@ function SyncRowItem({ row, date, selection, onChange }: SyncRowItemProps) {
                     dealId: picked.dealId,
                     serviceId: picked.serviceId,
                     path: picked.path,
+                    parts: picked.parts,
                   }
                 : { ...EMPTY_SELECTION }
             )

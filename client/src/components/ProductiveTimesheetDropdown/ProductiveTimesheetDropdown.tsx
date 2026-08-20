@@ -128,6 +128,7 @@ function allExpandableKeys(nodes: TreeNode[], parentKey = '', out: string[] = []
 export function ProductiveTimesheetDropdown({
   date,
   value,
+  valuePath = '',
   onChange,
   disabled = false,
   placeholder = 'Select a service',
@@ -176,6 +177,9 @@ export function ProductiveTimesheetDropdown({
   const treeIndex = useMemo(() => indexServices(tree), [tree]);
 
   const selected = value ? (fullIndex.get(value) ?? treeIndex.get(value)) : undefined;
+  // A remembered service can be absent from this date's tree (or the tree may
+  // still be loading); fall back to the stored path so the link stays visible.
+  const selectedLabel = selected?.path || (value ? valuePath : '') || '';
 
   const rows = useMemo(() => flattenTree(tree, expanded, isSearching), [tree, expanded, isSearching]);
 
@@ -307,11 +311,11 @@ export function ProductiveTimesheetDropdown({
         aria-expanded={open}
         aria-haspopup="tree"
         disabled={disabled}
-        className={`c-productive-dropdown__trigger${selected ? '' : ' is-placeholder'}`}
+        className={`c-productive-dropdown__trigger${selectedLabel ? '' : ' is-placeholder'}`}
         onClick={() => setOpen((prev) => !prev)}
       >
-        <span className="c-productive-dropdown__trigger-label" title={selected?.path}>
-          {selected ? selected.path : placeholder}
+        <span className="c-productive-dropdown__trigger-label" title={selectedLabel || undefined}>
+          {selectedLabel || placeholder}
         </span>
         {value && !disabled && (
           <span

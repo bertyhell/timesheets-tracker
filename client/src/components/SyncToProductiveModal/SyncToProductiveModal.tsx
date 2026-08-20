@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Modal } from 'react-responsive-modal';
 import Select from 'react-select';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 
 import Button, { ButtonVariant } from '../Button/Button';
@@ -45,9 +45,12 @@ interface RowSelection {
   companyId: string;
   dealId: string;
   serviceId: string;
+  /** `Company · Project · Budget · Service`, stored so the remembered link stays
+   *  readable even when the service is missing from the current service tree. */
+  path: string;
 }
 
-const EMPTY_SELECTION: RowSelection = { companyId: '', dealId: '', serviceId: '' };
+const EMPTY_SELECTION: RowSelection = { companyId: '', dealId: '', serviceId: '', path: '' };
 
 const OUTPUT_LOCATIONS = [{ value: 'productive', label: 'Productive' }];
 
@@ -79,7 +82,7 @@ function formatMinutes(minutes: number): string {
 
 /**
  * The tag name `code` stores the Productive target as JSON
- * `{ companyId, dealId, serviceId }`. Older codes held a raw service id string
+ * `{ companyId, dealId, serviceId, path }`. Older codes held a raw service id string
  * or `{ serviceId, taskId }`, so fall back to whatever fields are present.
  */
 function parseCode(code: string | null): RowSelection {
@@ -91,12 +94,13 @@ function parseCode(code: string | null): RowSelection {
         companyId: parsed.companyId != null ? String(parsed.companyId) : '',
         dealId: parsed.dealId != null ? String(parsed.dealId) : '',
         serviceId: parsed.serviceId != null ? String(parsed.serviceId) : '',
+        path: parsed.path != null ? String(parsed.path) : '',
       };
     }
   } catch {
     // legacy: code was a raw service id string
   }
-  return { companyId: '', dealId: '', serviceId: code };
+  return { companyId: '', dealId: '', serviceId: code, path: '' };
 }
 
 function encodeCode(selection: RowSelection): string {
@@ -104,6 +108,7 @@ function encodeCode(selection: RowSelection): string {
     companyId: selection.companyId,
     dealId: selection.dealId,
     serviceId: selection.serviceId,
+    path: selection.path,
   });
 }
 
@@ -152,11 +157,17 @@ function SyncRowItem({ row, date, selection, onChange }: SyncRowItemProps) {
         <ProductiveTimesheetDropdown
           date={date}
           value={selection.serviceId}
+          valuePath={selection.path}
           onChange={(picked) =>
             onChange(
               row.tagNameId,
               picked
-                ? { companyId: picked.companyId, dealId: picked.dealId, serviceId: picked.serviceId }
+                ? {
+                    companyId: picked.companyId,
+                    dealId: picked.dealId,
+                    serviceId: picked.serviceId,
+                    path: picked.path,
+                  }
                 : { ...EMPTY_SELECTION }
             )
           }
@@ -178,6 +189,7 @@ export function SyncToProductiveModal({
   const [selection, setSelection] = useState<Record<string, RowSelection>>({});
   const [isSyncing, setIsSyncing] = useState(false);
 
+  const queryClient = useQueryClient();
   const { mutateAsync: updateTagName } = useMutation({ ...tagNamesControllerUpdateMutation() });
 
   // Fetch tag names fresh so prefill reads the current `code`, not the
@@ -272,6 +284,10 @@ export function SyncToProductiveModal({
             return updateTagName({ path: { id: row.tagNameId }, body: { code } });
           })
       );
+
+      // Drop the cached tag names so the next opening prefills from the codes
+      // just written instead of the pre-sync snapshot.
+      await queryClient.invalidateQueries({ queryKey: tagNamesControllerFindAllOptions({ query: { term: '' } }).queryKey });
 
       toast(`Synced ${result.created} time ${result.created === 1 ? 'entry' : 'entries'} to Productive`, {
         type: 'success',

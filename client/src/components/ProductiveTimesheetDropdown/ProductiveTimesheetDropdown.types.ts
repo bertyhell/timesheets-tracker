@@ -16,6 +16,11 @@ export interface ProductiveTimesheetDropdownProps {
   date: string;
   /** Currently selected service id, or '' for nothing selected. */
   value: string;
+  /**
+   * Previously stored path for `value`, used as the trigger label while the
+   * service tree loads or when the service is no longer part of that tree.
+   */
+  valuePath?: string;
   onChange: (selection: ProductiveServiceSelection | null) => void;
   disabled?: boolean;
   placeholder?: string;

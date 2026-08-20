@@ -4,6 +4,7 @@ import { ProductiveService } from './productive.service';
 import { ProductiveCompanyDto } from './dto/company.dto';
 import { ProductiveDealDto } from './dto/deal.dto';
 import { ProductiveServiceDto } from './dto/service.dto';
+import { ProductiveServiceTreeNodeDto } from './dto/service-tree.dto';
 import { SyncTimeEntriesDto, SyncTimeEntriesResultDto } from './dto/sync-time-entries.dto';
 
 @ApiTags('productive')
@@ -33,6 +34,17 @@ export class ProductiveController {
     @Query('date') date: string
   ): Promise<ProductiveServiceDto[]> {
     return this.productiveService.getServicesByDeal(dealId, date);
+  }
+
+  @ApiOkResponse({ type: ProductiveServiceTreeNodeDto, isArray: true })
+  @ApiQuery({ type: 'string', name: 'date', required: true, example: '2026-07-17' })
+  @ApiQuery({ type: 'string', name: 'q', required: false, description: 'Server-side search query' })
+  @Get('service-tree')
+  getServiceTree(
+    @Query('date') date: string,
+    @Query('q') q?: string
+  ): Promise<ProductiveServiceTreeNodeDto[]> {
+    return this.productiveService.getServiceTree(date, q ?? '');
   }
 
   @ApiOkResponse({ type: SyncTimeEntriesResultDto })

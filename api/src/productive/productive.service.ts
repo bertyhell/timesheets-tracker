@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { IntegrationsService } from '../integrations/integrations.service';
 import { DatabaseService } from '../database/database.service';
 import { TimelineEventDto } from '../timelines/dto/response-timeline-events.dto';
@@ -6,6 +6,39 @@ import { ProductiveCompanyDto } from './dto/company.dto';
 import { ProductiveDealDto } from './dto/deal.dto';
 import { ProductiveServiceDto } from './dto/service.dto';
 import { SyncTimeEntryDto } from './dto/sync-time-entries.dto';
+import {
+  ProductiveServiceTreeNodeDto,
+  ProductiveServiceTreeNodeKind,
+} from './dto/service-tree.dto';
+
+/** Carries Productive's error text through to the HTTP response. */
+class BadGatewayLikeError extends HttpException {
+  constructor(message: string) {
+    super(message, HttpStatus.BAD_GATEWAY);
+  }
+}
+
+/** Minimal JSON:API shapes, enough to walk `data` + `included` sideloads. */
+interface JsonApiRelationship {
+  data?: { id: string; type: string } | null;
+}
+
+interface JsonApiResource {
+  id: string;
+  type: string;
+  attributes?: Record<string, unknown>;
+  relationships?: Record<string, JsonApiRelationship>;
+}
+
+/**
+ * Intermediate tree node: `node` is the DTO under construction, `children`
+ * keeps insertion order per level while services are folded in. `position` is
+ * carried on the node during building and stripped before it is returned.
+ */
+interface TreeBucket {
+  node: ProductiveServiceTreeNodeDto & { position?: number };
+  children: Map<string, TreeBucket>;
+}
 
 interface ProductiveServiceRecord {
   id: string;
@@ -69,12 +102,7 @@ export class ProductiveService {
       }
     }
 
-    const integration = this.integrationsService.findOne('productive');
-    if (!integration) {
-      throw new NotFoundException('Productive integration not configured');
-    }
-
-    const { baseUrl, organisationId, token, userId } = integration;
+    const { baseUrl, organisationId, token, userId } = this.getIntegration();
 
     if (!userId) {
       throw new Error('Productive user ID is not configured — fill in the User ID field in Settings → Integrations → Productive');
@@ -129,7 +157,24 @@ export class ProductiveService {
     if (!integration) {
       throw new NotFoundException('Productive integration not configured');
     }
-    return integration;
+    return { ...integration, baseUrl: ProductiveService.resolveBaseUrl(integration.baseUrl) };
+  }
+
+  /**
+   * The settings field is commonly filled in as just `https://api.productive.io`
+   * (that is also the form's default), which is the host and not the API root.
+   * Append the version prefix when no path was given so every call below lands
+   * on a real route instead of a 404 "Route Not Found".
+   */
+  private static resolveBaseUrl(baseUrl: string): string {
+    const trimmed = (baseUrl ?? '').replace(/\/+$/, '');
+    if (!trimmed) return 'https://api.productive.io/api/v2';
+    try {
+      const { pathname } = new URL(trimmed);
+      return pathname === '' || pathname === '/' ? `${trimmed}/api/v2` : trimmed;
+    } catch {
+      return trimmed;
+    }
   }
 
   private buildHeaders(organisationId: string, token: string) {
@@ -359,5 +404,228 @@ export class ProductiveService {
     const d = new Date(year, month - 1, day);
     d.setHours(Math.floor(totalMinutes / 60), Math.round(totalMinutes % 60), 0, 0);
     return d.toISOString();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Service tree (single-call, 5-level company → project → budget → section →
+  // service picker used by the "Sync to output" dropdown).
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Fetch the bookable services in one call and fold them into the nested tree
+   * the picker renders. `query` is passed straight to Productive as
+   * `filter[query]` (server-side search); results are only cached when there is
+   * no query, since a search is cheap to repeat and quickly goes stale.
+   */
+  async getServiceTree(date: string, query = ''): Promise<ProductiveServiceTreeNodeDto[]> {
+    const trimmedQuery = query.trim();
+    const cacheKey = `${ProductiveService.LIST_CACHE_PREFIX}service-tree-${date}`;
+
+    if (!trimmedQuery) {
+      const cached = this.readListCache<ProductiveServiceTreeNodeDto[]>(cacheKey);
+      if (cached) return cached;
+    }
+
+    const payload = await this.fetchServices(date, trimmedQuery);
+    const tree = this.buildServiceTree(payload);
+
+    if (!trimmedQuery) this.writeListCache(cacheKey, tree);
+    return tree;
+  }
+
+  /**
+   * The full filter/sort/include set below is what Productive's own web app
+   * sends. Not all of those keys are in the public reference, so a rejected
+   * request is retried with only the documented filters and sorted client-side
+   * afterwards (see buildServiceTree).
+   */
+  private async fetchServices(
+    date: string,
+    query: string
+  ): Promise<{ data: JsonApiResource[]; included: JsonApiResource[] }> {
+    const { userId } = this.getIntegration();
+
+    const include = 'deal.company,deal.project.company,section.deal';
+    const fields = [
+      'fields[services]=id,name,position,worked_time,budgeted_time,section,deal,time_tracking_enabled',
+      'fields[deals]=id,name,budget,project,company',
+      'fields[sections]=id,name,position,deal',
+      'fields[projects]=id,name,company',
+      'fields[companies]=id,name,avatar_url',
+    ];
+
+    const common = [...fields, `include=${encodeURIComponent(include)}`];
+    if (date) common.push(`filter[bookable_date]=${encodeURIComponent(date)}`);
+    if (userId) common.push(`filter[person_id]=${encodeURIComponent(userId)}`);
+    if (query) common.push(`filter[query]=${encodeURIComponent(query)}`);
+
+    const preferred = [
+      ...common,
+      'filter[budgets_and_deals]=true',
+      'filter[time_tracking_enabled]=true',
+      `sort=${encodeURIComponent('company,project_name,budget,section_position,position')}`,
+    ];
+    const fallback = [...common, 'filter[time_tracking_enabled]=true'];
+
+    try {
+      return await this.fetchAllServicePages(preferred);
+    } catch (preferredError) {
+      console.warn(
+        '[Productive] service tree request rejected, retrying with documented filters only:',
+        preferredError instanceof Error ? preferredError.message : preferredError
+      );
+      try {
+        return await this.fetchAllServicePages(fallback);
+      } catch (fallbackError) {
+        // Surface Productive's own message instead of a bare 500 so the picker
+        // can show why it failed.
+        throw new BadGatewayLikeError(
+          fallbackError instanceof Error ? fallbackError.message : String(fallbackError)
+        );
+      }
+    }
+  }
+
+  private async fetchAllServicePages(
+    params: string[]
+  ): Promise<{ data: JsonApiResource[]; included: JsonApiResource[] }> {
+    const { baseUrl, organisationId, token } = this.getIntegration();
+    const headers = this.buildHeaders(organisationId, token);
+
+    const data: JsonApiResource[] = [];
+    const included: JsonApiResource[] = [];
+
+    let pageNumber = 1;
+    for (;;) {
+      const url = `${baseUrl}/services?${[...params, 'page[size]=200', `page[number]=${pageNumber}`].join('&')}`;
+      const res = await fetch(url, { headers });
+      if (!res.ok) {
+        const body = await res.text().catch(() => '');
+        throw new Error(`Productive services request failed: ${res.status} — ${body}`);
+      }
+
+      const json = (await res.json()) as Record<string, unknown>;
+      const pageData = (json.data as JsonApiResource[]) ?? [];
+      data.push(...pageData);
+      included.push(...((json.included as JsonApiResource[]) ?? []));
+
+      const totalPages = (json.meta as { total_pages?: number } | undefined)?.total_pages;
+      if (pageData.length === 0 || !totalPages || pageNumber >= totalPages) break;
+      pageNumber += 1;
+    }
+
+    return { data, included };
+  }
+
+  /**
+   * Fold the flat JSON:API service list into company → project → budget →
+   * (section) → service. The section level is optional (services can hang
+   * directly off a budget) and so is the project level (internal budgets have
+   * no project), so both fall back to a synthetic bucket.
+   */
+  private buildServiceTree(payload: {
+    data: JsonApiResource[];
+    included: JsonApiResource[];
+  }): ProductiveServiceTreeNodeDto[] {
+    const lookup = new Map<string, JsonApiResource>();
+    for (const resource of payload.included) {
+      lookup.set(`${resource.type}:${resource.id}`, resource);
+    }
+    const resolve = (ref?: JsonApiRelationship): JsonApiResource | undefined => {
+      const identifier = ref?.data;
+      return identifier ? lookup.get(`${identifier.type}:${identifier.id}`) : undefined;
+    };
+
+    // Nested insertion-ordered maps: company → project → budget → section.
+    const companies = new Map<string, TreeBucket>();
+
+    const bucket = (
+      parent: Map<string, TreeBucket>,
+      id: string,
+      kind: ProductiveServiceTreeNodeKind,
+      label: string,
+      extra: Partial<TreeBucket['node']> = {}
+    ): TreeBucket => {
+      let existing = parent.get(id);
+      if (!existing) {
+        existing = { node: { id, kind, label, selectable: false, children: [], ...extra }, children: new Map() };
+        parent.set(id, existing);
+      }
+      return existing;
+    };
+
+    for (const service of payload.data) {
+      const section = resolve(service.relationships?.section);
+      const deal = resolve(service.relationships?.deal) ?? resolve(section?.relationships?.deal);
+      const project = resolve(deal?.relationships?.project);
+      const company =
+        resolve(project?.relationships?.company) ?? resolve(deal?.relationships?.company);
+
+      const companyBucket = bucket(
+        companies,
+        company?.id ?? 'no-company',
+        'company',
+        (company?.attributes?.name as string) ?? 'No company',
+        { avatarUrl: (company?.attributes?.avatar_url as string | undefined) ?? undefined }
+      );
+      const projectBucket = bucket(
+        companyBucket.children,
+        project?.id ?? `${companyBucket.node.id}:no-project`,
+        'project',
+        (project?.attributes?.name as string) ?? 'No project'
+      );
+      const budgetBucket = bucket(
+        projectBucket.children,
+        deal?.id ?? `${projectBucket.node.id}:no-budget`,
+        'budget',
+        (deal?.attributes?.name as string) ?? 'No budget'
+      );
+
+      // No section, or an unnamed default one → hang the service straight off
+      // the budget, the way Productive's own picker renders it.
+      const sectionName = ((section?.attributes?.name as string) ?? '').trim();
+      const parentChildren = sectionName
+        ? bucket(budgetBucket.children, section!.id, 'section', sectionName, {
+            position: section!.attributes?.position as number | undefined,
+          }).children
+        : budgetBucket.children;
+
+      parentChildren.set(service.id, {
+        node: {
+          id: service.id,
+          kind: 'service',
+          label: (service.attributes?.name as string) ?? 'Unnamed service',
+          selectable: true,
+          workedMinutes: (service.attributes?.worked_time as number | undefined) ?? 0,
+          budgetedMinutes: (service.attributes?.budgeted_time as number | undefined) ?? undefined,
+          children: [],
+          position: service.attributes?.position as number | undefined,
+        },
+        children: new Map(),
+      });
+    }
+
+    return this.flattenBuckets(companies);
+  }
+
+  /** Depth-first: buckets → DTO nodes, sorted the way the picker renders them. */
+  private flattenBuckets(buckets: Map<string, TreeBucket>): ProductiveServiceTreeNodeDto[] {
+    return Array.from(buckets.values())
+      .map((entry) => ({
+        ...entry.node,
+        children: this.flattenBuckets(entry.children),
+      }))
+      .sort((a, b) => {
+        // Sections and services carry an explicit position from Productive;
+        // everything else is alphabetical.
+        const aPos = (a as { position?: number }).position;
+        const bPos = (b as { position?: number }).position;
+        if (aPos != null && bPos != null && aPos !== bPos) return aPos - bPos;
+        return a.label.localeCompare(b.label);
+      })
+      .map(({ ...node }) => {
+        delete (node as { position?: number }).position;
+        return node;
+      });
   }
 }

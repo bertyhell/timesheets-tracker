@@ -12,6 +12,7 @@ import {
   tagNamesControllerUpdateMutation,
 } from '../../generated/api/@tanstack/react-query.gen';
 import { productiveApi } from '../../api/productive';
+import { ProductiveTimesheetDropdown } from '../ProductiveTimesheetDropdown/ProductiveTimesheetDropdown';
 import { tagSelectStyles } from '../TagSelect/tagSelectStyles';
 
 import './SyncToProductiveModal.css';
@@ -46,15 +47,9 @@ interface RowSelection {
   serviceId: string;
 }
 
-type SelectOption = { value: string; label: string };
-
 const EMPTY_SELECTION: RowSelection = { companyId: '', dealId: '', serviceId: '' };
 
 const OUTPUT_LOCATIONS = [{ value: 'productive', label: 'Productive' }];
-
-// Sentinel option meaning "leave this tag out of the sync". Empty value so it
-// is treated as unselected everywhere entries/codes are built.
-const DO_NOT_SYNC_OPTION: SelectOption = { value: '', label: 'Do not sync' };
 
 // Stored in tag name code to persist the "do not sync" choice across sessions.
 const DO_NOT_SYNC_CODE = '{"doNotSync":true}';
@@ -140,101 +135,32 @@ function buildRows(events: TimelineEventDto[]): SyncRow[] {
 interface SyncRowItemProps {
   row: SyncRow;
   date: string;
-  companyOptions: SelectOption[];
   selection: RowSelection;
   onChange: (tagNameId: string, selection: RowSelection) => void;
 }
 
-function SyncRowItem({ row, date, companyOptions, selection, onChange }: SyncRowItemProps) {
-  const { companyId, dealId, serviceId } = selection;
-
-  const { data: deals = [], isLoading: dealsLoading, isError: dealsError } = useQuery({
-    queryKey: ['productive', 'deals', companyId],
-    queryFn: () => productiveApi.getDeals(companyId),
-    enabled: !!companyId,
-  });
-
-  const { data: services = [], isLoading: servicesLoading, isError: servicesError } = useQuery({
-    queryKey: ['productive', 'services', dealId, date],
-    queryFn: () => productiveApi.getServices(dealId, date),
-    enabled: !!dealId,
-  });
-
-  const dealOptions = useMemo(
-    () => deals.map((deal) => ({ value: deal.dealId, label: deal.dealName })),
-    [deals]
-  );
-  const serviceOptions = useMemo(
-    () => services.map((service) => ({ value: service.serviceId, label: service.serviceName })),
-    [services]
-  );
-
+function SyncRowItem({ row, date, selection, onChange }: SyncRowItemProps) {
   return (
     <div className="flex flex-row items-center gap-2 mt-2">
-      <div className="flex-1">
-        <div>{row.name}</div>
+      <div className="flex-1 min-w-0">
+        <div className="truncate" title={row.name}>
+          {row.name}
+        </div>
         <div className="text-sm text-gray-500">{formatMinutes(row.totalMinutes)}</div>
       </div>
-      <div className="flex-1">
-        <Select
-          options={companyOptions}
-          value={companyOptions.find((o) => o.value === companyId) ?? DO_NOT_SYNC_OPTION}
-          onChange={(option) =>
-            // Changing the company invalidates the deal and service below it.
-            onChange(row.tagNameId, { companyId: option ? option.value : '', dealId: '', serviceId: '' })
+      <div style={{ width: '60%', flex: 'none' }}>
+        <ProductiveTimesheetDropdown
+          date={date}
+          value={selection.serviceId}
+          onChange={(picked) =>
+            onChange(
+              row.tagNameId,
+              picked
+                ? { companyId: picked.companyId, dealId: picked.dealId, serviceId: picked.serviceId }
+                : { ...EMPTY_SELECTION }
+            )
           }
-          styles={tagSelectStyles}
-          menuPortalTarget={document.body}
-          menuPosition="fixed"
-          placeholder="Select a company…"
-          isClearable
-        />
-      </div>
-      <div className="flex-1">
-        <Select
-          options={dealOptions}
-          value={dealOptions.find((o) => o.value === dealId) ?? null}
-          onChange={(option) =>
-            // Changing the deal invalidates the service below it.
-            onChange(row.tagNameId, { companyId, dealId: option ? option.value : '', serviceId: '' })
-          }
-          styles={tagSelectStyles}
-          menuPortalTarget={document.body}
-          menuPosition="fixed"
-          placeholder={
-            !companyId
-              ? 'Select a company first'
-              : dealsLoading
-                ? 'Loading deals…'
-                : dealsError
-                  ? 'Failed to load deals'
-                  : 'Select a deal…'
-          }
-          isDisabled={!companyId || dealsLoading}
-          isClearable
-        />
-      </div>
-      <div className="flex-1">
-        <Select
-          options={serviceOptions}
-          value={serviceOptions.find((o) => o.value === serviceId) ?? null}
-          onChange={(option) =>
-            onChange(row.tagNameId, { companyId, dealId, serviceId: option ? option.value : '' })
-          }
-          styles={tagSelectStyles}
-          menuPortalTarget={document.body}
-          menuPosition="fixed"
-          placeholder={
-            !dealId
-              ? 'Select a deal first'
-              : servicesLoading
-                ? 'Loading services…'
-                : servicesError
-                  ? 'Failed to load services'
-                  : 'Select a service…'
-          }
-          isDisabled={!dealId || servicesLoading}
-          isClearable
+          placeholder="Do not sync"
         />
       </div>
     </div>
@@ -254,17 +180,6 @@ export function SyncToProductiveModal({
 
   const { mutateAsync: updateTagName } = useMutation({ ...tagNamesControllerUpdateMutation() });
 
-  const {
-    data: companies = [],
-    isLoading: companiesLoading,
-    isError: companiesError,
-    error: companiesErrorObj,
-  } = useQuery({
-    queryKey: ['productive', 'companies'],
-    queryFn: productiveApi.getCompanies,
-    enabled: open,
-  });
-
   // Fetch tag names fresh so prefill reads the current `code`, not the
   // possibly-stale `tagNameCode` embedded in the (cached) timeline events.
   const { data: tagNames = [], isLoading: tagNamesLoading } = useQuery({
@@ -282,17 +197,9 @@ export function SyncToProductiveModal({
     return map;
   }, [tagNames]);
 
-  const companyOptions = useMemo(
-    () => [
-      DO_NOT_SYNC_OPTION,
-      ...companies.map((company) => ({ value: company.companyId, label: company.companyName })),
-    ],
-    [companies]
-  );
-
-  // Prefill the company → deal → service chain per row from its stored code,
-  // once per modal opening and only after the fresh tag names have loaded. The
-  // deal/service ids resolve in the row's own dropdowns once their lists load.
+  // Prefill each row's service from its stored code, once per modal opening and
+  // only after the fresh tag names have loaded. The dropdown resolves the id to
+  // a readable company → project → budget → service path once its tree loads.
   const prefilledRef = useRef(false);
   useEffect(() => {
     if (!open) {
@@ -307,32 +214,6 @@ export function SyncToProductiveModal({
         next[row.tagNameId] = parseCode(code);
       }
 
-      // Most people work for the same customer, so prefill rows whose stored
-      // code has no company with the most common company across the known rows.
-      // Only the company is filled — the deal/service stay empty for the user
-      // to pick, since those are project-specific.
-      const counts = new Map<string, number>();
-      for (const sel of Object.values(next)) {
-        if (sel.companyId) counts.set(sel.companyId, (counts.get(sel.companyId) ?? 0) + 1);
-      }
-      let lastKnownCompanyId = '';
-      let bestCount = 0;
-      for (const [companyId, count] of counts) {
-        if (count > bestCount) {
-          bestCount = count;
-          lastKnownCompanyId = companyId;
-        }
-      }
-      if (lastKnownCompanyId) {
-        for (const row of rows) {
-          const code = codeByTagNameId.get(row.tagNameId) ?? row.code ?? null;
-          const sel = next[row.tagNameId];
-          if (sel && !sel.companyId && !isDoNotSyncCode(code)) {
-            sel.companyId = lastKnownCompanyId;
-          }
-        }
-      }
-
       return next;
     });
     prefilledRef.current = true;
@@ -342,11 +223,8 @@ export function SyncToProductiveModal({
     setSelection((prev) => ({ ...prev, [tagNameId]: rowSelection }));
   };
 
-  // Rows with a company selected must reach a service before syncing. Rows left
-  // on "Do not sync" (no company) are skipped entirely.
-  const startedRows = rows.filter((row) => selection[row.tagNameId]?.companyId);
-  const canSync =
-    startedRows.length > 0 && startedRows.every((row) => !!selection[row.tagNameId]?.serviceId);
+  // A row is either mapped to a service or left on "Do not sync" and skipped.
+  const canSync = rows.some((row) => !!selection[row.tagNameId]?.serviceId);
 
   const handleSync = async () => {
     setIsSyncing(true);
@@ -378,16 +256,15 @@ export function SyncToProductiveModal({
       const result = await productiveApi.sync({ date, entries });
 
       // Persist the chosen company/deal/service back onto the tag name's code so
-      // future syncs resolve automatically. Rows explicitly left without a company
-      // get the do-not-sync sentinel so they are never auto-prefilled again.
+      // future syncs resolve automatically. Rows left unmapped get the
+      // do-not-sync sentinel so they are never re-prefilled.
       await Promise.all(
         rows
           .filter((row) => {
             const sel = selection[row.tagNameId];
             const storedCode = codeByTagNameId.get(row.tagNameId) ?? row.code ?? null;
             if (sel?.serviceId) return encodeCode(sel) !== storedCode;
-            if (!sel?.companyId) return !isDoNotSyncCode(storedCode);
-            return false;
+            return !isDoNotSyncCode(storedCode);
           })
           .map((row) => {
             const sel = selection[row.tagNameId];
@@ -434,31 +311,17 @@ export function SyncToProductiveModal({
           {itemLabel} for {date}
         </h4>
 
-        {companiesLoading && <p>Loading Productive companies…</p>}
-        {companiesError && (
-          <p className="text-red-600">
-            {companiesErrorObj instanceof Error
-              ? companiesErrorObj.message
-              : 'Failed to load Productive companies'}
-          </p>
-        )}
+        {rows.length === 0 && <p>No {itemLabel} to sync for this day.</p>}
 
-        {!companiesLoading && !companiesError && rows.length === 0 && (
-          <p>No {itemLabel} to sync for this day.</p>
-        )}
-
-        {!companiesLoading &&
-          !companiesError &&
-          rows.map((row) => (
-            <SyncRowItem
-              key={row.tagNameId}
-              row={row}
-              date={date}
-              companyOptions={companyOptions}
-              selection={selection[row.tagNameId] ?? EMPTY_SELECTION}
-              onChange={handleRowChange}
-            />
-          ))}
+        {rows.map((row) => (
+          <SyncRowItem
+            key={row.tagNameId}
+            row={row}
+            date={date}
+            selection={selection[row.tagNameId] ?? EMPTY_SELECTION}
+            onChange={handleRowChange}
+          />
+        ))}
       </div>
 
       <div className="flex flex-row justify-end gap-2 mt-48">

@@ -15,6 +15,24 @@ export interface ProductiveServiceOption {
   serviceName: string;
 }
 
+export type ProductiveServiceTreeNodeKind =
+  | 'company'
+  | 'project'
+  | 'budget'
+  | 'section'
+  | 'service';
+
+export interface ProductiveServiceTreeNode {
+  id: string;
+  kind: ProductiveServiceTreeNodeKind;
+  label: string;
+  selectable: boolean;
+  avatarUrl?: string;
+  workedMinutes?: number;
+  budgetedMinutes?: number;
+  children: ProductiveServiceTreeNode[];
+}
+
 export interface SyncTimeEntry {
   serviceId: string;
   minutes: number;
@@ -51,6 +69,21 @@ export const productiveApi = {
       url: '/api/productive/services',
       query: { dealId, date },
     });
+    return data ?? [];
+  },
+
+  getServiceTree: async (date: string, q = ''): Promise<ProductiveServiceTreeNode[]> => {
+    // The generated client resolves with `error` instead of throwing, which
+    // would show up as an empty tree ("No services found"). Throw so the picker
+    // can render its error/retry state with Productive's own message.
+    const { data, error } = await client.get<ProductiveServiceTreeNode[]>({
+      url: '/api/productive/service-tree',
+      query: q ? { date, q } : { date },
+    });
+    if (error) {
+      const message = (error as { message?: string })?.message;
+      throw new Error(message ?? 'Failed to load Productive services');
+    }
     return data ?? [];
   },
 

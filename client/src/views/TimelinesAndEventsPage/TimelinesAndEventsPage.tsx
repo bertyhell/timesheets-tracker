@@ -31,7 +31,7 @@ import {
 } from 'react-resizable-panels';
 import Button, { ButtonVariant } from '../../components/Button/Button';
 import { ROUTE_PARTS } from '../../App';
-import { Menu, Plus } from 'lucide-react';
+import { Loader2, Menu, Plus } from 'lucide-react';
 import { TimelinesViewer } from '../../components/TimelinesViewer/TimelinesViewer';
 
 const NO_EVENTS_MESSAGE_BY_TYPE: Record<TimelineType, string> = {
@@ -58,7 +58,7 @@ export function TimelinesAndEventsPage() {
 
   const {
     data: timelinesWithEvents,
-    isLoading: isLoadingTimelineEvents,
+    isFetching: isFetchingTimelineEvents,
     refetch: refetchTimelinesWithEvents,
   } = useQuery({
     ...timelinesControllerFindAllEventsOptions({
@@ -359,8 +359,10 @@ export function TimelinesAndEventsPage() {
         </div>
 
         <div className="p-page-header-right">
-          {isLoadingTimelineEvents && <span className="p-loading-indicator">Loading...</span>}
-          {isLoadingTimelineEvents && <div className="p-header-divider" />}
+          {isFetchingTimelineEvents && (
+            <Loader2 className="p-loading-indicator animate-spin" size={16} />
+          )}
+          {isFetchingTimelineEvents && <div className="p-header-divider" />}
           <DateSelect />
           <div className="p-header-divider" />
           <GlobalSearchBar />

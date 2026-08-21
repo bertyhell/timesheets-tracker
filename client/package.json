@@ -1,6 +1,6 @@
 {
   "name": "timesheet-tracker",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "license": "MIT",
   "scripts": {
     "dev:client": "vite",

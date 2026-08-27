@@ -8,6 +8,7 @@ import { UpdateWebsiteDto } from './dto/update-website.dto';
 import { findAllWebsites } from './queries/findAllWebsites';
 import { findOneWebsite } from './queries/findOneWebsite';
 import { findOneWebsiteByStartTime } from './queries/findOneWebsiteByStartTime';
+import { findWebsiteByNextStartedAt } from './queries/findWebsiteByNextStartedAt';
 import { createWebsite } from './queries/createWebsite';
 import { updateWebsite } from './queries/updateWebsite';
 import { deleteWebsite } from './queries/deleteWebsite';
@@ -65,6 +66,26 @@ export class WebsitesService {
     } catch (err) {
       const error = new CustomError(
         'Failed to fetch website by start time from the database',
+        err,
+        { startedAt }
+      );
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async findByNextStartedAt(startedAt: string): Promise<Website | null> {
+    try {
+      const result = findWebsiteByNextStartedAt(this.databaseService.getDb(), { startedAt });
+
+      if (!result) {
+        return null;
+      }
+
+      return this.adapt(result);
+    } catch (err) {
+      const error = new CustomError(
+        'Failed to fetch website by next startedAt from the database',
         err,
         { startedAt }
       );

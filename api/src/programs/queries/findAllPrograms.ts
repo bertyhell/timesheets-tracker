@@ -25,6 +25,7 @@ export function findAllPrograms(
 	    WHERE startedAt > ? AND endedAt < ?
 	)
 	WHERE rn = 1
+	ORDER BY startedAt
 	`;
   return db
     .prepare(sql)

@@ -24,6 +24,7 @@ export function findAllWebsites(
 	    WHERE startedAt > ? AND startedAt < ?
 	)
 	WHERE rn = 1
+	ORDER BY startedAt
 	`;
   return db
     .prepare(sql)

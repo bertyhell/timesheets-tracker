@@ -5,4 +5,4 @@ FROM (
     WHERE startedAt > :startedAt AND endedAt < :endedAt
 )
 WHERE rn = 1
-
+ORDER BY startedAt

@@ -11,7 +11,6 @@ import {
   Tag,
   Timeline,
   TimelineType,
-  Website,
 } from '../types/types';
 import { UpdateTimelineDto } from './dto/update-timeline.dto';
 import { findAllTimelines } from './queries/findAllTimelines';
@@ -28,6 +27,7 @@ import { TimelineDto } from './dto/response-timeline.dto';
 import { CalendarsService } from '../calendars/calendars.service';
 import { ProgramsService } from '../programs/programs.service';
 import { WebsitesService } from '../websites/websites.service';
+import { resolveWebsiteEndTimes } from '../websites/helpers/resolve-website-end-times';
 import { TagsService } from '../tags/tags.service';
 import { AutoTagsService } from '../auto-tags/auto-tags.service';
 import { AutoNotesService } from '../auto-notes/auto-notes.service';
@@ -284,26 +284,18 @@ export class TimelinesService {
               return (async () => {
                 const websites = await this.websitesService.findAll(startedAt, endedAt);
                 const programs = await this.programsService.findAll(startedAt, endedAt);
-                return websites
-                  .map((website: Website): TimelineEventDto | null => {
-                    const nextProgram = programs.find(
-                      (program) => program.startedAt > website.startedAt
-                    );
-                    if (!nextProgram) {
-                      return null;
-                    }
-                    return {
-                      id: website.id,
-                      startedAt: website.startedAt,
-                      endedAt: nextProgram.startedAt,
-                      info: {
-                        websiteUrl: website.websiteUrl,
-                        websiteTitle: website.websiteTitle,
-                      },
-                      timelineId: timelineInfo.id,
-                    };
+                return resolveWebsiteEndTimes(websites, programs).map(
+                  (website): TimelineEventDto => ({
+                    id: website.id,
+                    startedAt: website.startedAt,
+                    endedAt: website.endedAt,
+                    info: {
+                      websiteUrl: website.websiteUrl,
+                      websiteTitle: website.websiteTitle,
+                    },
+                    timelineId: timelineInfo.id,
                   })
-                  .filter((e): e is TimelineEventDto => e !== null);
+                );
               })();
 
             case TimelineType.Program:

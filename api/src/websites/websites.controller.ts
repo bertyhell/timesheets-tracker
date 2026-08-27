@@ -15,8 +15,9 @@ import { endOfDay, startOfDay } from 'date-fns';
 import { CreateWebsiteDto } from './dto/create-website.dto';
 import { ResponseWebsiteDto } from './dto/response-website.dto';
 import { ProgramsService } from '../programs/programs.service';
-import { compact, uniqBy } from 'lodash';
+import { compact } from 'lodash';
 import { logger } from '../shared/logger';
+import { resolveWebsiteEndTimes } from './helpers/resolve-website-end-times';
 
 @ApiTags('websites')
 @Controller('api/websites')
@@ -63,24 +64,10 @@ export class WebsitesController {
     @Query('startedAt') startedAt: string,
     @Query('endedAt') endedAt: string
   ): Promise<Website[]> {
-    // Set endedAt to the startedAt of the next program entry
+    // A website event only has a startedAt, so its endedAt is derived from the next boundary
     const websites = await this.websitesService.findAll(startedAt, endedAt);
     const programs = await this.programsService.findAll(startedAt, endedAt);
-    return compact(
-      uniqBy(
-        websites.map((website) => {
-          const nextProgram = programs.find((program) => program.startedAt > website.startedAt);
-          if (!nextProgram) {
-            return null;
-          }
-          return {
-            ...website,
-            endedAt: nextProgram.startedAt,
-          };
-        }),
-        (event) => event.startedAt
-      )
-    );
+    return resolveWebsiteEndTimes(websites, programs);
   }
 
   @Get(':id')
@@ -91,12 +78,16 @@ export class WebsitesController {
   })
   async findOne(@Param('id') id: string): Promise<Website> {
     const website = await this.websitesService.findOne(id);
+    const nextWebsite = await this.websitesService.findByNextStartedAt(website.startedAt);
     const nextProgram = await this.programsService.findByNextStartedAt(website.startedAt);
-    if (!nextProgram) {
+    const [resolved] = resolveWebsiteEndTimes(
+      compact([website, nextWebsite]),
+      compact([nextProgram])
+    );
+    if (!resolved) {
       throw new NotFoundException("Couldn't determine the endedAt date of this website");
     }
-    website.endedAt = nextProgram.endedAt;
-    return website;
+    return resolved;
   }
 
   @Delete()

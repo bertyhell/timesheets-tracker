@@ -9,6 +9,7 @@ import { ProgramsService } from '../programs/programs.service';
 import { WebsitesService } from '../websites/websites.service';
 import { ActiveStatesService } from '../active-states/active-states.service';
 import { getWebsiteDomain } from './helpers/get-website-domain';
+import { resolveWebsiteEndTimes } from '../websites/helpers/resolve-website-end-times';
 import { CreateSavedOverviewConfigDto } from './dto/create-saved-overview-config.dto';
 import { UpdateSavedOverviewConfigDto } from './dto/update-saved-overview-config.dto';
 import { findAllSavedOverviewConfigs } from './queries/findAllSavedOverviewConfigs';
@@ -208,8 +209,8 @@ export class OverviewsService {
 
       if (sourceTypes.includes(OverviewSourceType.Website)) {
         const websites = await this.websitesService.findAll(startedAt, endedAt);
-        for (const website of websites) {
-          if (!website.endedAt) continue;
+        const websitePrograms = await this.programsService.findAll(startedAt, endedAt);
+        for (const website of resolveWebsiteEndTimes(websites, websitePrograms)) {
           rows.push(
             this.toFlatRow(
               website.id,

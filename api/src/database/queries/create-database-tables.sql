@@ -112,3 +112,10 @@ CREATE TABLE IF NOT EXISTS savedOverviewConfigs
     "createdAt"         text NOT NULL,
     "updatedAt"         text NOT NULL
 );
+
+
+-- Websites and programs are almost always read as a time range for a single day, and the
+-- website end-time clamping additionally does a "first event after X" lookup. Without these
+-- both degrade to a full table scan plus a temp b-tree sort.
+CREATE INDEX IF NOT EXISTS idx_websites_startedAt ON websites ("startedAt");
+CREATE INDEX IF NOT EXISTS idx_programs_startedAt ON programs ("startedAt");

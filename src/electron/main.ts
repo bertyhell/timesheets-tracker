@@ -24,6 +24,7 @@ import {
 } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { spawn, ChildProcess } from 'child_process';
+import * as fs from 'fs';
 import * as path from 'path';
 
 const UPDATE_CHECK_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000; // 1 week
@@ -65,13 +66,37 @@ if (!gotSingleInstanceLock) {
 // ── Spawn NestJS backend as a child process ──────────────────────────────────
 // Use Electron's bundled Node runtime (ELECTRON_RUN_AS_NODE) so no system Node
 // installation is required in the packaged app.
+// macOS: process.execPath is the app bundle's MAIN executable, and its Info.plist
+// registers a regular foreground app. As soon as the API child touches AppKit
+// (@paymoapp/active-window does), LaunchServices gives that child its own dock
+// tile — a second, window-less icon with the same app icon. The bundled Electron
+// "Helper" app has LSUIElement=1 in its Info.plist, so a process started from
+// that executable never gets a dock tile. Same Node runtime, no extra icon.
+function resolveNodeRuntime(): string {
+  if (process.platform !== 'darwin') return process.execPath;
+
+  const appBundle = path.resolve(path.dirname(process.execPath), '../..'); // …/Foo.app
+  if (!appBundle.endsWith('.app')) return process.execPath;
+
+  const bundleName = path.basename(appBundle, '.app');
+  const helper = path.join(
+    appBundle,
+    'Contents/Frameworks',
+    `${bundleName} Helper.app/Contents/MacOS/${bundleName} Helper`,
+  );
+
+  return fs.existsSync(helper) ? helper : process.execPath;
+}
+
 function startApiServer(): ChildProcess {
   const apiScript = path.join(API_DIR, 'dist/src/main.js');
+  const nodeRuntime = resolveNodeRuntime();
 
   console.log('[electron] API_DIR:', API_DIR);
   console.log('[electron] apiScript:', apiScript);
+  console.log('[electron] node runtime:', nodeRuntime);
 
-  const proc = spawn(process.execPath, [apiScript], {
+  const proc = spawn(nodeRuntime, [apiScript], {
     cwd: API_DIR,
     env: {
       ...process.env,

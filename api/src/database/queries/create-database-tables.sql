@@ -114,8 +114,24 @@ CREATE TABLE IF NOT EXISTS savedOverviewConfigs
 );
 
 
--- Websites and programs are almost always read as a time range for a single day, and the
--- website end-time clamping additionally does a "first event after X" lookup. Without these
--- both degrade to a full table scan plus a temp b-tree sort.
-CREATE INDEX IF NOT EXISTS idx_websites_startedAt ON websites ("startedAt");
+-- Indexes.
+--
+-- The event tables (programs, websites, activeStates, tags) grow without bound and are always
+-- read as a time range for a single day, purged with "startedAt < x", and — for websites —
+-- probed for "the first event after x" on every clamp and for an exact startedAt match on
+-- every insert from the browser extension. Without an index on startedAt each of those is a
+-- full table scan plus a temp b-tree sort.
+-- (cachedNetworkRequests is created by a migration, so its index lives there too.)
 CREATE INDEX IF NOT EXISTS idx_programs_startedAt ON programs ("startedAt");
+CREATE INDEX IF NOT EXISTS idx_websites_startedAt ON websites ("startedAt");
+CREATE INDEX IF NOT EXISTS idx_activeStates_startedAt ON activeStates ("startedAt");
+CREATE INDEX IF NOT EXISTS idx_tags_startedAt ON tags ("startedAt");
+
+-- SQLite needs an index on the child side of a foreign key to cascade a delete without
+-- scanning the whole child table, so deleting a tagName would otherwise scan tags and autoTags.
+CREATE INDEX IF NOT EXISTS idx_tags_tagNameId ON tags ("tagNameId");
+CREATE INDEX IF NOT EXISTS idx_autoTags_tagNameId ON autoTags ("tagNameId");
+
+-- Deliberately not indexed: tagNames, calendars, autoNotes, timelines, integrations, settings
+-- and savedOverviewConfigs are all configuration tables of at most a few dozen rows, read by
+-- primary key or with a full-table LIKE '%term%' that no index can serve.

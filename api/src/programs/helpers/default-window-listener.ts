@@ -4,6 +4,16 @@ import { logger } from '../../shared/logger';
 import { CreateProgramDto } from '../dto/create-activity.dto';
 import { type IWindowListener, type WindowChangeEvent } from './window-listener.types';
 
+export class MissingScreenRecordingPermissionError extends Error {
+  constructor() {
+    super(
+      'Screen recording permission is not granted. Activity tracking is disabled. ' +
+        'Grant it in System Settings > Privacy & Security > Screen Recording and restart the app.'
+    );
+    this.name = 'MissingScreenRecordingPermissionError';
+  }
+}
+
 export class DefaultWindowListener implements IWindowListener {
   private subscriptionId: number;
   // Lazily loaded to avoid crashing headless environments at module init time.
@@ -17,11 +27,12 @@ export class DefaultWindowListener implements IWindowListener {
 
     this.activeWindow.initialize({ osxRunLoop: 'all' });
 
+    // Never exit the process here: this listener runs inside the API server, which
+    // also serves the UI. Killing it over a missing permission leaves the Electron
+    // shell waiting forever for a server that will never listen — a window-less app
+    // with no visible error. Degrade instead: no activity tracking, everything else works.
     if (!this.activeWindow.requestPermissions()) {
-      console.error(
-        'Error: You need to grant screen recording permission in System Preferences > Security & Privacy > Privacy > Screen Recording'
-      );
-      process.exit(0);
+      throw new MissingScreenRecordingPermissionError();
     }
 
     this.subscriptionId = this.activeWindow.subscribe(async (windowInfo) => {

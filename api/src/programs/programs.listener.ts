@@ -4,31 +4,60 @@ import { ProgramsService } from './programs.service';
 import { CreateProgramDto } from './dto/create-activity.dto';
 import { extractIconColor } from './helpers/extract-icon-color';
 import { createWindowListener } from './helpers/create-window-listener';
+import { MissingScreenRecordingPermissionError } from './helpers/default-window-listener';
 import { type IWindowListener } from './helpers/window-listener.types';
 import { isActivityTrackingDisabled } from '../shared/is-activity-tracking-disabled';
+import { logger } from '../shared/logger';
 
 @Injectable()
 export class ProgramsListener implements OnApplicationBootstrap {
   private windowListener: IWindowListener | null = null;
   private lastProgram: CreateProgramDto | null = null;
   private _isTracking = false;
+  private _trackingError: string | null = null;
 
   constructor(@Inject(ProgramsService) private programsService: ProgramsService) {}
 
   async onApplicationBootstrap() {
     if (isActivityTrackingDisabled()) return;
-    await this.startListening();
+    // A tracking failure at boot (e.g. macOS screen recording permission not granted)
+    // must not abort Nest startup: the same server serves the UI, so the app would
+    // come up with no window at all. Log it, expose it, keep serving.
+    try {
+      await this.startListening();
+    } catch (err) {
+      logger.error(`could not start activity tracking: ${(err as Error).message}`);
+    }
   }
 
   get isTracking(): boolean {
     return this._isTracking;
   }
 
+  get trackingError(): string | null {
+    return this._trackingError;
+  }
+
   async startListening() {
     if (this._isTracking) return;
     this._isTracking = true;
+    this._trackingError = null;
     this.windowListener = createWindowListener();
-    const initial = await this.windowListener.start(async ({ program, icon }) => {
+    try {
+      await this.startWindowListener();
+    } catch (err) {
+      this._isTracking = false;
+      this.windowListener = null;
+      this._trackingError =
+        err instanceof MissingScreenRecordingPermissionError
+          ? err.message
+          : `Could not start activity tracking: ${(err as Error).message}`;
+      throw err;
+    }
+  }
+
+  private async startWindowListener() {
+    const initial = await this.windowListener!.start(async ({ program, icon }) => {
       await this.handleProgramChange(program, icon);
     });
     if (initial) {
@@ -38,6 +67,7 @@ export class ProgramsListener implements OnApplicationBootstrap {
 
   async stopListening() {
     this._isTracking = false;
+    this._trackingError = null;
     this.windowListener?.stop();
     this.windowListener = null;
     this.lastProgram = null;

@@ -15,18 +15,28 @@ export class ProgramsController {
   ) {}
 
   @Get('tracking')
-  getTracking(): { isTracking: boolean } {
-    return { isTracking: this.programsListener.isTracking };
+  getTracking(): { isTracking: boolean; trackingError: string | null } {
+    return {
+      isTracking: this.programsListener.isTracking,
+      trackingError: this.programsListener.trackingError,
+    };
   }
 
   @Put('tracking')
-  async setTracking(@Body() body: { enabled: boolean }): Promise<{ isTracking: boolean }> {
+  async setTracking(
+    @Body() body: { enabled: boolean }
+  ): Promise<{ isTracking: boolean; trackingError: string | null }> {
     if (body.enabled) {
-      await this.programsListener.startListening();
+      // Swallow: trackingError carries the reason back to the client, so a missing
+      // screen recording permission shows up as a message instead of a 500.
+      await this.programsListener.startListening().catch(() => undefined);
     } else {
       await this.programsListener.stopListening();
     }
-    return { isTracking: this.programsListener.isTracking };
+    return {
+      isTracking: this.programsListener.isTracking,
+      trackingError: this.programsListener.trackingError,
+    };
   }
 
   @Post()

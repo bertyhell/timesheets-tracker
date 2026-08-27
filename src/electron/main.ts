@@ -44,6 +44,60 @@ const ICON_PATH = isDev
 
 const PRELOAD_PATH = path.join(__dirname, 'preload.js');
 
+// ── File logging ─────────────────────────────────────────────────────────────
+// A Finder/dock launch has no terminal attached, so console output goes nowhere
+// and startup failures are invisible. Mirror everything to a log file under
+// userData; `npm run logs:mac` tails it.
+const LOG_PATH = path.join(app.getPath('userData'), 'main.log');
+let logStream: fs.WriteStream | null = null;
+
+function initFileLogging(): void {
+  try {
+    fs.mkdirSync(path.dirname(LOG_PATH), { recursive: true });
+    // Truncate per launch: this is a startup/diagnostics log, not an audit trail.
+    logStream = fs.createWriteStream(LOG_PATH, { flags: 'w' });
+    logStream.on('error', () => {
+      logStream = null;
+    });
+  } catch {
+    return;
+  }
+
+  const write = (level: string, args: unknown[]): void => {
+    const line = args
+      .map((a) =>
+        typeof a === 'string'
+          ? a
+          : (() => {
+              try {
+                return JSON.stringify(a);
+              } catch {
+                return String(a);
+              }
+            })()
+      )
+      .join(' ');
+    logStream?.write(`${new Date().toISOString()} [${level}] ${line.replace(/\s+$/, '')}\n`);
+  };
+
+  for (const level of ['log', 'warn', 'error'] as const) {
+    const original = console[level].bind(console);
+    console[level] = (...args: unknown[]): void => {
+      write(level, args);
+      original(...args);
+    };
+  }
+
+  process.on('uncaughtException', (err) => {
+    console.error('[electron] uncaught exception:', err.stack ?? String(err));
+  });
+  process.on('unhandledRejection', (reason) => {
+    console.error('[electron] unhandled rejection:', String(reason));
+  });
+}
+
+initFileLogging();
+
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let serverProcess: ChildProcess | null = null;
@@ -82,11 +136,16 @@ function resolveNodeRuntime(): string {
   const helper = path.join(
     appBundle,
     'Contents/Frameworks',
-    `${bundleName} Helper.app/Contents/MacOS/${bundleName} Helper`,
+    `${bundleName} Helper.app/Contents/MacOS/${bundleName} Helper`
   );
 
   return fs.existsSync(helper) ? helper : process.execPath;
 }
+
+// Tail of the API's stderr plus whether it died — used to explain a failed startup
+// instead of hanging invisibly.
+const apiErrorOutput: string[] = [];
+let apiExited = false;
 
 function startApiServer(): ChildProcess {
   const apiScript = path.join(API_DIR, 'dist/src/main.js');
@@ -106,9 +165,23 @@ function startApiServer(): ChildProcess {
     stdio: 'pipe',
   });
 
-  proc.stdout?.on('data', (data) => process.stdout.write('[api] ' + data));
-  proc.stderr?.on('data', (data) => process.stderr.write('[api] ' + data));
-  proc.on('exit', (code) => console.log('[electron] NestJS subprocess exited with code:', code));
+  proc.stdout?.on('data', (data) => console.log('[api]', String(data).trimEnd()));
+  proc.stderr?.on('data', (data) => {
+    const text = String(data).trimEnd();
+    apiErrorOutput.push(text);
+    // Keep only the tail — this feeds an error dialog, not a full transcript.
+    if (apiErrorOutput.length > 20) apiErrorOutput.shift();
+    console.error('[api]', text);
+  });
+  proc.on('error', (err) => {
+    apiExited = true;
+    apiErrorOutput.push(`failed to spawn: ${err.message}`);
+    console.error('[electron] NestJS subprocess failed to spawn:', err.message);
+  });
+  proc.on('exit', (code) => {
+    apiExited = true;
+    console.log('[electron] NestJS subprocess exited with code:', code);
+  });
 
   return proc;
 }
@@ -122,6 +195,10 @@ async function waitForServer(url: string, timeoutMs = 120_000): Promise<void> {
       if (res.status < 500) return;
     } catch {
       // not ready yet
+    }
+    // No point waiting out the full timeout for a process that is already gone.
+    if (apiExited) {
+      throw new Error('The backend process exited before it started listening.');
     }
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
@@ -328,7 +405,8 @@ function setupAutoUpdater(): void {
         cancelId: 1,
         title: 'Update Ready',
         message: `Version ${info.version} has been downloaded.`,
-        detail: 'Restart the app to apply it now, or it will be applied automatically the next time you quit.',
+        detail:
+          'Restart the app to apply it now, or it will be applied automatically the next time you quit.',
       })
       .then(({ response }) => {
         if (response === 0) {
@@ -377,13 +455,51 @@ ipcMain.handle('shell:showItemInFolder', (_event, targetPath: string) => {
   shell.showItemInFolder(targetPath);
 });
 
+// ── Fatal startup failure ────────────────────────────────────────────────────
+function reportFatalStartupError(message: string): void {
+  const tail = apiErrorOutput.join('\n').trim();
+  console.error('[electron] fatal startup error:', message);
+
+  const response = dialog.showMessageBoxSync({
+    type: 'error',
+    title: 'Timesheets Tracker could not start',
+    message: 'The backend server did not start, so the app cannot open.',
+    detail: [message, tail && `Last output:\n${tail}`, `Log file:\n${LOG_PATH}`]
+      .filter(Boolean)
+      .join('\n\n'),
+    buttons: ['Open log file', 'Quit'],
+    defaultId: 0,
+    cancelId: 1,
+  });
+
+  if (response === 0) {
+    shell.showItemInFolder(LOG_PATH);
+  }
+
+  isQuitting = true;
+  if (serverProcess) {
+    try {
+      serverProcess.kill();
+    } catch {}
+  }
+  app.quit();
+}
+
 // ── App lifecycle ─────────────────────────────────────────────────────────────
 app.whenReady().then(async () => {
+  console.log('[electron] log file:', LOG_PATH);
   console.log('[electron] Starting NestJS API server...');
   serverProcess = startApiServer();
 
   console.log('[electron] Waiting for NestJS server to start...');
-  await waitForServer(APP_URL);
+  try {
+    await waitForServer(APP_URL);
+  } catch (err) {
+    // Without this the rejection is silent: no window, no tray, no error — just a
+    // live process the user can only kill from Activity Monitor.
+    reportFatalStartupError((err as Error).message);
+    return;
+  }
   console.log('[electron] NestJS server is ready');
 
   setAppMenu();

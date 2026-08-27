@@ -17,6 +17,7 @@
     "build:api": "cd api && npm run build",
     "build:client": "cd client && npm run build",
     "build:electron-main": "tsc -p src/electron/tsconfig.json",
+    "logs:mac": "tail -f \"$HOME/Library/Application Support/timesheets-tracker/main.log\"",
     "clean:release": "rimraf release",
     "build": "npm run clean:release && npm run build:api && npm run build:client && npm run build:electron-main && electron-builder --config electron-builder.config.js",
     "build:win": "npm run clean:release && npm run build:api && npm run build:client && npm run build:electron-main && electron-builder --win --config electron-builder.config.js",

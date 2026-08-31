@@ -30,7 +30,6 @@ import { getOverlappingAutoTagNotes } from '../../helpers/get-overlapping-auto-t
 import {
   QueryObserverResult,
   RefetchOptions,
-  Register,
   useMutation,
   useQuery,
   useQueryClient,
@@ -43,8 +42,6 @@ import {
   timelinesControllerFindAllEventsQueryKey,
 } from '../../generated/api/@tanstack/react-query.gen';
 import { toast } from 'react-toastify';
-import { RuleTester } from 'oxlint/plugins-dev';
-import Error = RuleTester.Error;
 
 interface TimelinesViewerProps {
   timelineInfos: TimelineDto[] | undefined;
@@ -55,16 +52,9 @@ interface TimelinesViewerProps {
     selectedTimelineId: string | null;
     selectedEventId: string | null;
   }) => void;
-  refetchTimelinesWithEvents: (options?: RefetchOptions) => Promise<
-    QueryObserverResult<
-      Array<TimelineWithEventsDto>,
-      Register extends {
-        defaultError: infer TError;
-      }
-        ? TError
-        : Error
-    >
-  >;
+  refetchTimelinesWithEvents: (
+    options?: RefetchOptions
+  ) => Promise<QueryObserverResult<Array<TimelineWithEventsDto>>>;
   onDeleteTag: (tagId: string) => Promise<unknown>;
   onRefreshEvents: () => void;
 }

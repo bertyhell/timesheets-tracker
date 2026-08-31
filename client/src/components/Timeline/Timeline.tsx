@@ -491,9 +491,6 @@ function Timeline({
                           <b>Title:</b> {String(eventInfo['tagNameTitle'] ?? '')}
                         </li>
                         <li>
-                          <b>Code:</b> {String(eventInfo['tagNameCode'] ?? '')}
-                        </li>
-                        <li>
                           <b>Priority:</b> {String(eventInfo['priority'] ?? '')}
                         </li>
                       </>

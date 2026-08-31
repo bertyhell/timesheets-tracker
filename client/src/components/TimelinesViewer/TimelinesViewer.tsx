@@ -26,6 +26,7 @@ import { ROUTE_PARTS } from '../../App';
 import { useNavigate } from 'react-router-dom';
 import { TagName } from '../../types/types';
 import type { ProminentCondition } from '../Timeline/helpers/getMostProminentConditions';
+import { getOverlappingAutoTagNotes } from '../../helpers/get-overlapping-auto-tag-notes';
 import {
   QueryObserverResult,
   RefetchOptions,
@@ -460,11 +461,18 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
 
   const handleCreateTag = useCallback(
     async (tagNameId: string): Promise<void> => {
+      // Carry over the notes of the auto tags the new tag overlaps with
+      const note = getOverlappingAutoTagNotes(
+        timelinesWithEvents,
+        selectionStartTime,
+        selectionEndTime
+      ).join(', ');
       await createTag({
         body: {
           tagNameId,
           startedAt: selectionStartTime.toISOString(),
           endedAt: selectionEndTime.toISOString(),
+          ...(note ? { note } : {}),
         },
       });
       await Promise.all([refetchTimelinesWithEvents(), refetchTagNamesCount()]);
@@ -474,7 +482,14 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
       setSelectionMovePercent(null);
       setActiveSelectionTimeline(null);
     },
-    [createTag, selectionStartTime, selectionEndTime, refetchTimelinesWithEvents, refetchTagNamesCount]
+    [
+      createTag,
+      timelinesWithEvents,
+      selectionStartTime,
+      selectionEndTime,
+      refetchTimelinesWithEvents,
+      refetchTagNamesCount,
+    ]
   );
 
   const handleTagResized = useCallback(

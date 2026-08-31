@@ -4,15 +4,19 @@ import React, { useState } from 'react';
 import { Modal } from 'react-responsive-modal';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { parseISO } from 'date-fns';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { endOfDay, parseISO, startOfDay } from 'date-fns';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { ROUTE_PARTS } from '../../App';
-import { tagsControllerCreateMutation } from '../../generated/api/@tanstack/react-query.gen';
+import {
+  tagsControllerCreateMutation,
+  timelinesControllerFindAllEventsOptions,
+} from '../../generated/api/@tanstack/react-query.gen';
 import type { TimelineEventDto } from '../../generated/api/types.gen';
 import type { TagName } from '../../types/types';
 import TagSelectSingle from '../TagSelect/TagSelectSingle';
 import Button, { ButtonVariant } from '../Button/Button';
+import { getOverlappingAutoTagNotes } from '../../helpers/get-overlapping-auto-tag-notes';
 
 interface MergedInterval {
   startedAt: string;
@@ -57,6 +61,21 @@ export function BulkTagModal() {
 
   const { mutateAsync: createTag } = useMutation({ ...tagsControllerCreateMutation() });
 
+  // Load the day of the selected events so the notes of the overlapping auto tags
+  // can be copied onto the created tags
+  const firstEventStartedAt = events[0]?.startedAt;
+  const { data: dayTimelinesWithEvents } = useQuery({
+    ...timelinesControllerFindAllEventsOptions({
+      query: {
+        startedAt: startOfDay(
+          parseISO(firstEventStartedAt || new Date().toISOString())
+        ).toISOString(),
+        endedAt: endOfDay(parseISO(firstEventStartedAt || new Date().toISOString())).toISOString(),
+      },
+    }),
+    enabled: !!firstEventStartedAt,
+  });
+
   const handleClose = () => navigate('/' + ROUTE_PARTS.timelinesAndEvents);
 
   const handleSave = async () => {
@@ -72,15 +91,21 @@ export function BulkTagModal() {
     const intervals = mergeIntervals(events);
 
     await Promise.all(
-      intervals.map((interval) =>
-        createTag({
+      intervals.map((interval) => {
+        const note = getOverlappingAutoTagNotes(
+          dayTimelinesWithEvents,
+          parseISO(interval.startedAt),
+          parseISO(interval.endedAt)
+        ).join(', ');
+        return createTag({
           body: {
             tagNameId: selectedTagName.id,
             startedAt: interval.startedAt,
             endedAt: interval.endedAt,
+            ...(note ? { note } : {}),
           },
-        })
-      )
+        });
+      })
     );
 
     await queryClient.invalidateQueries({

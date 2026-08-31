@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Modal } from 'react-responsive-modal';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { format, parseISO } from 'date-fns';
+import { endOfDay, format, parseISO, startOfDay } from 'date-fns';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { Pencil } from 'lucide-react';
@@ -17,8 +17,10 @@ import {
   tagsControllerFindOneOptions,
   tagsControllerRemoveMutation,
   tagsControllerUpdateMutation,
+  timelinesControllerFindAllEventsOptions,
 } from '../../generated/api/@tanstack/react-query.gen';
 import type { TagDto, TagNameDto } from '../../generated/api/types.gen';
+import { getOverlappingAutoTagNotes } from '../../helpers/get-overlapping-auto-tag-notes';
 import { getRandomColor } from '../Timeline/helpers/getColorForEvent';
 import type { TagName } from '../../types/types';
 import TagSelectSingle from '../TagSelect/TagSelectSingle';
@@ -54,6 +56,18 @@ export function EditTagModal() {
     enabled: !!(tag as TagDto)?.tagNameId,
   });
 
+  // When creating a tag for a time range, load that day so the notes of the
+  // overlapping auto tags can be copied into the note field
+  const { data: dayTimelinesWithEvents } = useQuery({
+    ...timelinesControllerFindAllEventsOptions({
+      query: {
+        startedAt: startOfDay(parseISO(paramStartedAt || new Date().toISOString())).toISOString(),
+        endedAt: endOfDay(parseISO(paramStartedAt || new Date().toISOString())).toISOString(),
+      },
+    }),
+    enabled: !uuid && !!paramStartedAt && !!paramEndedAt,
+  });
+
   const { mutateAsync: createTagName } = useMutation({ ...tagNamesControllerCreateMutation() });
   const { mutateAsync: createTag } = useMutation({ ...tagsControllerCreateMutation() });
   const { mutateAsync: updateTag } = useMutation({ ...tagsControllerUpdateMutation() });
@@ -73,6 +87,18 @@ export function EditTagModal() {
       setSelectedTagName(tagName as unknown as TagName);
     }
   }, [tagName]);
+
+  useEffect(() => {
+    if (uuid || !dayTimelinesWithEvents || !paramStartedAt || !paramEndedAt) return;
+    const autoTagNotes = getOverlappingAutoTagNotes(
+      dayTimelinesWithEvents,
+      parseISO(paramStartedAt),
+      parseISO(paramEndedAt)
+    );
+    if (!autoTagNotes.length) return;
+    // Never overwrite what the user already typed
+    setNote((currentNote) => currentNote || autoTagNotes.join(', '));
+  }, [uuid, dayTimelinesWithEvents, paramStartedAt, paramEndedAt]);
 
   const handleClose = () => navigate('/' + ROUTE_PARTS.timelinesAndEvents);
 

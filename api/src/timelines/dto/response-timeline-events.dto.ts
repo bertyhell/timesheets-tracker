@@ -9,7 +9,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { TimelineType } from '../../types/types';
+import { ConditionOperator, ConditionVariable, TimelineType } from '../../types/types';
 
 export class ActiveStateEventInfoDto {
   @IsBoolean()
@@ -175,6 +175,50 @@ export class TagEventInfoDto {
   note?: string;
 }
 
+export class MatchedAutoTagConditionDto {
+  @IsEnum(ConditionVariable)
+  @Type(() => String)
+  @ApiProperty({
+    type: ConditionVariable,
+    description: 'Variable of the event that the condition was checked against',
+    enum: ConditionVariable,
+    enumName: 'ConditionVariable',
+    required: true,
+  })
+  variable: ConditionVariable;
+
+  @IsEnum(ConditionOperator)
+  @Type(() => String)
+  @ApiProperty({
+    type: ConditionOperator,
+    description: 'Operator that was used to compare the variable with the value',
+    enum: ConditionOperator,
+    enumName: 'ConditionOperator',
+    required: true,
+  })
+  operator: ConditionOperator;
+
+  @IsString()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Value the variable was compared against',
+    example: 'jira',
+    required: true,
+  })
+  value: string;
+
+  @IsString()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Value of the event variable that made this condition match',
+    example: 'https://jira.company.com/browse/ABC-123',
+    required: true,
+  })
+  matchedValue: string;
+}
+
 export class AutoTagEventInfoDto {
   @IsString()
   @Type(() => String)
@@ -249,6 +293,18 @@ export class AutoTagEventInfoDto {
     required: true,
   })
   priority: number;
+
+  @IsArray()
+  @IsOptional()
+  @Type(() => MatchedAutoTagConditionDto)
+  @ApiProperty({
+    type: MatchedAutoTagConditionDto,
+    isArray: true,
+    description:
+      'The conditions of the auto tag rule that were triggered by the source event. Empty for events that originate from a manual tag.',
+    required: false,
+  })
+  matchedConditions?: MatchedAutoTagConditionDto[];
 }
 
 export class ProductiveEventInfoDto {

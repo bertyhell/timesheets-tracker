@@ -22,10 +22,15 @@ import {
 import { formatDuration } from '../../helpers/format-duration';
 import type { TagName } from '../../types/types';
 import TagSelectSingle from '../TagSelect/TagSelectSingle';
-import type { TimelineDto, TimelineEventDto } from '../../generated/api/types.gen';
+import type {
+  AutoTagEventInfoDto,
+  TimelineDto,
+  TimelineEventDto,
+} from '../../generated/api/types.gen';
 import { getColorForEvent, getColorFromString, getDarkerTextColor, getRandomColor } from './helpers/getColorForEvent';
 import { getTicks } from './helpers/getTicks';
 import { getEventLabel } from './helpers/getEventLabel';
+import { formatMatchedCondition } from './helpers/formatMatchedCondition';
 import {
   getMostProminentConditions,
   type ProminentCondition,
@@ -452,6 +457,10 @@ function Timeline({
             const color = getColorForEvent(timelineInfo, event);
             const isTagTimeline = timelineInfo.timelineType === TimelineType.Tag && !!onTagResized;
             const isAutoTagTimeline = timelineInfo.timelineType === TimelineType.AutoTag;
+            const autoTagInfo = isAutoTagTimeline
+              ? (event.info as AutoTagEventInfoDto)
+              : null;
+            const matchedConditions = autoTagInfo?.matchedConditions ?? [];
             const isProductiveTimeline = timelineInfo.timelineType === TimelineType.Productive;
             const isDimmed =
               !!lowerSearch && !JSON.stringify(event).toLowerCase().includes(lowerSearch);
@@ -493,6 +502,32 @@ function Timeline({
                         <li>
                           <b>Priority:</b> {String(eventInfo['priority'] ?? '')}
                         </li>
+                        {autoTagInfo?.tagNameNote && (
+                          <li>
+                            <b>Note:</b> {autoTagInfo.tagNameNote}
+                          </li>
+                        )}
+                        {!!matchedConditions.length && (
+                          <li className="c-timeline__event__tooltip__conditions">
+                            <b>{matchedConditions.length > 1 ? 'Conditions' : 'Condition'}:</b>
+                            <ul>
+                              {matchedConditions.map((condition, conditionIndex) => (
+                                <li
+                                  key={
+                                    'c-timeline__' +
+                                    timelineInfo.title +
+                                    '__event__' +
+                                    event.id +
+                                    '__condition__' +
+                                    conditionIndex
+                                  }
+                                >
+                                  {formatMatchedCondition(condition)}
+                                </li>
+                              ))}
+                            </ul>
+                          </li>
+                        )}
                       </>
                     ) : isProductiveTimeline ? (
                       <>

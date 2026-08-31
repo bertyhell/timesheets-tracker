@@ -497,6 +497,25 @@ export type TagEventInfoDto = {
     note?: string | null;
 };
 
+export type MatchedAutoTagConditionDto = {
+    /**
+     * Variable of the event that the condition was checked against
+     */
+    variable: ConditionVariable;
+    /**
+     * Operator that was used to compare the variable with the value
+     */
+    operator: ConditionOperator;
+    /**
+     * Value the variable was compared against
+     */
+    value: string;
+    /**
+     * Value of the event variable that made this condition match
+     */
+    matchedValue: string;
+};
+
 export type AutoTagEventInfoDto = {
     /**
      * Id of the auto tag rule that produced this event
@@ -526,6 +545,10 @@ export type AutoTagEventInfoDto = {
      * Priority of the auto tag that produced this event
      */
     priority: number;
+    /**
+     * The conditions of the auto tag rule that were triggered by the source event. Empty for events that originate from a manual tag.
+     */
+    matchedConditions?: Array<MatchedAutoTagConditionDto>;
 };
 
 export type GitCommitEventInfoDto = {
@@ -738,6 +761,43 @@ export type ProductiveServiceDto = {
      * Name of the service
      */
     serviceName: string;
+};
+
+export type ProductiveServiceTreeNodeDto = {
+    /**
+     * Productive id of the resource this node represents
+     */
+    id: string;
+    /**
+     * Which level of the tree this node sits on
+     */
+    kind: 'company' | 'project' | 'budget' | 'section' | 'service';
+    /**
+     * Label to render for this node
+     */
+    label: string;
+    /**
+     * Only service leaves are selectable
+     */
+    selectable: boolean;
+    /**
+     * Company avatar (companies only)
+     */
+    avatarUrl?: string;
+    /**
+     * Minutes already worked (services only)
+     */
+    workedMinutes?: number;
+    /**
+     * Minutes budgeted (services only)
+     */
+    budgetedMinutes?: number;
+    /**
+     * Child nodes, one level down
+     */
+    children: Array<{
+        [key: string]: unknown;
+    }>;
 };
 
 export type SyncTimeEntryDto = {
@@ -1852,6 +1912,25 @@ export type ProductiveControllerGetServicesResponses = {
 
 export type ProductiveControllerGetServicesResponse = ProductiveControllerGetServicesResponses[keyof ProductiveControllerGetServicesResponses];
 
+export type ProductiveControllerGetServiceTreeData = {
+    body?: never;
+    path?: never;
+    query: {
+        date: string;
+        /**
+         * Server-side search query
+         */
+        q?: string;
+    };
+    url: '/api/productive/service-tree';
+};
+
+export type ProductiveControllerGetServiceTreeResponses = {
+    200: Array<ProductiveServiceTreeNodeDto>;
+};
+
+export type ProductiveControllerGetServiceTreeResponse = ProductiveControllerGetServiceTreeResponses[keyof ProductiveControllerGetServiceTreeResponses];
+
 export type ProductiveControllerSyncData = {
     body: SyncTimeEntriesDto;
     path?: never;
@@ -2033,6 +2112,17 @@ export type SettingsControllerMoveDatabaseResponses = {
 };
 
 export type SettingsControllerMoveDatabaseResponse = SettingsControllerMoveDatabaseResponses[keyof SettingsControllerMoveDatabaseResponses];
+
+export type SettingsControllerOpenDatabaseFolderData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/settings/open-database-folder';
+};
+
+export type SettingsControllerOpenDatabaseFolderResponses = {
+    201: unknown;
+};
 
 export type OverviewsControllerGetDataData = {
     body?: never;

@@ -28,6 +28,22 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
+    /* The triggered auto tag conditions can be long, let them wrap instead of being cut off */
+    .c-timeline__event__tooltip__conditions {
+      white-space: normal;
+      overflow: visible;
+
+      ul {
+        padding: 0 0 0 0.75rem;
+      }
+
+      li {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: unset;
+      }
+    }
   }
 
   [id*='react-select-'] {

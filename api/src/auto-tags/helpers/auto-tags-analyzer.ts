@@ -7,6 +7,7 @@ import {
 import { AutoTagConditionDto, AutoTagDto } from '../dto/response-auto-tag.dto';
 import {
   AutoTagEventInfoDto,
+  MatchedAutoTagConditionDto,
   TagEventInfoDto,
   TimelineEventDto,
   TimelineWithEventsDto,
@@ -46,22 +47,40 @@ function splitConditionsOnOrOperators(conditions: AutoTagConditionDto[]): AutoTa
   return groupedConditions;
 }
 
-function doesConditionMatchEvent(event: TimelineEventDto, condition: AutoTagConditionDto): boolean {
+/**
+ * Checks a single condition against an event.
+ * Returns the matched condition (including the event variable and value that triggered it)
+ * or null when the condition does not match.
+ */
+function getMatchedCondition(
+  event: TimelineEventDto,
+  condition: AutoTagConditionDto
+): MatchedAutoTagConditionDto | null {
   if (!condition.variable) {
-    return false;
+    return null;
   }
 
-  if (condition.variable === 'anyVariable') {
-    // Check all variables prop names except for the anyVariable prop name that exist in the enum ConditionVariable
-    return !!Object.values(ConditionVariable)
-      .filter((conditionVariable) => conditionVariable !== ConditionVariable.anyVariable)
-      .find((conditionVariable) => {
-        return doesConditionValueMatchEvent(event, condition, conditionVariable);
-      });
-  } else {
-    // Check one variable
-    return doesConditionValueMatchEvent(event, condition, condition.variable);
+  const variablesToCheck =
+    condition.variable === ConditionVariable.anyVariable
+      ? // Check all variable prop names except for the anyVariable prop name that exist in the enum ConditionVariable
+        Object.values(ConditionVariable).filter(
+          (conditionVariable) => conditionVariable !== ConditionVariable.anyVariable
+        )
+      : [condition.variable];
+
+  const matchedVariable = variablesToCheck.find((conditionVariable) =>
+    doesConditionValueMatchEvent(event, condition, conditionVariable)
+  );
+  if (!matchedVariable) {
+    return null;
   }
+
+  return {
+    variable: matchedVariable,
+    operator: condition.operator,
+    value: condition.value,
+    matchedValue: String(event.info[matchedVariable] ?? ''),
+  };
 }
 
 function doesConditionValueMatchEvent(
@@ -90,12 +109,25 @@ function doesConditionValueMatchEvent(
   }
 }
 
-function doesAutoTagMatch(autoTag: AutoTagDto, event: TimelineEventDto): boolean {
+/**
+ * Checks an auto tag against an event.
+ * Returns the conditions of the first matching AND-group, so the UI can show why the auto tag triggered.
+ * Returns null when the auto tag does not match the event.
+ */
+function getMatchedAutoTagConditions(
+  autoTag: AutoTagDto,
+  event: TimelineEventDto
+): MatchedAutoTagConditionDto[] | null {
   const groupedConditions = splitConditionsOnOrOperators(autoTag.conditions);
-  const matchedGroup = groupedConditions.find((groupedCondition) => {
-    return groupedCondition.every((condition) => doesConditionMatchEvent(event, condition));
-  });
-  return !!matchedGroup;
+  for (const groupedCondition of groupedConditions) {
+    const matchedConditions = groupedCondition.map((condition) =>
+      getMatchedCondition(event, condition)
+    );
+    if (matchedConditions.every((matchedCondition) => !!matchedCondition)) {
+      return matchedConditions as MatchedAutoTagConditionDto[];
+    }
+  }
+  return null;
 }
 
 function getEventsAtTimestamp(timelinesWithEvents: TimelineWithEventsDto[], timestamp: string) {
@@ -214,6 +246,7 @@ function convertTagEventsToAutoTagEvents(
         tagNameCode: tagInfo.tagNameCode,
         tagNameNote: tagInfo.tagNameNote,
         priority: Infinity,
+        matchedConditions: [],
       };
       return {
         id: crypto.randomUUID(),
@@ -299,8 +332,12 @@ export function calculateAutoTagEvents(
   allEventStartTimes.map((startTime) => {
     const eventsAtTimestamp = getEventsAtTimestamp(timelinesWithEvents, startTime);
     eventsAtTimestamp.find((event) => {
-      const autoTag = validAutoTags.find((autoTag) => doesAutoTagMatch(autoTag, event));
-      if (!autoTag) {
+      let matchedConditions: MatchedAutoTagConditionDto[] | null = null;
+      const autoTag = validAutoTags.find((autoTag) => {
+        matchedConditions = getMatchedAutoTagConditions(autoTag, event);
+        return !!matchedConditions;
+      });
+      if (!autoTag || !matchedConditions) {
         return false;
       }
       // Found a match between event and auto tag
@@ -320,6 +357,7 @@ export function calculateAutoTagEvents(
         tagNameCode: tagName.code,
         tagNameNote: tagName.note || undefined,
         priority: autoTag.priority,
+        matchedConditions,
       };
       autoTagEvents.push({
         id: crypto.randomUUID(),

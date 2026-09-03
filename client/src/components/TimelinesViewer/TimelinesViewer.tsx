@@ -1,6 +1,7 @@
 import React, { FC, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, Maximize, ZoomIn, ZoomOut } from 'lucide-react';
 import {
+  AutoTagEventInfoDto,
   TimelineDto,
   TimelineEventDto,
   TimelinesControllerFindAllEventsResponse,
@@ -615,6 +616,27 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
     [navigate]
   );
 
+  // Creating a tag from an auto tag needs no extra input: the auto tag already knows
+  // the tag name, the note and the time range, so the tag is created right away.
+  const handleCreateTagFromAutoTagEvent = useCallback(
+    async (event: TimelineEventDto): Promise<void> => {
+      const info = event.info as AutoTagEventInfoDto;
+      if (!info?.tagNameId) return;
+      const note = info.tagNameNote?.trim();
+      await createTag({
+        body: {
+          tagNameId: info.tagNameId,
+          startedAt: event.startedAt,
+          endedAt: event.endedAt,
+          ...(note ? { note } : {}),
+        },
+      });
+      await Promise.all([refetchTimelinesWithEvents(), refetchTagNamesCount()]);
+      toast('Tag has been created', { type: 'success' });
+    },
+    [createTag, refetchTimelinesWithEvents, refetchTagNamesCount]
+  );
+
   const handleCreateAutoTagRuleFromEvent = useCallback(
     (conditions: ProminentCondition[]) => {
       const params = new URLSearchParams();
@@ -669,6 +691,7 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
           onEditTag={handleEditTag}
           onEditAutoTagRule={handleEditAutoTagRule}
           onCreateTagFromEvent={handleCreateTagFromEvent}
+          onCreateTagFromAutoTagEvent={handleCreateTagFromAutoTagEvent}
           onCreateAutoTagRuleFromEvent={handleCreateAutoTagRuleFromEvent}
           onRefreshEvents={onRefreshEvents}
         ></Timeline>
@@ -698,6 +721,7 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
     handleEditTag,
     handleEditAutoTagRule,
     handleCreateTagFromEvent,
+    handleCreateTagFromAutoTagEvent,
     handleCreateAutoTagRuleFromEvent,
     onRefreshEvents,
   ]);

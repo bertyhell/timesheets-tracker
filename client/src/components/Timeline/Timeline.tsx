@@ -78,6 +78,7 @@ interface TimelineProps {
   onEditTag?: (tagId: string) => void;
   onEditAutoTagRule?: (autoTagId: string) => void;
   onCreateTagFromEvent?: (startedAt: string, endedAt: string) => void;
+  onCreateTagFromAutoTagEvent?: (event: TimelineEventDto) => void;
   onCreateAutoTagRuleFromEvent?: (conditions: ProminentCondition[]) => void;
   onRefreshEvents?: () => void;
 }
@@ -124,6 +125,7 @@ function Timeline({
   onEditTag,
   onEditAutoTagRule,
   onCreateTagFromEvent,
+  onCreateTagFromAutoTagEvent,
   onCreateAutoTagRuleFromEvent,
   onRefreshEvents,
 }: TimelineProps) {
@@ -696,15 +698,30 @@ function Timeline({
                     },
                   ]
                 : []),
-            ...(onCreateTagFromEvent && contextMenu.eventStartedAt && contextMenu.eventEndedAt
-              ? [
-                  {
-                    label: 'Create tag',
-                    onClick: () =>
-                      onCreateTagFromEvent(contextMenu.eventStartedAt!, contextMenu.eventEndedAt!),
-                  },
-                ]
-              : []),
+            ...(timelineInfo.timelineType === TimelineType.AutoTag
+              ? // An auto tag already carries its tag name, note and time range,
+                // so the tag is created straight away without asking for anything else
+                onCreateTagFromAutoTagEvent &&
+                  (contextMenu.event.info as AutoTagEventInfoDto)?.tagNameId
+                  ? [
+                      {
+                        label: 'Create tag',
+                        onClick: () => onCreateTagFromAutoTagEvent(contextMenu.event),
+                      },
+                    ]
+                  : []
+              : onCreateTagFromEvent && contextMenu.eventStartedAt && contextMenu.eventEndedAt
+                ? [
+                    {
+                      label: 'Create tag',
+                      onClick: () =>
+                        onCreateTagFromEvent(
+                          contextMenu.eventStartedAt!,
+                          contextMenu.eventEndedAt!
+                        ),
+                    },
+                  ]
+                : []),
             ...(onCreateAutoTagRuleFromEvent &&
             timelineInfo.timelineType !== TimelineType.Tag &&
             timelineInfo.timelineType !== TimelineType.AutoTag

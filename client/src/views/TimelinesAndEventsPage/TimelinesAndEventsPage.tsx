@@ -333,7 +333,11 @@ export function TimelinesAndEventsPage() {
 
   const renderPageContent = () => {
     if (isLoadingTimelineInfos && !timelineInfos) {
-      return <>Loading timelines...</>;
+      return (
+        <div className="p-timelines-loading">
+          <span>Loading timelines...</span>
+        </div>
+      );
     }
 
     return renderTimelinesAndEvents();

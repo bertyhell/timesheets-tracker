@@ -61,6 +61,23 @@
   color: var(--primary-0);
 }
 
+.p-timelines-loading {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.p-timelines-loading span {
+  position: absolute;
+  top: 33.33%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+  text-align: center;
+  color: var(--gray-500);
+  font-size: 0.875rem;
+}
+
 /* Timelines page layout */
 .p-timelines-page {
   flex: 1;

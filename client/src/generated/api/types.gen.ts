@@ -280,6 +280,93 @@ export type UpdateAutoTagsDto = {
     conditions?: Array<AutoTagConditionDto>;
 };
 
+export type SettingsResponseDto = {
+    /**
+     * Absolute path to the SQLite database file
+     */
+    databasePath: string;
+};
+
+export type SettingDto = {
+    /**
+     * Setting key
+     */
+    key: string;
+    /**
+     * Setting value
+     */
+    value: string | null;
+    /**
+     * Creation timestamp
+     */
+    createdAt: string;
+    /**
+     * Last update timestamp
+     */
+    updatedAt: string;
+};
+
+export type UpsertSettingDto = {
+    /**
+     * Setting value
+     */
+    value: string;
+};
+
+export type DeleteEventsAfterDto = {
+    /**
+     * Numeric amount, e.g. 6
+     */
+    numeric: number | null;
+    /**
+     * Unit for the numeric amount
+     */
+    unit: 'years' | 'calendarYears' | 'months' | 'calendarMonths' | 'weeks' | 'calendarWeeks' | 'days';
+    /**
+     * Computed cutoff date: events older than this will be deleted
+     */
+    cutoffDate: string | null;
+};
+
+export type UpsertDeleteEventsAfterDto = {
+    /**
+     * Numeric amount, e.g. 6
+     */
+    numeric: number;
+    /**
+     * Unit for the numeric amount
+     */
+    unit: 'years' | 'calendarYears' | 'months' | 'calendarMonths' | 'weeks' | 'calendarWeeks' | 'days';
+};
+
+export type DeleteEventsAfterPreviewDto = {
+    /**
+     * Computed cutoff date for the given (not yet saved) numeric/unit combination
+     */
+    cutoffDate: string | null;
+};
+
+export type AutoMergeTagsDto = {
+    /**
+     * Auto tags resolving to the same tag are merged when less than this many minutes apart. 0 disables merging.
+     */
+    minutes: number;
+};
+
+export type UpsertAutoMergeTagsDto = {
+    /**
+     * Merge gap in minutes, between 0 (no merge) and 480 (8 hours)
+     */
+    minutes: number;
+};
+
+export type SwitchDatabaseDto = {
+    /**
+     * Absolute path to the target SQLite database file
+     */
+    path: string;
+};
+
 export type CreateWebsiteDto = {
     /**
      * Title of the webpage that is open
@@ -873,79 +960,6 @@ export type UpsertIntegrationDto = {
      * API token
      */
     token: string;
-};
-
-export type SettingsResponseDto = {
-    /**
-     * Absolute path to the SQLite database file
-     */
-    databasePath: string;
-};
-
-export type SettingDto = {
-    /**
-     * Setting key
-     */
-    key: string;
-    /**
-     * Setting value
-     */
-    value: string | null;
-    /**
-     * Creation timestamp
-     */
-    createdAt: string;
-    /**
-     * Last update timestamp
-     */
-    updatedAt: string;
-};
-
-export type UpsertSettingDto = {
-    /**
-     * Setting value
-     */
-    value: string;
-};
-
-export type DeleteEventsAfterDto = {
-    /**
-     * Numeric amount, e.g. 6
-     */
-    numeric: number | null;
-    /**
-     * Unit for the numeric amount
-     */
-    unit: 'years' | 'calendarYears' | 'months' | 'calendarMonths' | 'weeks' | 'calendarWeeks' | 'days';
-    /**
-     * Computed cutoff date: events older than this will be deleted
-     */
-    cutoffDate: string | null;
-};
-
-export type UpsertDeleteEventsAfterDto = {
-    /**
-     * Numeric amount, e.g. 6
-     */
-    numeric: number;
-    /**
-     * Unit for the numeric amount
-     */
-    unit: 'years' | 'calendarYears' | 'months' | 'calendarMonths' | 'weeks' | 'calendarWeeks' | 'days';
-};
-
-export type DeleteEventsAfterPreviewDto = {
-    /**
-     * Computed cutoff date for the given (not yet saved) numeric/unit combination
-     */
-    cutoffDate: string | null;
-};
-
-export type SwitchDatabaseDto = {
-    /**
-     * Absolute path to the target SQLite database file
-     */
-    path: string;
 };
 
 export type OverviewFlatRowDto = {
@@ -1562,6 +1576,167 @@ export type AutoTagsControllerReorderResponses = {
 
 export type AutoTagsControllerReorderResponse = AutoTagsControllerReorderResponses[keyof AutoTagsControllerReorderResponses];
 
+export type SettingsControllerGetSettingsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/settings';
+};
+
+export type SettingsControllerGetSettingsResponses = {
+    200: SettingsResponseDto;
+};
+
+export type SettingsControllerGetSettingsResponse = SettingsControllerGetSettingsResponses[keyof SettingsControllerGetSettingsResponses];
+
+export type SettingsControllerGetSettingByKeyData = {
+    body?: never;
+    path: {
+        key: string;
+    };
+    query?: never;
+    url: '/api/settings/key/{key}';
+};
+
+export type SettingsControllerGetSettingByKeyResponses = {
+    200: SettingDto | unknown;
+};
+
+export type SettingsControllerGetSettingByKeyResponse = SettingsControllerGetSettingByKeyResponses[keyof SettingsControllerGetSettingByKeyResponses];
+
+export type SettingsControllerSetSettingByKeyData = {
+    body: UpsertSettingDto;
+    path: {
+        key: string;
+    };
+    query?: never;
+    url: '/api/settings/key/{key}';
+};
+
+export type SettingsControllerSetSettingByKeyResponses = {
+    200: SettingDto;
+};
+
+export type SettingsControllerSetSettingByKeyResponse = SettingsControllerSetSettingByKeyResponses[keyof SettingsControllerSetSettingByKeyResponses];
+
+export type SettingsControllerClearDeleteEventsAfterData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/settings/delete-events-after';
+};
+
+export type SettingsControllerClearDeleteEventsAfterResponses = {
+    200: DeleteEventsAfterDto;
+};
+
+export type SettingsControllerClearDeleteEventsAfterResponse = SettingsControllerClearDeleteEventsAfterResponses[keyof SettingsControllerClearDeleteEventsAfterResponses];
+
+export type SettingsControllerGetDeleteEventsAfterData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/settings/delete-events-after';
+};
+
+export type SettingsControllerGetDeleteEventsAfterResponses = {
+    200: DeleteEventsAfterDto;
+};
+
+export type SettingsControllerGetDeleteEventsAfterResponse = SettingsControllerGetDeleteEventsAfterResponses[keyof SettingsControllerGetDeleteEventsAfterResponses];
+
+export type SettingsControllerSetDeleteEventsAfterData = {
+    body: UpsertDeleteEventsAfterDto;
+    path?: never;
+    query?: never;
+    url: '/api/settings/delete-events-after';
+};
+
+export type SettingsControllerSetDeleteEventsAfterResponses = {
+    200: DeleteEventsAfterDto;
+};
+
+export type SettingsControllerSetDeleteEventsAfterResponse = SettingsControllerSetDeleteEventsAfterResponses[keyof SettingsControllerSetDeleteEventsAfterResponses];
+
+export type SettingsControllerPreviewDeleteEventsAfterData = {
+    body?: never;
+    path?: never;
+    query?: {
+        numeric?: string;
+        unit?: string;
+    };
+    url: '/api/settings/delete-events-after/preview';
+};
+
+export type SettingsControllerPreviewDeleteEventsAfterResponses = {
+    200: DeleteEventsAfterPreviewDto;
+};
+
+export type SettingsControllerPreviewDeleteEventsAfterResponse = SettingsControllerPreviewDeleteEventsAfterResponses[keyof SettingsControllerPreviewDeleteEventsAfterResponses];
+
+export type SettingsControllerGetAutoMergeTagsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/settings/auto-merge-tags';
+};
+
+export type SettingsControllerGetAutoMergeTagsResponses = {
+    200: AutoMergeTagsDto;
+};
+
+export type SettingsControllerGetAutoMergeTagsResponse = SettingsControllerGetAutoMergeTagsResponses[keyof SettingsControllerGetAutoMergeTagsResponses];
+
+export type SettingsControllerSetAutoMergeTagsData = {
+    body: UpsertAutoMergeTagsDto;
+    path?: never;
+    query?: never;
+    url: '/api/settings/auto-merge-tags';
+};
+
+export type SettingsControllerSetAutoMergeTagsResponses = {
+    200: AutoMergeTagsDto;
+};
+
+export type SettingsControllerSetAutoMergeTagsResponse = SettingsControllerSetAutoMergeTagsResponses[keyof SettingsControllerSetAutoMergeTagsResponses];
+
+export type SettingsControllerSwitchDatabaseData = {
+    body: SwitchDatabaseDto;
+    path?: never;
+    query?: never;
+    url: '/api/settings/switch-database';
+};
+
+export type SettingsControllerSwitchDatabaseResponses = {
+    200: SettingsResponseDto;
+};
+
+export type SettingsControllerSwitchDatabaseResponse = SettingsControllerSwitchDatabaseResponses[keyof SettingsControllerSwitchDatabaseResponses];
+
+export type SettingsControllerMoveDatabaseData = {
+    body: SwitchDatabaseDto;
+    path?: never;
+    query?: never;
+    url: '/api/settings/move-database';
+};
+
+export type SettingsControllerMoveDatabaseResponses = {
+    200: SettingsResponseDto;
+};
+
+export type SettingsControllerMoveDatabaseResponse = SettingsControllerMoveDatabaseResponses[keyof SettingsControllerMoveDatabaseResponses];
+
+export type SettingsControllerOpenDatabaseFolderData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/settings/open-database-folder';
+};
+
+export type SettingsControllerOpenDatabaseFolderResponses = {
+    201: unknown;
+};
+
 export type WebsitesControllerDeleteData = {
     body?: never;
     path: {
@@ -1988,141 +2163,6 @@ export type IntegrationsControllerUpsertResponses = {
 };
 
 export type IntegrationsControllerUpsertResponse = IntegrationsControllerUpsertResponses[keyof IntegrationsControllerUpsertResponses];
-
-export type SettingsControllerGetSettingsData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/settings';
-};
-
-export type SettingsControllerGetSettingsResponses = {
-    200: SettingsResponseDto;
-};
-
-export type SettingsControllerGetSettingsResponse = SettingsControllerGetSettingsResponses[keyof SettingsControllerGetSettingsResponses];
-
-export type SettingsControllerGetSettingByKeyData = {
-    body?: never;
-    path: {
-        key: string;
-    };
-    query?: never;
-    url: '/api/settings/key/{key}';
-};
-
-export type SettingsControllerGetSettingByKeyResponses = {
-    200: SettingDto | unknown;
-};
-
-export type SettingsControllerGetSettingByKeyResponse = SettingsControllerGetSettingByKeyResponses[keyof SettingsControllerGetSettingByKeyResponses];
-
-export type SettingsControllerSetSettingByKeyData = {
-    body: UpsertSettingDto;
-    path: {
-        key: string;
-    };
-    query?: never;
-    url: '/api/settings/key/{key}';
-};
-
-export type SettingsControllerSetSettingByKeyResponses = {
-    200: SettingDto;
-};
-
-export type SettingsControllerSetSettingByKeyResponse = SettingsControllerSetSettingByKeyResponses[keyof SettingsControllerSetSettingByKeyResponses];
-
-export type SettingsControllerClearDeleteEventsAfterData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/settings/delete-events-after';
-};
-
-export type SettingsControllerClearDeleteEventsAfterResponses = {
-    200: DeleteEventsAfterDto;
-};
-
-export type SettingsControllerClearDeleteEventsAfterResponse = SettingsControllerClearDeleteEventsAfterResponses[keyof SettingsControllerClearDeleteEventsAfterResponses];
-
-export type SettingsControllerGetDeleteEventsAfterData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/settings/delete-events-after';
-};
-
-export type SettingsControllerGetDeleteEventsAfterResponses = {
-    200: DeleteEventsAfterDto;
-};
-
-export type SettingsControllerGetDeleteEventsAfterResponse = SettingsControllerGetDeleteEventsAfterResponses[keyof SettingsControllerGetDeleteEventsAfterResponses];
-
-export type SettingsControllerSetDeleteEventsAfterData = {
-    body: UpsertDeleteEventsAfterDto;
-    path?: never;
-    query?: never;
-    url: '/api/settings/delete-events-after';
-};
-
-export type SettingsControllerSetDeleteEventsAfterResponses = {
-    200: DeleteEventsAfterDto;
-};
-
-export type SettingsControllerSetDeleteEventsAfterResponse = SettingsControllerSetDeleteEventsAfterResponses[keyof SettingsControllerSetDeleteEventsAfterResponses];
-
-export type SettingsControllerPreviewDeleteEventsAfterData = {
-    body?: never;
-    path?: never;
-    query?: {
-        numeric?: string;
-        unit?: string;
-    };
-    url: '/api/settings/delete-events-after/preview';
-};
-
-export type SettingsControllerPreviewDeleteEventsAfterResponses = {
-    200: DeleteEventsAfterPreviewDto;
-};
-
-export type SettingsControllerPreviewDeleteEventsAfterResponse = SettingsControllerPreviewDeleteEventsAfterResponses[keyof SettingsControllerPreviewDeleteEventsAfterResponses];
-
-export type SettingsControllerSwitchDatabaseData = {
-    body: SwitchDatabaseDto;
-    path?: never;
-    query?: never;
-    url: '/api/settings/switch-database';
-};
-
-export type SettingsControllerSwitchDatabaseResponses = {
-    200: SettingsResponseDto;
-};
-
-export type SettingsControllerSwitchDatabaseResponse = SettingsControllerSwitchDatabaseResponses[keyof SettingsControllerSwitchDatabaseResponses];
-
-export type SettingsControllerMoveDatabaseData = {
-    body: SwitchDatabaseDto;
-    path?: never;
-    query?: never;
-    url: '/api/settings/move-database';
-};
-
-export type SettingsControllerMoveDatabaseResponses = {
-    200: SettingsResponseDto;
-};
-
-export type SettingsControllerMoveDatabaseResponse = SettingsControllerMoveDatabaseResponses[keyof SettingsControllerMoveDatabaseResponses];
-
-export type SettingsControllerOpenDatabaseFolderData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/settings/open-database-folder';
-};
-
-export type SettingsControllerOpenDatabaseFolderResponses = {
-    201: unknown;
-};
 
 export type OverviewsControllerGetDataData = {
     body?: never;

@@ -20,10 +20,14 @@ import { AutoTagDto, AutoTagMergeResultDto } from './dto/response-auto-tag.dto';
 import { TagNameDto } from '../tag-names/dto/response-tag-name.dto';
 import { TimelineWithEventsDto } from '../timelines/dto/response-timeline-events.dto';
 import { CustomError } from '../shared/CustomError';
+import { SettingsService } from '../settings/settings.service';
 
 @Injectable()
 export class AutoTagsService {
-  constructor(@Inject(DatabaseService) private databaseService: DatabaseService) {}
+  constructor(
+    @Inject(DatabaseService) private databaseService: DatabaseService,
+    @Inject(SettingsService) private settingsService: SettingsService
+  ) {}
 
   adapt(rawAutoTag: Record<string, any>): AutoTag {
     return {
@@ -203,6 +207,7 @@ export class AutoTagsService {
         (timeline) => timeline.type !== TimelineType.Tag
       );
       const tagTimelines = otherTimelines.filter((timeline) => timeline.type === TimelineType.Tag);
+      const combineGapMinutes = this.settingsService.getAutoMergeTagsMinutes();
       autoTagTimelines.forEach((autoTagTimeline) => {
         const autoTagEvents = calculateAutoTagEvents(
           timelinesForAutoTagAnalysis,
@@ -210,7 +215,8 @@ export class AutoTagsService {
           autoTagTimeline,
           allTagNames,
           undefined,
-          tagTimelines
+          tagTimelines,
+          combineGapMinutes
         );
         autoTagTimeline.events = autoTagEvents;
       });

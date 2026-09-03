@@ -12,13 +12,13 @@ import {
   TimelineEventDto,
   TimelineWithEventsDto,
 } from '../../timelines/dto/response-timeline-events.dto';
-import { compact, uniq } from 'lodash';
+import { compact, uniq, uniqBy } from 'lodash';
 import { isAfter, isBefore, isEqual, parseISO } from 'date-fns';
 import { TagNameDto } from '../../tag-names/dto/response-tag-name.dto';
 import { CustomError } from '../../shared/CustomError';
 import { isNil } from 'es-toolkit';
+import { DEFAULT_AUTO_MERGE_TAGS_MINUTES } from '../../settings/dto/auto-merge-tags.dto';
 
-const COMBINE_TAGS_THRESHOLD = 5 * 60 * 1000;
 const DEFAULT_MAX_GROW_TIME_MINUTES = 5;
 
 /**
@@ -200,29 +200,64 @@ export function growAutoTagEvents(
   return sortedAutoTagEvents;
 }
 
-function combineAutoTagEvents(autoTagEvents: TimelineEventDto[]): TimelineEventDto[] {
-  const combinedAutoTagEvents = [autoTagEvents[0]]; // Start with first event
-  if (autoTagEvents.length >= 2) {
+/**
+ * Unions the matched conditions of merged auto-tag events, deduplicating on the rule itself
+ * (variable + operator + value) so the first matched value is kept.
+ */
+function mergeMatchedConditions(
+  ...conditionLists: (MatchedAutoTagConditionDto[] | undefined)[]
+): MatchedAutoTagConditionDto[] {
+  return uniqBy(
+    conditionLists.flatMap((conditions) => conditions ?? []),
+    (condition) => `${condition.variable}|${condition.operator}|${condition.value}`
+  );
+}
+
+function combineAutoTagEvents(
+  autoTagEvents: TimelineEventDto[],
+  combineGapMinutes: number
+): TimelineEventDto[] {
+  const safeCombineGapMinutes = Number.isFinite(combineGapMinutes) ? combineGapMinutes : 0;
+  const combineGapMs = Math.max(0, safeCombineGapMinutes) * 60 * 1000;
+
+  // The matching phase iterates start times per timeline, so the events are not globally sorted yet.
+  const sortedAutoTagEvents = [...autoTagEvents].sort((a, b) => {
+    return parseISO(a.startedAt).getTime() - parseISO(b.startedAt).getTime();
+  });
+
+  const combinedAutoTagEvents = [sortedAutoTagEvents[0]]; // Start with first event
+  if (sortedAutoTagEvents.length >= 2) {
     // Combine auto tags that evaluate to the same tag name
     let index = 1;
     do {
       const lastCombinedAutoTagEvent = combinedAutoTagEvents.at(-1) as TimelineEventDto;
-      const currentAutoTagEvent = autoTagEvents[index];
+      const lastCombinedInfo = lastCombinedAutoTagEvent.info as AutoTagEventInfoDto;
+      const currentAutoTagEvent = sortedAutoTagEvents[index];
+      const currentInfo = currentAutoTagEvent.info as AutoTagEventInfoDto;
       if (
-        (lastCombinedAutoTagEvent.info as AutoTagEventInfoDto).tagNameId ===
-          (currentAutoTagEvent.info as AutoTagEventInfoDto).tagNameId &&
+        lastCombinedInfo.tagNameId === currentInfo.tagNameId &&
         new Date(currentAutoTagEvent.startedAt).getTime() -
           new Date(lastCombinedAutoTagEvent.endedAt).getTime() <
-          COMBINE_TAGS_THRESHOLD
+          combineGapMs
       ) {
-        // Combine events
-        lastCombinedAutoTagEvent.endedAt = currentAutoTagEvent.endedAt;
+        // Combine events, keeping the union of the conditions that explain the merged block
+        combinedAutoTagEvents[combinedAutoTagEvents.length - 1] = {
+          ...lastCombinedAutoTagEvent,
+          endedAt: currentAutoTagEvent.endedAt,
+          info: {
+            ...lastCombinedInfo,
+            matchedConditions: mergeMatchedConditions(
+              lastCombinedInfo.matchedConditions,
+              currentInfo.matchedConditions
+            ),
+          },
+        };
       } else {
         // Do not combine events
         combinedAutoTagEvents.push(currentAutoTagEvent);
       }
       index++;
-    } while (index < autoTagEvents.length);
+    } while (index < sortedAutoTagEvents.length);
   }
   return combinedAutoTagEvents;
 }
@@ -322,7 +357,8 @@ export function calculateAutoTagEvents(
   autoTagTimeline: TimelineWithEventsDto,
   allTagNames: TagNameDto[],
   maxGrowTimeMinutes = DEFAULT_MAX_GROW_TIME_MINUTES,
-  tagTimelines: TimelineWithEventsDto[] = []
+  tagTimelines: TimelineWithEventsDto[] = [],
+  combineGapMinutes = DEFAULT_AUTO_MERGE_TAGS_MINUTES
 ): TimelineEventDto[] {
   const validAutoTags = autoTags.filter(
     (autoTag) => !!autoTag.tagName && autoTag.conditions?.length
@@ -374,7 +410,7 @@ export function calculateAutoTagEvents(
     return convertTagEventsToAutoTagEvents(tagTimelines, autoTagTimeline.id);
   }
 
-  const combinedAutoTagEvents = combineAutoTagEvents(autoTagEvents);
+  const combinedAutoTagEvents = combineAutoTagEvents(autoTagEvents, combineGapMinutes);
 
   const grownAutoTagEvents = growAutoTagEvents(combinedAutoTagEvents, maxGrowTimeMinutes);
 

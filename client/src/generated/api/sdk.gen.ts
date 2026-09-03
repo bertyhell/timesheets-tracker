@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { ActiveStatesControllerCreateData, ActiveStatesControllerCreateResponses, ActiveStatesControllerDeleteData, ActiveStatesControllerDeleteResponses, ActiveStatesControllerFindAllData, ActiveStatesControllerFindAllResponses, ActiveStatesControllerFindOneData, ActiveStatesControllerFindOneResponses, AppControllerStatusData, AppControllerStatusResponses, AutoNotesControllerCountData, AutoNotesControllerCountResponses, AutoNotesControllerCreateData, AutoNotesControllerCreateResponses, AutoNotesControllerFindAllData, AutoNotesControllerFindAllResponses, AutoNotesControllerFindOneData, AutoNotesControllerFindOneResponses, AutoNotesControllerRemoveData, AutoNotesControllerRemoveResponses, AutoNotesControllerUpdateData, AutoNotesControllerUpdateResponses, AutoTagsControllerCountData, AutoTagsControllerCountResponses, AutoTagsControllerCreateData, AutoTagsControllerCreateResponses, AutoTagsControllerDeleteData, AutoTagsControllerDeleteResponses, AutoTagsControllerFindAllData, AutoTagsControllerFindAllResponses, AutoTagsControllerFindOneData, AutoTagsControllerFindOneResponses, AutoTagsControllerMergeDuplicatesData, AutoTagsControllerMergeDuplicatesResponses, AutoTagsControllerReorderData, AutoTagsControllerReorderResponses, AutoTagsControllerUpdateData, AutoTagsControllerUpdateResponses, CalendarsControllerGetEventsData, CalendarsControllerGetEventsResponses, IntegrationsControllerFindOneData, IntegrationsControllerFindOneResponses, IntegrationsControllerRemoveData, IntegrationsControllerRemoveResponses, IntegrationsControllerUpsertData, IntegrationsControllerUpsertResponses, OverviewsControllerCreateData, OverviewsControllerCreateResponses, OverviewsControllerFindAllData, OverviewsControllerFindAllResponses, OverviewsControllerFindOneData, OverviewsControllerFindOneResponses, OverviewsControllerGetDataData, OverviewsControllerGetDataResponses, OverviewsControllerRemoveData, OverviewsControllerRemoveResponses, OverviewsControllerUpdateData, OverviewsControllerUpdateResponses, ProductiveControllerGetCompaniesData, ProductiveControllerGetCompaniesResponses, ProductiveControllerGetDealsData, ProductiveControllerGetDealsResponses, ProductiveControllerGetServicesData, ProductiveControllerGetServicesResponses, ProductiveControllerGetServiceTreeData, ProductiveControllerGetServiceTreeResponses, ProductiveControllerSyncData, ProductiveControllerSyncResponses, ProgramsControllerCreateData, ProgramsControllerCreateResponses, ProgramsControllerDeleteData, ProgramsControllerDeleteResponses, ProgramsControllerFindAllData, ProgramsControllerFindAllResponses, ProgramsControllerFindOneData, ProgramsControllerFindOneResponses, ProgramsControllerGetTrackingData, ProgramsControllerGetTrackingResponses, ProgramsControllerSetTrackingData, ProgramsControllerSetTrackingResponses, SettingsControllerClearDeleteEventsAfterData, SettingsControllerClearDeleteEventsAfterResponses, SettingsControllerGetDeleteEventsAfterData, SettingsControllerGetDeleteEventsAfterResponses, SettingsControllerGetSettingByKeyData, SettingsControllerGetSettingByKeyResponses, SettingsControllerGetSettingsData, SettingsControllerGetSettingsResponses, SettingsControllerMoveDatabaseData, SettingsControllerMoveDatabaseResponses, SettingsControllerOpenDatabaseFolderData, SettingsControllerOpenDatabaseFolderResponses, SettingsControllerPreviewDeleteEventsAfterData, SettingsControllerPreviewDeleteEventsAfterResponses, SettingsControllerSetDeleteEventsAfterData, SettingsControllerSetDeleteEventsAfterResponses, SettingsControllerSetSettingByKeyData, SettingsControllerSetSettingByKeyResponses, SettingsControllerSwitchDatabaseData, SettingsControllerSwitchDatabaseResponses, TagNamesControllerCountData, TagNamesControllerCountResponses, TagNamesControllerCreateData, TagNamesControllerCreateResponses, TagNamesControllerFindAllData, TagNamesControllerFindAllResponses, TagNamesControllerFindOneData, TagNamesControllerFindOneResponses, TagNamesControllerRemoveData, TagNamesControllerRemoveResponses, TagNamesControllerUpdateData, TagNamesControllerUpdateResponses, TagsControllerCreateData, TagsControllerCreateResponses, TagsControllerFindAllData, TagsControllerFindAllResponses, TagsControllerFindOneData, TagsControllerFindOneResponses, TagsControllerRemoveData, TagsControllerRemoveResponses, TagsControllerUpdateData, TagsControllerUpdateResponses, TimelinesControllerCountData, TimelinesControllerCountResponses, TimelinesControllerCreateData, TimelinesControllerCreateResponses, TimelinesControllerDeleteData, TimelinesControllerDeleteResponses, TimelinesControllerFindAllData, TimelinesControllerFindAllEventsData, TimelinesControllerFindAllEventsResponses, TimelinesControllerFindAllResponses, TimelinesControllerFindOneData, TimelinesControllerFindOneResponses, TimelinesControllerReorderData, TimelinesControllerReorderResponses, TimelinesControllerUpdateData, TimelinesControllerUpdateResponses, WebsitesControllerCreateData, WebsitesControllerCreateResponses, WebsitesControllerDeleteData, WebsitesControllerDeleteResponses, WebsitesControllerFindAllData, WebsitesControllerFindAllResponses, WebsitesControllerFindOneData, WebsitesControllerFindOneResponses } from './types.gen';
+import type { ActiveStatesControllerCreateData, ActiveStatesControllerCreateResponses, ActiveStatesControllerDeleteData, ActiveStatesControllerDeleteResponses, ActiveStatesControllerFindAllData, ActiveStatesControllerFindAllResponses, ActiveStatesControllerFindOneData, ActiveStatesControllerFindOneResponses, AppControllerStatusData, AppControllerStatusResponses, AutoNotesControllerCountData, AutoNotesControllerCountResponses, AutoNotesControllerCreateData, AutoNotesControllerCreateResponses, AutoNotesControllerFindAllData, AutoNotesControllerFindAllResponses, AutoNotesControllerFindOneData, AutoNotesControllerFindOneResponses, AutoNotesControllerRemoveData, AutoNotesControllerRemoveResponses, AutoNotesControllerUpdateData, AutoNotesControllerUpdateResponses, AutoTagsControllerCountData, AutoTagsControllerCountResponses, AutoTagsControllerCreateData, AutoTagsControllerCreateResponses, AutoTagsControllerDeleteData, AutoTagsControllerDeleteResponses, AutoTagsControllerFindAllData, AutoTagsControllerFindAllResponses, AutoTagsControllerFindOneData, AutoTagsControllerFindOneResponses, AutoTagsControllerMergeDuplicatesData, AutoTagsControllerMergeDuplicatesResponses, AutoTagsControllerReorderData, AutoTagsControllerReorderResponses, AutoTagsControllerUpdateData, AutoTagsControllerUpdateResponses, CalendarsControllerGetEventsData, CalendarsControllerGetEventsResponses, IntegrationsControllerFindOneData, IntegrationsControllerFindOneResponses, IntegrationsControllerRemoveData, IntegrationsControllerRemoveResponses, IntegrationsControllerUpsertData, IntegrationsControllerUpsertResponses, OverviewsControllerCreateData, OverviewsControllerCreateResponses, OverviewsControllerFindAllData, OverviewsControllerFindAllResponses, OverviewsControllerFindOneData, OverviewsControllerFindOneResponses, OverviewsControllerGetDataData, OverviewsControllerGetDataResponses, OverviewsControllerRemoveData, OverviewsControllerRemoveResponses, OverviewsControllerUpdateData, OverviewsControllerUpdateResponses, ProductiveControllerGetCompaniesData, ProductiveControllerGetCompaniesResponses, ProductiveControllerGetDealsData, ProductiveControllerGetDealsResponses, ProductiveControllerGetServicesData, ProductiveControllerGetServicesResponses, ProductiveControllerGetServiceTreeData, ProductiveControllerGetServiceTreeResponses, ProductiveControllerSyncData, ProductiveControllerSyncResponses, ProgramsControllerCreateData, ProgramsControllerCreateResponses, ProgramsControllerDeleteData, ProgramsControllerDeleteResponses, ProgramsControllerFindAllData, ProgramsControllerFindAllResponses, ProgramsControllerFindOneData, ProgramsControllerFindOneResponses, ProgramsControllerGetTrackingData, ProgramsControllerGetTrackingResponses, ProgramsControllerSetTrackingData, ProgramsControllerSetTrackingResponses, SettingsControllerClearDeleteEventsAfterData, SettingsControllerClearDeleteEventsAfterResponses, SettingsControllerGetAutoMergeTagsData, SettingsControllerGetAutoMergeTagsResponses, SettingsControllerGetDeleteEventsAfterData, SettingsControllerGetDeleteEventsAfterResponses, SettingsControllerGetSettingByKeyData, SettingsControllerGetSettingByKeyResponses, SettingsControllerGetSettingsData, SettingsControllerGetSettingsResponses, SettingsControllerMoveDatabaseData, SettingsControllerMoveDatabaseResponses, SettingsControllerOpenDatabaseFolderData, SettingsControllerOpenDatabaseFolderResponses, SettingsControllerPreviewDeleteEventsAfterData, SettingsControllerPreviewDeleteEventsAfterResponses, SettingsControllerSetAutoMergeTagsData, SettingsControllerSetAutoMergeTagsResponses, SettingsControllerSetDeleteEventsAfterData, SettingsControllerSetDeleteEventsAfterResponses, SettingsControllerSetSettingByKeyData, SettingsControllerSetSettingByKeyResponses, SettingsControllerSwitchDatabaseData, SettingsControllerSwitchDatabaseResponses, TagNamesControllerCountData, TagNamesControllerCountResponses, TagNamesControllerCreateData, TagNamesControllerCreateResponses, TagNamesControllerFindAllData, TagNamesControllerFindAllResponses, TagNamesControllerFindOneData, TagNamesControllerFindOneResponses, TagNamesControllerRemoveData, TagNamesControllerRemoveResponses, TagNamesControllerUpdateData, TagNamesControllerUpdateResponses, TagsControllerCreateData, TagsControllerCreateResponses, TagsControllerFindAllData, TagsControllerFindAllResponses, TagsControllerFindOneData, TagsControllerFindOneResponses, TagsControllerRemoveData, TagsControllerRemoveResponses, TagsControllerUpdateData, TagsControllerUpdateResponses, TimelinesControllerCountData, TimelinesControllerCountResponses, TimelinesControllerCreateData, TimelinesControllerCreateResponses, TimelinesControllerDeleteData, TimelinesControllerDeleteResponses, TimelinesControllerFindAllData, TimelinesControllerFindAllEventsData, TimelinesControllerFindAllEventsResponses, TimelinesControllerFindAllResponses, TimelinesControllerFindOneData, TimelinesControllerFindOneResponses, TimelinesControllerReorderData, TimelinesControllerReorderResponses, TimelinesControllerUpdateData, TimelinesControllerUpdateResponses, WebsitesControllerCreateData, WebsitesControllerCreateResponses, WebsitesControllerDeleteData, WebsitesControllerDeleteResponses, WebsitesControllerFindAllData, WebsitesControllerFindAllResponses, WebsitesControllerFindOneData, WebsitesControllerFindOneResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -127,6 +127,65 @@ export const autoTagsControllerReorder = <ThrowOnError extends boolean = false>(
     }
 });
 
+export const settingsControllerGetSettings = <ThrowOnError extends boolean = false>(options?: Options<SettingsControllerGetSettingsData, ThrowOnError>) => (options?.client ?? client).get<SettingsControllerGetSettingsResponses, unknown, ThrowOnError>({ url: '/api/settings', ...options });
+
+export const settingsControllerGetSettingByKey = <ThrowOnError extends boolean = false>(options: Options<SettingsControllerGetSettingByKeyData, ThrowOnError>) => (options.client ?? client).get<SettingsControllerGetSettingByKeyResponses, unknown, ThrowOnError>({ url: '/api/settings/key/{key}', ...options });
+
+export const settingsControllerSetSettingByKey = <ThrowOnError extends boolean = false>(options: Options<SettingsControllerSetSettingByKeyData, ThrowOnError>) => (options.client ?? client).put<SettingsControllerSetSettingByKeyResponses, unknown, ThrowOnError>({
+    url: '/api/settings/key/{key}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const settingsControllerClearDeleteEventsAfter = <ThrowOnError extends boolean = false>(options?: Options<SettingsControllerClearDeleteEventsAfterData, ThrowOnError>) => (options?.client ?? client).delete<SettingsControllerClearDeleteEventsAfterResponses, unknown, ThrowOnError>({ url: '/api/settings/delete-events-after', ...options });
+
+export const settingsControllerGetDeleteEventsAfter = <ThrowOnError extends boolean = false>(options?: Options<SettingsControllerGetDeleteEventsAfterData, ThrowOnError>) => (options?.client ?? client).get<SettingsControllerGetDeleteEventsAfterResponses, unknown, ThrowOnError>({ url: '/api/settings/delete-events-after', ...options });
+
+export const settingsControllerSetDeleteEventsAfter = <ThrowOnError extends boolean = false>(options: Options<SettingsControllerSetDeleteEventsAfterData, ThrowOnError>) => (options.client ?? client).put<SettingsControllerSetDeleteEventsAfterResponses, unknown, ThrowOnError>({
+    url: '/api/settings/delete-events-after',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const settingsControllerPreviewDeleteEventsAfter = <ThrowOnError extends boolean = false>(options?: Options<SettingsControllerPreviewDeleteEventsAfterData, ThrowOnError>) => (options?.client ?? client).get<SettingsControllerPreviewDeleteEventsAfterResponses, unknown, ThrowOnError>({ url: '/api/settings/delete-events-after/preview', ...options });
+
+export const settingsControllerGetAutoMergeTags = <ThrowOnError extends boolean = false>(options?: Options<SettingsControllerGetAutoMergeTagsData, ThrowOnError>) => (options?.client ?? client).get<SettingsControllerGetAutoMergeTagsResponses, unknown, ThrowOnError>({ url: '/api/settings/auto-merge-tags', ...options });
+
+export const settingsControllerSetAutoMergeTags = <ThrowOnError extends boolean = false>(options: Options<SettingsControllerSetAutoMergeTagsData, ThrowOnError>) => (options.client ?? client).put<SettingsControllerSetAutoMergeTagsResponses, unknown, ThrowOnError>({
+    url: '/api/settings/auto-merge-tags',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const settingsControllerSwitchDatabase = <ThrowOnError extends boolean = false>(options: Options<SettingsControllerSwitchDatabaseData, ThrowOnError>) => (options.client ?? client).post<SettingsControllerSwitchDatabaseResponses, unknown, ThrowOnError>({
+    url: '/api/settings/switch-database',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const settingsControllerMoveDatabase = <ThrowOnError extends boolean = false>(options: Options<SettingsControllerMoveDatabaseData, ThrowOnError>) => (options.client ?? client).post<SettingsControllerMoveDatabaseResponses, unknown, ThrowOnError>({
+    url: '/api/settings/move-database',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const settingsControllerOpenDatabaseFolder = <ThrowOnError extends boolean = false>(options?: Options<SettingsControllerOpenDatabaseFolderData, ThrowOnError>) => (options?.client ?? client).post<SettingsControllerOpenDatabaseFolderResponses, unknown, ThrowOnError>({ url: '/api/settings/open-database-folder', ...options });
+
 export const websitesControllerDelete = <ThrowOnError extends boolean = false>(options: Options<WebsitesControllerDeleteData, ThrowOnError>) => (options.client ?? client).delete<WebsitesControllerDeleteResponses, unknown, ThrowOnError>({ url: '/api/websites', ...options });
 
 export const websitesControllerFindAll = <ThrowOnError extends boolean = false>(options: Options<WebsitesControllerFindAllData, ThrowOnError>) => (options.client ?? client).get<WebsitesControllerFindAllResponses, unknown, ThrowOnError>({ url: '/api/websites', ...options });
@@ -236,54 +295,6 @@ export const integrationsControllerUpsert = <ThrowOnError extends boolean = fals
         ...options.headers
     }
 });
-
-export const settingsControllerGetSettings = <ThrowOnError extends boolean = false>(options?: Options<SettingsControllerGetSettingsData, ThrowOnError>) => (options?.client ?? client).get<SettingsControllerGetSettingsResponses, unknown, ThrowOnError>({ url: '/api/settings', ...options });
-
-export const settingsControllerGetSettingByKey = <ThrowOnError extends boolean = false>(options: Options<SettingsControllerGetSettingByKeyData, ThrowOnError>) => (options.client ?? client).get<SettingsControllerGetSettingByKeyResponses, unknown, ThrowOnError>({ url: '/api/settings/key/{key}', ...options });
-
-export const settingsControllerSetSettingByKey = <ThrowOnError extends boolean = false>(options: Options<SettingsControllerSetSettingByKeyData, ThrowOnError>) => (options.client ?? client).put<SettingsControllerSetSettingByKeyResponses, unknown, ThrowOnError>({
-    url: '/api/settings/key/{key}',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-export const settingsControllerClearDeleteEventsAfter = <ThrowOnError extends boolean = false>(options?: Options<SettingsControllerClearDeleteEventsAfterData, ThrowOnError>) => (options?.client ?? client).delete<SettingsControllerClearDeleteEventsAfterResponses, unknown, ThrowOnError>({ url: '/api/settings/delete-events-after', ...options });
-
-export const settingsControllerGetDeleteEventsAfter = <ThrowOnError extends boolean = false>(options?: Options<SettingsControllerGetDeleteEventsAfterData, ThrowOnError>) => (options?.client ?? client).get<SettingsControllerGetDeleteEventsAfterResponses, unknown, ThrowOnError>({ url: '/api/settings/delete-events-after', ...options });
-
-export const settingsControllerSetDeleteEventsAfter = <ThrowOnError extends boolean = false>(options: Options<SettingsControllerSetDeleteEventsAfterData, ThrowOnError>) => (options.client ?? client).put<SettingsControllerSetDeleteEventsAfterResponses, unknown, ThrowOnError>({
-    url: '/api/settings/delete-events-after',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-export const settingsControllerPreviewDeleteEventsAfter = <ThrowOnError extends boolean = false>(options?: Options<SettingsControllerPreviewDeleteEventsAfterData, ThrowOnError>) => (options?.client ?? client).get<SettingsControllerPreviewDeleteEventsAfterResponses, unknown, ThrowOnError>({ url: '/api/settings/delete-events-after/preview', ...options });
-
-export const settingsControllerSwitchDatabase = <ThrowOnError extends boolean = false>(options: Options<SettingsControllerSwitchDatabaseData, ThrowOnError>) => (options.client ?? client).post<SettingsControllerSwitchDatabaseResponses, unknown, ThrowOnError>({
-    url: '/api/settings/switch-database',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-export const settingsControllerMoveDatabase = <ThrowOnError extends boolean = false>(options: Options<SettingsControllerMoveDatabaseData, ThrowOnError>) => (options.client ?? client).post<SettingsControllerMoveDatabaseResponses, unknown, ThrowOnError>({
-    url: '/api/settings/move-database',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-export const settingsControllerOpenDatabaseFolder = <ThrowOnError extends boolean = false>(options?: Options<SettingsControllerOpenDatabaseFolderData, ThrowOnError>) => (options?.client ?? client).post<SettingsControllerOpenDatabaseFolderResponses, unknown, ThrowOnError>({ url: '/api/settings/open-database-folder', ...options });
 
 export const overviewsControllerGetData = <ThrowOnError extends boolean = false>(options: Options<OverviewsControllerGetDataData, ThrowOnError>) => (options.client ?? client).get<OverviewsControllerGetDataResponses, unknown, ThrowOnError>({ url: '/api/overviews/data', ...options });
 

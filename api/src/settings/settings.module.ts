@@ -8,5 +8,6 @@ import { PurgeOldEventsListener } from './purge-old-events.listener';
   imports: [DatabaseModule],
   controllers: [SettingsController],
   providers: [SettingsService, PurgeOldEventsListener],
+  exports: [SettingsService],
 })
 export class SettingsModule {}

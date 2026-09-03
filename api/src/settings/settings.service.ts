@@ -16,6 +16,12 @@ import { findSettingByKey } from './queries/findSettingByKey';
 import { upsertSetting } from './queries/upsertSetting';
 import { deleteSettingByKey } from './queries/deleteSettingByKey';
 import { computeDeleteEventsCutoff } from './helpers/compute-delete-events-cutoff.helper';
+import {
+  AutoMergeTagsDto,
+  DEFAULT_AUTO_MERGE_TAGS_MINUTES,
+  MAX_AUTO_MERGE_TAGS_MINUTES,
+  UpsertAutoMergeTagsDto,
+} from './dto/auto-merge-tags.dto';
 
 @Injectable()
 export class SettingsService {
@@ -96,6 +102,33 @@ export class SettingsService {
     const unit = (unitRow?.value as DeleteEventsAfterUnit) ?? null;
 
     return { numeric: numeric && !Number.isNaN(numeric) ? numeric : null, unit };
+  }
+
+  getAutoMergeTags(): AutoMergeTagsDto {
+    return { minutes: this.getAutoMergeTagsMinutes() };
+  }
+
+  setAutoMergeTags(dto: UpsertAutoMergeTagsDto): AutoMergeTagsDto {
+    const db = this.databaseService.getDb();
+    upsertSetting(db, { key: SettingKey.AutoMergeTagsMinutes, value: String(dto.minutes) });
+    return this.getAutoMergeTags();
+  }
+
+  /**
+   * Gap (in minutes) within which consecutive auto tags resolving to the same tag are merged.
+   * Falls back to the historical hardcoded threshold when the setting was never saved.
+   */
+  getAutoMergeTagsMinutes(): number {
+    const db = this.databaseService.getDb();
+    const row = findSettingByKey(db, { key: SettingKey.AutoMergeTagsMinutes });
+    if (!row?.value) {
+      return DEFAULT_AUTO_MERGE_TAGS_MINUTES;
+    }
+    const minutes = Number(row.value);
+    if (Number.isNaN(minutes)) {
+      return DEFAULT_AUTO_MERGE_TAGS_MINUTES;
+    }
+    return Math.min(Math.max(minutes, 0), MAX_AUTO_MERGE_TAGS_MINUTES);
   }
 
   async switchDatabasePath(newPath: string): Promise<SettingsResponseDto> {

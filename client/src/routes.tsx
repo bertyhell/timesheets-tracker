@@ -14,6 +14,7 @@ import { TimelinesPage } from './views/settings/Timelines/TimelinesPage';
 import { EditTimelineModal } from './components/EditTimelineModal/EditTimelineModal';
 import { SettingsPage } from './views/settings/SettingsPage/SettingsPage';
 import { GeneralSettingsPage } from './views/settings/GeneralSettingsPage/GeneralSettingsPage';
+import { AutoTagsSettingsPage } from './views/settings/AutoTagsSettingsPage/AutoTagsSettingsPage';
 import { IntegrationsPage } from './views/settings/IntegrationsPage/IntegrationsPage';
 import { ProductiveSettingsPage } from './views/settings/IntegrationsPage/ProductiveSettingsPage';
 import { OverviewsPage } from './views/OverviewsPage/OverviewsPage';
@@ -82,6 +83,10 @@ export const routes: RouteObject[] = [
           {
             path: ROUTE_PARTS.general,
             element: <GeneralSettingsPage />,
+          },
+          {
+            path: ROUTE_PARTS.autoTags,
+            element: <AutoTagsSettingsPage />,
           },
           {
             path: ROUTE_PARTS.integrations,

@@ -28,6 +28,7 @@ export enum ROUTE_PARTS {
   general = 'general',
   timelines = 'timelines',
   autoTagRules = 'auto-tag-rules',
+  autoTags = 'auto-tags',
   tagNames = 'tag-names',
   notes = 'notes',
   calendars = 'calendars',

@@ -10,6 +10,7 @@ import {
   DeleteEventsAfterPreviewDto,
   UpsertDeleteEventsAfterDto,
 } from './dto/delete-events-after.dto';
+import { AutoMergeTagsDto, UpsertAutoMergeTagsDto } from './dto/auto-merge-tags.dto';
 
 @ApiTags('settings')
 @Controller('api/settings')
@@ -61,6 +62,18 @@ export class SettingsController {
     @Query('unit') unit?: string
   ): DeleteEventsAfterPreviewDto {
     return this.settingsService.previewDeleteEventsAfter(numeric, unit);
+  }
+
+  @ApiOkResponse({ type: AutoMergeTagsDto })
+  @Get('auto-merge-tags')
+  getAutoMergeTags(): AutoMergeTagsDto {
+    return this.settingsService.getAutoMergeTags();
+  }
+
+  @ApiOkResponse({ type: AutoMergeTagsDto })
+  @Put('auto-merge-tags')
+  setAutoMergeTags(@Body() dto: UpsertAutoMergeTagsDto): AutoMergeTagsDto {
+    return this.settingsService.setAutoMergeTags(dto);
   }
 
   @ApiOkResponse({ type: SettingsResponseDto })

@@ -1,7 +1,11 @@
-.c-timeline {
+:root {
+  /* Default row height; TimelinesViewer overrides this to fit the available height */
   --timeline-height: 4.5rem;
+}
+
+.c-timeline {
   height: var(--timeline-height);
-  min-height: 3rem;
+  min-height: 2.5rem;
   display: flex;
   flex-direction: row;
   border-bottom: 1px solid var(--gray-100);

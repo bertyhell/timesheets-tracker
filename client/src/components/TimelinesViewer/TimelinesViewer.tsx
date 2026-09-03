@@ -59,6 +59,10 @@ interface TimelinesViewerProps {
   onRefreshEvents: () => void;
 }
 
+const TIMELINE_MIN_HEIGHT = 40;
+const TIMELINE_MAX_HEIGHT = 90;
+const TIMELINE_BORDER_HEIGHT = 1;
+
 export const TimelinesViewer: FC<TimelinesViewerProps> = ({
   timelineInfos,
   timelinesWithEvents,
@@ -284,6 +288,35 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
     },
     [setZoom]
   );
+
+  // Fit the timeline rows to the available height: as many as possible, filling as much space as
+  // possible. Rows shrink towards TIMELINE_MIN_HEIGHT to fit more, and grow up to
+  // TIMELINE_MAX_HEIGHT to use up leftover space.
+  const [availableTimelinesHeight, setAvailableTimelinesHeight] = useState<number | null>(null);
+  useEffect(() => {
+    const el = timelinesContainerRef.current;
+    const scrollParent = el?.parentElement;
+    if (!el || !scrollParent) return;
+
+    const measure = () => {
+      const rulerEl = el.querySelector('.c-timeline-ruler') as HTMLElement | null;
+      const rulerHeight = rulerEl ? rulerEl.offsetHeight : 0;
+      setAvailableTimelinesHeight(scrollParent.clientHeight - rulerHeight);
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(scrollParent);
+    return () => observer.disconnect();
+  }, []);
+
+  const timelineHeight = useMemo(() => {
+    const timelineCount = timelineInfos?.length || 0;
+    if (!availableTimelinesHeight || !timelineCount) return null;
+    // Each row adds a 1px bottom border on top of its --timeline-height (content-box)
+    const heightPerTimeline = availableTimelinesHeight / timelineCount - TIMELINE_BORDER_HEIGHT;
+    return clamp(Math.floor(heightPerTimeline), TIMELINE_MIN_HEIGHT, TIMELINE_MAX_HEIGHT);
+  }, [availableTimelinesHeight, timelineInfos?.length]);
 
   // Non-passive wheel listener for zoom
   useEffect(() => {
@@ -674,7 +707,12 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
       className="c-timelines"
       ref={timelinesContainerRef}
       onMouseDown={handleTimelinesMiddleMouseDown}
-      style={{ cursor: isDragging ? 'grabbing' : undefined }}
+      style={
+        {
+          cursor: isDragging ? 'grabbing' : undefined,
+          ...(timelineHeight ? { '--timeline-height': `${timelineHeight}px` } : {}),
+        } as React.CSSProperties
+      }
     >
       <TimelineRuler
         minTime={visibleMinTime}

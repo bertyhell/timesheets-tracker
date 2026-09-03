@@ -17,8 +17,11 @@ export function getEventLabel(timelineInfo: TimelineDto, event: TimelineEventDto
       return info['isActive'] ? 'Active' : 'Inactive';
     case TimelineType.GitCommit:
       return String(info['repoName'] ?? timelineInfo.title ?? '');
-    case TimelineType.Productive:
-      return String(info['tagNameName'] ?? '');
+    case TimelineType.Productive: {
+      const serviceName = String(info['serviceName'] ?? '');
+      const note = String(info['tagNameName'] ?? '');
+      return note !== 'Unnamed booking' ? `${serviceName}: ${note}` : serviceName;
+    }
     default:
       return timelineInfo.title ?? '';
   }

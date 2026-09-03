@@ -322,7 +322,7 @@ function Timeline({
     const info = event.info as Record<string, unknown>;
     const infoLines = Object.entries(info)
       .filter(([, val]) => val !== '' && val !== null && val !== undefined)
-      .map(([key, val]) => `${key}: ${val}`)
+      .map(([key, val]) => `${key}: ${typeof val === 'object' ? JSON.stringify(val) : val}`)
       .join('\n');
     const text = [`Start: ${startStr}`, `End: ${endStr}`, `Duration: ${durationStr}`, '', infoLines]
       .filter(Boolean)

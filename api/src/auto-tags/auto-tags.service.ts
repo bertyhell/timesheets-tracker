@@ -206,7 +206,6 @@ export class AutoTagsService {
       const timelinesForAutoTagAnalysis = otherTimelines.filter(
         (timeline) => timeline.type !== TimelineType.Tag
       );
-      const tagTimelines = otherTimelines.filter((timeline) => timeline.type === TimelineType.Tag);
       const combineGapMinutes = this.settingsService.getAutoMergeTagsMinutes();
       autoTagTimelines.forEach((autoTagTimeline) => {
         const autoTagEvents = calculateAutoTagEvents(
@@ -215,7 +214,6 @@ export class AutoTagsService {
           autoTagTimeline,
           allTagNames,
           undefined,
-          tagTimelines,
           combineGapMinutes
         );
         autoTagTimeline.events = autoTagEvents;

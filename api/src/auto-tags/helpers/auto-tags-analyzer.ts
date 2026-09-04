@@ -8,7 +8,6 @@ import { AutoTagConditionDto, AutoTagDto } from '../dto/response-auto-tag.dto';
 import {
   AutoTagEventInfoDto,
   MatchedAutoTagConditionDto,
-  TagEventInfoDto,
   TimelineEventDto,
   TimelineWithEventsDto,
 } from '../../timelines/dto/response-timeline-events.dto';
@@ -262,102 +261,12 @@ function combineAutoTagEvents(
   return combinedAutoTagEvents;
 }
 
-/**
- * Converts manual tag events into the AutoTagEventInfoDto shape so they can
- * be included in an auto-tag timeline, preserving their original time ranges.
- */
-function convertTagEventsToAutoTagEvents(
-  tagTimelines: TimelineWithEventsDto[],
-  autoTagTimelineId: string
-): TimelineEventDto[] {
-  return tagTimelines.flatMap((timeline) =>
-    timeline.events.map((tagEvent) => {
-      const tagInfo = tagEvent.info as TagEventInfoDto;
-      const autoTagEventInfo: AutoTagEventInfoDto = {
-        autoTagId: '',
-        tagNameId: tagInfo.tagNameId,
-        tagNameTitle: tagInfo.tagNameName,
-        tagNameColor: tagInfo.tagNameColor,
-        tagNameCode: tagInfo.tagNameCode,
-        tagNameNote: tagInfo.tagNameNote,
-        priority: Infinity,
-        matchedConditions: [],
-      };
-      return {
-        id: crypto.randomUUID(),
-        startedAt: tagEvent.startedAt,
-        endedAt: tagEvent.endedAt,
-        timelineId: autoTagTimelineId,
-        info: autoTagEventInfo,
-      };
-    })
-  );
-}
-
-/**
- * Removes time ranges covered by manual tag events from auto-tag events.
- * manual tags always take precedence.
- */
-export function clipAutoTagEventsAgainstTagEvents(
-  autoTagEvents: TimelineEventDto[],
-  tagTimelines: TimelineWithEventsDto[]
-): TimelineEventDto[] {
-  const tagEvents = tagTimelines.flatMap((t) => t.events);
-  if (!tagEvents.length) {
-    return autoTagEvents;
-  }
-
-  const result: TimelineEventDto[] = [];
-
-  for (const autoTagEvent of autoTagEvents) {
-    let segments: [number, number][] = [
-      [parseISO(autoTagEvent.startedAt).getTime(), parseISO(autoTagEvent.endedAt).getTime()],
-    ];
-
-    for (const tagEvent of tagEvents) {
-      const tagStart = parseISO(tagEvent.startedAt).getTime();
-      const tagEnd = parseISO(tagEvent.endedAt).getTime();
-
-      const newSegments: [number, number][] = [];
-      for (const [segStart, segEnd] of segments) {
-        if (tagEnd <= segStart || tagStart >= segEnd) {
-          // No overlap — keep segment as-is
-          newSegments.push([segStart, segEnd]);
-        } else {
-          // Overlap — cut out the tag period
-          if (segStart < tagStart) {
-            newSegments.push([segStart, tagStart]);
-          }
-          if (segEnd > tagEnd) {
-            newSegments.push([tagEnd, segEnd]);
-          }
-        }
-      }
-      segments = newSegments;
-    }
-
-    for (const [segStart, segEnd] of segments) {
-      if (segEnd > segStart) {
-        result.push({
-          ...autoTagEvent,
-          id: crypto.randomUUID(),
-          startedAt: new Date(segStart).toISOString(),
-          endedAt: new Date(segEnd).toISOString(),
-        });
-      }
-    }
-  }
-
-  return result;
-}
-
 export function calculateAutoTagEvents(
   timelinesWithEvents: TimelineWithEventsDto[],
   autoTags: AutoTagDto[],
   autoTagTimeline: TimelineWithEventsDto,
   allTagNames: TagNameDto[],
   maxGrowTimeMinutes = DEFAULT_MAX_GROW_TIME_MINUTES,
-  tagTimelines: TimelineWithEventsDto[] = [],
   combineGapMinutes = DEFAULT_AUTO_MERGE_TAGS_MINUTES
 ): TimelineEventDto[] {
   const validAutoTags = autoTags.filter(
@@ -407,19 +316,10 @@ export function calculateAutoTagEvents(
   });
 
   if (!autoTagEvents.length) {
-    return convertTagEventsToAutoTagEvents(tagTimelines, autoTagTimeline.id);
+    return [];
   }
 
   const combinedAutoTagEvents = combineAutoTagEvents(autoTagEvents, combineGapMinutes);
 
-  const grownAutoTagEvents = growAutoTagEvents(combinedAutoTagEvents, maxGrowTimeMinutes);
-
-  const clippedAutoTagEvents = clipAutoTagEventsAgainstTagEvents(grownAutoTagEvents, tagTimelines);
-
-  const manualTagsAsAutoTagEvents = convertTagEventsToAutoTagEvents(
-    tagTimelines,
-    autoTagTimeline.id
-  );
-
-  return [...clippedAutoTagEvents, ...manualTagsAsAutoTagEvents];
+  return growAutoTagEvents(combinedAutoTagEvents, maxGrowTimeMinutes);
 }

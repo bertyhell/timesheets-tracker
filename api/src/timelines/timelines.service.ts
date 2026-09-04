@@ -507,8 +507,11 @@ export class TimelinesService {
         const value = String(rawValue);
         try {
           const regex = new RegExp(extractRegex);
-          if (!regex.test(value)) continue;
-          const note = value.replace(new RegExp(extractRegex), replacement);
+          const match = regex.exec(value);
+          if (!match) continue;
+          // Only the matched part is kept: applying the replacement to the whole value would
+          // leave any unmatched prefix/suffix (eg. a url query string) glued onto the note.
+          const note = match[0].replace(regex, replacement);
           if (note) return note;
         } catch {
           // invalid regex — skip this rule

@@ -18,6 +18,7 @@ import { ChartType, type ReportOptions } from '../reports/report.types';
 import { DEFAULT_REPORT_ID, findReport, REPORTS } from '../reports/report-catalog';
 import { resolveReportOptions, toReportState } from '../reports/helpers/report-state';
 import { toEChartsOption } from '../reports/helpers/to-echarts-option';
+import { getPreferredChartHeight } from '../reports/helpers/chart-height';
 import { downloadCsv, downloadDataUrl, reportToCsv } from '../reports/helpers/report-to-csv';
 import { ReportOptionsBar } from '../reports/components/ReportOptionsBar';
 import { ReportSummary } from '../reports/components/ReportSummary';
@@ -91,6 +92,8 @@ export function OverviewView() {
   );
 
   const chartOption = useMemo(() => toEChartsOption(result, options), [result, options]);
+  const isTable = options.chartType === ChartType.Table;
+  const preferredChartHeight = isTable ? undefined : getPreferredChartHeight(result, options);
 
   const hasData =
     result.kind === 'series'
@@ -217,7 +220,10 @@ export function OverviewView() {
 
         <ReportSummary result={result} />
 
-        <div className="m-overview-view__chart">
+        <div
+          className={'m-overview-view__chart' + (isTable ? ' m-overview-view__chart--table' : '')}
+          style={preferredChartHeight ? { minHeight: preferredChartHeight } : undefined}
+        >
           {isError && (
             <div className="m-overview-view__placeholder">
               Could not load the data for this report.
@@ -228,10 +234,8 @@ export function OverviewView() {
               {isFetching ? 'Loading…' : 'No tracked time in this range for this report.'}
             </div>
           )}
-          {!isError && hasData && options.chartType === ChartType.Table && (
-            <ReportTable result={result} />
-          )}
-          {!isError && hasData && options.chartType !== ChartType.Table && (
+          {!isError && hasData && isTable && <ReportTable result={result} />}
+          {!isError && hasData && !isTable && (
             <Chart
               option={chartOption}
               onInstance={(instance) => (chartInstanceRef.current = instance)}

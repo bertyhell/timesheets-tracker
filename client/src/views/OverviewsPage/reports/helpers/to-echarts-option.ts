@@ -270,26 +270,28 @@ function buildHeatmap(result: MatrixReportResult): EChartsCoreOption {
       textStyle: BASE_TEXT_STYLE,
       formatter: (param: { value: [number, number, number] }) =>
         '<b>' +
-        result.yLabels[param.value[1]] +
-        ' ' +
         result.xLabels[param.value[0]] +
+        ' ' +
+        result.yLabels[param.value[1]] +
         '</b><br/>' +
         formatValue(param.value[2], result.valueUnit),
     },
-    grid: { left: 12, right: 24, top: 12, bottom: 48, containLabel: true },
+    grid: { left: 12, right: 24, top: 24, bottom: 48, containLabel: true },
     xAxis: {
       type: 'category',
+      position: 'top',
       data: result.xLabels,
       splitArea: { show: true },
-      axisLabel: { color: GRAY_500, interval: 1 },
+      axisLabel: { color: GRAY_500, interval: 0 },
       axisTick: { show: false },
     },
     yAxis: {
       type: 'category',
       data: result.yLabels,
+      // First row on top, so the hours read 00h → 23h downwards.
       inverse: true,
       splitArea: { show: true },
-      axisLabel: { color: GRAY_500 },
+      axisLabel: { color: GRAY_500, interval: 0 },
       axisTick: { show: false },
     },
     visualMap: {
@@ -317,6 +319,9 @@ function buildHeatmap(result: MatrixReportResult): EChartsCoreOption {
 
 function buildCalendar(result: CalendarReportResult): EChartsCoreOption {
   const maxValue = result.days.reduce((max, day) => Math.max(max, day.value), 0);
+  // The year label would sit on top of the weekday header, so the year is folded into the
+  // month labels instead, and only when the range actually crosses a year boundary.
+  const spansMultipleYears = result.range[0].slice(0, 4) !== result.range[1].slice(0, 4);
   return {
     textStyle: BASE_TEXT_STYLE,
     tooltip: {
@@ -338,16 +343,24 @@ function buildCalendar(result: CalendarReportResult): EChartsCoreOption {
       inRange: { color: ['#f5f3ff', PRIMARY_LIGHT, PRIMARY, '#4c1d95'] },
     },
     calendar: {
-      top: 30,
+      // Vertical orientation puts the weekday labels across the top and stacks the months
+      // downwards, which reads like a wall calendar.
+      orient: 'vertical',
+      top: 40,
       bottom: 60,
-      left: 50,
+      left: 60,
       right: 20,
       cellSize: ['auto', 'auto'],
       range: result.range,
       splitLine: { lineStyle: { color: GRAY_100 } },
       itemStyle: { color: '#fff', borderColor: GRAY_100, borderWidth: 1 },
-      yearLabel: { show: true, color: GRAY_500 },
-      monthLabel: { color: GRAY_500, nameMap: 'en' },
+      yearLabel: { show: false },
+      monthLabel: {
+        color: GRAY_500,
+        nameMap: 'en',
+        formatter: (param: { nameMap: string; yyyy: string }) =>
+          spansMultipleYears ? param.nameMap + ' ' + param.yyyy.slice(2) : param.nameMap,
+      },
       dayLabel: { firstDay: 1, color: GRAY_500, nameMap: 'en' },
     },
     series: [

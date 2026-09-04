@@ -336,13 +336,14 @@ export function computeHourOfDay(context: ReportContext): ReportResult {
     }
   }
 
+  // Weekdays run across the top and the hours down the side, so a day reads as a column.
   const result: MatrixReportResult = {
     kind: 'matrix',
-    xLabels: HOUR_LABELS,
-    yLabels: WEEKDAY_LABELS,
+    xLabels: WEEKDAY_LABELS,
+    yLabels: HOUR_LABELS,
     cells: [...cells].map(([key, value]) => {
       const [hour, weekday] = key.split('|').map(Number);
-      return [hour, weekday, value] as [number, number, number];
+      return [weekday, hour, value] as [number, number, number];
     }),
     valueUnit: unitFor(context.options.metric),
     categoryLabel: 'Hour of day',

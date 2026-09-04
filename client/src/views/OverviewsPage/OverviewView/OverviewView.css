@@ -45,6 +45,9 @@
   display: flex;
   flex-direction: column;
   background-color: var(--bg-alternative);
+  /* Calendars, heatmaps and long horizontal bar charts ask for more height than the viewport
+     has; they get it and the page scrolls rather than squeezing the chart flat. */
+  overflow-y: auto;
 }
 
 .m-overview-view__intro {
@@ -70,7 +73,7 @@
 
 .m-overview-view__chart {
   position: relative;
-  flex: 1;
+  flex: 1 0 auto;
   min-height: 18rem;
   margin: 0 1.5rem 1.5rem;
   padding: 0.75rem;
@@ -78,6 +81,11 @@
   border-radius: 10px;
   background-color: white;
   overflow: hidden;
+}
+
+/* The table brings its own padding, so its sticky header band can span the full width. */
+.m-overview-view__chart--table {
+  padding: 0;
 }
 
 .m-overview-view__placeholder {

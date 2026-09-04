@@ -90,12 +90,19 @@ function buildTiles(result: ReportResult): Tile[] {
     ];
   }
 
+  // The category label is used as a hint rather than pluralised into the label, because
+  // "Hour of days" / "Sessions per session" read badly for some reports.
   return [
     { label: 'Total', value: formatValue(total, result.valueUnit) },
-    { label: result.categoryLabel + 's', value: String(nonEmpty.length) },
     {
-      label: 'Average per ' + result.categoryLabel.toLowerCase(),
+      label: 'With data',
+      value: String(nonEmpty.length),
+      hint: result.categoryLabel.toLowerCase(),
+    },
+    {
+      label: 'Average',
       value: nonEmpty.length ? formatValue(total / nonEmpty.length, result.valueUnit) : '–',
+      hint: 'per ' + result.categoryLabel.toLowerCase(),
     },
     biggest
       ? {

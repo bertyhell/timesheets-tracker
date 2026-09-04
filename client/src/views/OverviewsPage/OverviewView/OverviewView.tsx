@@ -234,7 +234,15 @@ export function OverviewView() {
               {isFetching ? 'Loading…' : 'No tracked time in this range for this report.'}
             </div>
           )}
-          {!isError && hasData && isTable && <ReportTable result={result} />}
+          {!isError && hasData && isTable && (
+            <ReportTable
+              result={result}
+              sort={report.optionSpec.sort ? options.sort : undefined}
+              onSortChange={
+                report.optionSpec.sort ? (sort) => handleOptionsChange({ sort }) : undefined
+              }
+            />
+          )}
           {!isError && hasData && !isTable && (
             <Chart
               option={chartOption}

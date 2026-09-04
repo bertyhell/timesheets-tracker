@@ -19,6 +19,8 @@ export function sortTotals(totals: LabelledTotal[], sort: SortMode): LabelledTot
       return sorted.sort((a, b) => a.value - b.value);
     case SortMode.Label:
       return sorted.sort((a, b) => a.label.localeCompare(b.label));
+    case SortMode.LabelDesc:
+      return sorted.sort((a, b) => b.label.localeCompare(a.label));
   }
 }
 

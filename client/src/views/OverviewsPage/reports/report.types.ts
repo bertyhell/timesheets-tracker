@@ -34,6 +34,7 @@ export enum SortMode {
   ValueDesc = 'valueDesc',
   ValueAsc = 'valueAsc',
   Label = 'label',
+  LabelDesc = 'labelDesc',
 }
 
 /**

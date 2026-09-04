@@ -105,7 +105,8 @@ export const BUCKET_LABELS: Record<TimeBucket, string> = {
 export const SORT_LABELS: Record<SortMode, string> = {
   [SortMode.ValueDesc]: 'Biggest first',
   [SortMode.ValueAsc]: 'Smallest first',
-  [SortMode.Label]: 'By name',
+  [SortMode.Label]: 'By name (A–Z)',
+  [SortMode.LabelDesc]: 'By name (Z–A)',
 };
 
 export const TOP_N_OPTIONS: { value: number; label: string }[] = [

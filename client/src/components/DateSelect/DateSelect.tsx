@@ -36,7 +36,7 @@ function DateSelect({ className }: { className?: string }) {
           ›
         </button>
       </div>
-      <div className="c-current-flex flex-row items-center gap-1 px-2 py-1.5 border border-gray-200 rounded-lg text-sm text-gray-700">
+      <div className="c-date-select__current flex flex-row items-center gap-1 px-2 py-1.5 border border-gray-200 rounded-lg text-sm text-gray-700">
         <span className="font-medium inline-block text-right min-w-[2.2rem]">
           {format(viewDate, 'eee,')}
         </span>

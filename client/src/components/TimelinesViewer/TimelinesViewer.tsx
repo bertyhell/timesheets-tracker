@@ -263,6 +263,47 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
     setViewEnd(end);
   }, []);
 
+  // Pan the view by a fraction of the currently visible span
+  const panBy = useCallback(
+    (deltaFraction: number) => {
+      const span = viewEndRef.current - viewStartRef.current;
+      let newStart = viewStartRef.current + deltaFraction;
+      let newEnd = newStart + span;
+      if (newStart < 0) {
+        newStart = 0;
+        newEnd = span;
+      }
+      if (newEnd > 1) {
+        newEnd = 1;
+        newStart = 1 - span;
+      }
+      setZoom(newStart, newEnd);
+    },
+    [setZoom]
+  );
+
+  // Zoom around a focal point, expressed as a fraction [0,1] of the full day
+  const zoomAtFocal = useCallback(
+    (focal: number, fractionInTrack: number, factor: number) => {
+      const currentSpan = viewEndRef.current - viewStartRef.current;
+      const newSpan = Math.max(MIN_SPAN, Math.min(1, currentSpan * factor));
+
+      let newStart = focal - fractionInTrack * newSpan;
+      let newEnd = focal + (1 - fractionInTrack) * newSpan;
+
+      if (newStart < 0) {
+        newEnd = Math.min(1, newEnd - newStart);
+        newStart = 0;
+      }
+      if (newEnd > 1) {
+        newStart = Math.max(0, newStart - (newEnd - 1));
+        newEnd = 1;
+      }
+      setZoom(newStart, newEnd);
+    },
+    [setZoom]
+  );
+
   const handleWheel = useCallback(
     (e: WheelEvent) => {
       if (!timelinesContainerRef.current) {
@@ -277,32 +318,37 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
       const trackWidth = rect.width - gutterWidth;
       if (trackWidth <= 0) return;
 
+      // A trackpad pinch arrives as a wheel event with ctrlKey set by the browser.
+      // A classic mouse wheel has no horizontal delta and comes in coarse steps
+      // (line mode, or large whole-pixel jumps), so keep zooming for those too.
+      const isPinch = e.ctrlKey || e.metaKey;
+      const isMouseWheel =
+        !isPinch && e.deltaX === 0 && (e.deltaMode !== 0 || Math.abs(e.deltaY) >= 40);
+
+      if (!isPinch && !isMouseWheel) {
+        // Two-finger trackpad drag: pan the timeline
+        const span = viewEndRef.current - viewStartRef.current;
+        // Vertical scrolling on the timelines has no meaning, so use it for panning too
+        const deltaPx = Math.abs(e.deltaX) >= Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+        panBy((deltaPx / trackWidth) * span);
+        return;
+      }
+
       const mouseXInTrack = e.clientX - rect.left - gutterWidth;
       const fraction = Math.max(0, Math.min(1, mouseXInTrack / trackWidth));
+      const focal = viewStartRef.current + fraction * (viewEndRef.current - viewStartRef.current);
 
-      const curStart = viewStartRef.current;
-      const curEnd = viewEndRef.current;
-      const focal = curStart + fraction * (curEnd - curStart);
+      // Pinch deltas are continuous, so scale smoothly with the gesture instead of
+      // applying the fixed per-notch factor a mouse wheel gets.
+      const factor = isPinch
+        ? Math.exp(e.deltaY * 0.01)
+        : e.deltaY < 0
+          ? ZOOM_FACTOR
+          : 1 / ZOOM_FACTOR;
 
-      const factor = e.deltaY < 0 ? ZOOM_FACTOR : 1 / ZOOM_FACTOR;
-      const currentSpan = curEnd - curStart;
-      let newSpan = Math.max(MIN_SPAN, Math.min(1, currentSpan * factor));
-
-      let newStart = focal - fraction * newSpan;
-      let newEnd = focal + (1 - fraction) * newSpan;
-
-      if (newStart < 0) {
-        newEnd = Math.min(1, newEnd - newStart);
-        newStart = 0;
-      }
-      if (newEnd > 1) {
-        newStart = Math.max(0, newStart - (newEnd - 1));
-        newEnd = 1;
-      }
-
-      setZoom(newStart, newEnd);
+      zoomAtFocal(focal, fraction, factor);
     },
-    [setZoom]
+    [panBy, zoomAtFocal]
   );
 
   // Fit the timeline rows to the available height: as many as possible, filling as much space as

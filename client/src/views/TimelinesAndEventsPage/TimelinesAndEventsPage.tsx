@@ -111,6 +111,7 @@ export function TimelinesAndEventsPage() {
     selectedTimelineId: null,
     selectedEventId: null,
   });
+  const [selectedEvents, setSelectedEvents] = useState<TimelineEventDto[]>([]);
   const selectedTimeline: TimelineWithEventsDto | null = useMemo(
     () =>
       timelinesWithEvents?.find(
@@ -246,6 +247,7 @@ export function TimelinesAndEventsPage() {
                   className="c-events-table"
                   timeline={selectedTimeline}
                   events={selectedTimeline.events}
+                  onSelectionChange={setSelectedEvents}
                   onAddBulkTag={(bulkEvents) =>
                     navigate(
                       {
@@ -308,7 +310,9 @@ export function TimelinesAndEventsPage() {
               {!selectedTimeline?.events?.length ? null : (
                 <EventsTotalsTable
                   className="c-events-totals-table"
-                  events={selectedTimeline.events}
+                  events={
+                    selectedEvents.length >= 2 ? selectedEvents : selectedTimeline.events
+                  }
                   timelineType={selectedTimeline.type}
                   onEditTag={(eventId) =>
                     navigate(

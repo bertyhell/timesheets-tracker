@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { orderBy } from 'lodash-es';
 import { differenceInSeconds, format, parseISO, roundToNearestMinutes } from 'date-fns';
@@ -127,6 +127,7 @@ interface EventsTableProps {
   events: TimelineEventDto[];
   className?: string;
   onAddBulkTag?: (events: TimelineEventDto[]) => void;
+  onSelectionChange?: (events: TimelineEventDto[]) => void;
   onEditTag?: (eventId: string) => void;
   onDeleteTag?: (eventId: string) => void;
   onCreateTagFromEvent?: (startedAt: string, endedAt: string) => void;
@@ -141,7 +142,7 @@ interface ContextMenuState {
   isBulk: boolean;
 }
 
-export function EventsTable({ timeline, events, className, onAddBulkTag, onEditTag, onDeleteTag, onCreateTagFromEvent, onCreateAutoTagRuleFromEvent }: EventsTableProps) {
+export function EventsTable({ timeline, events, className, onAddBulkTag, onSelectionChange, onEditTag, onDeleteTag, onCreateTagFromEvent, onCreateAutoTagRuleFromEvent }: EventsTableProps) {
   const [searchTerm] = useAtom(searchTermAtom);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [lastClickedIndex, setLastClickedIndex] = useState<number | null>(null);
@@ -202,6 +203,10 @@ export function EventsTable({ timeline, events, className, onAddBulkTag, onEditT
       [sortDescriptor.direction === 'descending' ? 'desc' : 'asc']
     );
   }, [events, searchTerm, sortDescriptor]);
+
+  useEffect(() => {
+    onSelectionChange?.(sortedItems.filter((event) => selectedKeys.has(event.id)));
+  }, [selectedKeys, sortedItems, onSelectionChange]);
 
   const getItemKey = useCallback((index: number) => sortedItems[index]?.id ?? index, [sortedItems]);
 

@@ -69,8 +69,8 @@ interface TimelineProps {
   hoverPercent: number | null;
   onCreateTagName: (data: { title: string; code: string; color: string }) => Promise<TagName>;
   onCreateTag: (tagNameId: string) => Promise<void>;
-  selectedEvent: TimelineEventDto | null;
-  setSelectedEvent: (event: TimelineEventDto, timeline: TimelineDto) => void;
+  selectedEventIds: string[];
+  setSelectedEventIds: (eventIds: string[], timeline: TimelineDto) => void;
   isActive: boolean;
   onSelectTimeline: (timelineId: string) => void;
   onTagResized?: (tagId: string, newStartedAt: string, newEndedAt: string) => void;
@@ -116,8 +116,8 @@ function Timeline({
   hoverPercent,
   onCreateTagName,
   onCreateTag,
-  selectedEvent,
-  setSelectedEvent,
+  selectedEventIds,
+  setSelectedEventIds,
   isActive,
   onSelectTimeline,
   onTagResized,
@@ -163,13 +163,47 @@ function Timeline({
           (activeEl as HTMLElement).isContentEditable)
       )
         return;
-      if (!selectedEvent) return;
-      if (!events.some((ev) => ev.id === selectedEvent.id)) return;
-      onDeleteTag(selectedEvent.id);
+      const ownSelectedEvents = events.filter((ev) => selectedEventIds.includes(ev.id));
+      if (!ownSelectedEvents.length) return;
+      ownSelectedEvents.forEach((ev) => onDeleteTag(ev.id));
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [timelineInfo.timelineType, onDeleteTag, selectedEvent, events]);
+  }, [timelineInfo.timelineType, onDeleteTag, selectedEventIds, events]);
+
+  const lastSelectedEventIdRef = useRef<string | null>(null);
+
+  const handleSelectEvent = (clickEvent: MouseEvent, event: TimelineEventDto) => {
+    const ownSelectedIds = events
+      .filter((ev) => selectedEventIds.includes(ev.id))
+      .map((ev) => ev.id);
+
+    if (clickEvent.shiftKey && lastSelectedEventIdRef.current) {
+      const anchorIndex = events.findIndex((ev) => ev.id === lastSelectedEventIdRef.current);
+      const clickedIndex = events.findIndex((ev) => ev.id === event.id);
+      if (anchorIndex !== -1 && clickedIndex !== -1) {
+        const from = Math.min(anchorIndex, clickedIndex);
+        const to = Math.max(anchorIndex, clickedIndex);
+        setSelectedEventIds(
+          events.slice(from, to + 1).map((ev) => ev.id),
+          timelineInfo
+        );
+        return;
+      }
+    }
+
+    if (clickEvent.ctrlKey || clickEvent.metaKey) {
+      const nextIds = ownSelectedIds.includes(event.id)
+        ? ownSelectedIds.filter((id) => id !== event.id)
+        : [...ownSelectedIds, event.id];
+      lastSelectedEventIdRef.current = event.id;
+      setSelectedEventIds(nextIds, timelineInfo);
+      return;
+    }
+
+    lastSelectedEventIdRef.current = event.id;
+    setSelectedEventIds([event.id], timelineInfo);
+  };
 
   const lowerSearch = searchTerm.toLowerCase();
 
@@ -277,6 +311,14 @@ function Timeline({
     }
     const eventId: string | null =
       (evt.target as HTMLElement)?.getAttribute('data-event-id') || null;
+    // Modifier clicks on an existing event are handled by the event's own
+    // onClick (multi-select); don't let the mouse up reset the selection.
+    if (
+      (evt.ctrlKey || evt.metaKey || evt.shiftKey) &&
+      (evt.target as HTMLElement)?.closest('[data-event-id]')
+    ) {
+      return;
+    }
     onMouseUp(timelineInfo.id, applySnap(posX, snapPointPercents, trackWidth), eventId);
   };
 
@@ -291,21 +333,8 @@ function Timeline({
   const handleContextMenu = (e: MouseEvent, eventId: string) => {
     e.preventDefault();
     e.stopPropagation();
-    const isAutoTag = timelineInfo.timelineType === TimelineType.AutoTag && !!onEditAutoTagRule;
     const event = events.find((ev) => ev.id === eventId);
     if (!event) return;
-    if (isAutoTag) {
-      const autoTagId = (event?.info as { autoTagId?: string })?.autoTagId;
-      setContextMenu({
-        x: e.clientX,
-        y: e.clientY,
-        eventId: autoTagId ?? eventId,
-        event,
-        eventStartedAt: event?.startedAt,
-        eventEndedAt: event?.endedAt,
-      });
-      return;
-    }
     setContextMenu({
       x: e.clientX,
       y: e.clientY,
@@ -583,7 +612,7 @@ function Timeline({
                 <div
                   className={
                     'c-timeline__event' +
-                    (selectedEvent?.id === event.id ? ' c-timeline__event--selected' : '') +
+                    (selectedEventIds.includes(event.id) ? ' c-timeline__event--selected' : '') +
                     (isNarrow ? ' c-timeline__event--narrow' : '') +
                     (isDimmed ? ' c-timeline__event--dimmed' : '')
                   }
@@ -595,8 +624,8 @@ function Timeline({
                     backgroundColor: color + '33',
                     borderLeft: `3px solid ${color}`,
                   }}
-                  onClick={() => {
-                    setSelectedEvent(event, timelineInfo);
+                  onClick={(clickEvent) => {
+                    handleSelectEvent(clickEvent, event);
                   }}
                   onContextMenu={(e) => handleContextMenu(e, event.id)}
                 >
@@ -665,7 +694,7 @@ function Timeline({
                   <TagSelectSingle value={null} onChange={handleTagNameChange} autoFocus />
                 </ul>
               }
-              visible={!!selectionPercentages.start && !!selectionPercentages.end && !selectedEvent}
+              visible={!!selectionPercentages.start && !!selectionPercentages.end && !selectedEventIds.length}
               placement="top-end"
             >
               <div
@@ -687,7 +716,18 @@ function Timeline({
           position={{ x: contextMenu.x, y: contextMenu.y }}
           items={[
             ...(timelineInfo.timelineType === TimelineType.AutoTag
-              ? [{ label: 'Edit rule', onClick: () => onEditAutoTagRule?.(contextMenu.eventId) }]
+              ? // Manual tags shown on an auto tag timeline have no rule behind them
+                (contextMenu.event.info as AutoTagEventInfoDto)?.autoTagId
+                ? [
+                    {
+                      label: 'Edit rule',
+                      onClick: () =>
+                        onEditAutoTagRule?.(
+                          (contextMenu.event.info as AutoTagEventInfoDto).autoTagId
+                        ),
+                    },
+                  ]
+                : []
               : timelineInfo.timelineType === TimelineType.Tag
                 ? [
                     { label: 'Edit tag', onClick: () => onEditTag?.(contextMenu.eventId) },

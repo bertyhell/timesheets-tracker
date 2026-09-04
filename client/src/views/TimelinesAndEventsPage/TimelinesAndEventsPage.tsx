@@ -106,10 +106,10 @@ export function TimelinesAndEventsPage() {
 
   const [selectedTimelineAndEvent, setSelectedTimelineAndEvent] = useState<{
     selectedTimelineId: string | null;
-    selectedEventId: string | null;
+    selectedEventIds: string[];
   }>({
     selectedTimelineId: null,
-    selectedEventId: null,
+    selectedEventIds: [],
   });
   const [selectedEvents, setSelectedEvents] = useState<TimelineEventDto[]>([]);
   const selectedTimeline: TimelineWithEventsDto | null = useMemo(
@@ -119,12 +119,12 @@ export function TimelinesAndEventsPage() {
       ) || null,
     [timelinesWithEvents, selectedTimelineAndEvent.selectedTimelineId]
   );
-  const selectedEvent: TimelineEventDto | null = useMemo(
+  const selectedTimelineEvents: TimelineEventDto[] = useMemo(
     () =>
-      selectedTimeline?.events?.find(
-        (event) => event.id === selectedTimelineAndEvent.selectedEventId
-      ) || null,
-    [selectedTimeline, selectedTimelineAndEvent.selectedEventId]
+      selectedTimeline?.events?.filter((event) =>
+        selectedTimelineAndEvent.selectedEventIds.includes(event.id)
+      ) ?? [],
+    [selectedTimeline, selectedTimelineAndEvent.selectedEventIds]
   );
 
   useEffect(() => {
@@ -133,7 +133,7 @@ export function TimelinesAndEventsPage() {
     }
     const programsTimeline = timelineInfos.find((t) => t.timelineType === TimelineType.Program);
     const defaultTimeline = programsTimeline ?? timelineInfos[0];
-    setSelectedTimelineAndEvent({ selectedTimelineId: defaultTimeline.id, selectedEventId: null });
+    setSelectedTimelineAndEvent({ selectedTimelineId: defaultTimeline.id, selectedEventIds: [] });
   }, [timelineInfos]);
 
   useEffect(() => {
@@ -151,13 +151,16 @@ export function TimelinesAndEventsPage() {
     // Use state setter function to get latest state, since this event handler happens outside the react
     setSelectedTimelineAndEvent(() => {
       if (evt.key === 'Delete') {
-        // Delete selected event
-        if (selectedEvent?.id && selectedTimeline?.type === TimelineType.Tag) {
+        // Delete selected events
+        if (selectedTimelineEvents.length && selectedTimeline?.type === TimelineType.Tag) {
           (async () => {
-            await deleteTag({
-              path: { id: selectedEvent?.id as string },
-            });
-            toast('Tag was deleted', { type: 'success' });
+            for (const event of selectedTimelineEvents) {
+              await deleteTag({ path: { id: event.id } });
+            }
+            toast(
+              selectedTimelineEvents.length > 1 ? 'Tags were deleted' : 'Tag was deleted',
+              { type: 'success' }
+            );
           })();
         } else {
           toast('No tag was selected', { type: 'warning' });
@@ -165,7 +168,7 @@ export function TimelinesAndEventsPage() {
       }
       return {
         selectedTimelineId: selectedTimeline?.id || null,
-        selectedEventId: null,
+        selectedEventIds: [],
       };
     });
   };
@@ -247,6 +250,7 @@ export function TimelinesAndEventsPage() {
                   className="c-events-table"
                   timeline={selectedTimeline}
                   events={selectedTimeline.events}
+                  selectedEventIds={selectedTimelineAndEvent.selectedEventIds}
                   onSelectionChange={setSelectedEvents}
                   onAddBulkTag={(bulkEvents) =>
                     navigate(

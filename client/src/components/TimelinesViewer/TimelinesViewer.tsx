@@ -50,10 +50,13 @@ interface TimelinesViewerProps {
   timelineInfos: TimelineDto[] | undefined;
   timelinesWithEvents?: Array<TimelineWithEventsDto> | undefined;
   viewDate: Date;
-  selectedTimelineAndEvent?: { selectedTimelineId: string | null; selectedEventId: string | null };
+  selectedTimelineAndEvent?: {
+    selectedTimelineId: string | null;
+    selectedEventIds: string[];
+  };
   setSelectedTimelineAndEvent: (newState: {
     selectedTimelineId: string | null;
-    selectedEventId: string | null;
+    selectedEventIds: string[];
   }) => void;
   refetchTimelinesWithEvents: (
     options?: RefetchOptions
@@ -94,12 +97,9 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
       ) || null,
     [timelinesWithEvents, selectedTimelineAndEvent?.selectedTimelineId]
   );
-  const selectedEvent: TimelineEventDto | null = useMemo(
-    () =>
-      selectedTimeline?.events?.find(
-        (event) => event.id === selectedTimelineAndEvent?.selectedEventId
-      ) || null,
-    [selectedTimeline, selectedTimelineAndEvent?.selectedEventId]
+  const selectedEventIds: string[] = useMemo(
+    () => selectedTimelineAndEvent?.selectedEventIds ?? [],
+    [selectedTimelineAndEvent?.selectedEventIds]
   );
   const eventBounds = useMemo(() => {
     const firstEvent = minBy(allEvents || [], (event: TimelineEventDto) =>
@@ -413,7 +413,7 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
         setActiveSelectionTimeline(null);
         setSelectedTimelineAndEvent({
           selectedTimelineId: timelineId,
-          selectedEventId: eventId,
+          selectedEventIds: eventId ? [eventId] : [],
         });
       } else if (selectionStartPercent !== null) {
         setSelectionEndPercent(clamp(posX, 0, 100));
@@ -559,11 +559,11 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
     [viewDate, queryClient, updateTag, refetchTimelinesWithEvents]
   );
 
-  const handleSetSelectedEvent = useCallback(
-    (event: TimelineEventDto, timeline: TimelineDto) =>
+  const handleSetSelectedEventIds = useCallback(
+    (eventIds: string[], timeline: TimelineDto) =>
       setSelectedTimelineAndEvent({
         selectedTimelineId: timeline.id,
-        selectedEventId: event.id,
+        selectedEventIds: eventIds,
       }),
     [setSelectedTimelineAndEvent]
   );
@@ -572,7 +572,7 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
     (timelineId: string) =>
       setSelectedTimelineAndEvent({
         selectedTimelineId: timelineId,
-        selectedEventId: null,
+        selectedEventIds: [],
       }),
     [setSelectedTimelineAndEvent]
   );
@@ -742,8 +742,8 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
           hoverPercent={hoverPercent}
           onCreateTagName={handleCreateTagName}
           onCreateTag={handleCreateTag}
-          selectedEvent={selectedEvent}
-          setSelectedEvent={handleSetSelectedEvent}
+          selectedEventIds={selectedEventIds}
+          setSelectedEventIds={handleSetSelectedEventIds}
           isActive={selectedTimeline?.id === timelineInfo.id}
           onSelectTimeline={handleSelectTimeline}
           onTagResized={handleTagResized}
@@ -772,8 +772,8 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
     hoverPercent,
     handleCreateTagName,
     handleCreateTag,
-    selectedEvent,
-    handleSetSelectedEvent,
+    selectedEventIds,
+    handleSetSelectedEventIds,
     selectedTimeline?.id,
     handleSelectTimeline,
     handleTagResized,

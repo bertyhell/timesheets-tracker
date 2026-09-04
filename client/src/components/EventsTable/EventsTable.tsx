@@ -128,6 +128,8 @@ interface EventsTableProps {
   className?: string;
   onAddBulkTag?: (events: TimelineEventDto[]) => void;
   onSelectionChange?: (events: TimelineEventDto[]) => void;
+  /** Ids selected outside of this table (e.g. in the timeline); keeps both views in sync. */
+  selectedEventIds?: string[];
   onEditTag?: (eventId: string) => void;
   onDeleteTag?: (eventId: string) => void;
   onCreateTagFromEvent?: (startedAt: string, endedAt: string) => void;
@@ -142,7 +144,7 @@ interface ContextMenuState {
   isBulk: boolean;
 }
 
-export function EventsTable({ timeline, events, className, onAddBulkTag, onSelectionChange, onEditTag, onDeleteTag, onCreateTagFromEvent, onCreateAutoTagRuleFromEvent }: EventsTableProps) {
+export function EventsTable({ timeline, events, className, onAddBulkTag, onSelectionChange, selectedEventIds, onEditTag, onDeleteTag, onCreateTagFromEvent, onCreateAutoTagRuleFromEvent }: EventsTableProps) {
   const [searchTerm] = useAtom(searchTermAtom);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [lastClickedIndex, setLastClickedIndex] = useState<number | null>(null);
@@ -208,6 +210,16 @@ export function EventsTable({ timeline, events, className, onAddBulkTag, onSelec
     onSelectionChange?.(sortedItems.filter((event) => selectedKeys.has(event.id)));
   }, [selectedKeys, sortedItems, onSelectionChange]);
 
+  // Mirror an externally driven selection (timeline clicks) into the table.
+  const externalSelectionKey = (selectedEventIds ?? []).join(',');
+  useEffect(() => {
+    if (!selectedEventIds) return;
+    setSelectedKeys(new Set(selectedEventIds));
+    setLastClickedIndex(
+      selectedEventIds.length ? sortedItems.findIndex((e) => e.id === selectedEventIds[0]) : null
+    );
+  }, [externalSelectionKey]);
+
   const getItemKey = useCallback((index: number) => sortedItems[index]?.id ?? index, [sortedItems]);
 
   const virtualizer = useVirtualizer({
@@ -217,6 +229,14 @@ export function EventsTable({ timeline, events, className, onAddBulkTag, onSelec
     overscan: 5,
     getItemKey,
   });
+
+  useEffect(() => {
+    if (!selectedEventIds?.length) return;
+    const firstIndex = sortedItems.findIndex((event) => event.id === selectedEventIds[0]);
+    if (firstIndex >= 0) {
+      virtualizer.scrollToIndex(firstIndex, { align: 'auto' });
+    }
+  }, [externalSelectionKey, sortedItems]);
 
   const virtualItems = virtualizer.getVirtualItems();
   const totalSize = virtualizer.getTotalSize();

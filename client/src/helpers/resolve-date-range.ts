@@ -10,7 +10,7 @@ import {
   subDays,
   subYears,
 } from 'date-fns';
-import { DateRangeMode } from '../../../types/types';
+import { DateRangeMode } from '../types/types';
 
 export interface DateRange {
   startedAt: string;

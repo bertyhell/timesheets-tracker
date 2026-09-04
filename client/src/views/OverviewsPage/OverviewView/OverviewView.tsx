@@ -13,7 +13,7 @@ import { ROUTE_PARTS } from '../../../App';
 import { headerActionsAtom } from '../../../store/store';
 import { DateRangeMode } from '../../../types/types';
 import { overviewsApi } from '../../../api/overviews';
-import { resolveDateRange } from '../helpers/resolveDateRange';
+import { resolveDateRange } from '../../../helpers/resolve-date-range';
 import { ChartType, type ReportOptions } from '../reports/report.types';
 import { DEFAULT_REPORT_ID, findReport, REPORTS } from '../reports/report-catalog';
 import { resolveReportOptions, toReportState } from '../reports/helpers/report-state';

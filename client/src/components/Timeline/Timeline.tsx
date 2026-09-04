@@ -135,7 +135,7 @@ function Timeline({
   const [resizeCurrentPosX, setResizeCurrentPosX] = useState<number | null>(null);
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const [titleContextMenu, setTitleContextMenu] = useState<{ x: number; y: number } | null>(null);
-  const [syncModalOpen, setSyncModalOpen] = useState(false);
+  const [syncEvents, setSyncEvents] = useState<TimelineEventDto[] | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const [trackWidth, setTrackWidth] = useState(0);
   const [pendingCreate, setPendingCreate] = useState<{ title: string; code: string; color: string } | null>(null);
@@ -735,6 +735,23 @@ function Timeline({
                   },
                 ]
               : []),
+            ...((timelineInfo.timelineType === TimelineType.Tag ||
+              timelineInfo.timelineType === TimelineType.AutoTag) &&
+            (contextMenu.event.info as AutoTagEventInfoDto)?.tagNameId
+              ? [
+                  {
+                    label:
+                      timelineInfo.timelineType === TimelineType.AutoTag
+                        ? 'Sync this auto tag'
+                        : 'Sync this tag',
+                    onClick: () => {
+                      const event = contextMenu.event;
+                      setContextMenu(null);
+                      setSyncEvents([event]);
+                    },
+                  },
+                ]
+              : []),
             {
               label: 'Copy to clipboard',
               onClick: () => handleCopyEventToClipboard(contextMenu.event),
@@ -755,7 +772,7 @@ function Timeline({
               : []),
             ...(timelineInfo.timelineType === TimelineType.Tag ||
             timelineInfo.timelineType === TimelineType.AutoTag
-              ? [{ label: 'Sync', onClick: () => { setTitleContextMenu(null); setSyncModalOpen(true); } }]
+              ? [{ label: 'Sync', onClick: () => { setTitleContextMenu(null); setSyncEvents(events); } }]
               : []),
           ]}
           onClose={() => setTitleContextMenu(null)}
@@ -806,11 +823,11 @@ function Timeline({
 
       {/* Sync to Productive modal */}
       <SyncToProductiveModal
-        open={syncModalOpen}
-        onClose={() => setSyncModalOpen(false)}
+        open={!!syncEvents}
+        onClose={() => setSyncEvents(null)}
         date={format(minTime, 'yyyy-MM-dd')}
         timelineType={timelineInfo.timelineType}
-        events={events}
+        events={syncEvents ?? []}
       />
     </>
   );

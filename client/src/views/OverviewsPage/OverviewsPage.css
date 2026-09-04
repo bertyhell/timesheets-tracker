@@ -140,3 +140,9 @@
   display: flex;
   flex-direction: column;
 }
+
+/* The report catalogue is long, so the panel scrolls instead of running off screen. */
+.m-overviews-template-panel {
+  max-height: min(32rem, calc(100vh - var(--header-height) - 6rem));
+  overflow-y: auto;
+}

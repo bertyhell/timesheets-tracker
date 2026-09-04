@@ -6,7 +6,7 @@ export type UpdateSavedOverviewConfigData = {
   customStartedAt: string | null;
   customEndedAt: string | null;
   sourceTypes: string;
-  pivotState: string;
+  reportState: string;
   updatedAt: string;
 };
 
@@ -31,7 +31,7 @@ export function updateSavedOverviewConfig(
 	    customStartedAt = ?,
 	    customEndedAt = ?,
 	    sourceTypes = ?,
-	    pivotState = ?,
+	    reportState = ?,
 	    updatedAt = ?
 	WHERE id = ?
 	`;
@@ -43,7 +43,7 @@ export function updateSavedOverviewConfig(
       data.customStartedAt,
       data.customEndedAt,
       data.sourceTypes,
-      data.pivotState,
+      data.reportState,
       data.updatedAt,
       params.id
     ) as UpdateSavedOverviewConfigResult;

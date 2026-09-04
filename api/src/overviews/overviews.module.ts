@@ -6,9 +6,21 @@ import { TagsModule } from '../tags/tags.module';
 import { ProgramsModule } from '../programs/programs.module';
 import { WebsitesModule } from '../websites/websites.module';
 import { ActiveStatesModule } from '../active-states/active-states.module';
+import { AutoTagsModule } from '../auto-tags/auto-tags.module';
+import { TagNamesModule } from '../tag-names/tag-names.module';
+import { TimelinesModule } from '../timelines/timelines.module';
 
 @Module({
-  imports: [DatabaseModule, TagsModule, ProgramsModule, WebsitesModule, ActiveStatesModule],
+  imports: [
+    DatabaseModule,
+    TagsModule,
+    ProgramsModule,
+    WebsitesModule,
+    ActiveStatesModule,
+    AutoTagsModule,
+    TagNamesModule,
+    TimelinesModule,
+  ],
   controllers: [OverviewsController],
   providers: [OverviewsService],
   exports: [OverviewsService],

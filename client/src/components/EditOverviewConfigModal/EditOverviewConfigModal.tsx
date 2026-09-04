@@ -9,26 +9,20 @@ import { DateRangeSelect } from '../DateRangeSelect/DateRangeSelect';
 import { ROUTE_PARTS } from '../../App';
 import { DateRangeMode, OverviewSourceType } from '../../types/types';
 import { overviewsApi } from '../../api/overviews';
-import { SOURCE_TYPE_OPTIONS } from '../../views/OverviewsPage/source-type-options';
+import { DEFAULT_REPORT_ID, findReport, REPORTS } from '../../views/OverviewsPage/reports/report-catalog';
+import { resolveReportOptions, toReportState } from '../../views/OverviewsPage/reports/helpers/report-state';
+import type { ReportState } from '../../views/OverviewsPage/reports/report.types';
 
-const BLANK_PIVOT_STATE = {
-  rows: [],
-  cols: [],
-  vals: [],
-  aggregatorName: 'Count',
-  rendererName: 'Table',
-  valueFilter: {},
-  sorters: {},
-  derivedAttributes: {},
-};
-
+/** State handed over by "Save as new", so the saved overview keeps the tweaks made in the view. */
 interface ForkState {
   sourceTypes?: OverviewSourceType[];
-  pivotState?: Record<string, any>;
+  reportState?: ReportState;
   dateRangeMode?: DateRangeMode;
   customStartedAt?: string;
   customEndedAt?: string;
 }
+
+const DEFAULT_REPORT = findReport(DEFAULT_REPORT_ID) ?? REPORTS[0];
 
 export function EditOverviewConfigModal() {
   const { id } = useParams();
@@ -43,11 +37,11 @@ export function EditOverviewConfigModal() {
   });
 
   const [name, setName] = useState('');
-  const [sourceTypes, setSourceTypes] = useState<OverviewSourceType[]>(
-    forkState?.sourceTypes ?? [OverviewSourceType.Tag]
+  const [reportId, setReportId] = useState<string>(
+    forkState?.reportState?.reportId ?? DEFAULT_REPORT_ID
   );
   const [dateRangeMode, setDateRangeMode] = useState<DateRangeMode>(
-    forkState?.dateRangeMode ?? DateRangeMode.ThisWeek
+    forkState?.dateRangeMode ?? DEFAULT_REPORT.defaultDateRangeMode
   );
   const [customStartedAt, setCustomStartedAt] = useState<string | undefined>(forkState?.customStartedAt);
   const [customEndedAt, setCustomEndedAt] = useState<string | undefined>(forkState?.customEndedAt);
@@ -55,21 +49,23 @@ export function EditOverviewConfigModal() {
   useEffect(() => {
     if (existingConfig) {
       setName(existingConfig.name);
-      setSourceTypes(existingConfig.sourceTypes);
+      setReportId(existingConfig.reportState?.reportId ?? DEFAULT_REPORT_ID);
       setDateRangeMode(existingConfig.dateRangeMode);
       setCustomStartedAt(existingConfig.customStartedAt ?? undefined);
       setCustomEndedAt(existingConfig.customEndedAt ?? undefined);
     }
   }, [existingConfig]);
 
+  const report = findReport(reportId) ?? DEFAULT_REPORT;
+  // A fork keeps the options it was saved with; picking another report starts from its defaults.
+  const options =
+    forkState?.reportState?.reportId === report.id
+      ? resolveReportOptions(report, forkState?.reportState?.options)
+      : resolveReportOptions(report, existingConfig?.reportState?.options);
+  const sourceTypes = report.sourceTypes(options);
+
   const handleClose = () => {
     navigate('/' + ROUTE_PARTS.overviews);
-  };
-
-  const toggleSourceType = (value: OverviewSourceType) => {
-    setSourceTypes((prev) =>
-      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
-    );
   };
 
   const handleSave = async () => {
@@ -80,6 +76,7 @@ export function EditOverviewConfigModal() {
         dateRangeMode,
         customStartedAt,
         customEndedAt,
+        reportState: toReportState(report, options),
       });
       toast('Overview updated', { type: 'success' });
       navigate('/' + ROUTE_PARTS.overviews + '/' + updated.id);
@@ -90,7 +87,7 @@ export function EditOverviewConfigModal() {
         dateRangeMode,
         customStartedAt,
         customEndedAt,
-        pivotState: forkState?.pivotState ?? BLANK_PIVOT_STATE,
+        reportState: toReportState(report, options),
       });
       toast('Overview created', { type: 'success' });
       navigate('/' + ROUTE_PARTS.overviews + '/' + created.id);
@@ -121,19 +118,21 @@ export function EditOverviewConfigModal() {
         />
       </div>
 
-      <h4 className="mt-4">Data sources</h4>
-      <div className="c-overview-source-types">
-        {SOURCE_TYPE_OPTIONS.map((option) => (
-          <label key={option.value} className="c-overview-source-types__option">
-            <input
-              type="checkbox"
-              checked={sourceTypes.includes(option.value)}
-              onChange={() => toggleSourceType(option.value)}
-            />
-            <span>{option.label}</span>
-          </label>
-        ))}
+      <h4 className="mt-4">Report</h4>
+      <div className="c-form">
+        <select
+          className="c-input"
+          value={reportId}
+          onChange={(evt: ChangeEvent<HTMLSelectElement>) => setReportId(evt.target.value)}
+        >
+          {REPORTS.map((reportOption) => (
+            <option key={reportOption.id} value={reportOption.id}>
+              {reportOption.group} · {reportOption.label}
+            </option>
+          ))}
+        </select>
       </div>
+      <p className="c-edit-overview-config-modal__hint">{report.description}</p>
 
       <h4 className="mt-4">Default date range</h4>
       <DateRangeSelect
@@ -159,7 +158,7 @@ export function EditOverviewConfigModal() {
           <Button onClick={handleClose} variant={ButtonVariant.Secondary}>
             Cancel
           </Button>
-          <Button disabled={!name || sourceTypes.length === 0} onClick={handleSave} variant={ButtonVariant.Primary}>
+          <Button disabled={!name} onClick={handleSave} variant={ButtonVariant.Primary}>
             Save
           </Button>
         </div>

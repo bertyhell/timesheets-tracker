@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS savedOverviewConfigs
     "customStartedAt"   text,
     "customEndedAt"     text,
     "sourceTypes"       text NOT NULL,
-    "pivotState"        text NOT NULL,
+    "reportState"       text NOT NULL,
     "createdAt"         text NOT NULL,
     "updatedAt"         text NOT NULL
 );

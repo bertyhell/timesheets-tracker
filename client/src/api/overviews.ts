@@ -9,7 +9,7 @@ export interface SavedOverviewConfigDto {
   customStartedAt: string | null;
   customEndedAt: string | null;
   sourceTypes: OverviewSourceType[];
-  pivotState: Record<string, any>;
+  reportState: Record<string, any>;
   createdAt: string;
   updatedAt: string;
 }
@@ -28,9 +28,11 @@ export interface OverviewFlatRowDto {
   websiteTitle?: string;
   tagName?: string;
   tagCode?: string;
+  tagColor?: string;
   programName?: string;
   windowTitle?: string;
   activeState?: string;
+  autoTagTitle?: string;
 }
 
 export interface SaveOverviewConfigPayload {
@@ -39,7 +41,7 @@ export interface SaveOverviewConfigPayload {
   customStartedAt?: string | null;
   customEndedAt?: string | null;
   sourceTypes: OverviewSourceType[];
-  pivotState: Record<string, any>;
+  reportState: Record<string, any>;
 }
 
 export const overviewsApi = {

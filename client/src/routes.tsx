@@ -20,7 +20,7 @@ import { ProductiveSettingsPage } from './views/settings/IntegrationsPage/Produc
 import { OverviewsPage } from './views/OverviewsPage/OverviewsPage';
 import { OverviewView } from './views/OverviewsPage/OverviewView/OverviewView';
 import { EditOverviewConfigModal } from './components/EditOverviewConfigModal/EditOverviewConfigModal';
-import { PREDEFINED_OVERVIEW_CONFIGS } from './views/OverviewsPage/predefined-configs';
+import { DEFAULT_REPORT_ID } from './views/OverviewsPage/reports/report-catalog';
 
 export const routes: RouteObject[] = [
   {
@@ -55,8 +55,7 @@ export const routes: RouteObject[] = [
         children: [
           {
             index: true,
-            loader: () =>
-              redirect('/' + ROUTE_PARTS.overviews + '/' + PREDEFINED_OVERVIEW_CONFIGS[0].id),
+            loader: () => redirect('/' + ROUTE_PARTS.overviews + '/' + DEFAULT_REPORT_ID),
           },
           {
             path: ROUTE_PARTS.new,

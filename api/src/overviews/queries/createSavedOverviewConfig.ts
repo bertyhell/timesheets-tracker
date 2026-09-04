@@ -8,7 +8,7 @@ export type CreateSavedOverviewConfigParams = {
   customStartedAt: string | null;
   customEndedAt: string | null;
   sourceTypes: string;
-  pivotState: string;
+  reportState: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -24,7 +24,7 @@ export function createSavedOverviewConfig(
 ): CreateSavedOverviewConfigResult {
   const sql = `
 	INSERT INTO savedOverviewConfigs
-	(id, name, visualOrder, dateRangeMode, customStartedAt, customEndedAt, sourceTypes, pivotState, createdAt, updatedAt)
+	(id, name, visualOrder, dateRangeMode, customStartedAt, customEndedAt, sourceTypes, reportState, createdAt, updatedAt)
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`;
   return db
@@ -37,7 +37,7 @@ export function createSavedOverviewConfig(
       params.customStartedAt,
       params.customEndedAt,
       params.sourceTypes,
-      params.pivotState,
+      params.reportState,
       params.createdAt,
       params.updatedAt
     ) as CreateSavedOverviewConfigResult;

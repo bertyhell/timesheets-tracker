@@ -12,7 +12,7 @@ export type FindOneSavedOverviewConfigResult = {
   customStartedAt?: string;
   customEndedAt?: string;
   sourceTypes: string;
-  pivotState: string;
+  reportState: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -22,7 +22,7 @@ export function findOneSavedOverviewConfig(
   params: FindOneSavedOverviewConfigParams
 ): FindOneSavedOverviewConfigResult | null {
   const sql = `
-	SELECT id, name, visualOrder, dateRangeMode, customStartedAt, customEndedAt, sourceTypes, pivotState, createdAt, updatedAt
+	SELECT id, name, visualOrder, dateRangeMode, customStartedAt, customEndedAt, sourceTypes, reportState, createdAt, updatedAt
 	FROM savedOverviewConfigs
 	WHERE id = ?
 	LIMIT 1

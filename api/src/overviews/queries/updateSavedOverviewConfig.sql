@@ -5,6 +5,6 @@ SET
     customStartedAt = :customStartedAt,
     customEndedAt = :customEndedAt,
     sourceTypes = :sourceTypes,
-    pivotState = :pivotState,
+    reportState = :reportState,
     updatedAt = :updatedAt
 WHERE id = :id

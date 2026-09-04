@@ -1,0 +1,105 @@
+.c-report-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 1.5rem;
+  border-bottom: 1px solid var(--gray-100);
+  background-color: white;
+}
+
+.c-report-options__chart-types {
+  display: inline-flex;
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: white;
+}
+
+.c-report-options__chart-type {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 1.875rem;
+  border: 0;
+  border-right: 1px solid var(--gray-100);
+  background-color: white;
+  color: var(--gray-500);
+  cursor: pointer;
+  transition: background-color 150ms ease-in, color 150ms ease-in;
+
+  &:last-child {
+    border-right: 0;
+  }
+
+  &:hover {
+    background-color: var(--bg-alternative);
+    color: var(--gray-700);
+  }
+
+  &.is-active {
+    background-color: var(--primary-4);
+    color: var(--primary-0);
+  }
+}
+
+.c-report-options__selects {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+
+.c-report-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.c-report-option__label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--gray-500);
+}
+
+.c-report-option__dropdown .c-dropdown__trigger-label {
+  max-width: 11rem;
+}
+
+.c-report-option__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 11rem;
+}
+
+.c-report-option__item {
+  text-align: left;
+  padding: 0.375rem 0.5rem;
+  border: 0;
+  border-radius: 6px;
+  background-color: transparent;
+  font-size: 0.8125rem;
+  color: var(--gray-700);
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: var(--bg-alternative);
+  }
+
+  &.is-active {
+    background-color: var(--primary-4);
+    color: var(--primary-0);
+    font-weight: 500;
+  }
+}
+
+.c-report-option--check {
+  font-size: 0.8125rem;
+  color: var(--gray-700);
+  cursor: pointer;
+}

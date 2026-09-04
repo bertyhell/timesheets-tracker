@@ -64,9 +64,9 @@ export class SavedOverviewConfigDto implements SavedOverviewConfig {
   @ApiProperty({
     type: Object,
     description:
-      'react-pivottable state (rows, cols, vals, aggregatorName, rendererName, valueFilter, sorters, derivedAttributes)',
+      'Report state: the id of the selected report plus its tweakable options (metric, chart type, grouping, bucket, top N, ...)',
   })
-  pivotState: Record<string, any>;
+  reportState: Record<string, any>;
 
   @IsString()
   @Type(() => String)

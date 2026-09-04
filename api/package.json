@@ -1,6 +1,6 @@
 {
   "name": "api",
-  "version": "0.1.8",
+  "version": "0.2.1",
   "private": true,
   "description": "Backend service for collecting and serving data for timesheet tracker",
   "license": "MIT",
@@ -14,7 +14,7 @@
     "check-types": "tsc -p ./tsconfig.json --diagnostics",
     "lint": "cd .. && npm run lint",
     "format": "cd .. && npm run format",
-    "bump": "npx bump-package-versions --part=patch --strategy=highest ./package.json ../package.json ../client/package.json",
+    "bump": "node ../scripts/bump-version.mjs",
     "generate-database-types": "npx typesql compile"
   },
   "dependencies": {
@@ -55,7 +55,6 @@
     "@types/lodash": "^4.14.202",
     "@types/node": "^26.0.0",
     "@types/pngjs": "^6.0.5",
-    "bump-package-versions": "^1.0.7",
     "open": "8.4.2",
     "source-map-support": "^0.5.21",
     "ts-loader": "^9.4.3",

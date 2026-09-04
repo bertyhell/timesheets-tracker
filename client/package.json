@@ -1,13 +1,13 @@
 {
   "name": "timesheet-tracker",
-  "version": "0.1.8",
+  "version": "0.2.1",
   "license": "MIT",
   "scripts": {
     "dev:client": "vite",
     "build": "tsc && vite build",
     "serve": "vite preview",
     "generate-api-helpers": "openapi-ts",
-    "bump": "npx bump-package-versions --part=patch --strategy=highest ./package.json ../package.json ../api/package.json"
+    "bump": "node ../scripts/bump-version.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

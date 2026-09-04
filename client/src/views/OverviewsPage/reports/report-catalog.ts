@@ -107,8 +107,7 @@ export const REPORTS: ReportDefinition[] = [
     chartTypes: DISTRIBUTION_CHARTS,
     optionSpec: {
       metric: [ReportMetric.Hours, ReportMetric.Count],
-      dimension: dimensionOptions([Dimension.TagName, Dimension.TagCode]),
-      dimensionLabel: 'Group by',
+      dimension: dimensionOptions([Dimension.TagName]),
       topN: true,
       sort: true,
     },

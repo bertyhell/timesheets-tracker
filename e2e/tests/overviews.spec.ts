@@ -4,10 +4,10 @@ import { uniqueName } from '../utils/unique-name';
 test.describe('Overviews page', () => {
   test('redirects to the first predefined overview and renders it', async ({ page }) => {
     await page.goto('/overviews');
-    await expect(page).toHaveURL(/\/overviews\/hours-per-tag-month$/);
+    await expect(page).toHaveURL(/\/overviews\/time-per-tag$/);
     await expect(page.getByRole('heading', { name: 'Overviews' })).toBeVisible();
     await expect(page.locator('.m-overviews-topbar__template .c-dropdown__trigger')).toContainText(
-      'Hours per Tag'
+      'Time per tag'
     );
   });
 
@@ -18,7 +18,7 @@ test.describe('Overviews page', () => {
     await test.step('create a custom overview', async () => {
       await page.goto('/overviews');
       await page.locator('.m-overviews-topbar__template .c-dropdown__trigger').click();
-      await page.getByRole('button', { name: 'New custom overview' }).click();
+      await page.getByRole('button', { name: 'New saved overview' }).click();
 
       const modal = page.locator('.c-edit-overview-config-modal');
       await expect(modal.getByRole('heading', { name: 'New custom overview' })).toBeVisible();

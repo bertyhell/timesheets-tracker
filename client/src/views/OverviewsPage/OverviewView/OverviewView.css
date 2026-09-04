@@ -73,9 +73,13 @@
 
 .m-overview-view__chart {
   position: relative;
-  flex: 1 0 auto;
+  flex: 1 1 auto;
+  /* Definite height comes from the flex layout (plus an inline min-height for charts that need
+     a row per category). The chart canvas is positioned out of the flow so a canvas left over
+     from a taller report cannot stretch this box. */
+  height: 0;
   min-height: 18rem;
-  margin: 0 1.5rem 1.5rem;
+  margin: 0 1.5rem 2rem;
   padding: 0.75rem;
   border: 1px solid var(--gray-100);
   border-radius: 10px;
@@ -107,4 +111,10 @@
   color: var(--primary-0);
   font-size: 0.6875rem;
   font-weight: 600;
+}
+
+/* Taken out of the flow: see the height note on .m-overview-view__chart. */
+.m-overview-view__chart > .c-chart {
+  position: absolute;
+  inset: 0.75rem;
 }

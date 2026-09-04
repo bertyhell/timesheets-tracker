@@ -100,7 +100,7 @@ function dataZoomFor(result: SeriesReportResult) {
   if (!result.categoriesAreTimeBuckets || result.categories.length <= 45) return undefined;
   return [
     { type: 'inside' as const, start: 60, end: 100 },
-    { type: 'slider' as const, start: 60, end: 100, height: 18, bottom: 6 },
+    { type: 'slider' as const, start: 60, end: 100, height: 18, bottom: 16 },
   ];
 }
 
@@ -172,7 +172,9 @@ function buildAxisChart(
       left: 12,
       right: 24,
       top: result.series.length > 1 ? 34 : 12,
-      bottom: dataZoomFor(result) ? 34 : 6,
+      // Leaves a margin below the (often rotated) category labels instead of letting them
+      // run into the edge of the card.
+      bottom: dataZoomFor(result) ? 48 : 18,
       containLabel: true,
     },
     tooltip: axisTooltip(result.valueUnit, !!stack),
@@ -300,7 +302,7 @@ function buildHeatmap(result: MatrixReportResult): EChartsCoreOption {
       calculable: false,
       orient: 'horizontal',
       left: 'center',
-      bottom: 0,
+      bottom: 8,
       itemHeight: 90,
       textStyle: BASE_TEXT_STYLE,
       formatter: (value: number) => formatAxisValue(value, result.valueUnit),
@@ -336,7 +338,7 @@ function buildCalendar(result: CalendarReportResult): EChartsCoreOption {
       calculable: false,
       orient: 'horizontal',
       left: 'center',
-      bottom: 0,
+      bottom: 8,
       itemHeight: 90,
       textStyle: BASE_TEXT_STYLE,
       formatter: (value: number) => formatAxisValue(value, result.valueUnit),

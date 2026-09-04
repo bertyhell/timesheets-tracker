@@ -1,5 +1,5 @@
 import './OverviewView.css';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useSetAtom } from 'jotai';
@@ -29,6 +29,11 @@ export function OverviewView() {
   const navigate = useNavigate();
   const setHeaderActions = useSetAtom(headerActionsAtom);
   const chartInstanceRef = useRef<echarts.ECharts | null>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<HTMLDivElement>(null);
+  // How much room is left for the chart below the intro and the summary tiles. Charts that ask
+  // for a height per row are capped to it, so the view fits on the screen without scrolling.
+  const [availableChartHeight, setAvailableChartHeight] = useState<number>();
 
   // A route param is either a report id from the catalog or the id of a saved custom overview.
   const predefinedReport = useMemo(() => findReport(configId), [configId]);
@@ -93,7 +98,29 @@ export function OverviewView() {
 
   const chartOption = useMemo(() => toEChartsOption(result, options), [result, options]);
   const isTable = options.chartType === ChartType.Table;
-  const preferredChartHeight = isTable ? undefined : getPreferredChartHeight(result, options);
+  const preferredChartHeight = isTable
+    ? undefined
+    : getPreferredChartHeight(result, options, availableChartHeight);
+
+  // Re-measured on every render (the intro wraps and the summary tiles change per report) and
+  // whenever the body resizes. Setting the same value again is a no-op, so this cannot loop.
+  useLayoutEffect(() => {
+    const body = bodyRef.current;
+    const chart = chartRef.current;
+    if (!body || !chart) return;
+
+    const measure = () => {
+      // The card's own bottom margin plus a little slack, so a chart that is capped to the
+      // available room still has room to breathe under its axis labels.
+      const bottomGap = 32 + 24;
+      setAvailableChartHeight(Math.round(body.clientHeight - chart.offsetTop - bottomGap));
+    };
+    measure();
+
+    const resizeObserver = new ResizeObserver(measure);
+    resizeObserver.observe(body);
+    return () => resizeObserver.disconnect();
+  });
 
   const hasData =
     result.kind === 'series'
@@ -212,7 +239,7 @@ export function OverviewView() {
         canStack={canStack}
       />
 
-      <div className="m-overview-view__body">
+      <div className="m-overview-view__body" ref={bodyRef}>
         <div className="m-overview-view__intro">
           <h3 className="m-overview-view__title">{title}</h3>
           <p className="m-overview-view__description">{report.description}</p>
@@ -221,8 +248,15 @@ export function OverviewView() {
         <ReportSummary result={result} />
 
         <div
+          ref={chartRef}
           className={'m-overview-view__chart' + (isTable ? ' m-overview-view__chart--table' : '')}
-          style={preferredChartHeight ? { minHeight: preferredChartHeight } : undefined}
+          // A chart that asked for a height keeps it: it must not stretch back to fill the view,
+          // which is what would eat the margin the capped height leaves below the labels.
+          style={
+            preferredChartHeight
+              ? { height: preferredChartHeight, minHeight: preferredChartHeight, flexGrow: 0 }
+              : undefined
+          }
         >
           {isError && (
             <div className="m-overview-view__placeholder">

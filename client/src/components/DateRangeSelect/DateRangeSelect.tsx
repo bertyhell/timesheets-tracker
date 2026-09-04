@@ -4,6 +4,7 @@ import { format, parseISO } from 'date-fns';
 import { DateRangeMode } from '../../types/types';
 import { resolveDateRange } from '../../helpers/resolve-date-range';
 import { Dropdown } from '../Dropdown/Dropdown';
+import { DatePicker } from 'rsuite';
 
 // Custom is deliberately absent: typing in one of the two date fields is what makes a range
 // custom, so it never has to be picked from the list.
@@ -14,6 +15,7 @@ const PRESETS: { mode: DateRangeMode; label: string }[] = [
   { mode: DateRangeMode.ThisYear, label: 'This year' },
   { mode: DateRangeMode.Last7Days, label: 'Last 7 days' },
   { mode: DateRangeMode.Last30Days, label: 'Last 30 days' },
+  { mode: DateRangeMode.Last90Days, label: 'Last 90 days' },
   { mode: DateRangeMode.Last365Days, label: 'Last 365 days' },
 ];
 
@@ -64,26 +66,40 @@ export function DateRangeSelect({
         )}
       </Dropdown>
 
+      {/* Two independent pickers rather than a range picker: each end is edited on its own,
+          and typing digits walks through the segments without needing separators. */}
       <div className="c-date-range-select__dates">
-        <input
-          type="date"
-          aria-label="Range start"
+        <DatePicker
           className="c-date-range-select__date"
-          value={fromValue}
-          max={toValue}
-          onChange={(evt) =>
-            evt.target.value && onChange(DateRangeMode.Custom, evt.target.value, toValue)
+          aria-label="Range start"
+          value={parseISO(startedAt)}
+          format="dd/MM/yyyy"
+          editable
+          oneTap
+          cleanable={false}
+          isoWeek
+          size="sm"
+          placement="bottomEnd"
+          shouldDisableDate={(date) => date > parseISO(endedAt)}
+          onChange={(date) =>
+            date && onChange(DateRangeMode.Custom, format(date, 'yyyy-MM-dd'), toValue)
           }
         />
         <span className="c-date-range-select__arrow">→</span>
-        <input
-          type="date"
-          aria-label="Range end"
+        <DatePicker
           className="c-date-range-select__date"
-          value={toValue}
-          min={fromValue}
-          onChange={(evt) =>
-            evt.target.value && onChange(DateRangeMode.Custom, fromValue, evt.target.value)
+          aria-label="Range end"
+          value={parseISO(endedAt)}
+          format="dd/MM/yyyy"
+          editable
+          oneTap
+          cleanable={false}
+          isoWeek
+          size="sm"
+          placement="bottomEnd"
+          shouldDisableDate={(date) => date < parseISO(startedAt)}
+          onChange={(date) =>
+            date && onChange(DateRangeMode.Custom, fromValue, format(date, 'yyyy-MM-dd'))
           }
         />
       </div>

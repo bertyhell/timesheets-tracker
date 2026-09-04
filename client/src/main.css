@@ -2,6 +2,11 @@
 
 @import 'react-responsive-modal/styles.css';
 
+/* no-reset build: keeps RSuite from overriding the app's own base styles. */
+@import 'rsuite/dist/rsuite-no-reset.min.css';
+/* must follow the library import so the palette overrides win */
+@import './styles/rsuite.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

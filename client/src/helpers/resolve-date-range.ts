@@ -39,6 +39,8 @@ export function resolveDateRange(
       return { startedAt: startOfDay(subDays(now, 6)).toISOString(), endedAt: endOfDay(now).toISOString() };
     case DateRangeMode.Last30Days:
       return { startedAt: startOfDay(subDays(now, 29)).toISOString(), endedAt: endOfDay(now).toISOString() };
+    case DateRangeMode.Last90Days:
+      return { startedAt: startOfDay(subDays(now, 89)).toISOString(), endedAt: endOfDay(now).toISOString() };
     case DateRangeMode.Last365Days:
       return { startedAt: startOfDay(subDays(now, 364)).toISOString(), endedAt: endOfDay(now).toISOString() };
     case DateRangeMode.Custom:

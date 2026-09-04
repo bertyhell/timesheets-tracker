@@ -1,0 +1,79 @@
+/* RSuite ships a blue theme. Its date picker popup renders in a portal at body level, so the
+   overrides have to be global rather than scoped to the picker components. Everything here is
+   remapping RSuite's own custom properties onto the app palette from variables.css. */
+:root {
+  /* Accent: selected day, primary buttons, links inside the popup. */
+  --rs-primary-50: var(--bg-alternative);
+  --rs-primary-100: var(--primary-4);
+  --rs-primary-200: var(--primary-3);
+  --rs-primary-300: var(--primary-3);
+  --rs-primary-400: var(--primary-2);
+  --rs-primary-500: var(--primary-0);
+  --rs-primary-600: var(--primary-0);
+  --rs-primary-700: #6d28d9;
+  --rs-primary-800: #5b21b6;
+  --rs-primary-900: #4c1d95;
+
+  --rs-color-focus-ring: 0 0 0 3px var(--primary-4);
+
+  --rs-text-primary: var(--gray-700);
+  --rs-text-secondary: var(--gray-500);
+  --rs-text-link: var(--primary-0);
+  --rs-text-link-hover: #6d28d9;
+  --rs-text-link-active: #5b21b6;
+
+  --rs-btn-link-text: var(--primary-0);
+  --rs-btn-link-hover-text: #6d28d9;
+  --rs-btn-link-active-text: #5b21b6;
+
+  --rs-btn-primary-bg: var(--primary-0);
+  --rs-btn-primary-hover-bg: #6d28d9;
+  --rs-btn-primary-active-bg: #5b21b6;
+
+  --rs-bg-active: var(--primary-0);
+  --rs-border-primary: var(--gray-200);
+
+  /* Calendar cells: today, the selected day, and the shaded in-between range. */
+  /* Today is a soft tint; the actual selection stays the solid accent, so the two are
+     never mistaken for each other. */
+  --rs-calendar-today-bg: var(--primary-4);
+  --rs-calendar-today-text: var(--primary-0);
+  --rs-calendar-date-selected-text: #fff;
+  --rs-calendar-cell-selected-hover-bg: #6d28d9;
+  --rs-calendar-range-bg: var(--primary-4);
+
+  --rs-listbox-option-hover-bg: var(--hover-highlight);
+  --rs-listbox-option-hover-text: var(--primary-0);
+  --rs-listbox-option-selected-bg: var(--primary-4);
+  --rs-listbox-option-selected-text: var(--primary-0);
+
+  --rs-input-focus-border: var(--primary-2);
+}
+
+/* Match the popup's chrome to the app's other floating panels: softer radius, lighter shadow,
+   and the same system font stack as the rest of the UI. */
+.rs-picker-popup {
+  font-family: inherit;
+  border: 1px solid var(--gray-100);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgb(15 23 42 / 12%);
+}
+
+.rs-picker-popup .rs-calendar-table-header-cell-content {
+  color: var(--gray-500);
+  font-weight: 600;
+}
+
+.rs-picker-popup .rs-calendar-table-cell-content:hover {
+  background-color: var(--hover-highlight);
+  color: var(--primary-0);
+}
+
+.rs-picker-popup .rs-calendar-header-title {
+  font-weight: 600;
+  color: var(--gray-700);
+}
+
+.rs-picker-popup .rs-picker-toolbar {
+  border-top: 1px solid var(--gray-100);
+}

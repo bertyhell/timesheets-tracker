@@ -1,0 +1,35 @@
+/* The picker sits inside the bordered pill next to the weekday label, so it drops its own
+   chrome and just contributes the editable date segments. */
+.c-date-select__picker.rs-picker {
+  --rs-input-focus-border: transparent;
+}
+
+.c-date-select__picker .rs-input-group,
+.c-date-select__picker .rs-picker-input-group {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  min-height: 0;
+  outline: 0;
+}
+
+.c-date-select__picker .rs-input-group:focus-within,
+.c-date-select__picker .rs-picker-input-group:focus-within {
+  border: 0;
+  box-shadow: none;
+  outline: 0;
+}
+
+.c-date-select__picker .rs-input {
+  padding: 0;
+  height: auto;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--gray-700);
+  background: transparent;
+}
+
+.c-date-select__picker .rs-input-group-addon {
+  padding: 0 0 0 0.25rem;
+  color: var(--gray-500);
+}

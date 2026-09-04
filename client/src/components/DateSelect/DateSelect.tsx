@@ -1,7 +1,9 @@
-import { addDays, format, parseISO } from 'date-fns';
+import './DateSelect.css';
+import { addDays, format, startOfDay } from 'date-fns';
 import Button, { ButtonSize, ButtonVariant } from '../Button/Button';
 import { useAtom } from 'jotai';
 import React from 'react';
+import { DatePicker } from 'rsuite';
 
 import { viewDateAtom } from '../../store/store';
 
@@ -9,7 +11,7 @@ function DateSelect({ className }: { className?: string }) {
   const [viewDate, setViewDate] = useAtom(viewDateAtom);
 
   return (
-    <div className={`flex flex-row items-center gap-1${className ? ' ' + className : ''}`}>
+    <div className={`c-date-select flex flex-row items-center gap-1${className ? ' ' + className : ''}`}>
       <Button
         className="hidden wide:inline-flex"
         onClick={() => setViewDate(new Date())}
@@ -38,11 +40,18 @@ function DateSelect({ className }: { className?: string }) {
         <span className="font-medium inline-block text-right min-w-[2.2rem]">
           {format(viewDate, 'eee,')}
         </span>
-        <input
-          type="date"
-          value={format(viewDate, 'yyyy-MM-dd')}
-          onChange={(evt) => setViewDate(parseISO(evt.target.value))}
-          className="border-none bg-transparent p-0 text-sm text-gray-700 cursor-pointer outline-none"
+        {/* editable + a separator-less format is what lets you type 04092026 straight through. */}
+        <DatePicker
+          className="c-date-select__picker"
+          value={viewDate}
+          format="dd/MM/yyyy"
+          editable
+          oneTap
+          cleanable={false}
+          isoWeek
+          size="sm"
+          placement="bottomEnd"
+          onChange={(date) => date && setViewDate(startOfDay(date))}
         />
       </div>
     </div>

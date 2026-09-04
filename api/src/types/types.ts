@@ -149,6 +149,7 @@ export enum DateRangeMode {
   ThisYear = 'thisYear',
   Last7Days = 'last7Days',
   Last30Days = 'last30Days',
+  Last90Days = 'last90Days',
   Last365Days = 'last365Days',
   Custom = 'custom',
 }

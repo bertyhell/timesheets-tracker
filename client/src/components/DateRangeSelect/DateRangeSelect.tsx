@@ -4,7 +4,7 @@ import { format, parseISO } from 'date-fns';
 import { DateRangeMode } from '../../types/types';
 import { resolveDateRange } from '../../helpers/resolve-date-range';
 import { Dropdown } from '../Dropdown/Dropdown';
-import { DatePicker } from 'rsuite';
+import { DateField } from '../DateField/DateField';
 
 // Custom is deliberately absent: typing in one of the two date fields is what makes a range
 // custom, so it never has to be picked from the list.
@@ -69,38 +69,20 @@ export function DateRangeSelect({
       {/* Two independent pickers rather than a range picker: each end is edited on its own,
           and typing digits walks through the segments without needing separators. */}
       <div className="c-date-range-select__dates">
-        <DatePicker
+        <DateField
           className="c-date-range-select__date"
-          aria-label="Range start"
-          value={parseISO(startedAt)}
-          format="dd/MM/yyyy"
-          editable
-          oneTap
-          cleanable={false}
-          isoWeek
-          size="sm"
-          placement="bottomEnd"
+          ariaLabel="Range start"
+          value={fromValue}
           shouldDisableDate={(date) => date > parseISO(endedAt)}
-          onChange={(date) =>
-            date && onChange(DateRangeMode.Custom, format(date, 'yyyy-MM-dd'), toValue)
-          }
+          onChange={(next) => onChange(DateRangeMode.Custom, next, toValue)}
         />
         <span className="c-date-range-select__arrow">→</span>
-        <DatePicker
+        <DateField
           className="c-date-range-select__date"
-          aria-label="Range end"
-          value={parseISO(endedAt)}
-          format="dd/MM/yyyy"
-          editable
-          oneTap
-          cleanable={false}
-          isoWeek
-          size="sm"
-          placement="bottomEnd"
+          ariaLabel="Range end"
+          value={toValue}
           shouldDisableDate={(date) => date < parseISO(startedAt)}
-          onChange={(date) =>
-            date && onChange(DateRangeMode.Custom, fromValue, format(date, 'yyyy-MM-dd'))
-          }
+          onChange={(next) => onChange(DateRangeMode.Custom, fromValue, next)}
         />
       </div>
     </div>

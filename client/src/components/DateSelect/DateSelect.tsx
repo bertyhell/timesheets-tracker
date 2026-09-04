@@ -1,9 +1,9 @@
 import './DateSelect.css';
-import { addDays, format, startOfDay } from 'date-fns';
+import { addDays, format, parseISO } from 'date-fns';
 import Button, { ButtonSize, ButtonVariant } from '../Button/Button';
 import { useAtom } from 'jotai';
 import React from 'react';
-import { DatePicker } from 'rsuite';
+import { DateField } from '../DateField/DateField';
 
 import { viewDateAtom } from '../../store/store';
 
@@ -40,18 +40,11 @@ function DateSelect({ className }: { className?: string }) {
         <span className="font-medium inline-block text-right min-w-[2.2rem]">
           {format(viewDate, 'eee,')}
         </span>
-        {/* editable + a separator-less format is what lets you type 04092026 straight through. */}
-        <DatePicker
+        <DateField
           className="c-date-select__picker"
-          value={viewDate}
-          format="dd/MM/yyyy"
-          editable
-          oneTap
-          cleanable={false}
-          isoWeek
-          size="sm"
-          placement="bottomEnd"
-          onChange={(date) => date && setViewDate(startOfDay(date))}
+          ariaLabel="Selected date"
+          value={format(viewDate, 'yyyy-MM-dd')}
+          onChange={(next) => setViewDate(parseISO(next))}
         />
       </div>
     </div>

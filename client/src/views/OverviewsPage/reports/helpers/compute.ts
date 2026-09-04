@@ -39,6 +39,8 @@ import {
 
 const MS_PER_HOUR = 3_600_000;
 
+const zeros = (length: number): number[] => Array.from({ length }, () => 0);
+
 function unitFor(metric: ReportMetric): ValueUnit {
   return metric === ReportMetric.Hours ? 'hours' : 'count';
 }
@@ -132,7 +134,6 @@ export function createBucketedReport(config: BucketedConfig) {
   return function computeBucketed(context: ReportContext): ReportResult {
     const { options } = context;
     const rows = sourceRows(context);
-    const dimension = options.dimension;
     const { keys, labels } = bucketCategories(context, config.kind);
     const keyIndex = new Map(keys.map((key, index) => [key, index]));
 
@@ -153,7 +154,7 @@ export function createBucketedReport(config: BucketedConfig) {
       if (index === undefined) return;
       let values = totalsBySeries.get(seriesLabel);
       if (!values) {
-        values = new Array(keys.length).fill(0);
+        values = zeros(keys.length);
         totalsBySeries.set(seriesLabel, values);
       }
       values[index] += value;
@@ -217,7 +218,7 @@ function buildSeries(
 
   if (!splitDimension) {
     return [
-      { name: singleSeriesName, data: totalsBySeries.get('Total') ?? new Array(bucketCount).fill(0) },
+      { name: singleSeriesName, data: totalsBySeries.get('Total') ?? zeros(bucketCount) },
     ];
   }
 
@@ -234,11 +235,11 @@ function buildSeries(
     .map((entry) => ({
       name: entry.label,
       color: getDimensionColor(entry.label, splitDimension, rowsByLabel),
-      data: totalsBySeries.get(entry.label) ?? new Array(bucketCount).fill(0),
+      data: totalsBySeries.get(entry.label) ?? zeros(bucketCount),
     }));
 
   if (keptLabels.has(OTHER_LABEL)) {
-    const otherValues = new Array(bucketCount).fill(0);
+    const otherValues = zeros(bucketCount);
     for (const [label, values] of totalsBySeries) {
       if (keptLabels.has(label)) continue;
       values.forEach((value, index) => (otherValues[index] += value));
@@ -303,7 +304,7 @@ function computeSessionsPerBucket(
     const seriesLabel = splitDimension ? session.label : 'Total';
     let values = totalsBySeries.get(seriesLabel);
     if (!values) {
-      values = new Array(keys.length).fill(0);
+      values = zeros(keys.length);
       totalsBySeries.set(seriesLabel, values);
     }
     values[index] += options.metric === ReportMetric.Hours ? session.hours : 1;
@@ -393,8 +394,8 @@ export function computeCoverage(context: ReportContext): ReportResult {
 
   const keys = enumerateBuckets(context.startedAt, context.endedAt, options.bucket);
   const keyIndex = new Map(keys.map((key, index) => [key, index]));
-  const trackedPerBucket = new Array(keys.length).fill(0);
-  const taggedPerBucket = new Array(keys.length).fill(0);
+  const trackedPerBucket = zeros(keys.length);
+  const taggedPerBucket = zeros(keys.length);
 
   const addIntervals = (intervals: [number, number][], target: number[]) => {
     for (const [start, end] of intervals) {

@@ -12,9 +12,9 @@ const PRESETS: { mode: DateRangeMode; label: string }[] = [
   { mode: DateRangeMode.ThisWeek, label: 'This week' },
   { mode: DateRangeMode.ThisMonth, label: 'This month' },
   { mode: DateRangeMode.ThisYear, label: 'This year' },
-  { mode: DateRangeMode.LastYear, label: 'Last year' },
   { mode: DateRangeMode.Last7Days, label: 'Last 7 days' },
   { mode: DateRangeMode.Last30Days, label: 'Last 30 days' },
+  { mode: DateRangeMode.Last365Days, label: 'Last 365 days' },
 ];
 
 interface DateRangeSelectProps {

@@ -8,6 +8,7 @@ import {
   startOfYear,
   endOfYear,
   subDays,
+  subYears,
 } from 'date-fns';
 import { DateRangeMode } from '../../../types/types';
 
@@ -35,6 +36,15 @@ export function resolveDateRange(
       return { startedAt: startOfMonth(now).toISOString(), endedAt: endOfMonth(now).toISOString() };
     case DateRangeMode.ThisYear:
       return { startedAt: startOfYear(now).toISOString(), endedAt: endOfYear(now).toISOString() };
+    case DateRangeMode.LastYear: {
+      // The previous calendar year, so it lines up with "this year" rather than being a
+      // rolling 12 months.
+      const lastYear = subYears(now, 1);
+      return {
+        startedAt: startOfYear(lastYear).toISOString(),
+        endedAt: endOfYear(lastYear).toISOString(),
+      };
+    }
     case DateRangeMode.Last7Days:
       return { startedAt: startOfDay(subDays(now, 6)).toISOString(), endedAt: endOfDay(now).toISOString() };
     case DateRangeMode.Last30Days:

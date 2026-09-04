@@ -132,17 +132,14 @@ export enum TimelineType {
   Productive = 'Productive',
 }
 
-// Timeline types that can be aggregated in Overviews.
-// Calendar and GitCommit are excluded as standalone sources because they are fetched live
-// per-request (an ICS feed / a git log scan) rather than stored in the database.
-// AutoTag is not stored either, but it is included because "which rules fired" is a report of
-// its own: its events are recomputed by replaying the auto-tag rules over the other timelines.
+// Database-backed timeline types that can be aggregated in Overviews.
+// Calendar, GitCommit and AutoTag are excluded because they are not stored: they are produced
+// per-request from an ICS feed, a git log scan, or by replaying the auto-tag rules.
 export enum OverviewSourceType {
   Tag = 'Tag',
   Program = 'Program',
   Website = 'Website',
   ActiveState = 'ActiveState',
-  AutoTag = 'AutoTag',
 }
 
 export enum DateRangeMode {
@@ -187,7 +184,6 @@ export interface OverviewFlatRow {
   programName?: string;
   windowTitle?: string;
   activeState?: string;
-  autoTagTitle?: string;
 }
 
 export interface Timeline {

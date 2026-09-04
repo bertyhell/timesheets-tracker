@@ -48,9 +48,6 @@ export enum Dimension {
   WebsiteDomain = 'websiteDomain',
   WebsiteTitle = 'websiteTitle',
   ActiveState = 'activeState',
-  AutoTagTitle = 'autoTagTitle',
-  /** The tag an auto-tag rule resolves to (AutoTag rows carry it alongside the rule title). */
-  AutoTagTagName = 'autoTagTagName',
 }
 
 /** Value of the "split by" option that means "one single series". */

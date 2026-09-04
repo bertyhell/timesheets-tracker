@@ -103,7 +103,7 @@ export class OverviewFlatRowDto implements OverviewFlatRow {
   @ApiPropertyOptional({
     type: String,
     description:
-      'Configured color of the tag, so charts can use the same colors as the timelines; present for Tag- and AutoTag-sourced rows',
+      'Configured color of the tag, so charts can use the same colors as the timelines; only present for Tag-sourced rows',
     default: undefined,
   })
   tagColor?: string;
@@ -137,15 +137,4 @@ export class OverviewFlatRowDto implements OverviewFlatRow {
     default: undefined,
   })
   activeState?: string;
-
-  @IsString()
-  @IsOptional()
-  @Type(() => String)
-  @ApiPropertyOptional({
-    type: String,
-    description:
-      'Title of the auto-tag rule that produced this event; only present for AutoTag-sourced rows. Same value as category for AutoTag rows, exposed under an explicit name for discoverability.',
-    default: undefined,
-  })
-  autoTagTitle?: string;
 }

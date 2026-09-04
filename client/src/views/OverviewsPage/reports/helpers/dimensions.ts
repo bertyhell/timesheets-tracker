@@ -15,8 +15,6 @@ export const DIMENSION_LABELS: Record<Dimension, string> = {
   [Dimension.WebsiteDomain]: 'Website domain',
   [Dimension.WebsiteTitle]: 'Page title',
   [Dimension.ActiveState]: 'Active state',
-  [Dimension.AutoTagTitle]: 'Auto-tag rule',
-  [Dimension.AutoTagTagName]: 'Resulting tag',
 };
 
 /** Which timeline the dimension's values come from, and therefore what has to be fetched. */
@@ -28,8 +26,6 @@ export const DIMENSION_SOURCE_TYPE: Record<Dimension, OverviewSourceType> = {
   [Dimension.WebsiteDomain]: OverviewSourceType.Website,
   [Dimension.WebsiteTitle]: OverviewSourceType.Website,
   [Dimension.ActiveState]: OverviewSourceType.ActiveState,
-  [Dimension.AutoTagTitle]: OverviewSourceType.AutoTag,
-  [Dimension.AutoTagTagName]: OverviewSourceType.AutoTag,
 };
 
 const UNKNOWN_LABEL = 'Unknown';
@@ -50,10 +46,6 @@ export function getDimensionValue(row: OverviewFlatRowDto, dimension: Dimension)
       return row.websiteTitle || UNKNOWN_LABEL;
     case Dimension.ActiveState:
       return row.activeState || UNKNOWN_LABEL;
-    case Dimension.AutoTagTitle:
-      return row.autoTagTitle || UNKNOWN_LABEL;
-    case Dimension.AutoTagTagName:
-      return row.tagName || UNKNOWN_LABEL;
   }
 }
 
@@ -71,11 +63,7 @@ export function getDimensionColor(
     if (label === 'Active') return ACTIVE_COLOR;
     if (label === 'Inactive') return INACTIVE_COLOR;
   }
-  if (
-    dimension === Dimension.TagName ||
-    dimension === Dimension.TagCode ||
-    dimension === Dimension.AutoTagTagName
-  ) {
+  if (dimension === Dimension.TagName || dimension === Dimension.TagCode) {
     const tagColor = rowsByLabel.get(label)?.tagColor;
     if (tagColor) return tagColor;
   }

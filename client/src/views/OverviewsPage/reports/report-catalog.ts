@@ -11,7 +11,6 @@ import {
   Tag,
   Timer,
   TrendingUp,
-  Zap,
 } from 'lucide-react';
 import { DateRangeMode, OverviewSourceType } from '../../../types/types';
 import {
@@ -168,33 +167,6 @@ export const REPORTS: ReportDefinition[] = [
     sourceTypes: sourceFromDimension,
     compute: computeDistribution,
   },
-  {
-    id: 'rule-activations',
-    label: 'Auto-tag rule activations',
-    group: REPORT_GROUPS.distribution,
-    description:
-      'Which auto-tag rules fire most often, and how much time they tag. One activation is a continuous block of matched time. Rules are replayed on demand, so wide ranges take a while.',
-    icon: Zap,
-    chartTypes: DISTRIBUTION_CHARTS,
-    optionSpec: {
-      metric: [ReportMetric.Count, ReportMetric.Hours],
-      dimension: dimensionOptions([Dimension.AutoTagTitle, Dimension.AutoTagTagName]),
-      dimensionLabel: 'Group by',
-      topN: true,
-      sort: true,
-    },
-    defaults: {
-      chartType: ChartType.BarHorizontal,
-      metric: ReportMetric.Count,
-      dimension: Dimension.AutoTagTitle,
-      topN: 15,
-    },
-    // Replaying every rule over every event is expensive, so this one starts on a single day.
-    defaultDateRangeMode: DateRangeMode.Today,
-    sourceTypes: sourceFromDimension,
-    compute: computeDistribution,
-  },
-
   // --- Over time -------------------------------------------------------------------------
   {
     id: 'activity-trend',

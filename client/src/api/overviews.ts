@@ -32,7 +32,6 @@ export interface OverviewFlatRowDto {
   programName?: string;
   windowTitle?: string;
   activeState?: string;
-  autoTagTitle?: string;
 }
 
 export interface SaveOverviewConfigPayload {

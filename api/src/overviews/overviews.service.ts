@@ -3,26 +3,11 @@ import { v4 as uuid } from 'uuid';
 import { format } from 'date-fns';
 import { DatabaseService } from '../database/database.service';
 import { CustomError } from '../shared/CustomError';
-import {
-  DateRangeMode,
-  OverviewFlatRow,
-  OverviewSourceType,
-  SavedOverviewConfig,
-  TimelineType,
-} from '../types/types';
+import { DateRangeMode, OverviewFlatRow, OverviewSourceType, SavedOverviewConfig } from '../types/types';
 import { TagsService } from '../tags/tags.service';
 import { ProgramsService } from '../programs/programs.service';
 import { WebsitesService } from '../websites/websites.service';
 import { ActiveStatesService } from '../active-states/active-states.service';
-import { AutoTagsService } from '../auto-tags/auto-tags.service';
-import { TagNamesService } from '../tag-names/tag-names.service';
-import { TimelinesService } from '../timelines/timelines.service';
-import { AutoTagDto } from '../auto-tags/dto/response-auto-tag.dto';
-import {
-  AutoTagEventInfoDto,
-  TimelineEventDto,
-  TimelineWithEventsDto,
-} from '../timelines/dto/response-timeline-events.dto';
 import { getWebsiteDomain } from './helpers/get-website-domain';
 import { resolveWebsiteEndTimes } from '../websites/helpers/resolve-website-end-times';
 import { CreateSavedOverviewConfigDto } from './dto/create-saved-overview-config.dto';
@@ -45,12 +30,7 @@ const OPTIONAL_FIELD_DEFAULTS: Partial<OverviewFlatRow> = {
   programName: NOT_APPLICABLE,
   windowTitle: NOT_APPLICABLE,
   activeState: NOT_APPLICABLE,
-  autoTagTitle: NOT_APPLICABLE,
 };
-
-// Id of the throw-away AutoTag timeline used to recompute rule activations for the
-// "Auto-tag rule activations" report when the user has no AutoTag timeline configured.
-const SYNTHETIC_AUTO_TAG_TIMELINE_ID = 'overviews-auto-tag-analysis';
 
 @Injectable()
 export class OverviewsService {
@@ -59,10 +39,7 @@ export class OverviewsService {
     @Inject(TagsService) private tagsService: TagsService,
     @Inject(ProgramsService) private programsService: ProgramsService,
     @Inject(WebsitesService) private websitesService: WebsitesService,
-    @Inject(ActiveStatesService) private activeStatesService: ActiveStatesService,
-    @Inject(AutoTagsService) private autoTagsService: AutoTagsService,
-    @Inject(TagNamesService) private tagNamesService: TagNamesService,
-    @Inject(TimelinesService) private timelinesService: TimelinesService
+    @Inject(ActiveStatesService) private activeStatesService: ActiveStatesService
   ) {}
 
   private adapt(raw: Record<string, any>): SavedOverviewConfig {
@@ -252,32 +229,6 @@ export class OverviewsService {
         }
       }
 
-      if (sourceTypes.includes(OverviewSourceType.AutoTag)) {
-        const autoTags = (await this.autoTagsService.findAll(undefined)) as AutoTagDto[];
-        const titlesByAutoTagId = new Map(autoTags.map((autoTag) => [autoTag.id, autoTag.title]));
-        const autoTagEvents = await this.getAutoTagEvents(startedAt, endedAt, autoTags);
-        for (const event of autoTagEvents) {
-          const info = event.info as AutoTagEventInfoDto;
-          const ruleTitle = titlesByAutoTagId.get(info.autoTagId) ?? 'Deleted rule';
-          rows.push(
-            this.toFlatRow(
-              event.id,
-              ruleTitle,
-              OverviewSourceType.AutoTag,
-              event.startedAt,
-              event.endedAt,
-              {
-                ...extraDefaults,
-                autoTagTitle: ruleTitle,
-                tagName: info.tagNameTitle,
-                tagCode: info.tagNameCode || NOT_APPLICABLE,
-                tagColor: info.tagNameColor,
-              }
-            )
-          );
-        }
-      }
-
       if (sourceTypes.includes(OverviewSourceType.ActiveState)) {
         const activeStates = await this.activeStatesService.findAll(startedAt, endedAt);
         for (const activeState of activeStates) {
@@ -304,53 +255,6 @@ export class OverviewsService {
       console.error(error);
       throw error;
     }
-  }
-
-  /**
-   * Auto-tag events are never stored: they are recomputed on every request by replaying the rules
-   * over the other timelines. This reuses the exact same pipeline the timeline view uses, so the
-   * activations counted here are the ones the user actually sees. When an AutoTag timeline exists
-   * its already-analysed events are reused; otherwise the rules are replayed onto a throw-away
-   * timeline so the report also works for users who never added an AutoTag timeline.
-   *
-   * Note that adjacent events resolving to the same tag are merged by the analyser, so one
-   * "activation" is a continuous block of matched time rather than a single raw condition match.
-   */
-  private async getAutoTagEvents(
-    startedAt: string,
-    endedAt: string,
-    autoTags: AutoTagDto[]
-  ): Promise<TimelineEventDto[]> {
-    const timelinesWithEvents = await this.timelinesService.findAllEvents(
-      startedAt,
-      endedAt,
-      undefined,
-      undefined
-    );
-
-    const existingAutoTagTimeline = timelinesWithEvents.find(
-      (timeline) => timeline.type === TimelineType.AutoTag
-    );
-    if (existingAutoTagTimeline) {
-      return existingAutoTagTimeline.events;
-    }
-
-    if (!autoTags.length) {
-      return [];
-    }
-
-    const syntheticAutoTagTimeline: TimelineWithEventsDto = {
-      id: SYNTHETIC_AUTO_TAG_TIMELINE_ID,
-      type: TimelineType.AutoTag,
-      events: [],
-    };
-    const tagNames = await this.tagNamesService.findAll(undefined);
-    const analysed = this.autoTagsService.analyseEvents(
-      [...timelinesWithEvents, syntheticAutoTagTimeline],
-      autoTags,
-      tagNames
-    );
-    return analysed.find((timeline) => timeline.id === SYNTHETIC_AUTO_TAG_TIMELINE_ID)?.events ?? [];
   }
 
   private toFlatRow(

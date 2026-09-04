@@ -100,7 +100,6 @@ export enum OverviewSourceType {
   Program = 'Program',
   Website = 'Website',
   ActiveState = 'ActiveState',
-  AutoTag = 'AutoTag',
 }
 
 export enum DateRangeMode {

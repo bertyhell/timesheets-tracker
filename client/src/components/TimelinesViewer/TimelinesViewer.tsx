@@ -46,6 +46,12 @@ import {
 } from '../../generated/api/@tanstack/react-query.gen';
 import { toast } from 'react-toastify';
 
+// Default visible window when opening the timelines view: 8:00 - 19:00
+const DEFAULT_VIEW_START_HOUR = 8;
+const DEFAULT_VIEW_END_HOUR = 19;
+const DEFAULT_VIEW_START = DEFAULT_VIEW_START_HOUR / 24;
+const DEFAULT_VIEW_END = DEFAULT_VIEW_END_HOUR / 24;
+
 interface TimelinesViewerProps {
   timelineInfos: TimelineDto[] | undefined;
   timelinesWithEvents?: Array<TimelineWithEventsDto> | undefined;
@@ -140,8 +146,8 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
   );
 
   // Zoom/pan state: fractions [0,1] of the full minTime–maxTime window
-  const [viewStart, setViewStart] = useState(0);
-  const [viewEnd, setViewEnd] = useState(1);
+  const [viewStart, setViewStart] = useState(DEFAULT_VIEW_START);
+  const [viewEnd, setViewEnd] = useState(DEFAULT_VIEW_END);
 
   // Visible (zoomed) time window
   const visibleMinTime = useMemo(
@@ -164,8 +170,8 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
   );
 
   const [isDragging, setIsDragging] = useState(false);
-  const viewStartRef = useRef(0);
-  const viewEndRef = useRef(1);
+  const viewStartRef = useRef(DEFAULT_VIEW_START);
+  const viewEndRef = useRef(DEFAULT_VIEW_END);
   const timelinesContainerRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{
     startX: number;
@@ -225,10 +231,10 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
     ...tagNamesControllerCountOptions(),
   });
 
-  // Reset zoom to full day when the date changes
+  // Reset zoom to the default 8:00-19:00 window when the date changes
   useEffect(() => {
     initialZoomSetForDate.current = null;
-    setZoom(0, 1);
+    setZoom(DEFAULT_VIEW_START, DEFAULT_VIEW_END);
   }, [viewDate]);
 
   // Auto-zoom to the event range the first time events load for a date
@@ -238,8 +244,15 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
     const dateKey = viewDate.toISOString().slice(0, 10);
     if (initialZoomSetForDate.current === dateKey) return;
     initialZoomSetForDate.current = dateKey;
-    const newStart = Math.max(0, differenceInMilliseconds(minTime, dayStart) / dayWindowMs);
-    const newEnd = Math.min(1, differenceInMilliseconds(maxTime, dayStart) / dayWindowMs);
+    // Keep the default 8:00-19:00 window, widened when events fall outside it
+    const newStart = Math.max(
+      0,
+      Math.min(DEFAULT_VIEW_START, differenceInMilliseconds(minTime, dayStart) / dayWindowMs)
+    );
+    const newEnd = Math.min(
+      1,
+      Math.max(DEFAULT_VIEW_END, differenceInMilliseconds(maxTime, dayStart) / dayWindowMs)
+    );
     if (newStart < newEnd) setZoom(newStart, newEnd);
   }, [timelinesWithEvents]);
 

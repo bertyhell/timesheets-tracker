@@ -575,6 +575,16 @@ function Timeline({
                             <b>Project:</b> {String(eventInfo['serviceProject'])}
                           </li>
                         )}
+                        {eventInfo['dealName'] && (
+                          <li>
+                            <b>Deal:</b> {String(eventInfo['dealName'])}
+                          </li>
+                        )}
+                        {eventInfo['companyName'] && (
+                          <li>
+                            <b>Company:</b> {String(eventInfo['companyName'])}
+                          </li>
+                        )}
                       </>
                     ) : (
                       Object.keys(eventInfo)

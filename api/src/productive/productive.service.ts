@@ -46,6 +46,11 @@ interface ProductiveServiceRecord {
     name: string;
     custom_fields: Record<string, unknown> | null;
   };
+  relationships?: {
+    deal?: {
+      data?: { id: string } | null;
+    };
+  };
 }
 
 interface ProductiveCompanyRecord {
@@ -59,6 +64,11 @@ interface ProductiveDealRecord {
   id: string;
   attributes: {
     name: string;
+  };
+  relationships?: {
+    company?: {
+      data?: { id: string } | null;
+    };
   };
 }
 
@@ -86,7 +96,9 @@ export class ProductiveService {
 
   async getEventsForDay(date: string, timelineId: string, clearCache = false): Promise<TimelineEventDto[]> {
     const db = this.databaseService.getDb();
-    const cacheKey = date; // yyyy-MM-dd
+    // The `-v2` suffix retires the caches written before deal/company were
+    // sideloaded, so old rows are not replayed without those names.
+    const cacheKey = `${date}-v2`; // yyyy-MM-dd
 
     if (!clearCache) {
       const cached = db.prepare(
@@ -96,9 +108,8 @@ export class ProductiveService {
       if (cached) {
         const bookingsJson = JSON.parse(cached.responseJson) as Record<string, unknown>;
         const bookings: ProductiveBooking[] = (bookingsJson.data as ProductiveBooking[]) ?? [];
-        const included: ProductiveServiceRecord[] = (bookingsJson.included as ProductiveServiceRecord[]) ?? [];
-        const serviceMap = new Map<string, ProductiveServiceRecord>(included.map(s => [s.id, s]));
-        return this.mapBookingsToEvents(bookings, serviceMap, date, timelineId);
+        const included: JsonApiResource[] = (bookingsJson.included as JsonApiResource[]) ?? [];
+        return this.mapBookingsToEvents(bookings, included, date, timelineId);
       }
     }
 
@@ -118,7 +129,7 @@ export class ProductiveService {
       `filter[person_id][eq]=${encodeURIComponent(userId)}`,
       `filter[started_on][lt_eq]=${encodeURIComponent(date)}`,
       `filter[ended_on][gt_eq]=${encodeURIComponent(date)}`,
-      'include=service',
+      'include=service.deal.company',
     ].join('&');
     const bookingsUrl = `${baseUrl}/bookings?${query}`;
 
@@ -145,11 +156,9 @@ export class ProductiveService {
     }
 
     const bookings: ProductiveBooking[] = (bookingsJson.data as ProductiveBooking[]) ?? [];
-    const included: ProductiveServiceRecord[] = (bookingsJson.included as ProductiveServiceRecord[]) ?? [];
+    const included: JsonApiResource[] = (bookingsJson.included as JsonApiResource[]) ?? [];
 
-    const serviceMap = new Map<string, ProductiveServiceRecord>(included.map(s => [s.id, s]));
-
-    return this.mapBookingsToEvents(bookings, serviceMap, date, timelineId);
+    return this.mapBookingsToEvents(bookings, included, date, timelineId);
   }
 
   private getIntegration() {
@@ -358,10 +367,20 @@ export class ProductiveService {
 
   private mapBookingsToEvents(
     bookings: ProductiveBooking[],
-    serviceMap: Map<string, ProductiveServiceRecord>,
+    included: JsonApiResource[],
     date: string,
     timelineId: string
   ): TimelineEventDto[] {
+    // The booking only points at its service; the deal (project) and the
+    // company hang off that service via `include=service.deal.company`.
+    const collect = <T extends { id: string }>(type: string) =>
+      new Map<string, T>(
+        included.filter((record) => record.type === type).map((record) => [record.id, record as unknown as T])
+      );
+    const serviceMap = collect<ProductiveServiceRecord>('services');
+    const dealMap = collect<ProductiveDealRecord>('deals');
+    const companyMap = collect<ProductiveCompanyRecord>('companies');
+
     let cursorMinutes = 9 * 60;
 
     return bookings
@@ -380,11 +399,18 @@ export class ProductiveService {
           ? (Object.values(service.attributes.custom_fields)[0] as string | undefined)
           : undefined;
 
+        const dealId = service?.relationships?.deal?.data?.id;
+        const deal = dealId ? dealMap.get(dealId) : undefined;
+        const dealName = deal?.attributes.name;
+
+        const companyId = deal?.relationships?.company?.data?.id;
+        const companyName = companyId ? companyMap.get(companyId)?.attributes.name : undefined;
+
         return {
           id: `productive-${booking.id}`,
           startedAt: this.minutesToIso(date, startMinutes),
           endedAt: this.minutesToIso(date, cursorMinutes),
-          info: { tagNameName: label, serviceName, serviceProject },
+          info: { tagNameName: label, serviceName, serviceProject, dealName, companyName },
           timelineId,
         };
       })

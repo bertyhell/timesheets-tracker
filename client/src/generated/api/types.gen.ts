@@ -662,6 +662,14 @@ export type ProductiveEventInfoDto = {
      * First custom field value of the service (typically the project/deal label)
      */
     serviceProject?: string | null;
+    /**
+     * Name of the Productive deal the booked service belongs to
+     */
+    dealName?: string | null;
+    /**
+     * Name of the company the deal belongs to
+     */
+    companyName?: string | null;
 };
 
 export type CalendarEventProviderInfoDto = {

@@ -18,9 +18,13 @@ export function getEventLabel(timelineInfo: TimelineDto, event: TimelineEventDto
     case TimelineType.GitCommit:
       return String(info['repoName'] ?? timelineInfo.title ?? '');
     case TimelineType.Productive: {
-      const serviceName = String(info['serviceName'] ?? '');
+      // deal - service - company, skipping whichever parts Productive did not return
+      const parts = [info['dealName'], info['serviceName'], info['companyName']]
+        .filter(Boolean)
+        .map(String);
+      const label = parts.join(' - ');
       const note = String(info['tagNameName'] ?? '');
-      return note !== 'Unnamed booking' ? `${serviceName}: ${note}` : serviceName;
+      return note && note !== 'Unnamed booking' ? `${label}: ${note}` : label;
     }
     default:
       return timelineInfo.title ?? '';

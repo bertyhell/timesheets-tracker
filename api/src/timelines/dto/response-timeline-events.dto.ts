@@ -341,6 +341,30 @@ export class ProductiveEventInfoDto {
     nullable: true,
   })
   serviceProject?: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Name of the Productive deal the booked service belongs to',
+    example: 'Hermes Spoor 3 - AI metadata ontsluiten',
+    required: false,
+    nullable: true,
+  })
+  dealName?: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Name of the company the deal belongs to',
+    example: 'meemoo',
+    required: false,
+    nullable: true,
+  })
+  companyName?: string;
 }
 
 export class GitCommitEventInfoDto {

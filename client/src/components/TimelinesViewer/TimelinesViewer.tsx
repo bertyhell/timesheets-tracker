@@ -2,6 +2,7 @@ import React, { FC, ReactNode, useCallback, useEffect, useMemo, useRef, useState
 import { ChevronLeft, ChevronRight, Maximize, ZoomIn, ZoomOut } from 'lucide-react';
 import {
   AutoTagEventInfoDto,
+  TagEventInfoDto,
   TimelineDto,
   TimelineEventDto,
   TimelinesControllerFindAllEventsResponse,
@@ -27,6 +28,7 @@ import { ROUTE_PARTS } from '../../App';
 import { useNavigate } from 'react-router-dom';
 import { TagName } from '../../types/types';
 import type { ProminentCondition } from '../Timeline/helpers/getMostProminentConditions';
+import { TimelineType } from '../Timeline/Timeline.types';
 import { getOverlappingAutoTagNotes } from '../../helpers/get-overlapping-auto-tag-notes';
 import {
   QueryObserverResult,
@@ -618,23 +620,81 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
 
   // Creating a tag from an auto tag needs no extra input: the auto tag already knows
   // the tag name, the note and the time range, so the tag is created right away.
+  // The tag is added to the tag timeline optimistically so the bar shows up instantly.
   const handleCreateTagFromAutoTagEvent = useCallback(
     async (event: TimelineEventDto): Promise<void> => {
       const info = event.info as AutoTagEventInfoDto;
       if (!info?.tagNameId) return;
       const note = info.tagNameNote?.trim();
-      await createTag({
-        body: {
-          tagNameId: info.tagNameId,
-          startedAt: event.startedAt,
-          endedAt: event.endedAt,
-          ...(note ? { note } : {}),
+      const body = {
+        tagNameId: info.tagNameId,
+        startedAt: event.startedAt,
+        endedAt: event.endedAt,
+        ...(note ? { note } : {}),
+      };
+
+      const queryKey = timelinesControllerFindAllEventsQueryKey({
+        query: {
+          startedAt: startOfDay(viewDate).toISOString(),
+          endedAt: endOfDay(viewDate).toISOString(),
         },
       });
-      await Promise.all([refetchTimelinesWithEvents(), refetchTagNamesCount()]);
-      toast('Tag has been created', { type: 'success' });
+
+      // Cancel any in-flight refetches so they don't overwrite the optimistic update
+      await queryClient.cancelQueries({ queryKey });
+
+      // Snapshot the current data for rollback on error
+      const previousData =
+        queryClient.getQueryData<TimelinesControllerFindAllEventsResponse>(queryKey);
+
+      const tagTimelineId = timelinesWithEvents?.find(
+        (timelineWithEvents) => timelineWithEvents.type === TimelineType.Tag
+      )?.id;
+
+      // Show the new tag right away, using the tag name details the auto tag carries
+      if (tagTimelineId) {
+        const optimisticEvent: TimelineEventDto = {
+          id: 'optimistic-tag-' + crypto.randomUUID(),
+          startedAt: body.startedAt,
+          endedAt: body.endedAt,
+          timelineId: tagTimelineId,
+          info: {
+            tagNameId: info.tagNameId,
+            tagNameName: info.tagNameTitle,
+            tagNameColor: info.tagNameColor,
+            tagNameCode: info.tagNameCode,
+            tagNameNote: info.tagNameNote,
+            note: note || null,
+          } satisfies TagEventInfoDto,
+        };
+        queryClient.setQueryData<TimelinesControllerFindAllEventsResponse>(queryKey, (old) => {
+          if (!old) return old;
+          return old.map((timeline) =>
+            timeline.id === tagTimelineId
+              ? { ...timeline, events: [...timeline.events, optimisticEvent] }
+              : timeline
+          );
+        });
+      }
+
+      try {
+        await createTag({ body });
+        await Promise.all([refetchTimelinesWithEvents(), refetchTagNamesCount()]);
+        toast('Tag has been created', { type: 'success' });
+      } catch {
+        // Roll back the optimistic tag if the save failed
+        queryClient.setQueryData(queryKey, previousData);
+        toast('Tag could not be created', { type: 'error' });
+      }
     },
-    [createTag, refetchTimelinesWithEvents, refetchTagNamesCount]
+    [
+      createTag,
+      viewDate,
+      queryClient,
+      timelinesWithEvents,
+      refetchTimelinesWithEvents,
+      refetchTagNamesCount,
+    ]
   );
 
   const handleCreateAutoTagRuleFromEvent = useCallback(

@@ -16,6 +16,7 @@ import { SettingsPage } from './views/settings/SettingsPage/SettingsPage';
 import { GeneralSettingsPage } from './views/settings/GeneralSettingsPage/GeneralSettingsPage';
 import { AutoTagsSettingsPage } from './views/settings/AutoTagsSettingsPage/AutoTagsSettingsPage';
 import { IntegrationsPage } from './views/settings/IntegrationsPage/IntegrationsPage';
+import { UpdatesPage } from './views/settings/UpdatesPage/UpdatesPage';
 import { ProductiveSettingsPage } from './views/settings/IntegrationsPage/ProductiveSettingsPage';
 import { OverviewsPage } from './views/OverviewsPage/OverviewsPage';
 import { OverviewView } from './views/OverviewsPage/OverviewView/OverviewView';
@@ -94,6 +95,10 @@ export const routes: RouteObject[] = [
           {
             path: ROUTE_PARTS.integrations + '/' + ROUTE_PARTS.productive,
             element: <ProductiveSettingsPage />,
+          },
+          {
+            path: ROUTE_PARTS.updates,
+            element: <UpdatesPage />,
           },
         ],
       },

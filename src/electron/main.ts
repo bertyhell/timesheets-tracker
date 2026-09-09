@@ -262,19 +262,64 @@ function quit(): void {
 // ── Auto-update (electron-updater, GitHub releases provider) ────────────────
 // Feed config is generated at build time (app-update.yml) from the `publish`
 // block in electron-builder.config.js, pointing at the GitHub releases page.
+//
+// Two entry points share one state machine:
+//  - the periodic/tray check (`checkForUpdates`), which keeps the old behaviour
+//    of downloading in the background and prompting with a dialog
+//  - the Updates settings page in the renderer, which drives the check and the
+//    download explicitly over IPC and renders its own progress
+type UpdateState =
+  | 'unsupported'
+  | 'idle'
+  | 'checking'
+  | 'available'
+  | 'downloading'
+  | 'downloaded'
+  | 'error';
+
+interface UpdateStatus {
+  state: UpdateState;
+  currentVersion: string;
+  availableVersion: string | null;
+  percent: number | null;
+  error: string | null;
+  /** True once electron-updater is wired up (packaged builds only). */
+  supported: boolean;
+}
+
+let updateStatus: UpdateStatus = {
+  state: app.isPackaged ? 'idle' : 'unsupported',
+  currentVersion: app.getVersion(),
+  availableVersion: null,
+  percent: null,
+  error: null,
+  supported: app.isPackaged,
+};
+
 let isManualUpdateCheck = false;
+/** True while the renderer drives the flow — suppresses the native dialogs. */
+let isRendererUpdateFlow = false;
+
+function setUpdateStatus(patch: Partial<UpdateStatus>): void {
+  updateStatus = { ...updateStatus, ...patch };
+  mainWindow?.webContents.send('updates:status', updateStatus);
+}
 
 function setupAutoUpdater(): void {
-  autoUpdater.autoDownload = true;
+  // The renderer decides when to download, so never download on check. The
+  // periodic background check calls downloadUpdate() itself.
+  autoUpdater.autoDownload = false;
   autoUpdater.autoInstallOnAppQuit = true;
 
   autoUpdater.on('checking-for-update', () => {
     console.log('[electron] Checking for update...');
+    setUpdateStatus({ state: 'checking', percent: null, error: null });
   });
 
   autoUpdater.on('update-not-available', () => {
     console.log('[electron] No update available');
-    if (isManualUpdateCheck) {
+    setUpdateStatus({ state: 'idle', availableVersion: null });
+    if (isManualUpdateCheck && !isRendererUpdateFlow) {
       dialog.showMessageBox({
         type: 'info',
         title: 'No Updates',
@@ -285,16 +330,42 @@ function setupAutoUpdater(): void {
 
   autoUpdater.on('error', (err) => {
     console.error('[electron] Auto-update error:', err);
-    if (isManualUpdateCheck) {
-      dialog.showErrorBox('Update Check Failed', err instanceof Error ? err.message : String(err));
+    const message = err instanceof Error ? err.message : String(err);
+    setUpdateStatus({ state: 'error', error: message, percent: null });
+    if (isManualUpdateCheck && !isRendererUpdateFlow) {
+      dialog.showErrorBox('Update Check Failed', message);
     }
   });
 
   autoUpdater.on('update-available', (info) => {
     console.log('[electron] Update available:', info.version);
+    setUpdateStatus({ state: 'available', availableVersion: info.version });
+
+    // Background checks keep the previous behaviour: fetch it right away.
+    if (!isRendererUpdateFlow) {
+      autoUpdater.downloadUpdate().catch((err) => {
+        console.error('[electron] Failed to download update:', err);
+      });
+    }
+  });
+
+  autoUpdater.on('download-progress', (progress) => {
+    setUpdateStatus({
+      state: 'downloading',
+      percent: Math.round(progress.percent),
+    });
   });
 
   autoUpdater.on('update-downloaded', (info) => {
+    setUpdateStatus({
+      state: 'downloaded',
+      availableVersion: info.version,
+      percent: 100,
+    });
+
+    // The settings page shows its own "Restart to install" affordance.
+    if (isRendererUpdateFlow) return;
+
     dialog
       .showMessageBox({
         type: 'info',
@@ -316,6 +387,7 @@ function setupAutoUpdater(): void {
 
 function checkForUpdates(manual: boolean): void {
   isManualUpdateCheck = manual;
+  isRendererUpdateFlow = false;
   autoUpdater.checkForUpdates().catch((err) => {
     console.error('[electron] Failed to check for updates:', err);
     if (manual) {
@@ -350,6 +422,62 @@ ipcMain.handle('dialog:saveFile', async (_event, defaultPath?: string) => {
 
 ipcMain.handle('shell:showItemInFolder', (_event, targetPath: string) => {
   shell.showItemInFolder(targetPath);
+});
+
+ipcMain.handle('updates:getStatus', () => updateStatus);
+
+ipcMain.handle('updates:check', async () => {
+  if (!updateStatus.supported) {
+    return { ...updateStatus, state: 'unsupported' as const };
+  }
+
+  isManualUpdateCheck = true;
+  isRendererUpdateFlow = true;
+
+  try {
+    const result = await autoUpdater.checkForUpdates();
+    // electron-updater only emits `update-available` for a newer version, so
+    // the events above already moved the state machine; fall back to the check
+    // result when no event fired (e.g. a cached "no update" answer).
+    if (result?.isUpdateAvailable) {
+      setUpdateStatus({ state: 'available', availableVersion: result.updateInfo.version });
+    } else if (updateStatus.state === 'checking') {
+      setUpdateStatus({ state: 'idle', availableVersion: null });
+    }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error('[electron] Failed to check for updates:', err);
+    setUpdateStatus({ state: 'error', error: message, percent: null });
+  }
+
+  return updateStatus;
+});
+
+ipcMain.handle('updates:download', async () => {
+  if (!updateStatus.supported) {
+    return { ...updateStatus, state: 'unsupported' as const };
+  }
+
+  isRendererUpdateFlow = true;
+  setUpdateStatus({ state: 'downloading', percent: 0, error: null });
+
+  try {
+    await autoUpdater.downloadUpdate();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error('[electron] Failed to download update:', err);
+    setUpdateStatus({ state: 'error', error: message, percent: null });
+  }
+
+  return updateStatus;
+});
+
+ipcMain.handle('updates:install', () => {
+  if (updateStatus.state !== 'downloaded') return false;
+  isQuitting = true;
+  // Defer so the IPC reply reaches the renderer before the app tears down.
+  setImmediate(() => autoUpdater.quitAndInstall());
+  return true;
 });
 
 // ── App lifecycle ─────────────────────────────────────────────────────────────

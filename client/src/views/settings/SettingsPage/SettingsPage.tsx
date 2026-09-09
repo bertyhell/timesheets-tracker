@@ -1,12 +1,13 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { Database, Plug, Zap } from 'lucide-react';
+import { Database, Plug, RefreshCw, Zap } from 'lucide-react';
 import './SettingsPage.css';
 
 const NAV_ITEMS = [
   { to: '/settings/general', label: 'Database', icon: Database },
   { to: '/settings/auto-tags', label: 'Auto tags', icon: Zap },
   { to: '/settings/integrations', label: 'Integrations', icon: Plug },
+  { to: '/settings/updates', label: 'Updates', icon: RefreshCw },
 ];
 
 export function SettingsPage() {

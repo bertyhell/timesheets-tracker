@@ -39,6 +39,7 @@ export enum ROUTE_PARTS {
   new = 'new',
   integrations = 'integrations',
   productive = 'productive',
+  updates = 'updates',
 }
 
 const OVERVIEW_NAV = [{ to: ROUTE_PARTS.timelinesAndEvents, label: 'Overview', icon: BarChart2 }];

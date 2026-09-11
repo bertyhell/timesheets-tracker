@@ -241,11 +241,29 @@ export class ProductiveService {
   // group on a frontend refresh (see clearListCache).
   private static readonly LIST_CACHE_PREFIX = 'productive-';
 
-  private readListCache<T>(cacheKey: string): T | null {
+  // The service tree changes as budgets/services are edited in Productive, so
+  // its cache expires rather than living until the next explicit refresh.
+  private static readonly SERVICE_TREE_CACHE_TTL_SECONDS = 5 * 60;
+
+  /**
+   * Reads a cached list. `ttlSeconds` treats rows older than that as a miss;
+   * the age check runs in SQL so it compares against the same UTC clock that
+   * `createdAt`'s `datetime('now')` default was written with. Without a TTL the
+   * entry lives until clearListCache() drops it.
+   */
+  private readListCache<T>(cacheKey: string, ttlSeconds?: number): T | null {
     const db = this.databaseService.getDb();
-    const row = db
-      .prepare('SELECT responseJson FROM cachedNetworkRequests WHERE cacheKey = ?')
-      .get(cacheKey) as { responseJson: string } | undefined;
+    const row = (
+      ttlSeconds === undefined
+        ? db
+            .prepare('SELECT responseJson FROM cachedNetworkRequests WHERE cacheKey = ?')
+            .get(cacheKey)
+        : db
+            .prepare(
+              "SELECT responseJson FROM cachedNetworkRequests WHERE cacheKey = ? AND createdAt > datetime('now', ?)"
+            )
+            .get(cacheKey, `-${ttlSeconds} seconds`)
+    ) as { responseJson: string } | undefined;
     return row ? (JSON.parse(row.responseJson) as T) : null;
   }
 
@@ -550,7 +568,10 @@ export class ProductiveService {
     const cacheKey = `${ProductiveService.LIST_CACHE_PREFIX}service-tree-${date}`;
 
     if (!trimmedQuery) {
-      const cached = this.readListCache<ProductiveServiceTreeNodeDto[]>(cacheKey);
+      const cached = this.readListCache<ProductiveServiceTreeNodeDto[]>(
+        cacheKey,
+        ProductiveService.SERVICE_TREE_CACHE_TTL_SECONDS
+      );
       if (cached) return cached;
     }
 

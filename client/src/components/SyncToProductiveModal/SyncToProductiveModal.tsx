@@ -31,6 +31,7 @@ interface EventInfoLike {
   tagNameName?: string;
   tagNameTitle?: string;
   tagNameCode?: string | null;
+  tagNameNote?: string | null;
   note?: string | null;
 }
 
@@ -166,6 +167,16 @@ function encodeCode(selection: RowSelection): string {
   });
 }
 
+/**
+ * The note an event is booked under: its own note (set manually or by an auto-note rule), or,
+ * when neither the tag nor the auto tag carries one, the note from the tag name definition.
+ */
+function eventNote(info: EventInfoLike): string {
+  const own = (info.note ?? '').trim();
+  if (own) return own;
+  return (info.tagNameNote ?? '').trim();
+}
+
 /** Group a timeline's tag/autotag events by tag name into rows for display. */
 function buildRows(events: TimelineEventDto[]): SyncRow[] {
   const byTagName = new Map<string, SyncRow>();
@@ -176,7 +187,7 @@ function buildRows(events: TimelineEventDto[]): SyncRow[] {
     if (!tagNameId) continue;
 
     const name = info.tagNameName ?? info.tagNameTitle ?? 'Unnamed';
-    const note = (info.note ?? '').trim();
+    const note = eventNote(info);
     const minutes = eventMinutes(event);
 
     let row = byTagName.get(tagNameId);

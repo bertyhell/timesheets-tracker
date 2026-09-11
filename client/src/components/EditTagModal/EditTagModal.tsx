@@ -18,8 +18,13 @@ import {
   tagsControllerRemoveMutation,
   tagsControllerUpdateMutation,
   timelinesControllerFindAllEventsOptions,
+  timelinesControllerFindAllEventsQueryKey,
 } from '../../generated/api/@tanstack/react-query.gen';
-import type { TagDto, TagNameDto } from '../../generated/api/types.gen';
+import type {
+  TagDto,
+  TagNameDto,
+  TimelinesControllerFindAllEventsResponse,
+} from '../../generated/api/types.gen';
 import { getOverlappingAutoTagNotes } from '../../helpers/get-overlapping-auto-tag-notes';
 import { getRandomColor } from '../Timeline/helpers/getColorForEvent';
 import type { TagName } from '../../types/types';
@@ -125,12 +130,59 @@ export function EditTagModal() {
     };
 
     if (uuid) {
-      await updateTag({ path: { id: uuid }, body });
-      toast('Tag has been updated', { type: 'success' });
-    } else {
-      await createTag({ body });
-      toast('Tag has been created', { type: 'success' });
+      const queryKey = timelinesControllerFindAllEventsQueryKey({
+        query: {
+          startedAt: startOfDay(new Date(startedAt)).toISOString(),
+          endedAt: endOfDay(new Date(startedAt)).toISOString(),
+        },
+      });
+
+      // Cancel any in-flight refetches so they don't overwrite the optimistic update
+      await queryClient.cancelQueries({ queryKey });
+
+      // Snapshot the current data for rollback on error
+      const previousData =
+        queryClient.getQueryData<TimelinesControllerFindAllEventsResponse>(queryKey);
+
+      // Patch the cache right away so the modal can close instantly
+      queryClient.setQueryData<TimelinesControllerFindAllEventsResponse>(queryKey, (old) => {
+        if (!old) return old;
+        return old.map((timeline) => ({
+          ...timeline,
+          events: timeline.events.map((event) =>
+            event.id === uuid
+              ? {
+                  ...event,
+                  startedAt: body.startedAt,
+                  endedAt: body.endedAt,
+                  info: { ...event.info, note: body.note ?? null },
+                }
+              : event
+          ),
+        }));
+      });
+
+      // Close right away, the mutation continues in the background
+      handleClose();
+
+      try {
+        await updateTag({ path: { id: uuid }, body });
+        toast('Tag has been updated', { type: 'success' });
+      } catch {
+        // Roll back the optimistic update if the save failed
+        queryClient.setQueryData(queryKey, previousData);
+        toast('Tag could not be updated', { type: 'error' });
+      }
+
+      await queryClient.invalidateQueries({
+        predicate: (query) =>
+          (query.queryKey[0] as { _id?: string })?._id === 'timelinesControllerFindAllEvents',
+      });
+      return;
     }
+
+    await createTag({ body });
+    toast('Tag has been created', { type: 'success' });
 
     await queryClient.invalidateQueries({
       predicate: (query) =>

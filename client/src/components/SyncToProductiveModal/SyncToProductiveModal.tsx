@@ -8,6 +8,7 @@ import type { TimelineDto, TimelineEventDto } from '../../generated/api/types.ge
 import {
   tagNamesControllerFindAllOptions,
   tagNamesControllerUpdateMutation,
+  tagsControllerUpdateMutation,
 } from '../../generated/api/@tanstack/react-query.gen';
 import { AlertTriangle, Check, ChevronDown, ChevronRight, X } from 'lucide-react';
 
@@ -40,7 +41,7 @@ interface SyncRow {
   name: string;
   code: string | null;
   totalMinutes: number;
-  events: { minutes: number; note: string }[];
+  events: { id: string; minutes: number; note: string }[];
 }
 
 /**
@@ -54,6 +55,8 @@ interface PlannedEntry {
   serviceId: string;
   note: string;
   minutes: number;
+  /** The timeline events collapsed into this entry, so an edited note can be written back to them. */
+  eventIds: string[];
 }
 
 interface RowSelection {
@@ -196,7 +199,7 @@ function buildRows(events: TimelineEventDto[]): SyncRow[] {
       byTagName.set(tagNameId, row);
     }
     row.totalMinutes += minutes;
-    row.events.push({ minutes, note });
+    row.events.push({ id: event.id, minutes, note });
   }
 
   return Array.from(byTagName.values());
@@ -217,6 +220,7 @@ function buildPlannedEntries(row: SyncRow, serviceId: string): PlannedEntry[] {
     const existing = byNote.get(event.note);
     if (existing) {
       existing.minutes += event.minutes;
+      existing.eventIds.push(event.id);
     } else {
       byNote.set(event.note, {
         key: `${row.tagNameId}||${serviceId}||${event.note}`,
@@ -224,6 +228,7 @@ function buildPlannedEntries(row: SyncRow, serviceId: string): PlannedEntry[] {
         serviceId,
         note: event.note,
         minutes: event.minutes,
+        eventIds: [event.id],
       });
     }
   }
@@ -262,6 +267,7 @@ interface SyncRowItemProps {
   onToggleExpanded: (tagNameId: string) => void;
   onToggleEntries: (keys: string[], included: boolean) => void;
   onChange: (tagNameId: string, selection: RowSelection) => void;
+  onNoteChange: (entryKey: string, note: string) => void;
 }
 
 /** A checkbox drawn as a button, so the tick, the dash and the accent fill are ours to style. */
@@ -311,6 +317,7 @@ function SyncRowItem({
   onToggleExpanded,
   onToggleEntries,
   onChange,
+  onNoteChange,
 }: SyncRowItemProps) {
   const includedCount = plannedEntries.filter((entry) => includedKeys[entry.key]).length;
   const allIncluded = plannedEntries.length > 0 && includedCount === plannedEntries.length;
@@ -410,12 +417,15 @@ function SyncRowItem({
                     onToggle={() => onToggleEntries([entry.key], !includedKeys[entry.key])}
                   />
                   <span className="c-sync-row__entry-minutes">{formatMinutes(entry.minutes)}</span>
-                  <span
-                    className={`c-sync-row__entry-note${entry.note ? '' : ' is-empty'}`}
+                  <input
+                    type="text"
+                    className="c-sync-row__entry-note"
+                    value={entry.note}
                     title={entry.note || 'No note'}
-                  >
-                    {entry.note || 'No note'}
-                  </span>
+                    placeholder="No note"
+                    aria-label="Note booked to Productive"
+                    onChange={(event) => onNoteChange(entry.key, event.target.value)}
+                  />
                   {entryStatus && (
                     <span
                       className={`c-sync-row__entry-status${entryStatus.status === 'created' ? ' is-booked' : ' is-failed'}`}
@@ -451,6 +461,8 @@ export function SyncToProductiveModal({
   /** Per planned-entry inclusion in the next sync, keyed by `PlannedEntry.key`. */
   const [includedKeys, setIncludedKeys] = useState<Record<string, boolean>>({});
   const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
+  /** Notes edited by hand in the accordion, keyed by `PlannedEntry.key`; these are what gets booked. */
+  const [noteOverrides, setNoteOverrides] = useState<Record<string, string>>({});
   /** Summary of the sync that just ran; only shown while something in it failed. */
   const [report, setReport] = useState<{ created: number; failed: number } | null>(null);
 
@@ -463,6 +475,7 @@ export function SyncToProductiveModal({
 
   const queryClient = useQueryClient();
   const { mutateAsync: updateTagName } = useMutation({ ...tagNamesControllerUpdateMutation() });
+  const { mutateAsync: updateTag } = useMutation({ ...tagsControllerUpdateMutation() });
 
   // Fetch tag names fresh so prefill reads the current `code`, not the
   // possibly-stale `tagNameCode` embedded in the (cached) timeline events.
@@ -490,10 +503,15 @@ export function SyncToProductiveModal({
   const plannedByTagNameId = useMemo(() => {
     const map = new Map<string, PlannedEntry[]>();
     for (const row of rows) {
-      map.set(row.tagNameId, buildPlannedEntries(row, selection[row.tagNameId]?.serviceId ?? ''));
+      const entries = buildPlannedEntries(row, selection[row.tagNameId]?.serviceId ?? '').map((entry) =>
+        // The key keeps the note the entry was grouped under, so an edit renames what is booked
+        // without splitting the entry or losing its tick.
+        entry.key in noteOverrides ? { ...entry, note: noteOverrides[entry.key] } : entry
+      );
+      map.set(row.tagNameId, entries);
     }
     return map;
-  }, [rows, selection]);
+  }, [rows, selection, noteOverrides]);
 
   const codeByTagNameId = useMemo(() => {
     const map = new Map<string, string | null>();
@@ -525,6 +543,7 @@ export function SyncToProductiveModal({
       return next;
     });
     setExpandedRows({});
+    setNoteOverrides({});
     setReport(null);
     prefilledRef.current = true;
   }, [open, tagNamesLoading, syncStatusesLoading, rows, codeByTagNameId]);
@@ -559,6 +578,10 @@ export function SyncToProductiveModal({
 
   const handleToggleExpanded = (tagNameId: string) => {
     setExpandedRows((prev) => ({ ...prev, [tagNameId]: !prev[tagNameId] }));
+  };
+
+  const handleNoteChange = (entryKey: string, note: string) => {
+    setNoteOverrides((prev) => ({ ...prev, [entryKey]: note }));
   };
 
   const handleRowChange = (tagNameId: string, rowSelection: RowSelection) => {
@@ -640,6 +663,30 @@ export function SyncToProductiveModal({
       }));
 
       const result = await productiveApi.sync({ date, entries });
+
+      // Notes rewritten in the accordion are the user's correction to what they did, not just to
+      // what Productive is told, so write them back onto the tag events they were collapsed from.
+      // Only manual tags carry a note of their own; auto tag events have nothing to write to.
+      if (timelineType === TimelineType.Tag) {
+        const edits = rows
+          .flatMap((row) => buildPlannedEntries(row, selection[row.tagNameId]?.serviceId ?? ''))
+          .filter((entry) => entry.key in noteOverrides && noteOverrides[entry.key] !== entry.note);
+
+        await Promise.all(
+          edits.flatMap((entry) =>
+            entry.eventIds.map((eventId) =>
+              updateTag({ path: { id: eventId }, body: { note: noteOverrides[entry.key] } })
+            )
+          )
+        );
+
+        if (edits.length > 0) {
+          await queryClient.invalidateQueries({
+            predicate: (query) =>
+              (query.queryKey[0] as { _id?: string })?._id === 'timelinesControllerFindAllEvents',
+          });
+        }
+      }
 
       // Persist the chosen company/deal/service back onto the tag name's code so
       // future syncs resolve automatically. Rows left unmapped get the
@@ -822,6 +869,7 @@ export function SyncToProductiveModal({
             onToggleExpanded={handleToggleExpanded}
             onToggleEntries={handleToggleEntries}
             onChange={handleRowChange}
+            onNoteChange={handleNoteChange}
           />
         ))}
       </div>

@@ -169,91 +169,101 @@ export function EventsTotalsTable({ events, timelineType, className, onEditTag }
   );
 
   return (
-    <div ref={parentRef} className={`c-events-totals-table${className ? ` ${className}` : ''}`}>
-      <table className="c-table" aria-label="Timeline event totals">
-        <colgroup>
-          <col style={{ width: '36px' }} />
-          {columns.map((col) => (
-            <col key={col.id} style={{ width: col.width ? `${col.width}px` : undefined }} />
-          ))}
-        </colgroup>
-        <thead>
-          <tr>
-            <th style={{ width: '36px' }}></th>
+    <div className={`c-events-totals-table${className ? ` ${className}` : ''}`}>
+      <div className="c-events-section-header">
+        <div className="c-events-section-header__title">
+          <span>Totals</span>
+          {sortedTotals.length > 0 && (
+            <span className="c-events-count-badge">{sortedTotals.length}</span>
+          )}
+        </div>
+      </div>
+      <div ref={parentRef} className="c-events-totals-table__scroll">
+        <table className="c-table" aria-label="Timeline event totals">
+          <colgroup>
+            <col style={{ width: '36px' }} />
             {columns.map((col) => (
-              <th
-                key={col.id}
-                aria-sort={
-                  sortDescriptor.column === col.id
-                    ? sortDescriptor.direction === 'ascending'
-                      ? 'ascending'
-                      : 'descending'
-                    : col.allowsSorting
-                      ? 'none'
-                      : undefined
-                }
-              >
-                {col.allowsSorting ? (
-                  <button className="c-table-sort-btn" onClick={() => handleSort(col.id)}>
-                    {col.title}
-                    {sortDescriptor.column === col.id && (
-                      <span aria-hidden="true">
-                        {sortDescriptor.direction === 'ascending' ? ' ↑' : ' ↓'}
-                      </span>
-                    )}
-                  </button>
-                ) : (
-                  col.title
-                )}
-              </th>
+              <col key={col.id} style={{ width: col.width ? `${col.width}px` : undefined }} />
             ))}
-          </tr>
-        </thead>
-        <tbody>
-          {paddingTop > 0 && (
-            <tr aria-hidden="true">
-              <td colSpan={columns.length + 1} style={{ height: paddingTop, padding: 0 }} />
+          </colgroup>
+          <thead>
+            <tr>
+              <th style={{ width: '36px' }}></th>
+              {columns.map((col) => (
+                <th
+                  key={col.id}
+                  aria-sort={
+                    sortDescriptor.column === col.id
+                      ? sortDescriptor.direction === 'ascending'
+                        ? 'ascending'
+                        : 'descending'
+                      : col.allowsSorting
+                        ? 'none'
+                        : undefined
+                  }
+                >
+                  {col.allowsSorting ? (
+                    <button className="c-table-sort-btn" onClick={() => handleSort(col.id)}>
+                      {col.title}
+                      {sortDescriptor.column === col.id && (
+                        <span aria-hidden="true">
+                          {sortDescriptor.direction === 'ascending' ? ' ↑' : ' ↓'}
+                        </span>
+                      )}
+                    </button>
+                  ) : (
+                    col.title
+                  )}
+                </th>
+              ))}
             </tr>
-          )}
-          {virtualItems.map((virtualRow) => {
-            const row = sortedTotals[virtualRow.index];
-            return (
-              <tr
-                key={virtualRow.key}
-                style={{ height: ROW_HEIGHT }}
-                aria-selected={selectedKey === row.id}
-                className={selectedKey === row.id ? 'is-selected' : undefined}
-                onClick={() => setSelectedKey(row.id)}
-                onContextMenu={(e) => handleRowContextMenu(e, row)}
-              >
-                <td style={{ padding: '0 0 0 8px' }}>
-                  <span
-                    className="block h-5 w-5 rounded-md"
-                    style={{ backgroundColor: row.color }}
-                  />
-                </td>
-                {columns.map((col) => (
-                  <td key={col.id}>{String(row[col.id as keyof TotalRow] ?? '')}</td>
-                ))}
+          </thead>
+          <tbody>
+            {paddingTop > 0 && (
+              <tr aria-hidden="true">
+                <td colSpan={columns.length + 1} style={{ height: paddingTop, padding: 0 }} />
               </tr>
-            );
-          })}
-          {paddingBottom > 0 && (
-            <tr aria-hidden="true">
-              <td colSpan={columns.length + 1} style={{ height: paddingBottom, padding: 0 }} />
-            </tr>
+            )}
+            {virtualItems.map((virtualRow) => {
+              const row = sortedTotals[virtualRow.index];
+              return (
+                <tr
+                  key={virtualRow.key}
+                  style={{ height: ROW_HEIGHT }}
+                  aria-selected={selectedKey === row.id}
+                  className={selectedKey === row.id ? 'is-selected' : undefined}
+                  onClick={() => setSelectedKey(row.id)}
+                  onContextMenu={(e) => handleRowContextMenu(e, row)}
+                >
+                  <td style={{ padding: '0 0 0 8px' }}>
+                    <span
+                      className="block h-5 w-5 rounded-md"
+                      style={{ backgroundColor: row.color }}
+                    />
+                  </td>
+                  {columns.map((col) => (
+                    <td key={col.id}>{String(row[col.id as keyof TotalRow] ?? '')}</td>
+                  ))}
+                </tr>
+              );
+            })}
+            {paddingBottom > 0 && (
+              <tr aria-hidden="true">
+                <td colSpan={columns.length + 1} style={{ height: paddingBottom, padding: 0 }} />
+              </tr>
+            )}
+          </tbody>
+          {sortedTotals.length > 0 && (
+            <tfoot>
+              <tr className="c-table-total-row">
+                <td></td>
+                <td>Total</td>
+                <td>{formatDuration(grandTotalMs / 1000)}</td>
+              </tr>
+            </tfoot>
           )}
-        </tbody>
-        {sortedTotals.length > 0 && (
-          <tfoot>
-            <tr className="c-table-total-row">
-              <td></td>
-              <td>Total</td>
-              <td>{formatDuration(grandTotalMs / 1000)}</td>
-            </tr>
-          </tfoot>
-        )}
-      </table>
+        </table>
+      </div>
       {sortedTotals.length === 0 && <div className="c-table-empty">No events</div>}
       {contextMenu && (
         <ContextMenu

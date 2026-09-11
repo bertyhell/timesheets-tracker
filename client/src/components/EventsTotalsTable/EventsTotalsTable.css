@@ -1,6 +1,10 @@
 .c-events-totals-table {
   overflow-x: hidden;
 
+  .c-events-totals-table__scroll {
+    overflow-x: hidden;
+  }
+
   tfoot .c-table-total-row {
     position: sticky;
     bottom: 0;

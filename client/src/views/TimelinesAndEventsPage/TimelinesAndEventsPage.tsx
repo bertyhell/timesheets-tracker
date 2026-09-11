@@ -227,22 +227,22 @@ export function TimelinesAndEventsPage() {
         <PanelResizeHandle className="c-resize-handle c-resize-handle--horizontal" />
 
         <Panel minSize="10%" className="c-timeline-events-list">
-          {/* Events section header */}
-          <div className="c-events-section-header">
-            <div className="c-events-section-header__title">
-              <span>Events</span>
-              {totalEventCount > 0 && (
-                <span className="c-events-count-badge">{totalEventCount}</span>
-              )}
-            </div>
-          </div>
-
           <PanelGroup
             orientation="horizontal"
             defaultLayout={horizontalDefaultLayout}
             onLayoutChanged={onHorizontalLayoutChanged}
           >
-            <Panel minSize="15%" defaultSize="70%">
+            <Panel minSize="15%" defaultSize="70%" className="c-events-panel">
+              {/* Events section header */}
+              <div className="c-events-section-header">
+                <div className="c-events-section-header__title">
+                  <span>Events</span>
+                  {totalEventCount > 0 && (
+                    <span className="c-events-count-badge">{totalEventCount}</span>
+                  )}
+                </div>
+              </div>
+
               {!selectedTimeline?.events?.length ? (
                 <div className="c-no-events">{noEventsMessage}</div>
               ) : (

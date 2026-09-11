@@ -6,6 +6,7 @@ import { ProductiveDealDto } from './dto/deal.dto';
 import { ProductiveServiceDto } from './dto/service.dto';
 import { ProductiveServiceTreeNodeDto } from './dto/service-tree.dto';
 import { SyncTimeEntriesDto, SyncTimeEntriesResultDto } from './dto/sync-time-entries.dto';
+import { SyncStatusDto } from './dto/sync-status.dto';
 
 @ApiTags('productive')
 @Controller('api/productive')
@@ -51,5 +52,12 @@ export class ProductiveController {
   @Post('sync')
   sync(@Body() dto: SyncTimeEntriesDto): Promise<SyncTimeEntriesResultDto> {
     return this.productiveService.createTimeEntries(dto.date, dto.entries);
+  }
+
+  @ApiOkResponse({ type: SyncStatusDto, isArray: true })
+  @ApiQuery({ type: 'string', name: 'date', required: true, example: '2026-07-17' })
+  @Get('sync-status')
+  getSyncStatuses(@Query('date') date: string): Promise<SyncStatusDto[]> {
+    return this.productiveService.getSyncStatuses(date);
   }
 }

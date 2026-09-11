@@ -135,3 +135,13 @@ CREATE INDEX IF NOT EXISTS idx_autoTags_tagNameId ON autoTags ("tagNameId");
 -- Deliberately not indexed: tagNames, calendars, autoNotes, timelines, integrations, settings
 -- and savedOverviewConfigs are all configuration tables of at most a few dozen rows, read by
 -- primary key or with a full-table LIKE '%term%' that no index can serve.
+
+CREATE TABLE IF NOT EXISTS productiveSyncStatuses
+(
+    "tagNameId" text NOT NULL,
+    "date"      text NOT NULL,
+    "status"    text NOT NULL,
+    "entries"   text NOT NULL,
+    "syncedAt"  text NOT NULL,
+    PRIMARY KEY ("tagNameId", "date")
+);

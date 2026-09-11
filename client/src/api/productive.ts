@@ -34,9 +34,13 @@ export interface ProductiveServiceTreeNode {
 }
 
 export interface SyncTimeEntry {
+  /** Echoed back on the result so each outcome can be matched to its entry. */
+  id: string;
   serviceId: string;
   minutes: number;
   note?: string;
+  /** Tags whose time this entry covers; merged entries carry more than one. */
+  tagNameIds: string[];
 }
 
 export interface SyncPayload {
@@ -44,8 +48,33 @@ export interface SyncPayload {
   entries: SyncTimeEntry[];
 }
 
+export interface SyncEntryResult {
+  id: string;
+  status: 'created' | 'failed';
+  error?: string;
+}
+
 export interface SyncResult {
   created: number;
+  failed: number;
+  results: SyncEntryResult[];
+}
+
+export type SyncStatusValue = 'synced' | 'partial' | 'failed';
+
+export interface SyncStatusEntry {
+  serviceId: string;
+  note: string;
+  minutes: number;
+  status: 'created' | 'failed';
+  error?: string;
+}
+
+export interface SyncStatus {
+  tagNameId: string;
+  status: SyncStatusValue;
+  entries: SyncStatusEntry[];
+  syncedAt: string;
 }
 
 export const productiveApi = {
@@ -88,11 +117,26 @@ export const productiveApi = {
   },
 
   sync: async (payload: SyncPayload): Promise<SyncResult> => {
-    const { data } = await client.post<SyncResult>({
+    // The generated client resolves with `error` instead of throwing, so
+    // without this a failed sync would leave `data` undefined and blow up on
+    // `result.created` instead of showing Productive's own message.
+    const { data, error } = await client.post<SyncResult>({
       url: '/api/productive/sync',
       body: payload,
       headers: { 'Content-Type': 'application/json' },
     });
-    return data as SyncResult;
+    if (error || !data) {
+      const message = (error as { message?: string })?.message;
+      throw new Error(message ?? 'Failed to sync to Productive');
+    }
+    return data;
+  },
+
+  getSyncStatuses: async (date: string): Promise<SyncStatus[]> => {
+    const { data } = await client.get<SyncStatus[]>({
+      url: '/api/productive/sync-status',
+      query: { date },
+    });
+    return data ?? [];
   },
 };

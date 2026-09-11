@@ -1,19 +1,20 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Modal } from 'react-responsive-modal';
-import Select from 'react-select';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 
-import Button, { ButtonVariant } from '../Button/Button';
 import { TimelineType } from '../Timeline/Timeline.types';
 import type { TimelineDto, TimelineEventDto } from '../../generated/api/types.gen';
 import {
   tagNamesControllerFindAllOptions,
   tagNamesControllerUpdateMutation,
 } from '../../generated/api/@tanstack/react-query.gen';
+import { AlertTriangle, Check, ChevronDown, ChevronRight, X } from 'lucide-react';
+
 import { productiveApi } from '../../api/productive';
+import type { SyncStatus, SyncStatusEntry, SyncStatusValue } from '../../api/productive';
+import { integrationsApi } from '../../api/integrations';
 import { ProductiveTimesheetDropdown } from '../ProductiveTimesheetDropdown/ProductiveTimesheetDropdown';
-import { tagSelectStyles } from '../TagSelect/tagSelectStyles';
 
 import './SyncToProductiveModal.css';
 
@@ -41,6 +42,19 @@ interface SyncRow {
   events: { minutes: number; note: string }[];
 }
 
+/**
+ * One time entry as it will be sent to Productive: a tag's events collapsed by note, so a tag
+ * with three same-note events books one entry. The key stays stable across renders and across
+ * syncs, which is what lets a planned entry be matched to its previous outcome.
+ */
+interface PlannedEntry {
+  key: string;
+  tagNameId: string;
+  serviceId: string;
+  note: string;
+  minutes: number;
+}
+
 interface RowSelection {
   companyId: string;
   dealId: string;
@@ -60,7 +74,30 @@ const EMPTY_SELECTION: RowSelection = {
   parts: [],
 };
 
-const OUTPUT_LOCATIONS = [{ value: 'productive', label: 'Productive' }];
+/** Productive is the only output today; the menu exists so a second one is a data change. */
+const OUTPUT_LOCATIONS = [{ id: 'productive', name: 'Productive' }];
+
+/** Host of the configured Productive API, shown in the header chip. */
+function endpointHost(baseUrl: string | undefined): string {
+  if (!baseUrl) return 'Not configured';
+  try {
+    return new URL(baseUrl).host;
+  } catch {
+    return baseUrl.replace(/^https?:\/\//, '').split('/')[0];
+  }
+}
+
+/** "Thursday 10 September 2026" — the day being booked, spelled out. */
+function formatLongDate(date: string): string {
+  const parsed = new Date(`${date}T00:00:00`);
+  if (Number.isNaN(parsed.getTime())) return date;
+  return parsed.toLocaleDateString(undefined, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
 
 // Stored in tag name code to persist the "do not sync" choice across sessions.
 const DO_NOT_SYNC_CODE = '{"doNotSync":true}';
@@ -154,45 +191,238 @@ function buildRows(events: TimelineEventDto[]): SyncRow[] {
   return Array.from(byTagName.values());
 }
 
+/**
+ * Collapse a row's events into the entries that will actually be posted, one per distinct note.
+ *
+ * The grouping is per tag: two tags pointing at the same service with the same note produce two
+ * entries rather than one merged entry, because an entry has to be attributable to a single tag
+ * for its outcome to be reported, retried and toggled per tag.
+ */
+function buildPlannedEntries(row: SyncRow, serviceId: string): PlannedEntry[] {
+  if (!serviceId) return [];
+
+  const byNote = new Map<string, PlannedEntry>();
+  for (const event of row.events) {
+    const existing = byNote.get(event.note);
+    if (existing) {
+      existing.minutes += event.minutes;
+    } else {
+      byNote.set(event.note, {
+        key: `${row.tagNameId}||${serviceId}||${event.note}`,
+        tagNameId: row.tagNameId,
+        serviceId,
+        note: event.note,
+        minutes: event.minutes,
+      });
+    }
+  }
+
+  return Array.from(byNote.values()).filter((entry) => Math.round(entry.minutes) > 0);
+}
+
+/** The stored outcome for a planned entry, matched on the service and note it was booked under. */
+function findEntryStatus(status: SyncStatus | undefined, entry: PlannedEntry): SyncStatusEntry | undefined {
+  return status?.entries.find((stored) => stored.serviceId === entry.serviceId && stored.note === entry.note);
+}
+
+/**
+ * Entries that failed (or were never attempted) are included in the next sync; entries Productive
+ * already accepted are left out, so a retry does not book them a second time.
+ */
+function defaultIncluded(status: SyncStatus | undefined, entry: PlannedEntry): boolean {
+  return findEntryStatus(status, entry)?.status !== 'created';
+}
+
+/** One vocabulary for a tag's state: a labelled pill, never a bare icon. */
+const STATUS_PILLS: Record<SyncStatusValue, { label: string; className: string }> = {
+  synced: { label: 'Synced', className: 'is-synced' },
+  partial: { label: 'Partial', className: 'is-partial' },
+  failed: { label: 'Failed', className: 'is-failed' },
+};
+
 interface SyncRowItemProps {
   row: SyncRow;
   date: string;
   selection: RowSelection;
+  plannedEntries: PlannedEntry[];
+  status?: SyncStatus;
+  includedKeys: Record<string, boolean>;
+  expanded: boolean;
+  onToggleExpanded: (tagNameId: string) => void;
+  onToggleEntries: (keys: string[], included: boolean) => void;
   onChange: (tagNameId: string, selection: RowSelection) => void;
 }
 
-function SyncRowItem({ row, date, selection, onChange }: SyncRowItemProps) {
+/** A checkbox drawn as a button, so the tick, the dash and the accent fill are ours to style. */
+function CheckBox({
+  checked,
+  indeterminate = false,
+  disabled = false,
+  size,
+  label,
+  title,
+  onToggle,
+}: {
+  checked: boolean;
+  indeterminate?: boolean;
+  disabled?: boolean;
+  size: 'row' | 'entry';
+  label: string;
+  title: string;
+  onToggle: () => void;
+}) {
+  const on = checked || indeterminate;
   return (
-    <div className="flex flex-row items-center gap-2 mt-2">
-      <div className="flex-1 min-w-0">
-        <div className="truncate" title={row.name}>
-          {row.name}
-        </div>
-        <div className="text-sm text-gray-500">{formatMinutes(row.totalMinutes)}</div>
-      </div>
-      <div style={{ width: '60%', flex: 'none' }}>
-        <ProductiveTimesheetDropdown
-          date={date}
-          value={selection.serviceId}
-          valuePath={selection.path}
-          valueParts={selection.parts}
-          onChange={(picked) =>
-            onChange(
-              row.tagNameId,
-              picked
-                ? {
-                    companyId: picked.companyId,
-                    dealId: picked.dealId,
-                    serviceId: picked.serviceId,
-                    path: picked.path,
-                    parts: picked.parts,
-                  }
-                : { ...EMPTY_SELECTION }
-            )
-          }
-          placeholder="Do not sync"
+    <button
+      type="button"
+      role="checkbox"
+      aria-checked={indeterminate ? 'mixed' : checked}
+      aria-label={label}
+      title={title}
+      disabled={disabled}
+      onClick={onToggle}
+      className={`c-sync-check c-sync-check--${size}${on ? ' is-on' : ''}`}
+    >
+      {checked && <Check size={size === 'row' ? 12 : 10} strokeWidth={size === 'row' ? 3.5 : 4} />}
+      {indeterminate && !checked && <span className="c-sync-check__dash" />}
+    </button>
+  );
+}
+
+function SyncRowItem({
+  row,
+  date,
+  selection,
+  plannedEntries,
+  status,
+  includedKeys,
+  expanded,
+  onToggleExpanded,
+  onToggleEntries,
+  onChange,
+}: SyncRowItemProps) {
+  const includedCount = plannedEntries.filter((entry) => includedKeys[entry.key]).length;
+  const allIncluded = plannedEntries.length > 0 && includedCount === plannedEntries.length;
+  // A row whose entries disagree shows a dash rather than a tick, so "some of this tag is
+  // queued" is not mistaken for "all of it is".
+  const someIncluded = includedCount > 0 && !allIncluded;
+  const canExpand = plannedEntries.length > 0;
+  // A tag that failed is tinted for the whole card, so the eye lands on it before anything else.
+  const hasFailure = status?.entries.some((entry) => entry.status === 'failed') ?? false;
+  const pill = status ? STATUS_PILLS[status.status] : null;
+
+  return (
+    <div className={`c-sync-row${hasFailure ? ' has-failure' : ''}`}>
+      <div className="c-sync-row__head">
+        <CheckBox
+          checked={allIncluded}
+          indeterminate={someIncluded}
+          disabled={plannedEntries.length === 0}
+          size="row"
+          label={`Include ${row.name} in the next sync`}
+          title="Sync all entries for this tag"
+          onToggle={() => onToggleEntries(plannedEntries.map((entry) => entry.key), !allIncluded)}
         />
+
+        <div className="c-sync-row__chevron-cell">
+          {canExpand && (
+            <button
+              type="button"
+              className={`c-sync-row__chevron${expanded ? ' is-expanded' : ''}`}
+              onClick={() => onToggleExpanded(row.tagNameId)}
+              aria-expanded={expanded}
+              aria-label={expanded ? 'Hide entries' : 'Show entries'}
+            >
+              <ChevronRight size={18} />
+            </button>
+          )}
+        </div>
+
+        <div className="c-sync-row__identity">
+          <div className="c-sync-row__name" title={row.name}>
+            {row.name}
+          </div>
+          <div className="c-sync-row__meta">
+            <span className="c-sync-row__duration">{formatMinutes(row.totalMinutes)}</span>
+            {canExpand && (
+              <>
+                <span className="c-sync-row__dot">·</span>
+                <span>
+                  {plannedEntries.length} {plannedEntries.length === 1 ? 'entry' : 'entries'}
+                </span>
+              </>
+            )}
+          </div>
+        </div>
+
+        <div className="c-sync-row__service">
+          <ProductiveTimesheetDropdown
+            date={date}
+            value={selection.serviceId}
+            valuePath={selection.path}
+            valueParts={selection.parts}
+            onChange={(picked) =>
+              onChange(
+                row.tagNameId,
+                picked
+                  ? {
+                      companyId: picked.companyId,
+                      dealId: picked.dealId,
+                      serviceId: picked.serviceId,
+                      path: picked.path,
+                      parts: picked.parts,
+                    }
+                  : { ...EMPTY_SELECTION }
+              )
+            }
+            placeholder="Not mapped — pick a service"
+          />
+        </div>
+
+        <div className="c-sync-row__status">
+          {pill && <span className={`c-sync-pill ${pill.className}`}>{pill.label}</span>}
+        </div>
       </div>
+
+      {expanded && (
+        <ul className="c-sync-row__entries">
+          {plannedEntries.map((entry) => {
+            const entryStatus = findEntryStatus(status, entry);
+            return (
+              <li key={entry.key} className="c-sync-row__entry">
+                <div className="c-sync-row__entry-line">
+                  <CheckBox
+                    checked={!!includedKeys[entry.key]}
+                    size="entry"
+                    label={`Include "${entry.note || 'No note'}" in the next sync`}
+                    title="Sync this entry"
+                    onToggle={() => onToggleEntries([entry.key], !includedKeys[entry.key])}
+                  />
+                  <span className="c-sync-row__entry-minutes">{formatMinutes(entry.minutes)}</span>
+                  <span
+                    className={`c-sync-row__entry-note${entry.note ? '' : ' is-empty'}`}
+                    title={entry.note || 'No note'}
+                  >
+                    {entry.note || 'No note'}
+                  </span>
+                  {entryStatus && (
+                    <span
+                      className={`c-sync-row__entry-status${entryStatus.status === 'created' ? ' is-booked' : ' is-failed'}`}
+                    >
+                      {entryStatus.status === 'created' ? 'Booked' : 'Failed'}
+                    </span>
+                  )}
+                </div>
+                {entryStatus?.status === 'failed' && entryStatus.error && (
+                  // Productive's reason is the most useful thing on screen after a failure, so it
+                  // wraps in full instead of being truncated into a tooltip.
+                  <div className="c-sync-row__entry-error">{entryStatus.error}</div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>
   );
 }
@@ -204,9 +434,21 @@ export function SyncToProductiveModal({
   timelineType,
   events,
 }: SyncToProductiveModalProps) {
-  const [outputLocation, setOutputLocation] = useState(OUTPUT_LOCATIONS[0]);
+  const [outputMenuOpen, setOutputMenuOpen] = useState(false);
   const [selection, setSelection] = useState<Record<string, RowSelection>>({});
   const [isSyncing, setIsSyncing] = useState(false);
+  /** Per planned-entry inclusion in the next sync, keyed by `PlannedEntry.key`. */
+  const [includedKeys, setIncludedKeys] = useState<Record<string, boolean>>({});
+  const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
+  /** Summary of the sync that just ran; only shown while something in it failed. */
+  const [report, setReport] = useState<{ created: number; failed: number } | null>(null);
+
+  // Powers the endpoint chip in the header: which Productive account this will actually book to.
+  const { data: integration } = useQuery({
+    queryKey: ['integrations', 'productive'],
+    queryFn: () => integrationsApi.findOne('productive'),
+    enabled: open,
+  });
 
   const queryClient = useQueryClient();
   const { mutateAsync: updateTagName } = useMutation({ ...tagNamesControllerUpdateMutation() });
@@ -218,7 +460,29 @@ export function SyncToProductiveModal({
     enabled: open,
   });
 
+  // The outcome of the last sync for this day, so rows can show where they stand and default
+  // their already-booked entries off.
+  const { data: syncStatuses = [], isLoading: syncStatusesLoading } = useQuery({
+    queryKey: ['productive', 'sync-status', date],
+    queryFn: () => productiveApi.getSyncStatuses(date),
+    enabled: open,
+  });
+
+  const statusByTagNameId = useMemo(() => {
+    const map = new Map<string, SyncStatus>();
+    for (const status of syncStatuses) map.set(status.tagNameId, status);
+    return map;
+  }, [syncStatuses]);
+
   const rows = useMemo(() => buildRows(events), [events]);
+
+  const plannedByTagNameId = useMemo(() => {
+    const map = new Map<string, PlannedEntry[]>();
+    for (const row of rows) {
+      map.set(row.tagNameId, buildPlannedEntries(row, selection[row.tagNameId]?.serviceId ?? ''));
+    }
+    return map;
+  }, [rows, selection]);
 
   const codeByTagNameId = useMemo(() => {
     const map = new Map<string, string | null>();
@@ -237,7 +501,9 @@ export function SyncToProductiveModal({
       prefilledRef.current = false;
       return;
     }
-    if (prefilledRef.current || tagNamesLoading) return;
+    // Wait for the stored statuses too: the inclusion defaults below depend on them, and
+    // prefilling before they land would queue up entries that are already booked.
+    if (prefilledRef.current || tagNamesLoading || syncStatusesLoading) return;
     setSelection(() => {
       const next: Record<string, RowSelection> = {};
       for (const row of rows) {
@@ -247,42 +513,120 @@ export function SyncToProductiveModal({
 
       return next;
     });
+    setExpandedRows({});
+    setReport(null);
     prefilledRef.current = true;
-  }, [open, tagNamesLoading, rows, codeByTagNameId]);
+  }, [open, tagNamesLoading, syncStatusesLoading, rows, codeByTagNameId]);
+
+  // Seed the inclusion state for entries that do not have one yet — on first prefill, and again
+  // whenever picking a different service introduces new entries. Choices already made by hand
+  // are left alone.
+  useEffect(() => {
+    if (!open || !prefilledRef.current) return;
+    setIncludedKeys((prev) => {
+      const next = { ...prev };
+      let changed = false;
+      for (const [tagNameId, entries] of plannedByTagNameId) {
+        const status = statusByTagNameId.get(tagNameId);
+        for (const entry of entries) {
+          if (entry.key in next) continue;
+          next[entry.key] = defaultIncluded(status, entry);
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
+  }, [open, plannedByTagNameId, statusByTagNameId]);
+
+  const handleToggleEntries = (keys: string[], included: boolean) => {
+    setIncludedKeys((prev) => {
+      const next = { ...prev };
+      for (const key of keys) next[key] = included;
+      return next;
+    });
+  };
+
+  const handleToggleExpanded = (tagNameId: string) => {
+    setExpandedRows((prev) => ({ ...prev, [tagNameId]: !prev[tagNameId] }));
+  };
 
   const handleRowChange = (tagNameId: string, rowSelection: RowSelection) => {
     setSelection((prev) => ({ ...prev, [tagNameId]: rowSelection }));
   };
 
-  // A row is either mapped to a service or left on "Do not sync" and skipped.
-  const canSync = rows.some((row) => !!selection[row.tagNameId]?.serviceId);
+  // Only entries that are both mapped to a service and ticked will be sent.
+  const queuedEntries = useMemo(
+    () =>
+      Array.from(plannedByTagNameId.values())
+        .flat()
+        .filter((entry) => includedKeys[entry.key]),
+    [plannedByTagNameId, includedKeys]
+  );
+
+  const canSync = queuedEntries.length > 0;
+
+  const selectedMinutes = useMemo(
+    () => queuedEntries.reduce((total, entry) => total + entry.minutes, 0),
+    [queuedEntries]
+  );
+
+  const allEntries = useMemo(() => Array.from(plannedByTagNameId.values()).flat(), [plannedByTagNameId]);
+
+  // "Select all" flips to "Deselect all" once everything mappable is already ticked.
+  const allSelected = allEntries.length > 0 && queuedEntries.length === allEntries.length;
+  const anyExpanded = rows.some((row) => expandedRows[row.tagNameId]);
+
+  // Only offered once a sync has actually left failures behind to re-target.
+  const failedEntryKeys = useMemo(
+    () =>
+      allEntries
+        .filter((entry) => findEntryStatus(statusByTagNameId.get(entry.tagNameId), entry)?.status === 'failed')
+        .map((entry) => entry.key),
+    [allEntries, statusByTagNameId]
+  );
+
+  const handleSelectAll = () => {
+    const next: Record<string, boolean> = {};
+    for (const entry of allEntries) next[entry.key] = !allSelected;
+    setIncludedKeys((prev) => ({ ...prev, ...next }));
+  };
+
+  const handleSelectFailed = () => {
+    const failed = new Set(failedEntryKeys);
+    const next: Record<string, boolean> = {};
+    for (const entry of allEntries) next[entry.key] = failed.has(entry.key);
+    setIncludedKeys((prev) => ({ ...prev, ...next }));
+  };
+
+  const handleToggleAllExpanded = () => {
+    const next: Record<string, boolean> = {};
+    for (const row of rows) next[row.tagNameId] = !anyExpanded;
+    setExpandedRows(next);
+  };
+
+  const selectionSummary =
+    queuedEntries.length === 0
+      ? 'Nothing selected'
+      : `${queuedEntries.length} ${queuedEntries.length === 1 ? 'entry' : 'entries'} selected · ${formatMinutes(selectedMinutes)}`;
+
+  const footerNote = report
+    ? 'Fix the mapping on a failed tag and sync again — booked entries are already unticked.'
+    : canSync
+      ? `Will book ${formatMinutes(selectedMinutes)} to Productive`
+      : 'Tick at least one entry to sync';
+
 
   const handleSync = async () => {
     setIsSyncing(true);
+    setReport(null);
     try {
-      // Group by (service + note): identical notes merge, different notes split.
-      const byKey = new Map<string, { serviceId: string; note: string; minutes: number }>();
-      for (const row of rows) {
-        const serviceId = selection[row.tagNameId]?.serviceId;
-        if (!serviceId) continue;
-        for (const event of row.events) {
-          const key = `${serviceId}||${event.note}`;
-          const existing = byKey.get(key);
-          if (existing) {
-            existing.minutes += event.minutes;
-          } else {
-            byKey.set(key, { serviceId, note: event.note, minutes: event.minutes });
-          }
-        }
-      }
-
-      const entries = Array.from(byKey.values())
-        .map((entry) => ({
-          serviceId: entry.serviceId,
-          minutes: Math.round(entry.minutes),
-          note: entry.note || undefined,
-        }))
-        .filter((entry) => entry.minutes > 0);
+      const entries = queuedEntries.map((entry) => ({
+        id: entry.key,
+        serviceId: entry.serviceId,
+        minutes: Math.round(entry.minutes),
+        note: entry.note || undefined,
+        tagNameIds: [entry.tagNameId],
+      }));
 
       const result = await productiveApi.sync({ date, entries });
 
@@ -307,11 +651,38 @@ export function SyncToProductiveModal({
       // Drop the cached tag names so the next opening prefills from the codes
       // just written instead of the pre-sync snapshot.
       await queryClient.invalidateQueries({ queryKey: tagNamesControllerFindAllOptions({ query: { term: '' } }).queryKey });
+      // Pull the statuses this sync just wrote so the icons and the accordions update in place.
+      await queryClient.invalidateQueries({ queryKey: ['productive', 'sync-status', date] });
 
-      toast(`Synced ${result.created} time ${result.created === 1 ? 'entry' : 'entries'} to Productive`, {
-        type: 'success',
+      // What landed is now booked, so untick it; what failed stays ticked for a retry.
+      const statusById = new Map(result.results.map((entryResult) => [entryResult.id, entryResult.status]));
+      setIncludedKeys((prev) => {
+        const next = { ...prev };
+        for (const [id, status] of statusById) next[id] = status !== 'created';
+        return next;
       });
-      onClose();
+
+      if (result.failed === 0) {
+        toast(`Synced ${result.created} time ${result.created === 1 ? 'entry' : 'entries'} to Productive`, {
+          type: 'success',
+        });
+        onClose();
+        return;
+      }
+
+      // Something was rejected: keep the modal open on the report instead of closing over it,
+      // and open the tags that failed so the reason is visible without hunting for it.
+      setReport({ created: result.created, failed: result.failed });
+      const failedTagNameIds = new Set(
+        queuedEntries
+          .filter((entry) => statusById.get(entry.key) === 'failed')
+          .map((entry) => entry.tagNameId)
+      );
+      setExpandedRows((prev) => {
+        const next = { ...prev };
+        for (const tagNameId of failedTagNameIds) next[tagNameId] = true;
+        return next;
+      });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to sync to Productive';
       toast(message, { type: 'error' });
@@ -321,32 +692,111 @@ export function SyncToProductiveModal({
   };
 
   const itemLabel = timelineType === TimelineType.AutoTag ? 'auto tags' : 'tags';
+  const connected = !!integration?.token;
 
   return (
     <Modal
       open={open}
       onClose={onClose}
-      classNames={{ modal: 'c-sync-modal', closeButton: 'c-button c-button--small' }}
+      showCloseIcon={false}
+      classNames={{
+        overlay: 'c-sync-overlay',
+        modalContainer: 'c-sync-modal-container',
+        modal: 'c-sync-modal',
+      }}
     >
-      <h3>Sync to output</h3>
+      <header className="c-sync-header">
+        <div className="c-sync-header__main">
+          <div className="c-sync-header__title">
+            <h3>Sync to</h3>
+            <div className="c-sync-output">
+              <button
+                type="button"
+                className="c-sync-output__trigger"
+                onClick={() => setOutputMenuOpen((prev) => !prev)}
+                aria-expanded={outputMenuOpen}
+              >
+                {OUTPUT_LOCATIONS[0].name}
+                <ChevronDown size={15} />
+              </button>
+              {outputMenuOpen && (
+                <div className="c-sync-output__menu">
+                  {OUTPUT_LOCATIONS.map((output) => (
+                    <button
+                      type="button"
+                      key={output.id}
+                      className="c-sync-output__option is-selected"
+                      onClick={() => setOutputMenuOpen(false)}
+                    >
+                      <span className={`c-sync-dot${connected ? ' is-connected' : ''}`} />
+                      <span className="c-sync-output__option-text">
+                        <span className="c-sync-output__option-name">{output.name}</span>
+                        <span className="c-sync-output__option-meta">
+                          {connected
+                            ? `${endpointHost(integration?.baseUrl)} · connected`
+                            : 'Not connected — add in Settings'}
+                        </span>
+                      </span>
+                      <Check size={14} />
+                    </button>
+                  ))}
+                  <div className="c-sync-output__footnote">Manage in Settings · Integrations</div>
+                </div>
+              )}
+            </div>
+            <span className="c-sync-endpoint">
+              <span className={`c-sync-dot${connected ? ' is-connected' : ''}`} />
+              {endpointHost(integration?.baseUrl)}
+            </span>
+          </div>
+          <div className="c-sync-header__subtitle">
+            {formatLongDate(date)} · {itemLabel} timeline
+          </div>
+        </div>
+        <button type="button" className="c-sync-header__close" onClick={onClose} aria-label="Close">
+          <X size={20} />
+        </button>
+      </header>
 
-      <div className="c-form">
-        <h4 className="mt-4">Output location</h4>
-        <Select
-          options={OUTPUT_LOCATIONS}
-          value={outputLocation}
-          onChange={(option) => option && setOutputLocation(option)}
-          styles={tagSelectStyles}
-          menuPortalTarget={document.body}
-          menuPosition="fixed"
-          isSearchable={false}
-        />
+      {report && (
+        <div className="c-sync-report" role="status">
+          <AlertTriangle size={18} />
+          <div>
+            <strong>
+              {report.created} of {report.created + report.failed} entries booked — {report.failed} failed.
+            </strong>{' '}
+            <span>
+              Failed entries stay ticked so you can fix the mapping and sync again — the ones that landed are
+              unticked.
+            </span>
+          </div>
+        </div>
+      )}
 
-        <h4 className="mt-4">
-          {itemLabel} for {date}
-        </h4>
+      <div className="c-sync-toolbar">
+        <div className="c-sync-toolbar__summary">{selectionSummary}</div>
+        <div className="c-sync-toolbar__actions">
+          <button type="button" className="c-sync-chip" onClick={handleSelectAll} disabled={allEntries.length === 0}>
+            {allSelected ? 'Deselect all' : 'Select all'}
+          </button>
+          {failedEntryKeys.length > 0 && (
+            <button type="button" className="c-sync-chip is-danger" onClick={handleSelectFailed}>
+              Only failed
+            </button>
+          )}
+          <button
+            type="button"
+            className="c-sync-chip"
+            onClick={handleToggleAllExpanded}
+            disabled={allEntries.length === 0}
+          >
+            {anyExpanded ? 'Collapse all' : 'Expand all'}
+          </button>
+        </div>
+      </div>
 
-        {rows.length === 0 && <p>No {itemLabel} to sync for this day.</p>}
+      <div className="c-sync-rows">
+        {rows.length === 0 && <p className="c-sync-empty">No {itemLabel} to sync for this day.</p>}
 
         {rows.map((row) => (
           <SyncRowItem
@@ -354,19 +804,32 @@ export function SyncToProductiveModal({
             row={row}
             date={date}
             selection={selection[row.tagNameId] ?? EMPTY_SELECTION}
+            plannedEntries={plannedByTagNameId.get(row.tagNameId) ?? []}
+            status={statusByTagNameId.get(row.tagNameId)}
+            includedKeys={includedKeys}
+            expanded={!!expandedRows[row.tagNameId]}
+            onToggleExpanded={handleToggleExpanded}
+            onToggleEntries={handleToggleEntries}
             onChange={handleRowChange}
           />
         ))}
       </div>
 
-      <div className="flex flex-row justify-end gap-2 mt-48">
-        <Button onClick={onClose} variant={ButtonVariant.Secondary}>
-          Cancel
-        </Button>
-        <Button disabled={!canSync || isSyncing} onClick={handleSync} variant={ButtonVariant.Primary}>
-          {isSyncing ? 'Syncing…' : 'Sync'}
-        </Button>
-      </div>
+      <footer className="c-sync-footer">
+        <div className="c-sync-footer__note">{footerNote}</div>
+        <button type="button" className="c-sync-button" onClick={onClose}>
+          {report ? 'Close' : 'Cancel'}
+        </button>
+        <button
+          type="button"
+          className="c-sync-button is-primary"
+          disabled={!canSync || isSyncing}
+          onClick={handleSync}
+        >
+          {isSyncing && <span className="c-sync-spinner" />}
+          {isSyncing ? 'Syncing…' : report ? 'Sync again' : 'Sync'}
+        </button>
+      </footer>
     </Modal>
   );
 }

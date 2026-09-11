@@ -26,8 +26,17 @@
     color: var(--gray-500);
   }
 
+  /* Unmapped reads as an empty slot waiting to be filled, not as a settled choice. */
   &.is-placeholder {
     color: var(--gray-500);
+    border-style: dashed;
+    border-color: var(--gray-300, #d1d5db);
+    padding-block: 0.75rem;
+
+    &:hover:not(:disabled) {
+      border-color: #a78bfa;
+      color: #7c3aed;
+    }
   }
 }
 
@@ -70,14 +79,13 @@
   }
 }
 
+/* Portalled to <body>: fixed to the viewport, with top/left/width/max-height set inline from
+   the trigger's rect so a scrolling ancestor can never clip it. */
 .c-productive-dropdown__panel {
-  position: absolute;
-  top: calc(100% + 0.25rem);
-  left: 0;
-  z-index: 40;
+  position: fixed;
+  z-index: 1400;
   display: flex;
   flex-direction: column;
-  width: 100%;
   min-width: 26rem;
   background-color: #ffffff;
   border: 1px solid var(--gray-200);
@@ -99,6 +107,9 @@
 }
 
 .c-productive-dropdown__list {
+  /* Shrinks within the panel's measured max-height instead of forcing it past the viewport. */
+  flex: 1 1 auto;
+  min-height: 0;
   max-height: 20rem;
   overflow-y: auto;
   padding: 0.25rem 0;

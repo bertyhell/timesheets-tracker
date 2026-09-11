@@ -1,4 +1,605 @@
+/* Tokens taken from the approved design: violet accent, 8px radii, grey borders. */
 .c-sync-modal {
-  width: 100rem;
-  max-width: 90%;
+  --sync-accent: #7c3aed;
+  --sync-border: #e5e7eb;
+
+  width: 100%;
+  max-width: 1040px;
+  margin: 0;
+  padding: 0;
+  border-radius: 12px;
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.28);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 64px);
+  overflow: hidden;
+  color: #111827;
+}
+
+.c-sync-overlay {
+  background: rgba(17, 24, 39, 0.38);
+}
+
+/* Centre the panel with flexbox rather than the library's inline-block + vertical-align trick,
+   which only holds while the panel is inline-level — and it is a flex column here. */
+.c-sync-modal-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+}
+
+.c-sync-modal-container::after {
+  content: none;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────── */
+.c-sync-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--sync-border);
+}
+
+.c-sync-header__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.c-sync-header__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.c-sync-header__title h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.c-sync-header__subtitle {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.c-sync-header__close {
+  border: none;
+  background: transparent;
+  padding: 6px;
+  margin: -6px -6px 0 0;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #6b7280;
+  line-height: 0;
+}
+
+.c-sync-header__close:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+/* ── Output picker + endpoint chip ──────────────────────────────────── */
+.c-sync-output {
+  position: relative;
+}
+
+.c-sync-output__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--sync-border);
+  background: #fff;
+  border-radius: 6px;
+  padding: 3px 8px 3px 10px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #111827;
+}
+
+.c-sync-output__trigger:hover {
+  border-color: #c4b5fd;
+  background: #fdfcff;
+}
+
+.c-sync-output__trigger svg {
+  color: #9ca3af;
+}
+
+.c-sync-output__menu {
+  position: absolute;
+  top: 38px;
+  left: 0;
+  z-index: 20;
+  width: 296px;
+  background: #fff;
+  border: 1px solid var(--sync-border);
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.16);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+}
+
+.c-sync-output__option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.c-sync-output__option:hover {
+  background: #f5f3ff;
+}
+
+.c-sync-output__option.is-selected {
+  background: #f5f3ff;
+}
+
+.c-sync-output__option svg {
+  color: var(--sync-accent);
+}
+
+.c-sync-output__option-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.c-sync-output__option-name {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: #111827;
+}
+
+.c-sync-output__option-meta {
+  display: block;
+  margin-top: 1px;
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.c-sync-output__footnote {
+  border-top: 1px solid #f3f4f6;
+  margin-top: 4px;
+  padding: 8px 10px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.c-sync-endpoint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border: 1px solid var(--sync-border);
+  border-radius: 999px;
+  font-size: 11px;
+  color: #6b7280;
+  background: #f9fafb;
+}
+
+/* Grey until the integration actually has a token — never claim a connection we don't have. */
+.c-sync-dot {
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: 999px;
+  background: #d1d5db;
+}
+
+.c-sync-dot.is-connected {
+  background: #10b981;
+}
+
+/* ── Failure report ─────────────────────────────────────────────────── */
+.c-sync-report {
+  margin: 16px 24px 0;
+  display: flex;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #78350f;
+}
+
+.c-sync-report svg {
+  flex: none;
+  margin-top: 1px;
+  color: #b45309;
+}
+
+.c-sync-report strong {
+  color: #7c2d12;
+  font-weight: 600;
+}
+
+/* ── Toolbar ────────────────────────────────────────────────────────── */
+.c-sync-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 16px 24px 12px;
+}
+
+.c-sync-toolbar__summary {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.c-sync-toolbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.c-sync-chip {
+  border: 1px solid var(--sync-border);
+  background: #fff;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  color: #374151;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.c-sync-chip:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.c-sync-chip:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.c-sync-chip.is-danger {
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.c-sync-chip.is-danger:hover:not(:disabled) {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+/* ── Row list ───────────────────────────────────────────────────────── */
+.c-sync-rows {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.c-sync-empty {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.c-sync-row {
+  flex: none;
+  border: 1px solid var(--sync-border);
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* A tag with a failed entry is tinted end to end, so it reads before the rest of the list. */
+.c-sync-row.has-failure {
+  border-color: #fecaca;
+  background: #fffbfb;
+}
+
+/* The service picker shares the width instead of taking a fixed 60% of it. */
+.c-sync-row__head {
+  display: grid;
+  grid-template-columns: 22px 20px minmax(140px, 1fr) minmax(0, 1.5fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+}
+
+.c-sync-row__chevron-cell {
+  display: flex;
+}
+
+.c-sync-row__chevron {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  color: #9ca3af;
+  line-height: 0;
+  display: flex;
+  transition: transform 140ms ease;
+}
+
+.c-sync-row__chevron:hover {
+  color: #4b5563;
+}
+
+.c-sync-row__chevron.is-expanded {
+  transform: rotate(90deg);
+}
+
+.c-sync-row__identity {
+  min-width: 0;
+}
+
+.c-sync-row__name {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.c-sync-row__meta {
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.c-sync-row__duration {
+  font-variant-numeric: tabular-nums;
+}
+
+.c-sync-row__dot {
+  color: #d1d5db;
+}
+
+.c-sync-row__service {
+  min-width: 0;
+}
+
+.c-sync-row__status {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 96px;
+}
+
+/* ── Status pill — one vocabulary for a tag's state ─────────────────── */
+.c-sync-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.c-sync-pill::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.c-sync-pill.is-synced {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.c-sync-pill.is-partial {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.c-sync-pill.is-failed {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* ── Checkboxes ─────────────────────────────────────────────────────── */
+.c-sync-check {
+  flex: none;
+  border-radius: 4px;
+  border: 1.5px solid #d1d5db;
+  background: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: #fff;
+}
+
+.c-sync-check--row {
+  width: 18px;
+  height: 18px;
+}
+
+.c-sync-check--entry {
+  width: 16px;
+  height: 16px;
+}
+
+.c-sync-check.is-on {
+  background: var(--sync-accent);
+  border-color: var(--sync-accent);
+}
+
+.c-sync-check:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.c-sync-check__dash {
+  width: 8px;
+  height: 2px;
+  background: #fff;
+  border-radius: 1px;
+}
+
+/* ── Expanded entries ───────────────────────────────────────────────── */
+.c-sync-row__entries {
+  border-top: 1px solid #f3f4f6;
+  background: #fcfcfd;
+  padding: 6px 14px 10px 54px;
+  margin: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.c-sync-row__entry {
+  flex: none;
+  padding: 7px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.c-sync-row__entry:last-child {
+  border-bottom: none;
+}
+
+.c-sync-row__entry-line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.c-sync-row__entry-minutes {
+  width: 52px;
+  flex: none;
+  font-size: 12px;
+  color: #6b7280;
+  font-variant-numeric: tabular-nums;
+}
+
+.c-sync-row__entry-note {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  color: #374151;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.c-sync-row__entry-note.is-empty {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.c-sync-row__entry-status {
+  flex: none;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.c-sync-row__entry-status.is-booked {
+  color: #059669;
+}
+
+.c-sync-row__entry-status.is-failed {
+  color: #dc2626;
+}
+
+/* Productive's reason wraps in full — it is the most useful thing on screen after a failure. */
+.c-sync-row__entry-error {
+  margin: 6px 0 2px 28px;
+  padding: 8px 10px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #b91c1c;
+}
+
+/* ── Footer ─────────────────────────────────────────────────────────── */
+.c-sync-footer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 24px;
+  border-top: 1px solid var(--sync-border);
+  background: #fafafa;
+}
+
+.c-sync-footer__note {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.c-sync-button {
+  border: 1px solid var(--sync-border);
+  background: #fff;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  color: #374151;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* Scoped away from the primary button, which keeps its accent fill and only brightens. */
+.c-sync-button:not(.is-primary):hover:not(:disabled) {
+  background: #f3f4f6;
+}
+
+.c-sync-button.is-primary {
+  border: none;
+  padding: 8px 18px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--sync-accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.c-sync-button.is-primary:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+
+.c-sync-button.is-primary:disabled {
+  background: #c4b5fd;
+  cursor: default;
+}
+
+.c-sync-spinner {
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-top-color: #fff;
+  border-radius: 999px;
+  display: inline-block;
+  animation: c-sync-spin 700ms linear infinite;
+}
+
+@keyframes c-sync-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

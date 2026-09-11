@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Building2, ChevronDown, ChevronRight, Folder, Receipt, X } from 'lucide-react';
 
@@ -143,6 +144,15 @@ export function ProductiveTimesheetDropdown({
   const [activeIndex, setActiveIndex] = useState(-1);
 
   const rootRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  // The panel is portalled to <body>, so it needs viewport coordinates of its own rather
+  // than inheriting the trigger's containing block.
+  const [panelPos, setPanelPos] = useState<{
+    top: number;
+    left: number;
+    width: number;
+    maxHeight: number;
+  } | null>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -200,11 +210,55 @@ export function ProductiveTimesheetDropdown({
   useEffect(() => {
     if (!open) return;
     const handleClickOutside = (evt: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(evt.target as Node)) setOpen(false);
+      const target = evt.target as Node;
+      // The panel lives outside the root in the portal, so it has to be tested separately —
+      // otherwise clicking inside it would count as clicking away.
+      if (rootRef.current?.contains(target) || panelRef.current?.contains(target)) return;
+      setOpen(false);
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [open]);
+
+  const GAP = 4;
+  const VIEWPORT_MARGIN = 8;
+  /** The list's own max-height (20rem) plus the search box and footer around it. */
+  const PREFERRED_HEIGHT = 420;
+
+  // Anchor the portalled panel to the trigger: below it when there is room, flipped above when
+  // there is not, and never taller than the space it actually has.
+  const positionPanel = useCallback(() => {
+    const trigger = triggerRef.current;
+    if (!trigger) return;
+    const rect = trigger.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom - GAP - VIEWPORT_MARGIN;
+    const spaceAbove = rect.top - GAP - VIEWPORT_MARGIN;
+    const below = spaceBelow >= Math.min(PREFERRED_HEIGHT, spaceAbove) || spaceBelow >= spaceAbove;
+    const maxHeight = Math.max(160, Math.min(PREFERRED_HEIGHT, below ? spaceBelow : spaceAbove));
+
+    setPanelPos({
+      top: below ? rect.bottom + GAP : Math.max(VIEWPORT_MARGIN, rect.top - GAP - maxHeight),
+      left: rect.left,
+      width: rect.width,
+      maxHeight,
+    });
+  }, []);
+
+  // Before paint, so the panel never shows up at a stale position for a frame.
+  useLayoutEffect(() => {
+    if (!open) {
+      setPanelPos(null);
+      return;
+    }
+    positionPanel();
+    // `true` catches scrolling in the modal's own row list, which does not bubble.
+    window.addEventListener('scroll', positionPanel, true);
+    window.addEventListener('resize', positionPanel);
+    return () => {
+      window.removeEventListener('scroll', positionPanel, true);
+      window.removeEventListener('resize', positionPanel);
+    };
+  }, [open, positionPanel]);
 
   useEffect(() => {
     if (open) {
@@ -355,8 +409,21 @@ export function ProductiveTimesheetDropdown({
         <ChevronDown size={14} className={`c-productive-dropdown__chevron${open ? ' is-open' : ''}`} />
       </button>
 
-      {open && (
-        <div className="c-productive-dropdown__panel" onKeyDown={handleKeyDown}>
+      {open &&
+        panelPos &&
+        // Rendered into <body> so the modal's scrolling row list cannot clip it.
+        createPortal(
+          <div
+            ref={panelRef}
+            className="c-productive-dropdown__panel"
+            onKeyDown={handleKeyDown}
+            style={{
+              top: panelPos.top,
+              left: panelPos.left,
+              width: panelPos.width,
+              maxHeight: panelPos.maxHeight,
+            }}
+          >
           <input
             ref={searchRef}
             type="text"
@@ -445,8 +512,9 @@ export function ProductiveTimesheetDropdown({
               Expand all
             </button>
           </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </div>
   );
 }

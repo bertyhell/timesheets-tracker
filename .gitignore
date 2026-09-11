@@ -36,3 +36,4 @@ test-results/
 blob-report/
 
 *.sqlite3 copy
+ai-files/

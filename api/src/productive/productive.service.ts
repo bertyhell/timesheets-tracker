@@ -5,7 +5,14 @@ import { TimelineEventDto } from '../timelines/dto/response-timeline-events.dto'
 import { ProductiveCompanyDto } from './dto/company.dto';
 import { ProductiveDealDto } from './dto/deal.dto';
 import { ProductiveServiceDto } from './dto/service.dto';
-import { SyncTimeEntryDto } from './dto/sync-time-entries.dto';
+import {
+  SyncEntryResultDto,
+  SyncTimeEntriesResultDto,
+  SyncTimeEntryDto,
+} from './dto/sync-time-entries.dto';
+import { SyncStatusDto, SyncStatusEntryDto, SyncStatusValue } from './dto/sync-status.dto';
+import { findSyncStatusesByDate } from './queries/findSyncStatusesByDate';
+import { upsertSyncStatus } from './queries/upsertSyncStatus';
 import {
   ProductiveServiceTreeNodeDto,
   ProductiveServiceTreeNodeKind,
@@ -307,9 +314,9 @@ export class ProductiveService {
     return result;
   }
 
-  async createTimeEntries(date: string, entries: SyncTimeEntryDto[]): Promise<{ created: number }> {
+  async createTimeEntries(date: string, entries: SyncTimeEntryDto[]): Promise<SyncTimeEntriesResultDto> {
     if (entries.length === 0) {
-      return { created: 0 };
+      return { created: 0, failed: 0, results: [] };
     }
 
     const { baseUrl, organisationId, token, userId } = this.getIntegration();
@@ -325,7 +332,11 @@ export class ProductiveService {
     // One standard JSON:API create per entry (`data` is a single resource
     // object). A day only has a handful of entries, well under the
     // 100-requests-per-10-seconds rate limit.
-    let created = 0;
+    //
+    // Every entry is attempted even after one is rejected: a single unbookable
+    // service should not strand the rest of the day, and the caller gets a
+    // per-entry report instead of a count that stops at the first failure.
+    const results: SyncEntryResultDto[] = [];
     for (const entry of entries) {
       const attributes: Record<string, unknown> = { date, time: entry.minutes };
       if (entry.note) attributes.note = entry.note;
@@ -341,28 +352,119 @@ export class ProductiveService {
         },
       };
 
-      const res = await fetch(url, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(body),
-      });
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(body),
+        });
 
-      if (!res.ok) {
-        const errorBody = await res.text().catch(() => '');
-        throw new Error(
-          `Productive time entry request failed (${created}/${entries.length} created): ${res.status} — ${errorBody}`
-        );
+        if (res.ok) {
+          results.push({ id: entry.id, status: 'created' });
+        } else {
+          const errorBody = await res.text().catch(() => '');
+          results.push({
+            id: entry.id,
+            status: 'failed',
+            error: ProductiveService.describeJsonApiError(errorBody) ?? `${res.status} ${errorBody}`.trim(),
+          });
+        }
+      } catch (err) {
+        // Network-level failure: Productive never saw the entry, so it is safe
+        // to report it as failed and let the user retry it.
+        results.push({
+          id: entry.id,
+          status: 'failed',
+          error: err instanceof Error ? err.message : String(err),
+        });
       }
-
-      created += 1;
     }
 
-    return { created };
+    this.recordSyncStatuses(date, entries, results);
 
-    // // Temporary: the real POST above is commented out for debugging. Remove this
-    // console.log('sending items to time_entries', JSON.stringify(body, null, 2));
-    // // once the fetch is re-enabled so the real created count is returned.
-    // return { created: entries.length };
+    const created = results.filter((result) => result.status === 'created').length;
+    return { created, failed: results.length - created, results };
+  }
+
+  /**
+   * Rolls the per-entry outcomes up per tag name and stores them for `date`, so reopening the
+   * sync modal shows what landed last time and can default the failures back on.
+   *
+   * An entry that merges several tags reports the same outcome to each of them.
+   */
+  private recordSyncStatuses(date: string, entries: SyncTimeEntryDto[], results: SyncEntryResultDto[]): void {
+    const resultById = new Map(results.map((result) => [result.id, result]));
+    const byTagName = new Map<string, SyncStatusEntryDto[]>();
+
+    for (const entry of entries) {
+      const result = resultById.get(entry.id);
+      if (!result) continue;
+      for (const tagNameId of entry.tagNameIds) {
+        const statusEntry: SyncStatusEntryDto = {
+          serviceId: entry.serviceId,
+          note: entry.note ?? '',
+          minutes: entry.minutes,
+          status: result.status,
+          error: result.error,
+        };
+        const existing = byTagName.get(tagNameId);
+        if (existing) existing.push(statusEntry);
+        else byTagName.set(tagNameId, [statusEntry]);
+      }
+    }
+
+    const syncedAt = new Date().toISOString();
+    const db = this.databaseService.getDb();
+
+    for (const [tagNameId, statusEntries] of byTagName) {
+      const createdCount = statusEntries.filter((statusEntry) => statusEntry.status === 'created').length;
+      const status: SyncStatusValue =
+        createdCount === statusEntries.length ? 'synced' : createdCount === 0 ? 'failed' : 'partial';
+
+      try {
+        upsertSyncStatus(db, { status, entries: JSON.stringify(statusEntries), syncedAt }, { tagNameId, date });
+      } catch (err) {
+        // The time entries are already booked in Productive; losing the local
+        // bookkeeping must not turn a successful sync into a failed request.
+        console.error('[Productive] failed to record sync status for tag name', tagNameId, err);
+      }
+    }
+  }
+
+  /** The last sync outcome per tag name for `date`, for the sync modal's status column. */
+  async getSyncStatuses(date: string): Promise<SyncStatusDto[]> {
+    const rows = findSyncStatusesByDate(this.databaseService.getDb(), { date });
+    return rows.map((row) => ({
+      tagNameId: row.tagNameId,
+      status: row.status as SyncStatusValue,
+      entries: ProductiveService.parseSyncStatusEntries(row.entries),
+      syncedAt: row.syncedAt,
+    }));
+  }
+
+  private static parseSyncStatusEntries(raw: string): SyncStatusEntryDto[] {
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? (parsed as SyncStatusEntryDto[]) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Pulls the human-readable `detail` out of a JSON:API error body, falling
+   * back to null when the body is not the shape Productive documents.
+   */
+  private static describeJsonApiError(body: string): string | null {
+    try {
+      const parsed = JSON.parse(body) as { errors?: { detail?: string; title?: string }[] };
+      const messages = (parsed.errors ?? [])
+        .map((error) => error.detail ?? error.title)
+        .filter((message): message is string => Boolean(message));
+      return messages.length > 0 ? messages.join('; ') : null;
+    } catch {
+      return null;
+    }
   }
 
   private mapBookingsToEvents(

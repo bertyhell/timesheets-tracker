@@ -37,8 +37,44 @@
   color: var(--gray-500);
 }
 
-.c-edit-auto-tag-modal__hint {
-  margin-top: 0.25rem;
-  font-size: 0.75rem;
+.c-edit-auto-tag-modal__active-period-info {
+  display: inline-flex;
+  align-items: center;
   color: var(--gray-500);
+  cursor: help;
+}
+
+.c-edit-auto-tag-modal__active-period-info:hover,
+.c-edit-auto-tag-modal__active-period-info:focus-visible {
+  color: var(--gray-700);
+}
+
+.c-edit-auto-tag-modal__quick-picks:first-of-type {
+  margin-top: 0.5rem;
+}
+
+.c-edit-auto-tag-modal__quick-picks {
+  display: flex;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.c-edit-auto-tag-modal__quick-pick {
+  padding: 0.125rem 0.5rem;
+  border: 1px solid var(--gray-200);
+  border-radius: 999px;
+  background-color: white;
+  font-size: 0.75rem;
+  color: var(--gray-700);
+  cursor: pointer;
+}
+
+.c-edit-auto-tag-modal__quick-pick:hover {
+  border-color: var(--primary-3);
+}
+
+.c-edit-auto-tag-modal__quick-pick--active {
+  border-color: var(--primary-2);
+  background-color: var(--primary-4);
+  color: var(--primary-1);
 }

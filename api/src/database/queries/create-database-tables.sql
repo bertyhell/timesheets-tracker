@@ -53,6 +53,9 @@ CREATE TABLE IF NOT EXISTS autoTags
     "tagNameId"     text NOT NULL,
     "priority"      int NOT NULL,
     "conditions"    text NOT NULL,
+    -- Optional yyyy-MM-dd bounds limiting the period in which the rule applies. NULL means unbounded on that side.
+    "activeFrom"    text,
+    "activeUntil"   text,
     FOREIGN KEY ("tagNameId") REFERENCES "tagNames" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 

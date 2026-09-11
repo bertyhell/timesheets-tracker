@@ -5,6 +5,8 @@ export type UpdateAutoTagData = {
   tagNameId: string;
   priority: number;
   conditions: string;
+  activeFrom: string | null;
+  activeUntil: string | null;
 };
 
 export type UpdateAutoTagParams = {
@@ -26,7 +28,9 @@ export function updateAutoTag(
 	    title = ?,
 	    tagNameId = ?,
 	    priority = ?,
-	    conditions = ?
+	    conditions = ?,
+	    activeFrom = ?,
+	    activeUntil = ?
 	WHERE id = ?
 	`;
   return db
@@ -36,6 +40,8 @@ export function updateAutoTag(
       data.tagNameId,
       data.priority,
       data.conditions,
+      data.activeFrom ?? null,
+      data.activeUntil ?? null,
       params.id
     ) as UpdateAutoTagResult;
 }

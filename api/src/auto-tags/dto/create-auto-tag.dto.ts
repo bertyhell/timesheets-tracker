@@ -1,8 +1,10 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsNumber, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString, Matches } from 'class-validator';
 import { type AutoTagCondition } from '../../types/types';
 import { AutoTagConditionDto } from './response-auto-tag.dto';
+
+const DATE_ONLY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
 export class CreateAutoTagDto {
   @IsString()
@@ -41,4 +43,30 @@ export class CreateAutoTagDto {
     default: [],
   })
   conditions: AutoTagCondition[];
+
+  @IsOptional()
+  @IsString()
+  @Matches(DATE_ONLY_REGEX)
+  @Type(() => String)
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description:
+      'First day (yyyy-MM-dd, inclusive) on which the auto tag applies. Omit or null for no start bound.',
+    default: null,
+  })
+  activeFrom?: string | null;
+
+  @IsOptional()
+  @IsString()
+  @Matches(DATE_ONLY_REGEX)
+  @Type(() => String)
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description:
+      'Last day (yyyy-MM-dd, inclusive) on which the auto tag applies. Omit or null for no end bound.',
+    default: null,
+  })
+  activeUntil?: string | null;
 }

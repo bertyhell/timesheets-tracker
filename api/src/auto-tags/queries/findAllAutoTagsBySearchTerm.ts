@@ -10,6 +10,8 @@ export type FindAllAutoTagsBySearchTermResult = {
   tagNameId: string;
   priority: number;
   conditions: string;
+  activeFrom: string | null;
+  activeUntil: string | null;
   'tagName.id': string;
   'tagName.title': string;
   'tagName.color': string;
@@ -26,6 +28,8 @@ export function findAllAutoTagsBySearchTerm(
 	    autoTags.tagNameId,
 	    autoTags.priority,
 	    autoTags.conditions,
+	    autoTags.activeFrom,
+	    autoTags.activeUntil,
 	    tagNames.id as "tagName.id",
 	    tagNames.title as "tagName.title",
 	    tagNames.color as "tagName.color"
@@ -46,6 +50,8 @@ function mapArrayToFindAllAutoTagsBySearchTermResult(data: any) {
     tagNameId: data.tagNameId,
     priority: data.priority,
     conditions: data.conditions,
+    activeFrom: data.activeFrom ?? null,
+    activeUntil: data.activeUntil ?? null,
     'tagName.id': data['tagName.id'],
     'tagName.title': data['tagName.title'],
     'tagName.color': data['tagName.color'],

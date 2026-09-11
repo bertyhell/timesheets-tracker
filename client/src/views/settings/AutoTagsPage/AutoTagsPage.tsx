@@ -28,24 +28,67 @@ import {
   DragOverlay,
 } from '@dnd-kit/core';
 import type { DragEndEvent, DragStartEvent, DragOverEvent } from '@dnd-kit/core';
-import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+  arrayMove,
+} from '@dnd-kit/sortable';
 import { GripHandle } from '../../../components/GripHandle/GripHandle';
 import { reorderAutoTags as reorderAutoTagsApi } from '../../../api/reorder';
 
 const AUTOTAGS_PROPERTY_NAME_FOR_PASTE_DETECTION = 'timesheetTrackerAutoTags';
 
+/**
+ * Mirrors the grouping the API merges on: two rules are duplicates only when they target the same
+ * tag name AND cover the same active period. Conditions can be OR'd together, two date ranges
+ * cannot, so rules whose periods differ are never merged into one another.
+ */
+function autoTagMergeGroupKey(autoTag: AutoTagDto): string {
+  return [autoTag.tagNameId, autoTag.activeFrom ?? '', autoTag.activeUntil ?? ''].join('|');
+}
+
+/** Renders the optional active period of a rule as a compact range, or '—' when unbounded. */
+function formatActivePeriod(autoTag: AutoTagDto): string {
+  if (!autoTag.activeFrom && !autoTag.activeUntil) {
+    return '—';
+  }
+  return `${autoTag.activeFrom ?? '…'} → ${autoTag.activeUntil ?? '…'}`;
+}
+
 function AutoTagDragOverlay({ autoTag }: { autoTag: AutoTagDto }) {
   return (
-    <table style={{ width: '100%', tableLayout: 'fixed', borderCollapse: 'collapse', boxShadow: '0 4px 16px rgba(0,0,0,0.18)', background: 'white', opacity: 0.95 }}>
+    <table
+      style={{
+        width: '100%',
+        tableLayout: 'fixed',
+        borderCollapse: 'collapse',
+        boxShadow: '0 4px 16px rgba(0,0,0,0.18)',
+        background: 'white',
+        opacity: 0.95,
+      }}
+    >
       <tbody>
         <tr>
-          <td style={{ width: 28, paddingLeft: 8, color: '#888' }}><GripHandle /></td>
+          <td style={{ width: 28, paddingLeft: 8, color: '#888' }}>
+            <GripHandle />
+          </td>
           <td style={{ width: 28, paddingLeft: 8 }}>
-            <span style={{ display: 'block', height: 20, width: 20, borderRadius: 6, backgroundColor: autoTag.tagName?.color }} />
+            <span
+              style={{
+                display: 'block',
+                height: 20,
+                width: 20,
+                borderRadius: 6,
+                backgroundColor: autoTag.tagName?.color,
+              }}
+            />
           </td>
           <td style={{ paddingLeft: 12 }}>{autoTag.title}</td>
           <td style={{ paddingLeft: 12 }}>{autoTag.priority}</td>
-          <td /><td />
+          <td style={{ paddingLeft: 12 }}>{formatActivePeriod(autoTag)}</td>
+          <td />
+          <td />
         </tr>
       </tbody>
     </table>
@@ -106,6 +149,7 @@ function SortableAutoTagRow({
       </td>
       <td className="pl-3">{autoTag.title}</td>
       <td className="pl-3">{autoTag.priority}</td>
+      <td className="pl-3 whitespace-nowrap">{formatActivePeriod(autoTag)}</td>
       <td className="w-px whitespace-nowrap">
         <Button
           variant={ButtonVariant.Secondary}
@@ -168,7 +212,9 @@ export function AutoTagsPage() {
   const { mutateAsync: insertAutoTag } = useMutation({ ...autoTagsControllerCreateMutation() });
   const autoTags = autoTagItems as AutoTagDto[];
   const { mutateAsync: deleteAutoTag } = useMutation({ ...autoTagsControllerDeleteMutation() });
-  const { mutateAsync: mergeDuplicates } = useMutation({ ...autoTagsControllerMergeDuplicatesMutation() });
+  const { mutateAsync: mergeDuplicates } = useMutation({
+    ...autoTagsControllerMergeDuplicatesMutation(),
+  });
 
   useEffect(() => {
     refetchAutoTags();
@@ -178,9 +224,7 @@ export function AutoTagsPage() {
     setLocalAutoTags((autoTagItems as AutoTagDto[]) ?? []);
   }, [autoTagItems]);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
-  );
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
   const sortedAutoTags = orderBy(
     localAutoTags,
@@ -188,7 +232,7 @@ export function AutoTagsPage() {
     sortDir
   );
 
-  const activeAutoTag = activeId ? sortedAutoTags.find((t) => t.id === activeId) ?? null : null;
+  const activeAutoTag = activeId ? (sortedAutoTags.find((t) => t.id === activeId) ?? null) : null;
 
   const handleDragStart = ({ active }: DragStartEvent) => {
     setActiveId(active.id as string);
@@ -227,6 +271,8 @@ export function AutoTagsPage() {
           priority: pastedAutoTag.priority,
           tagNameId: pastedAutoTag.tagNameId,
           conditions: pastedAutoTag.conditions as AutoTagConditionDto[],
+          activeFrom: pastedAutoTag.activeFrom ?? null,
+          activeUntil: pastedAutoTag.activeUntil ?? null,
         },
       });
     });
@@ -272,14 +318,15 @@ export function AutoTagsPage() {
     const grouped = new Map<string, AutoTagDto[]>();
     for (const tag of autoTags ?? []) {
       if (!tag.tagNameId) continue;
-      if (!grouped.has(tag.tagNameId)) grouped.set(tag.tagNameId, []);
-      grouped.get(tag.tagNameId)!.push(tag);
+      const groupKey = autoTagMergeGroupKey(tag);
+      if (!grouped.has(groupKey)) grouped.set(groupKey, []);
+      grouped.get(groupKey)!.push(tag);
     }
 
     const duplicateGroups = Array.from(grouped.values()).filter((g) => g.length > 1);
 
     if (duplicateGroups.length === 0) {
-      toast('No duplicate tag names found', { type: 'info' });
+      toast('No rules share both a tag name and an active period', { type: 'info' });
       return;
     }
 
@@ -357,6 +404,7 @@ export function AutoTagsPage() {
                 >
                   Priority{sortIndicator('priority')}
                 </th>
+                <th className="text-left pl-3">Active period</th>
                 <th className="w-px whitespace-nowrap" />
                 <th className="w-px whitespace-nowrap" />
               </tr>
@@ -401,9 +449,7 @@ export function AutoTagsPage() {
             </tbody>
           </table>
         </SortableContext>
-        <DragOverlay>
-          {activeAutoTag && <AutoTagDragOverlay autoTag={activeAutoTag} />}
-        </DragOverlay>
+        <DragOverlay>{activeAutoTag && <AutoTagDragOverlay autoTag={activeAutoTag} />}</DragOverlay>
       </DndContext>
       {mergeGroups && (
         <Modal
@@ -413,14 +459,22 @@ export function AutoTagsPage() {
         >
           <h3>Merge duplicate tag rules</h3>
           <p className="text-gray-500 mt-1 mb-4" style={{ fontSize: '0.85em' }}>
-            The following tag names have multiple rules. They will be merged into one rule per tag,
-            with conditions joined by OR between each original rule.
+            The following rules share a tag name and an active period. Each set is merged into a
+            single rule, with conditions joined by OR between each original rule. Rules for the same
+            tag whose active periods differ are left alone.
           </p>
           <ul className="mb-6" style={{ paddingLeft: '1.25rem', listStyle: 'disc' }}>
             {mergeGroups.map((group) => (
-              <li key={group[0].tagNameId}>
+              <li key={autoTagMergeGroupKey(group[0])}>
                 <strong>{group[0].tagName?.title ?? group[0].tagNameId}</strong>
-                {' — '}{group.length} rules
+                {' — '}
+                {group.length} rules
+                {(group[0].activeFrom || group[0].activeUntil) && (
+                  <span className="text-gray-500">
+                    {' — '}
+                    {formatActivePeriod(group[0])}
+                  </span>
+                )}
               </li>
             ))}
           </ul>

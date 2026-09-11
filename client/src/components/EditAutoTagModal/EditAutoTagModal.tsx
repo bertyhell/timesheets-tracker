@@ -1,7 +1,8 @@
 import './EditAutoTagModal.css';
 
+import { parseISO } from 'date-fns';
 import { cloneDeep } from 'lodash-es';
-import React, { type ChangeEvent, useEffect, useState } from 'react';
+import React, { type ChangeEvent, useEffect, useRef, useState } from 'react';
 import Button, { ButtonVariant } from '../Button/Button';
 import { Modal } from 'react-responsive-modal';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -27,6 +28,7 @@ import {
   type TagName,
 } from '../../types/types';
 import AutoTagConditionInput from '../AutoTagCondition/AutoTagConditionInput';
+import { DateField } from '../DateField/DateField';
 import TagSelectSingle from '../TagSelect/TagSelectSingle';
 import { getRandomColor } from '../Timeline/helpers/getColorForEvent';
 import type { TagNameDto } from '../../generated/api/types.gen';
@@ -75,6 +77,13 @@ export function EditAutoTagModal() {
       : [NEW_CONDITION, NEW_CONDITION]
   );
   const [userModifiedName, setUserModifiedName] = useState<boolean>(false);
+  // '' means "no bound": the auto tag is active indefinitely on that side.
+  const [activeFrom, setActiveFrom] = useState<string>('');
+  // The calendar panels are portalled into the form rather than to <body>: RSuite stacks them
+  // at z-index 7, which is below the modal, so by default they open behind it. The form (rather
+  // than the date row itself) is the container so RSuite has room to open the panel downwards.
+  const activePeriodRef = useRef<HTMLDivElement>(null);
+  const [activeUntil, setActiveUntil] = useState<string>('');
   const { data: autoTagsCount } = useQuery({ ...autoTagsControllerCountOptions() });
   const { data: autoTagResponse } = useQuery({
     ...autoTagsControllerFindOneOptions({ path: { id: id as string } }),
@@ -94,6 +103,8 @@ export function EditAutoTagModal() {
         setSelectedTagName(autoTag.tagName);
       }
       setPriority(autoTag.priority);
+      setActiveFrom(autoTag.activeFrom ?? '');
+      setActiveUntil(autoTag.activeUntil ?? '');
       if (autoTag.conditions?.length !== 0) {
         setConditions(autoTag.conditions);
       }
@@ -143,11 +154,18 @@ export function EditAutoTagModal() {
 
     const tagNameId = selectedTagName.id;
 
+    if (activeFrom && activeUntil && activeFrom > activeUntil) {
+      toast('The active period must start before it ends', { type: 'warning' });
+      return;
+    }
+
     const updatedAutoTag: Omit<AutoTag, 'id'> & { id?: string } = {
       tagNameId,
       title: name,
       priority: autoTagsCount?.count || 0,
       conditions: conditions.filter((condition) => !!condition.value),
+      activeFrom: activeFrom || null,
+      activeUntil: activeUntil || null,
     };
     if (id) {
       // edit existing auto tag
@@ -183,7 +201,7 @@ export function EditAutoTagModal() {
     if (!userModifiedName) setName(newTag.title || '');
   };
 
-  const handleTagChanged = async (option: (TagName | null)) => {
+  const handleTagChanged = async (option: TagName | null) => {
     if (!option) {
       setSelectedTagName(null);
       if (!userModifiedName) setName('');
@@ -200,7 +218,7 @@ export function EditAutoTagModal() {
       setSelectedTagName(option);
       if (!userModifiedName) setName(option.title || '');
     }
-  }
+  };
 
   return (
     <Modal
@@ -210,7 +228,7 @@ export function EditAutoTagModal() {
     >
       <h3>{id ? 'Edit auto tag' : 'Add auto tag'}</h3>
 
-      <div className="c-form">
+      <div className="c-form" ref={activePeriodRef}>
         <label>Tag name</label>
         <div className="flex flex-row items-center gap-2">
           <div className="w-2/3">
@@ -242,6 +260,37 @@ export function EditAutoTagModal() {
             setName(evt.target.value);
           }}
         />
+
+        <label>Active period</label>
+        <div className="c-edit-auto-tag-modal__active-period">
+          <DateField
+            className="c-edit-auto-tag-modal__active-period-date"
+            ariaLabel="Active from"
+            placement="bottomStart"
+            container={() => activePeriodRef.current as HTMLDivElement}
+            placeholder="Always"
+            cleanable
+            value={activeFrom}
+            shouldDisableDate={(date) => !!activeUntil && date > parseISO(activeUntil)}
+            onChange={setActiveFrom}
+          />
+          <span className="c-edit-auto-tag-modal__active-period-arrow">→</span>
+          <DateField
+            className="c-edit-auto-tag-modal__active-period-date"
+            ariaLabel="Active until"
+            placement="bottomStart"
+            container={() => activePeriodRef.current as HTMLDivElement}
+            placeholder="Forever"
+            cleanable
+            value={activeUntil}
+            shouldDisableDate={(date) => !!activeFrom && date < parseISO(activeFrom)}
+            onChange={setActiveUntil}
+          />
+        </div>
+        <p className="c-edit-auto-tag-modal__hint">
+          Leave a date empty to leave that side unbounded. Both days are included, so a rule that
+          ends on 31 March still tags activity on 31 March.
+        </p>
 
         <label>Conditions</label>
         <div>

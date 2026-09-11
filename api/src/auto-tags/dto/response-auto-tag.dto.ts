@@ -1,6 +1,6 @@
-import { IsArray, IsEnum, IsNumber, IsObject, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   type AutoTag,
   type AutoTagCondition,
@@ -94,6 +94,28 @@ export class AutoTagDto implements AutoTag {
     default: '[]',
   })
   conditions: AutoTagCondition[];
+
+  @IsOptional()
+  @IsString()
+  @Type(() => String)
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description:
+      'First day (yyyy-MM-dd, inclusive) on which the auto tag applies. Null when there is no start bound.',
+  })
+  activeFrom: string | null;
+
+  @IsOptional()
+  @IsString()
+  @Type(() => String)
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description:
+      'Last day (yyyy-MM-dd, inclusive) on which the auto tag applies. Null when there is no end bound.',
+  })
+  activeUntil: string | null;
 
   @IsObject()
   @Type(() => TagNameDto)

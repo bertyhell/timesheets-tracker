@@ -6,6 +6,8 @@ export type CreateAutoTagParams = {
   tagNameId: string;
   priority: number;
   conditions: string;
+  activeFrom: string | null;
+  activeUntil: string | null;
 };
 
 export type CreateAutoTagResult = {
@@ -21,9 +23,11 @@ export function createAutoTag(db: DatabaseSync, params: CreateAutoTagParams): Cr
 	    title,
 	    tagNameId,
 	    priority,
-	    conditions
+	    conditions,
+	    activeFrom,
+	    activeUntil
 	)
-	VALUES (?, ?, ?, ?, ?)
+	VALUES (?, ?, ?, ?, ?, ?, ?)
 	`;
   return db
     .prepare(sql)
@@ -32,6 +36,8 @@ export function createAutoTag(db: DatabaseSync, params: CreateAutoTagParams): Cr
       params.title,
       params.tagNameId ?? null,
       params.priority,
-      params.conditions
+      params.conditions,
+      params.activeFrom ?? null,
+      params.activeUntil ?? null
     ) as CreateAutoTagResult;
 }

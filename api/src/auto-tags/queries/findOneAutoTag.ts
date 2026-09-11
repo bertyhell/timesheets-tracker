@@ -10,6 +10,8 @@ export type FindOneAutoTagResult = {
   tagNameId: string;
   priority: number;
   conditions: string;
+  activeFrom: string | null;
+  activeUntil: string | null;
   'tagName.id': string;
   'tagName.title': string;
   'tagName.color': string;
@@ -26,6 +28,8 @@ export function findOneAutoTag(
 	    autoTags.tagNameId,
 	    autoTags.priority,
 	    autoTags.conditions,
+	    autoTags.activeFrom,
+	    autoTags.activeUntil,
 	    tagNames.id as "tagName.id",
 	    tagNames.title as "tagName.title",
 	    tagNames.color as "tagName.color"

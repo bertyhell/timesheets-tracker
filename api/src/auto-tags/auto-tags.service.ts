@@ -22,6 +22,17 @@ import { TimelineWithEventsDto } from '../timelines/dto/response-timeline-events
 import { CustomError } from '../shared/CustomError';
 import { SettingsService } from '../settings/settings.service';
 
+/**
+ * Two rules are merge candidates only when they target the same tag name AND cover the same
+ * active period. Merging joins conditions with OR, which has no equivalent for two date ranges,
+ * so rules whose periods differ must stay separate instead of losing one of the periods.
+ */
+export function autoTagMergeGroupKey(
+  autoTag: Pick<AutoTag, 'tagNameId' | 'activeFrom' | 'activeUntil'>
+): string {
+  return [autoTag.tagNameId, autoTag.activeFrom ?? '', autoTag.activeUntil ?? ''].join('|');
+}
+
 @Injectable()
 export class AutoTagsService {
   constructor(
@@ -91,6 +102,8 @@ export class AutoTagsService {
         tagNameId: autoTag.tagNameId,
         priority: autoTag.priority,
         conditions: JSON.stringify(autoTag.conditions),
+        activeFrom: autoTag.activeFrom || null,
+        activeUntil: autoTag.activeUntil || null,
       });
 
       return this.findOne(id); // is already adapted
@@ -115,6 +128,15 @@ export class AutoTagsService {
           tagNameId: updateAutoTagDto.tagNameId ?? existing.tagNameId,
           priority: updateAutoTagDto.priority ?? existing.priority,
           conditions: JSON.stringify(updateAutoTagDto.conditions ?? existing.conditions),
+          // `undefined` means "not part of this patch"; an explicit null clears the bound.
+          activeFrom:
+            updateAutoTagDto.activeFrom === undefined
+              ? (existing.activeFrom ?? null)
+              : updateAutoTagDto.activeFrom || null,
+          activeUntil:
+            updateAutoTagDto.activeUntil === undefined
+              ? (existing.activeUntil ?? null)
+              : updateAutoTagDto.activeUntil || null,
         },
         { id }
       );
@@ -137,8 +159,12 @@ export class AutoTagsService {
       const grouped = new Map<string, AutoTag[]>();
       for (const tag of autoTags) {
         if (!tag.tagNameId) continue;
-        if (!grouped.has(tag.tagNameId)) grouped.set(tag.tagNameId, []);
-        grouped.get(tag.tagNameId)!.push(tag);
+        // The active period is part of what makes two rules duplicates. Conditions can be OR'd
+        // together but two date ranges cannot, so rules that differ in their period are left
+        // alone rather than merged into one whose period only matches some of them.
+        const groupKey = autoTagMergeGroupKey(tag);
+        if (!grouped.has(groupKey)) grouped.set(groupKey, []);
+        grouped.get(groupKey)!.push(tag);
       }
 
       const duplicateGroups = Array.from(grouped.values()).filter((g) => g.length > 1);
@@ -151,7 +177,9 @@ export class AutoTagsService {
         for (const tag of rest) {
           const conditions = tag.conditions ?? [];
           conditions.forEach((cond, i) => {
-            mergedConditions.push(i === 0 ? { ...cond, booleanOperator: BooleanOperator.OR } : cond);
+            mergedConditions.push(
+              i === 0 ? { ...cond, booleanOperator: BooleanOperator.OR } : cond
+            );
           });
         }
 

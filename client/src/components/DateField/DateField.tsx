@@ -7,13 +7,31 @@ import { DatePicker } from 'rsuite';
 const MIN_COMPLETE_YEAR = 1000;
 
 interface DateFieldProps {
-  /** yyyy-MM-dd */
+  /** yyyy-MM-dd, or '' when the field is allowed to be empty (see `cleanable`). */
   value: string;
-  /** Called with a yyyy-MM-dd string, only once a complete date has been entered. */
+  /**
+   * Called with a yyyy-MM-dd string, only once a complete date has been entered, or with ''
+   * when a cleanable field is cleared.
+   */
   onChange: (value: string) => void;
   shouldDisableDate?: (date: Date) => boolean;
   ariaLabel?: string;
   className?: string;
+  /** Show a clear button and accept '' as a value, for fields where "no date" is meaningful. */
+  cleanable?: boolean;
+  placeholder?: string;
+  /**
+   * Which edge of the field the calendar panel is anchored to. The default hangs it off the
+   * right edge, which needs free space to the left; use 'bottomStart' for a field that sits
+   * near the left edge of its container, or the panel is cut off.
+   */
+  placement?: 'bottomEnd' | 'bottomStart';
+  /**
+   * Where the calendar panel is portalled to. It defaults to `<body>`, where RSuite gives it
+   * z-index 7 — which loses to anything stacked above that, so a field inside a modal has to
+   * point this at an element within the modal or the panel opens behind it.
+   */
+  container?: HTMLElement | (() => HTMLElement);
 }
 
 /**
@@ -32,6 +50,10 @@ export function DateField({
   shouldDisableDate,
   ariaLabel,
   className,
+  cleanable = false,
+  placeholder,
+  placement = 'bottomEnd',
+  container,
 }: DateFieldProps) {
   const [syncKey, setSyncKey] = useState(0);
   // The last value this field itself emitted, so an echo of our own change is not mistaken
@@ -52,14 +74,16 @@ export function DateField({
       key={syncKey}
       className={className}
       aria-label={ariaLabel}
-      defaultValue={parseISO(value)}
+      defaultValue={value ? parseISO(value) : null}
       format="dd/MM/yyyy"
       editable
       oneTap
-      cleanable={false}
+      cleanable={cleanable}
+      placeholder={placeholder}
       isoWeek
       size="sm"
-      placement="bottomEnd"
+      placement={placement}
+      container={container}
       shouldDisableDate={shouldDisableDate}
       onChange={(date) => {
         if (!date || !isValid(date) || date.getFullYear() < MIN_COMPLETE_YEAR) {
@@ -70,6 +94,13 @@ export function DateField({
         const next = format(date, 'yyyy-MM-dd');
         emitted.current = next;
         onChange(next);
+      }}
+      onClean={() => {
+        // Clearing also fires onChange(null), which the guard above treats as a half-typed
+        // date; this runs after it and commits the empty value for real.
+        hasUncommittedEdit.current = false;
+        emitted.current = '';
+        onChange('');
       }}
       onBlur={() => {
         // A half-typed date that was abandoned never got committed, so snap the display back

@@ -69,6 +69,10 @@ export interface AutoTag {
   tagNameId: string;
   priority: number;
   conditions: AutoTagCondition[];
+  /** yyyy-MM-dd, inclusive. null/undefined means the rule has no start bound. */
+  activeFrom?: string | null;
+  /** yyyy-MM-dd, inclusive to the end of that day. null/undefined means no end bound. */
+  activeUntil?: string | null;
   tagName?: TagName;
 }
 

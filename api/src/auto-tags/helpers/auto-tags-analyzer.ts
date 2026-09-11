@@ -12,7 +12,7 @@ import {
   TimelineWithEventsDto,
 } from '../../timelines/dto/response-timeline-events.dto';
 import { compact, uniq, uniqBy } from 'lodash';
-import { isAfter, isBefore, isEqual, parseISO } from 'date-fns';
+import { endOfDay, isAfter, isBefore, isEqual, isValid, parseISO, startOfDay } from 'date-fns';
 import { TagNameDto } from '../../tag-names/dto/response-tag-name.dto';
 import { CustomError } from '../../shared/CustomError';
 import { isNil } from 'es-toolkit';
@@ -127,6 +127,39 @@ function getMatchedAutoTagConditions(
     }
   }
   return null;
+}
+
+/**
+ * An auto tag can be limited to an active period, so a rule for a project that ran from March
+ * to June stops claiming time outside those months instead of having to be deleted.
+ *
+ * Both bounds are optional yyyy-MM-dd days in local time and both are inclusive: an auto tag
+ * with activeUntil 2026-03-31 still matches an event that starts at 23:00 on 31 March. The
+ * event's start is what is compared, so an event straddling a bound belongs to the day it
+ * started on rather than being split.
+ */
+function isAutoTagActiveForEvent(autoTag: AutoTagDto, event: TimelineEventDto): boolean {
+  if (!autoTag.activeFrom && !autoTag.activeUntil) {
+    return true;
+  }
+
+  const eventStartedAt = parseISO(event.startedAt);
+
+  if (autoTag.activeFrom) {
+    const activeFrom = parseISO(autoTag.activeFrom);
+    if (isValid(activeFrom) && isBefore(eventStartedAt, startOfDay(activeFrom))) {
+      return false;
+    }
+  }
+
+  if (autoTag.activeUntil) {
+    const activeUntil = parseISO(autoTag.activeUntil);
+    if (isValid(activeUntil) && isAfter(eventStartedAt, endOfDay(activeUntil))) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 function getEventsAtTimestamp(timelinesWithEvents: TimelineWithEventsDto[], timestamp: string) {
@@ -279,6 +312,10 @@ export function calculateAutoTagEvents(
     eventsAtTimestamp.find((event) => {
       let matchedConditions: MatchedAutoTagConditionDto[] | null = null;
       const autoTag = validAutoTags.find((autoTag) => {
+        if (!isAutoTagActiveForEvent(autoTag, event)) {
+          matchedConditions = null;
+          return false;
+        }
         matchedConditions = getMatchedAutoTagConditions(autoTag, event);
         return !!matchedConditions;
       });

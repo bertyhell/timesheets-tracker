@@ -218,6 +218,14 @@ export type CreateAutoTagDto = {
      * Conditions for the auto tag
      */
     conditions?: Array<AutoTagConditionDto>;
+    /**
+     * First day (yyyy-MM-dd, inclusive) on which the auto tag applies. Omit or null for no start bound.
+     */
+    activeFrom?: string | null;
+    /**
+     * Last day (yyyy-MM-dd, inclusive) on which the auto tag applies. Omit or null for no end bound.
+     */
+    activeUntil?: string | null;
 };
 
 export type AutoTagDto = {
@@ -241,6 +249,14 @@ export type AutoTagDto = {
      * Conditions for the auto tag
      */
     conditions: Array<AutoTagConditionDto>;
+    /**
+     * First day (yyyy-MM-dd, inclusive) on which the auto tag applies. Null when there is no start bound.
+     */
+    activeFrom?: string | null;
+    /**
+     * Last day (yyyy-MM-dd, inclusive) on which the auto tag applies. Null when there is no end bound.
+     */
+    activeUntil?: string | null;
     /**
      * The tag name object linked to this auto tag
      */
@@ -278,6 +294,14 @@ export type UpdateAutoTagsDto = {
      * Conditions for the auto tag
      */
     conditions?: Array<AutoTagConditionDto>;
+    /**
+     * First day (yyyy-MM-dd, inclusive) on which the auto tag applies. Omit or null for no start bound.
+     */
+    activeFrom?: string | null;
+    /**
+     * Last day (yyyy-MM-dd, inclusive) on which the auto tag applies. Omit or null for no end bound.
+     */
+    activeUntil?: string | null;
 };
 
 export type SettingsResponseDto = {

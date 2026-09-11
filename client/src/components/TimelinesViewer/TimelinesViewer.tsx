@@ -2,6 +2,7 @@ import React, { FC, ReactNode, useCallback, useEffect, useMemo, useRef, useState
 import { ChevronLeft, ChevronRight, Maximize, ZoomIn, ZoomOut } from 'lucide-react';
 import {
   AutoTagEventInfoDto,
+  CalendarEventInfoDto,
   TagEventInfoDto,
   TimelineDto,
   TimelineEventDto,
@@ -112,6 +113,22 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
       new Date(event.startedAt).getTime()
     );
     const lastEvent = maxBy(allEvents || [], (event: TimelineEventDto) =>
+      new Date(event.endedAt).getTime()
+    );
+    if (!firstEvent || !lastEvent) return null;
+    return { start: parseISO(firstEvent.startedAt), end: parseISO(lastEvent.endedAt) };
+  }, [allEvents]);
+
+  // Bounds used by "zoom to fit events": all-day events span the whole day and
+  // would make the fit useless, so they are ignored here.
+  const timedEventBounds = useMemo(() => {
+    const timedEvents = (allEvents || []).filter(
+      (event: TimelineEventDto) => !(event.info as CalendarEventInfoDto)?.allDay
+    );
+    const firstEvent = minBy(timedEvents, (event: TimelineEventDto) =>
+      new Date(event.startedAt).getTime()
+    );
+    const lastEvent = maxBy(timedEvents, (event: TimelineEventDto) =>
       new Date(event.endedAt).getTime()
     );
     if (!firstEvent || !lastEvent) return null;
@@ -514,13 +531,13 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
   }, [setZoom]);
 
   const handleZoomToFitEvents = useCallback(() => {
-    if (!eventBounds) return;
-    const paddedStart = subMinutes(eventBounds.start, 30);
-    const paddedEnd = addMinutes(eventBounds.end, 30);
+    if (!timedEventBounds) return;
+    const paddedStart = subMinutes(timedEventBounds.start, 30);
+    const paddedEnd = addMinutes(timedEventBounds.end, 30);
     const newStart = Math.max(0, differenceInMilliseconds(paddedStart, dayStart) / dayWindowMs);
     const newEnd = Math.min(1, differenceInMilliseconds(paddedEnd, dayStart) / dayWindowMs);
     if (newStart < newEnd) setZoom(newStart, newEnd);
-  }, [eventBounds, dayStart, dayWindowMs, setZoom]);
+  }, [timedEventBounds, dayStart, dayWindowMs, setZoom]);
 
   const handlePanLeft = useCallback(() => {
     const span = viewEndRef.current - viewStartRef.current;

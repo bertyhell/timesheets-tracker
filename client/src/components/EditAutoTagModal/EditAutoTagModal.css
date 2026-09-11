@@ -1,70 +1,373 @@
-.c-edit-auto-tag-modal {
-  .c-toggle-button {
-    .c-button:first-child {
-      margin-left: 0;
-    }
-  }
+/* The modal owns its own header / body / footer chrome, so the global modal padding is off. */
+.react-responsive-modal-modal.c-edit-auto-tag-modal {
+  width: 100%;
+  max-width: 900px;
+  padding: 0;
+  border-radius: 12px;
+  overflow: visible;
 }
 
-.c-edit-auto-tag-modal__active-period {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
+.c-edit-auto-tag-modal__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem 1.125rem;
+  border-bottom: 1px solid #f3f4f6;
 }
 
-.c-edit-auto-tag-modal__active-period-date .rs-input-group,
-.c-edit-auto-tag-modal__active-period-date .rs-picker-input-group {
-  border: 1px solid var(--gray-200);
+.c-edit-auto-tag-modal__header-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  margin-top: 2px;
   border-radius: 8px;
-  background-color: white;
+  background-color: var(--primary-4);
+  color: var(--primary);
 }
 
-.c-edit-auto-tag-modal__active-period-date .rs-input-group:focus-within,
-.c-edit-auto-tag-modal__active-period-date .rs-picker-input-group:focus-within {
-  border-color: var(--primary-2);
-  box-shadow: 0 0 0 3px var(--primary-4);
-  outline: 0;
+.c-edit-auto-tag-modal__header-text {
+  flex: 1;
+  min-width: 0;
 }
 
-.c-edit-auto-tag-modal__active-period-date .rs-input {
-  font-size: 0.8125rem;
-  font-family: inherit;
-  color: var(--gray-700);
+.c-edit-auto-tag-modal__title {
+  margin: 0;
+  font-size: 1.1875rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
-.c-edit-auto-tag-modal__active-period-arrow {
+.c-edit-auto-tag-modal__subtitle {
+  margin: 0.1875rem 0 0;
   font-size: 0.8125rem;
   color: var(--gray-500);
 }
 
-.c-edit-auto-tag-modal__active-period-info {
+.c-edit-auto-tag-modal__close {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background-color: transparent;
+  color: var(--gray-500);
+  cursor: pointer;
+}
+
+.c-edit-auto-tag-modal__close:hover,
+.c-edit-auto-tag-modal__close:focus-visible {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+.c-edit-auto-tag-modal__body {
+  /* The calendar panels are portalled in here and positioned absolutely, so this element has
+     to be their offset parent or they land at the wrong height. */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.625rem;
+  padding: 1.375rem 1.5rem 1.5rem;
+}
+
+.c-edit-auto-tag-modal__section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.c-edit-auto-tag-modal__section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.625rem;
+  flex-wrap: wrap;
+}
+
+.c-edit-auto-tag-modal__section-header--spread {
+  justify-content: space-between;
+}
+
+.c-edit-auto-tag-modal__section-title {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gray-700);
+}
+
+.c-edit-auto-tag-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  min-width: 0;
+}
+
+.c-edit-auto-tag-modal__label {
+  display: block;
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--gray-700);
+}
+
+.c-edit-auto-tag-modal__sub-label {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+}
+
+.c-edit-auto-tag-modal__hint {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+}
+
+.c-edit-auto-tag-modal__hint a {
+  color: var(--primary);
+}
+
+.c-edit-auto-tag-modal__hint a:hover {
+  text-decoration: underline;
+}
+
+.c-edit-auto-tag-modal__link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  color: var(--primary);
+  cursor: pointer;
+}
+
+.c-edit-auto-tag-modal__link-button:hover {
+  text-decoration: underline;
+}
+
+/* Rule section --------------------------------------------------------------------------- */
+
+.c-edit-auto-tag-modal__rule-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) 108px;
+  gap: 0.875rem;
+  align-items: start;
+}
+
+.c-edit-auto-tag-modal__input.c-input {
+  height: 38px;
+  padding: 0 0.625rem;
+  border: 1px solid var(--gray-100);
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+
+.c-edit-auto-tag-modal__input.c-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-4);
+}
+
+/* react-select generates its own emotion class names; these hooks match their suffixes. */
+.c-edit-auto-tag-modal__tag-select [class$='-control'] {
+  min-height: 38px;
+  border-radius: 8px;
+  border-color: var(--gray-100);
+}
+
+.c-edit-auto-tag-modal__tag-select [class$='-control']:hover {
+  border-color: var(--gray-200);
+}
+
+.c-edit-auto-tag-modal__tag-select [class$='-indicatorSeparator'] {
+  display: none;
+}
+
+.c-edit-auto-tag-modal__priority {
+  display: flex;
+  align-items: center;
+  height: 38px;
+  border: 1px solid var(--gray-100);
+  border-radius: 8px;
+  background-color: white;
+  overflow: hidden;
+}
+
+.c-edit-auto-tag-modal__priority:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-4);
+}
+
+.c-edit-auto-tag-modal__priority-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 0 0 0.625rem;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.875rem;
+}
+
+.c-edit-auto-tag-modal__priority-steppers {
+  display: flex;
+  flex-direction: column;
+  flex: none;
+  border-left: 1px solid #f3f4f6;
+
+  button {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 18px;
+    border: 0;
+    background-color: white;
+    color: var(--gray-500);
+    cursor: pointer;
+  }
+
+  button:last-child {
+    border-top: 1px solid #f3f4f6;
+  }
+
+  button:hover {
+    background-color: #f9fafb;
+    color: #111827;
+  }
+}
+
+.c-edit-auto-tag-modal__accordion-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.c-edit-auto-tag-modal__accordion-chevron {
+  flex: none;
+  color: var(--gray-500);
+  transition: transform 0.15s ease-in-out;
+}
+
+.c-edit-auto-tag-modal__accordion-chevron--open {
+  transform: rotate(90deg);
+}
+
+.c-edit-auto-tag-modal__tooltip .c-tooltip__content {
+  /* The default 80vw is far too wide for a two-line explanation. */
+  max-width: 20rem;
+}
+
+.c-edit-auto-tag-modal__info {
   display: inline-flex;
   align-items: center;
   color: var(--gray-500);
   cursor: help;
 }
 
-.c-edit-auto-tag-modal__active-period-info:hover,
-.c-edit-auto-tag-modal__active-period-info:focus-visible {
+.c-edit-auto-tag-modal__info:hover,
+.c-edit-auto-tag-modal__info:focus-visible {
   color: var(--gray-700);
 }
 
-.c-edit-auto-tag-modal__quick-picks:first-of-type {
-  margin-top: 0.5rem;
+/* Active period -------------------------------------------------------------------------- */
+
+.c-edit-auto-tag-modal__active-period {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.625rem;
+}
+
+.c-edit-auto-tag-modal__active-period-date {
+  width: 176px;
+}
+
+.c-edit-auto-tag-modal__active-period-date .rs-input-group,
+.c-edit-auto-tag-modal__active-period-date .rs-picker-input-group {
+  height: 38px;
+  border: 1px solid var(--gray-100);
+  border-radius: 8px;
+  background-color: white;
+}
+
+.c-edit-auto-tag-modal__active-period-date .rs-input-group:focus-within,
+.c-edit-auto-tag-modal__active-period-date .rs-picker-input-group:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-4);
+  outline: 0;
+}
+
+.c-edit-auto-tag-modal__active-period-date .rs-input {
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--gray-700);
+}
+
+.c-edit-auto-tag-modal__active-period-arrow {
+  display: flex;
+  align-items: center;
+  height: 38px;
+  color: #9ca3af;
+}
+
+.c-edit-auto-tag-modal__active-period-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  height: 38px;
+  margin-left: 0.25rem;
+  font-size: 0.8125rem;
+  color: var(--gray-700);
+}
+
+.c-edit-auto-tag-modal__quick-pick-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4375rem;
+  padding: 0.75rem 0.875rem;
+  background-color: #f9fafb;
+  border: 1px solid #f3f4f6;
+  border-radius: 10px;
 }
 
 .c-edit-auto-tag-modal__quick-picks {
   display: flex;
-  gap: 0.25rem;
-  margin-top: 0.25rem;
+  align-items: center;
+  gap: 0.625rem;
+  flex-wrap: wrap;
+}
+
+.c-edit-auto-tag-modal__quick-picks-label {
+  flex: none;
+  width: 56px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gray-700);
+}
+
+.c-edit-auto-tag-modal__quick-picks-buttons {
+  display: flex;
+  gap: 0.375rem;
+  flex-wrap: wrap;
 }
 
 .c-edit-auto-tag-modal__quick-pick {
-  padding: 0.125rem 0.5rem;
-  border: 1px solid var(--gray-200);
+  height: 28px;
+  padding: 0 0.75rem;
+  border: 1px solid var(--gray-100);
   border-radius: 999px;
   background-color: white;
-  font-size: 0.75rem;
+  font-family: inherit;
+  font-size: 0.8125rem;
   color: var(--gray-700);
   cursor: pointer;
 }
@@ -74,7 +377,61 @@
 }
 
 .c-edit-auto-tag-modal__quick-pick--active {
-  border-color: var(--primary-2);
+  border-color: var(--primary-3);
   background-color: var(--primary-4);
-  color: var(--primary-1);
+  color: #5b21b6;
+}
+
+/* Conditions ----------------------------------------------------------------------------- */
+
+.c-edit-auto-tag-modal__conditions {
+  border: 1px solid var(--gray-100);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.c-edit-auto-tag-modal__explainer {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.6875rem 0.8125rem;
+  background-color: var(--hover-highlight);
+  border: 1px solid var(--primary-4);
+  border-radius: 10px;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: #4c1d95;
+}
+
+.c-edit-auto-tag-modal__explainer svg {
+  flex: none;
+  margin-top: 1px;
+  color: var(--primary);
+}
+
+/* Footer --------------------------------------------------------------------------------- */
+
+.c-edit-auto-tag-modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+/* On a narrow window the three-up rule row stops fitting, and the condition grid is better
+   scrolled sideways than squashed into unreadable columns. */
+@media (max-width: 640px) {
+  .c-edit-auto-tag-modal__rule-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .c-edit-auto-tag-modal__conditions {
+    overflow-x: auto;
+  }
+
+  .c-edit-auto-tag-modal__conditions .c-auto-tag-condition-grid {
+    min-width: 560px;
+  }
 }

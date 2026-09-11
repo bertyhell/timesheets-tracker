@@ -1,40 +1,97 @@
-.c-auto-tag-condition {
-  display: flex;
-  flex-direction: row;
-  padding-left: 3.5rem;
-  gap: 0.5rem;
-  position: relative;
+.c-auto-tag-condition-grid {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.35fr) 36px;
+  gap: 0.625rem;
+  align-items: center;
+}
 
-  .c-button {
-    margin: 0;
+.c-auto-tag-condition-header {
+  padding: 0.5625rem 0.75rem;
+  background-color: #f9fafb;
+  border-bottom: 1px solid var(--gray-100);
+
+  span {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--gray-700);
   }
 }
-.c-auto-tag-condition--and {
-  margin-top: 0.2rem;
+
+.c-auto-tag-condition {
+  /* The join pill of the next row is lifted onto this row's bottom edge, so the rows need a
+     little more vertical breathing room than the pill is tall. */
+  position: relative;
+  padding: 0.875rem 0.75rem;
+  background-color: white;
 }
 
-.c-auto-tag-condition--or {
-  margin-top: 0.5rem;
+.c-auto-tag-condition + .c-auto-tag-condition {
+  border-top: 1px solid #f3f4f6;
 }
 
-.c-auto-tag-condition__boolean-operator-button {
+.c-auto-tag-condition__join {
+  /* Centred on the divider line above this row. */
   position: absolute;
-  left: 0;
   top: 0;
-  width: 3rem;
-  text-align: center;
-  transform: translateY(calc(-50% - 0.25rem));
+  left: 0.75rem;
+  transform: translateY(-50%);
+  height: 26px;
+  padding: 0 0.625rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  font-family: inherit;
+  cursor: pointer;
 }
 
-.c-auto-tag-condition--and .c-auto-tag-condition__boolean-operator-button {
-  transform: translateY(calc(-50% - 0.1rem));
+.c-auto-tag-condition__join--or {
+  border-color: #ddd6fe;
+  background-color: var(--hover-highlight);
+  color: #6d28d9;
 }
 
-.c-auto-tag-condition__variable-select,
-.c-auto-tag-condition__operator-select {
-  width: 25rem;
+.c-auto-tag-condition__join--and {
+  border-color: #bfdbfe;
+  background-color: #eff6ff;
+  color: #1d4ed8;
 }
 
-.c-auto-tag-condition__value-input {
-  font-size: 0.8rem;
+.c-auto-tag-condition__value.c-input {
+  height: 36px;
+  padding: 0 0.625rem;
+  border: 1px solid var(--gray-100);
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+
+.c-auto-tag-condition__value.c-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-4);
+}
+
+.c-auto-tag-condition__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.c-auto-tag-condition__delete {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background-color: transparent;
+  color: #9ca3af;
+  cursor: pointer;
+}
+
+.c-auto-tag-condition__delete:hover,
+.c-auto-tag-condition__delete:focus-visible {
+  background-color: #fef2f2;
+  color: #dc2626;
 }

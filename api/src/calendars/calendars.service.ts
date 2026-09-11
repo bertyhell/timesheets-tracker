@@ -10,9 +10,9 @@ type ICalEvent = {
   summary?: string;
   description?: string;
   location?: string;
-  start: Date;
+  start: Date & { dateOnly?: boolean };
   end: Date;
-  dateOnly?: boolean;
+  datetype?: 'date' | 'date-time';
 };
 
 @Injectable()
@@ -53,7 +53,9 @@ export class CalendarsService {
           location: event.location || '',
           startedAt: event.start.toISOString(),
           endedAt: event.end.toISOString(),
-          allDay: event.dateOnly || false,
+          // node-ical marks date-only (all-day) events via `datetype`/`start.dateOnly`,
+          // there is no `dateOnly` property on the event itself.
+          allDay: event.datetype === 'date' || event.start?.dateOnly === true,
         })
       );
     } catch (err) {

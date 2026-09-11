@@ -33,9 +33,9 @@ test.describe('Auto tag rules management', () => {
       // already defaults to "contains" for every blank condition row, so it's left alone
       // (clicking it would be ambiguous: every still-blank row shows the same selected value).
       const conditionRow = modal.locator('.c-auto-tag-condition').first();
-      await conditionRow.locator('.c-auto-tag-condition__variable-select').click();
+      await conditionRow.locator('.c-auto-tag-condition__select').first().click();
       await page.getByText('programName', { exact: true }).click();
-      await conditionRow.locator('input.c-auto-tag-condition__value-input').fill(ruleTitle);
+      await conditionRow.locator('input.c-auto-tag-condition__value').fill(ruleTitle);
 
       await modal.getByRole('button', { name: 'Save' }).click();
       await expect(modal).not.toBeVisible();

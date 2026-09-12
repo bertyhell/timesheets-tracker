@@ -45,8 +45,10 @@ export function getMostProminentConditions(
       // Broadest first: most rules tag a whole project, and the narrower ones below are there to be
       // deleted down to whichever one the user actually wants to tag by.
       addIfPresent(conditions, ConditionVariable.jiraProjectKey, info['jiraProjectKey']);
+      addIfPresent(conditions, ConditionVariable.jiraProjectName, info['jiraProjectName']);
       addIfPresent(conditions, ConditionVariable.jiraIssueKey, info['jiraIssueKey']);
       addIfPresent(conditions, ConditionVariable.jiraLabels, info['jiraLabels']);
+      addIfPresent(conditions, ConditionVariable.jiraFixVersions, info['jiraFixVersions']);
       addIfPresent(conditions, ConditionVariable.jiraSprint, info['jiraSprint']);
       break;
     default:

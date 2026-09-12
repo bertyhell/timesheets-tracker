@@ -2,6 +2,7 @@
   display: flex;
   align-items: center;
   width: 100%;
+  gap: 0.5rem;
   padding: 0.5rem 0.625rem;
   border-radius: 8px;
   color: var(--gray-700);
@@ -13,4 +14,17 @@
     background-color: var(--bg-alternative);
     color: var(--primary-0);
   }
+}
+
+.m-integrations__logo {
+  flex-shrink: 0;
+  /* roughly the height of the name + url text block beside it */
+  width: auto;
+  height: 2.25rem;
+  object-fit: contain;
+  background: none;
+}
+
+.m-integrations-dropdown__item .m-integrations__logo {
+  height: 1.25rem;
 }

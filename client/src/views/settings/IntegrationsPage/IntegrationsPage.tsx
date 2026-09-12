@@ -8,12 +8,19 @@ import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import Button, { ButtonVariant } from '../../../components/Button/Button';
 import { Dropdown } from '../../../components/Dropdown/Dropdown';
 import { integrationsApi } from '../../../api/integrations';
+import productiveLogo from '../../../assets/integrations/productive.svg';
+import jiraLogo from '../../../assets/integrations/jira.svg';
 
 // Adding an integration is this entry plus its own settings page — everything below is driven off
 // this list rather than off the integration name.
 const INTEGRATION_TYPES = [
-  { value: 'productive', label: 'Productive', path: '/settings/integrations/productive' },
-  { value: 'jira', label: 'Jira', path: '/settings/integrations/jira' },
+  {
+    value: 'productive',
+    label: 'Productive',
+    path: '/settings/integrations/productive',
+    logo: productiveLogo,
+  },
+  { value: 'jira', label: 'Jira', path: '/settings/integrations/jira', logo: jiraLogo },
 ] as const;
 
 export function IntegrationsPage() {
@@ -59,14 +66,17 @@ export function IntegrationsPage() {
           <>
             {configuredTypes.length > 0 && (
               <div className="flex flex-col gap-3 mb-6">
-                {configuredTypes.map(({ value, label, path, baseUrl }) => (
+                {configuredTypes.map(({ value, label, path, baseUrl, logo }) => (
                   <div key={value} className="border border-gray-200 rounded-lg p-6">
                     <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-semibold text-sm">{label}</p>
-                        <p className="text-gray-500" style={{ fontSize: '0.8em' }}>
-                          {baseUrl}
-                        </p>
+                      <div className="flex items-center gap-3">
+                        <img src={logo} alt="" className="m-integrations__logo" />
+                        <div>
+                          <p className="font-semibold text-sm">{label}</p>
+                          <p className="text-gray-500" style={{ fontSize: '0.8em' }}>
+                            {baseUrl}
+                          </p>
+                        </div>
                       </div>
                       <div className="flex gap-2">
                         <Button
@@ -94,12 +104,13 @@ export function IntegrationsPage() {
               <Dropdown label={<><Plus size={14} />Add integration</>}>
                 {(close) => (
                   <>
-                    {unconfiguredTypes.map(({ value, label, path }) => (
+                    {unconfiguredTypes.map(({ value, label, path, logo }) => (
                       <button
                         key={value}
                         className="m-integrations-dropdown__item"
                         onClick={() => { navigate(path); close(); }}
                       >
+                        <img src={logo} alt="" className="m-integrations__logo" />
                         {label}
                       </button>
                     ))}

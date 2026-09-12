@@ -12,6 +12,7 @@ import { ActiveStatesModule } from '../active-states/active-states.module';
 import { TagNamesModule } from '../tag-names/tag-names.module';
 import { GitCommitsModule } from '../git-commits/git-commits.module';
 import { ProductiveModule } from '../productive/productive.module';
+import { JiraModule } from '../jira/jira.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ProductiveModule } from '../productive/productive.module';
     CalendarsModule,
     DatabaseModule,
     GitCommitsModule,
+    JiraModule,
     ProductiveModule,
     ProgramsModule,
     TagsModule,

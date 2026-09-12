@@ -43,6 +43,7 @@ const NO_EVENTS_MESSAGE_BY_TYPE: Record<TimelineType, string> = {
   [TimelineType.Website]: 'No website activity',
   [TimelineType.GitCommit]: 'No git commits',
   [TimelineType.Productive]: 'No planned time',
+  [TimelineType.Jira]: 'No Jira tickets visited',
 };
 
 export function TimelinesAndEventsPage() {

@@ -88,6 +88,22 @@ export enum ConditionVariable {
   tagNameCode = 'tagNameCode',
   repoName = 'repoName',
   commitMessage = 'commitMessage',
+
+  jiraIssueKey = 'jiraIssueKey',
+  jiraSummary = 'jiraSummary',
+  jiraProjectKey = 'jiraProjectKey',
+  jiraProjectName = 'jiraProjectName',
+  jiraLabels = 'jiraLabels',
+  jiraFixVersions = 'jiraFixVersions',
+  jiraComponents = 'jiraComponents',
+  jiraSprint = 'jiraSprint',
+  jiraAssignee = 'jiraAssignee',
+  jiraReporter = 'jiraReporter',
+  jiraStatus = 'jiraStatus',
+  jiraIssueType = 'jiraIssueType',
+  jiraPriority = 'jiraPriority',
+  jiraParentKey = 'jiraParentKey',
+  jiraParentSummary = 'jiraParentSummary',
 }
 
 export enum ConditionOperator {

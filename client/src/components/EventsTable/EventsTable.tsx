@@ -81,6 +81,14 @@ function getDynamicColumns(timelineType: string | undefined): ColumnDef[] {
         { id: 'serviceName', title: 'Service', allowsSorting: true, width: 150 },
       ];
 
+    case TimelineType.Jira:
+      return [
+        { id: 'jiraIssueKey', title: 'Ticket', allowsSorting: true, width: 110 },
+        { id: 'jiraSummary', title: 'Summary', allowsSorting: true },
+        { id: 'jiraProjectName', title: 'Project', allowsSorting: true, width: 150 },
+        { id: 'jiraSprint', title: 'Sprint', allowsSorting: true, width: 130 },
+      ];
+
     default:
       return [];
   }
@@ -109,6 +117,14 @@ function getCellValue(event: TimelineEventDto, columnKey: string): string {
       return String(info['serviceProject'] ?? '');
     case 'serviceName':
       return String(info['serviceName'] ?? '');
+    case 'jiraIssueKey':
+      return String(info['jiraIssueKey'] ?? '');
+    case 'jiraSummary':
+      return String(info['jiraSummary'] ?? '');
+    case 'jiraProjectName':
+      return String(info['jiraProjectName'] ?? info['jiraProjectKey'] ?? '');
+    case 'jiraSprint':
+      return String(info['jiraSprint'] ?? '');
     case 'startedAt':
       return format(roundToNearestMinutes(parseISO(event.startedAt)), 'HH:mm');
     case 'endedAt':

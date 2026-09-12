@@ -389,6 +389,190 @@ export class GitCommitEventInfoDto {
   commitMessage: string;
 }
 
+/**
+ * Ticket info for a block of time spent on a single Jira ticket.
+ *
+ * Every property name here doubles as a ConditionVariable, so auto-tag rules can match on it — which
+ * is why they all carry the `jira` prefix (a bare `summary` would collide with the calendar one) and
+ * why the multi-value fields are comma-joined strings rather than arrays.
+ */
+export class JiraEventInfoDto {
+  @IsString()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Key of the Jira issue that was visited',
+    example: 'ABC-123',
+    required: true,
+  })
+  jiraIssueKey: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Title of the Jira issue',
+    example: 'Login button is misaligned on mobile',
+    required: false,
+  })
+  jiraSummary?: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Key of the Jira project ("space") the issue belongs to',
+    example: 'ABC',
+    required: false,
+  })
+  jiraProjectKey?: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Name of the Jira project ("space") the issue belongs to',
+    example: 'Acme Web Shop',
+    required: false,
+  })
+  jiraProjectName?: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Labels on the issue, comma separated',
+    example: 'frontend, regression',
+    required: false,
+  })
+  jiraLabels?: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Fix versions of the issue, comma separated',
+    example: '2.4.0',
+    required: false,
+  })
+  jiraFixVersions?: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Components of the issue, comma separated',
+    example: 'Checkout, Payments',
+    required: false,
+  })
+  jiraComponents?: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Name of the sprint the issue is in (the most recent one when it spans several)',
+    example: 'Sprint 42',
+    required: false,
+  })
+  jiraSprint?: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Display name of the assignee',
+    example: 'Jane Doe',
+    required: false,
+  })
+  jiraAssignee?: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Display name of the reporter',
+    example: 'John Roe',
+    required: false,
+  })
+  jiraReporter?: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Current status of the issue',
+    example: 'In Progress',
+    required: false,
+  })
+  jiraStatus?: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Issue type',
+    example: 'Bug',
+    required: false,
+  })
+  jiraIssueType?: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Priority of the issue',
+    example: 'High',
+    required: false,
+  })
+  jiraPriority?: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Key of the parent issue / epic',
+    example: 'ABC-100',
+    required: false,
+  })
+  jiraParentKey?: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Title of the parent issue / epic',
+    example: 'Mobile checkout revamp',
+    required: false,
+  })
+  jiraParentSummary?: string;
+
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Link to the issue in Jira',
+    example: 'https://your-org.atlassian.net/browse/ABC-123',
+    required: false,
+  })
+  jiraUrl?: string;
+}
+
 export class TimelineEventDto {
   @IsString()
   @Type(() => String)
@@ -412,6 +596,7 @@ export class TimelineEventDto {
       { $ref: getSchemaPath(AutoTagEventInfoDto) },
       { $ref: getSchemaPath(GitCommitEventInfoDto) },
       { $ref: getSchemaPath(ProductiveEventInfoDto) },
+      { $ref: getSchemaPath(JiraEventInfoDto) },
     ],
   })
   info:
@@ -422,7 +607,8 @@ export class TimelineEventDto {
     | TagEventInfoDto
     | AutoTagEventInfoDto
     | GitCommitEventInfoDto
-    | ProductiveEventInfoDto;
+    | ProductiveEventInfoDto
+    | JiraEventInfoDto;
 
   @IsString()
   @Type(() => String)

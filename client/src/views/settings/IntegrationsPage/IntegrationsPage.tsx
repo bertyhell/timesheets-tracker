@@ -1,7 +1,7 @@
 import React from 'react';
 import './IntegrationsPage.css';
 import { useNavigate } from 'react-router-dom';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueries, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { Plus, Trash2, Pencil } from 'lucide-react';
 import { PageHeader } from '../../../components/PageHeader/PageHeader';
@@ -9,20 +9,25 @@ import Button, { ButtonVariant } from '../../../components/Button/Button';
 import { Dropdown } from '../../../components/Dropdown/Dropdown';
 import { integrationsApi } from '../../../api/integrations';
 
+// Adding an integration is this entry plus its own settings page — everything below is driven off
+// this list rather than off the integration name.
 const INTEGRATION_TYPES = [
   { value: 'productive', label: 'Productive', path: '/settings/integrations/productive' },
+  { value: 'jira', label: 'Jira', path: '/settings/integrations/jira' },
 ] as const;
-
-type IntegrationTypeValue = (typeof INTEGRATION_TYPES)[number]['value'];
 
 export function IntegrationsPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { data: productiveIntegration, isLoading } = useQuery({
-    queryKey: ['integrations', 'productive'],
-    queryFn: () => integrationsApi.findOne('productive'),
+  const integrationQueries = useQueries({
+    queries: INTEGRATION_TYPES.map(({ value }) => ({
+      queryKey: ['integrations', value],
+      queryFn: () => integrationsApi.findOne(value),
+    })),
   });
+
+  const isLoading = integrationQueries.some((query) => query.isLoading);
 
   const deleteMutation = useMutation({
     mutationFn: (type: string) => integrationsApi.remove(type),
@@ -33,11 +38,14 @@ export function IntegrationsPage() {
     onError: () => toast('Failed to remove integration', { type: 'error' }),
   });
 
-  const isConfigured = (type: IntegrationTypeValue) =>
-    type === 'productive' ? !!productiveIntegration : false;
+  const integrations = INTEGRATION_TYPES.map((integrationType, index) => ({
+    ...integrationType,
+    baseUrl: integrationQueries[index].data?.baseUrl ?? '',
+    isConfigured: !!integrationQueries[index].data,
+  }));
 
-  const configuredTypes = INTEGRATION_TYPES.filter(({ value }) => isConfigured(value));
-  const unconfiguredTypes = INTEGRATION_TYPES.filter(({ value }) => !isConfigured(value));
+  const configuredTypes = integrations.filter(({ isConfigured }) => isConfigured);
+  const unconfiguredTypes = integrations.filter(({ isConfigured }) => !isConfigured);
 
   return (
     <div className="p-integrations-settings">
@@ -51,13 +59,13 @@ export function IntegrationsPage() {
           <>
             {configuredTypes.length > 0 && (
               <div className="flex flex-col gap-3 mb-6">
-                {configuredTypes.map(({ value, label, path }) => (
+                {configuredTypes.map(({ value, label, path, baseUrl }) => (
                   <div key={value} className="border border-gray-200 rounded-lg p-6">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-semibold text-sm">{label}</p>
                         <p className="text-gray-500" style={{ fontSize: '0.8em' }}>
-                          {value === 'productive' ? (productiveIntegration?.baseUrl ?? '') : ''}
+                          {baseUrl}
                         </p>
                       </div>
                       <div className="flex gap-2">

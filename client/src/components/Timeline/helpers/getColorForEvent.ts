@@ -88,6 +88,13 @@ export function getColorForEvent(timelineInfo: TimelineDto, event: TimelineEvent
     case TimelineType.Productive: {
       return getColorFromString((event.info as { tagNameName?: string })?.tagNameName);
     }
+
+    case TimelineType.Jira: {
+      // Coloured per project rather than per ticket, so a day spent in one project reads as one
+      // colour instead of a different colour for every ticket opened.
+      const info = event.info as { jiraProjectKey?: string; jiraIssueKey?: string };
+      return getColorFromString(info?.jiraProjectKey || info?.jiraIssueKey);
+    }
   }
   return getColorFromString(timelineInfo.title);
 }

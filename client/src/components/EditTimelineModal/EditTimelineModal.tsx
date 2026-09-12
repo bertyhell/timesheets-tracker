@@ -48,9 +48,18 @@ export function EditTimelineModal() {
     queryFn: () => integrationsApi.findOne('productive'),
   });
 
-  const timelineTypes: TimelineType[] = productiveIntegration
-    ? [...BASE_TIMELINE_TYPES, 'Productive']
-    : BASE_TIMELINE_TYPES;
+  const { data: jiraIntegration } = useQuery({
+    queryKey: ['integrations', 'jira'],
+    queryFn: () => integrationsApi.findOne('jira'),
+  });
+
+  // Integration-backed types are only offerable once their credentials exist — picking one without
+  // them would just create a permanently empty timeline.
+  const timelineTypes: TimelineType[] = [
+    ...BASE_TIMELINE_TYPES,
+    ...(productiveIntegration ? (['Productive'] as const) : []),
+    ...(jiraIntegration ? (['Jira'] as const) : []),
+  ];
 
   const { mutateAsync: createTimeline } = useMutation({ ...timelinesControllerCreateMutation() });
   const { mutateAsync: updateTimeline } = useMutation({ ...timelinesControllerUpdateMutation() });

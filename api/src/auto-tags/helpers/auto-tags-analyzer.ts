@@ -101,8 +101,12 @@ function doesConditionValueMatchEvent(
       return toCheckValue.toLowerCase() === condition.value.toLowerCase();
     case ConditionOperator.isNotExact:
       return toCheckValue.toLowerCase() !== condition.value.toLowerCase();
+    // The `g` flag is deliberately absent: it makes `.test()` stateful via lastIndex, which would
+    // make a rule match or not depending on how many events came before it.
+    case ConditionOperator.matchesRegex:
+      return new RegExp(condition.value).test(toCheckValue);
     case ConditionOperator.doesNotMatchRegex:
-      return !new RegExp(condition.value, 'g').test(toCheckValue);
+      return !new RegExp(condition.value).test(toCheckValue);
     default:
       return false;
   }

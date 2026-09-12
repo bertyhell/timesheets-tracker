@@ -36,6 +36,7 @@ import { AutoTagDto } from '../auto-tags/dto/response-auto-tag.dto';
 import { TagNamesService } from '../tag-names/tag-names.service';
 import { GitCommitsService, GitCommitEvent } from '../git-commits/git-commits.service';
 import { ProductiveService } from '../productive/productive.service';
+import { JiraService } from '../jira/jira.service';
 import { CustomError } from '../shared/CustomError';
 
 @Injectable()
@@ -51,7 +52,8 @@ export class TimelinesService {
     @Inject(TagsService) private tagsService: TagsService,
     @Inject(TagNamesService) private tagNamesService: TagNamesService,
     @Inject(WebsitesService) private websitesService: WebsitesService,
-    @Inject(ProductiveService) private productiveService: ProductiveService
+    @Inject(ProductiveService) private productiveService: ProductiveService,
+    @Inject(JiraService) private jiraService: JiraService
   ) {}
 
   adapt(rawTimeline: Record<string, any>): Timeline {
@@ -222,9 +224,11 @@ export class TimelinesService {
     clearCache = false
   ): Promise<TimelineWithEventsDto[]> {
     try {
-      // A refresh should also drop the cached Productive company/deal/service lists.
+      // A refresh should also drop the cached Productive company/deal/service lists and the cached
+      // Jira sprint field id.
       if (clearCache) {
         this.productiveService.clearListCache();
+        this.jiraService.clearFieldCache();
       }
 
       const timelines = await this.findAllTimelines(undefined);
@@ -414,6 +418,26 @@ export class TimelinesService {
                     })
                   );
                   return [];
+                }
+              })();
+
+            case TimelineType.Jira:
+              return (async () => {
+                try {
+                  return await this.jiraService.getEventsForRange(
+                    startedAt,
+                    endedAt,
+                    timelineInfo.id,
+                    clearCache
+                  );
+                } catch (err) {
+                  console.error(
+                    new CustomError('Failed to fetch events from Jira', err, {
+                      startedAt,
+                      endedAt,
+                    })
+                  );
+                  return []; // TODO pass errors to client to show as toast messages
                 }
               })();
           }

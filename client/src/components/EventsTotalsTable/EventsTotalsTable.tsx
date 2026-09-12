@@ -11,6 +11,7 @@ import {
   AutoTagEventInfoDto,
   CalendarEventInfoDto,
   GitCommitEventInfoDto,
+  JiraEventInfoDto,
   ProductiveEventInfoDto,
   ProgramEventInfoDto,
   TagEventInfoDto,
@@ -77,6 +78,11 @@ function getCategoryLabel(event: TimelineEventDto, timelineType: TimelineType): 
       const productive = info as ProductiveEventInfoDto;
       const parts = [productive.serviceProject, productive.serviceName].filter(Boolean);
       return parts.length > 0 ? parts.join(' – ') : 'Unknown';
+    }
+    case 'Jira': {
+      // Grouped per ticket: "how long was I on ABC-123 today" is the number this table exists for.
+      const jira = info as JiraEventInfoDto;
+      return jira.jiraSummary ? `${jira.jiraIssueKey}: ${jira.jiraSummary}` : jira.jiraIssueKey;
     }
     default:
       return 'Unknown';

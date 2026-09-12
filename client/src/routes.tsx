@@ -18,6 +18,7 @@ import { AutoTagsSettingsPage } from './views/settings/AutoTagsSettingsPage/Auto
 import { IntegrationsPage } from './views/settings/IntegrationsPage/IntegrationsPage';
 import { UpdatesPage } from './views/settings/UpdatesPage/UpdatesPage';
 import { ProductiveSettingsPage } from './views/settings/IntegrationsPage/ProductiveSettingsPage';
+import { JiraSettingsPage } from './views/settings/IntegrationsPage/JiraSettingsPage';
 import { OverviewsPage } from './views/OverviewsPage/OverviewsPage';
 import { OverviewView } from './views/OverviewsPage/OverviewView/OverviewView';
 import { EditOverviewConfigModal } from './components/EditOverviewConfigModal/EditOverviewConfigModal';
@@ -95,6 +96,10 @@ export const routes: RouteObject[] = [
           {
             path: ROUTE_PARTS.integrations + '/' + ROUTE_PARTS.productive,
             element: <ProductiveSettingsPage />,
+          },
+          {
+            path: ROUTE_PARTS.integrations + '/' + ROUTE_PARTS.jira,
+            element: <JiraSettingsPage />,
           },
           {
             path: ROUTE_PARTS.updates,

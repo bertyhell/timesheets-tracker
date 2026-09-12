@@ -34,7 +34,7 @@ test.describe('Auto tag rules management', () => {
       // (clicking it would be ambiguous: every still-blank row shows the same selected value).
       const conditionRow = modal.locator('.c-auto-tag-condition').first();
       await conditionRow.locator('.c-auto-tag-condition__select').first().click();
-      await page.getByText('programName', { exact: true }).click();
+      await page.getByText('Program name', { exact: true }).click();
       await conditionRow.locator('input.c-auto-tag-condition__value').fill(ruleTitle);
 
       await modal.getByRole('button', { name: 'Save' }).click();

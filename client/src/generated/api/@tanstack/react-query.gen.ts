@@ -3,8 +3,8 @@
 import { type DefaultError, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { activeStatesControllerCreate, activeStatesControllerDelete, activeStatesControllerFindAll, activeStatesControllerFindOne, appControllerStatus, autoNotesControllerCount, autoNotesControllerCreate, autoNotesControllerFindAll, autoNotesControllerFindOne, autoNotesControllerRemove, autoNotesControllerUpdate, autoTagsControllerCount, autoTagsControllerCreate, autoTagsControllerDelete, autoTagsControllerFindAll, autoTagsControllerFindOne, autoTagsControllerMergeDuplicates, autoTagsControllerReorder, autoTagsControllerUpdate, calendarsControllerGetEvents, integrationsControllerFindOne, integrationsControllerRemove, integrationsControllerUpsert, type Options, overviewsControllerCreate, overviewsControllerFindAll, overviewsControllerFindOne, overviewsControllerGetData, overviewsControllerRemove, overviewsControllerUpdate, productiveControllerGetCompanies, productiveControllerGetDeals, productiveControllerGetServices, productiveControllerGetServiceTree, productiveControllerSync, programsControllerCreate, programsControllerDelete, programsControllerFindAll, programsControllerFindOne, programsControllerGetTracking, programsControllerSetTracking, settingsControllerClearDeleteEventsAfter, settingsControllerGetAutoMergeTags, settingsControllerGetDeleteEventsAfter, settingsControllerGetSettingByKey, settingsControllerGetSettings, settingsControllerMoveDatabase, settingsControllerOpenDatabaseFolder, settingsControllerPreviewDeleteEventsAfter, settingsControllerSetAutoMergeTags, settingsControllerSetDeleteEventsAfter, settingsControllerSetSettingByKey, settingsControllerSwitchDatabase, tagNamesControllerCount, tagNamesControllerCreate, tagNamesControllerFindAll, tagNamesControllerFindOne, tagNamesControllerRemove, tagNamesControllerUpdate, tagsControllerCreate, tagsControllerFindAll, tagsControllerFindOne, tagsControllerRemove, tagsControllerUpdate, timelinesControllerCount, timelinesControllerCreate, timelinesControllerDelete, timelinesControllerFindAll, timelinesControllerFindAllEvents, timelinesControllerFindOne, timelinesControllerReorder, timelinesControllerUpdate, websitesControllerCreate, websitesControllerDelete, websitesControllerFindAll, websitesControllerFindOne } from '../sdk.gen';
-import type { ActiveStatesControllerCreateData, ActiveStatesControllerDeleteData, ActiveStatesControllerFindAllData, ActiveStatesControllerFindAllResponse, ActiveStatesControllerFindOneData, AppControllerStatusData, AutoNotesControllerCountData, AutoNotesControllerCountResponse, AutoNotesControllerCreateData, AutoNotesControllerCreateResponse, AutoNotesControllerFindAllData, AutoNotesControllerFindAllResponse, AutoNotesControllerFindOneData, AutoNotesControllerFindOneResponse, AutoNotesControllerRemoveData, AutoNotesControllerUpdateData, AutoTagsControllerCountData, AutoTagsControllerCountResponse, AutoTagsControllerCreateData, AutoTagsControllerCreateResponse, AutoTagsControllerDeleteData, AutoTagsControllerFindAllData, AutoTagsControllerFindAllResponse, AutoTagsControllerFindOneData, AutoTagsControllerFindOneResponse, AutoTagsControllerMergeDuplicatesData, AutoTagsControllerMergeDuplicatesResponse, AutoTagsControllerReorderData, AutoTagsControllerReorderResponse, AutoTagsControllerUpdateData, CalendarsControllerGetEventsData, CalendarsControllerGetEventsResponse, IntegrationsControllerFindOneData, IntegrationsControllerFindOneResponse, IntegrationsControllerRemoveData, IntegrationsControllerRemoveResponse, IntegrationsControllerUpsertData, IntegrationsControllerUpsertResponse, OverviewsControllerCreateData, OverviewsControllerCreateResponse, OverviewsControllerFindAllData, OverviewsControllerFindAllResponse, OverviewsControllerFindOneData, OverviewsControllerFindOneResponse, OverviewsControllerGetDataData, OverviewsControllerGetDataResponse, OverviewsControllerRemoveData, OverviewsControllerUpdateData, ProductiveControllerGetCompaniesData, ProductiveControllerGetCompaniesResponse, ProductiveControllerGetDealsData, ProductiveControllerGetDealsResponse, ProductiveControllerGetServicesData, ProductiveControllerGetServicesResponse, ProductiveControllerGetServiceTreeData, ProductiveControllerGetServiceTreeResponse, ProductiveControllerSyncData, ProductiveControllerSyncResponse, ProgramsControllerCreateData, ProgramsControllerDeleteData, ProgramsControllerFindAllData, ProgramsControllerFindAllResponse, ProgramsControllerFindOneData, ProgramsControllerGetTrackingData, ProgramsControllerSetTrackingData, SettingsControllerClearDeleteEventsAfterData, SettingsControllerClearDeleteEventsAfterResponse, SettingsControllerGetAutoMergeTagsData, SettingsControllerGetAutoMergeTagsResponse, SettingsControllerGetDeleteEventsAfterData, SettingsControllerGetDeleteEventsAfterResponse, SettingsControllerGetSettingByKeyData, SettingsControllerGetSettingByKeyResponse, SettingsControllerGetSettingsData, SettingsControllerGetSettingsResponse, SettingsControllerMoveDatabaseData, SettingsControllerMoveDatabaseResponse, SettingsControllerOpenDatabaseFolderData, SettingsControllerPreviewDeleteEventsAfterData, SettingsControllerPreviewDeleteEventsAfterResponse, SettingsControllerSetAutoMergeTagsData, SettingsControllerSetAutoMergeTagsResponse, SettingsControllerSetDeleteEventsAfterData, SettingsControllerSetDeleteEventsAfterResponse, SettingsControllerSetSettingByKeyData, SettingsControllerSetSettingByKeyResponse, SettingsControllerSwitchDatabaseData, SettingsControllerSwitchDatabaseResponse, TagNamesControllerCountData, TagNamesControllerCountResponse, TagNamesControllerCreateData, TagNamesControllerCreateResponse, TagNamesControllerFindAllData, TagNamesControllerFindAllResponse, TagNamesControllerFindOneData, TagNamesControllerFindOneResponse, TagNamesControllerRemoveData, TagNamesControllerUpdateData, TagsControllerCreateData, TagsControllerCreateResponse, TagsControllerFindAllData, TagsControllerFindAllResponse, TagsControllerFindOneData, TagsControllerRemoveData, TagsControllerUpdateData, TimelinesControllerCountData, TimelinesControllerCountResponse, TimelinesControllerCreateData, TimelinesControllerCreateResponse, TimelinesControllerDeleteData, TimelinesControllerFindAllData, TimelinesControllerFindAllEventsData, TimelinesControllerFindAllEventsResponse, TimelinesControllerFindAllResponse, TimelinesControllerFindOneData, TimelinesControllerFindOneResponse, TimelinesControllerReorderData, TimelinesControllerReorderResponse, TimelinesControllerUpdateData, WebsitesControllerCreateData, WebsitesControllerDeleteData, WebsitesControllerFindAllData, WebsitesControllerFindAllResponse, WebsitesControllerFindOneData } from '../types.gen';
+import { activeStatesControllerCreate, activeStatesControllerDelete, activeStatesControllerFindAll, activeStatesControllerFindOne, appControllerStatus, autoNotesControllerCount, autoNotesControllerCreate, autoNotesControllerFindAll, autoNotesControllerFindOne, autoNotesControllerRemove, autoNotesControllerUpdate, autoTagsControllerCount, autoTagsControllerCreate, autoTagsControllerDelete, autoTagsControllerFindAll, autoTagsControllerFindOne, autoTagsControllerMergeDuplicates, autoTagsControllerReorder, autoTagsControllerUpdate, calendarsControllerGetEvents, integrationsControllerFindOne, integrationsControllerRemove, integrationsControllerUpsert, jiraControllerTestConnection, type Options, overviewsControllerCreate, overviewsControllerFindAll, overviewsControllerFindOne, overviewsControllerGetData, overviewsControllerRemove, overviewsControllerUpdate, productiveControllerGetCompanies, productiveControllerGetDeals, productiveControllerGetServices, productiveControllerGetServiceTree, productiveControllerGetSyncStatuses, productiveControllerSync, programsControllerCreate, programsControllerDelete, programsControllerFindAll, programsControllerFindOne, programsControllerGetTracking, programsControllerSetTracking, settingsControllerClearDeleteEventsAfter, settingsControllerGetAutoMergeTags, settingsControllerGetDeleteEventsAfter, settingsControllerGetSettingByKey, settingsControllerGetSettings, settingsControllerMoveDatabase, settingsControllerOpenDatabaseFolder, settingsControllerPreviewDeleteEventsAfter, settingsControllerSetAutoMergeTags, settingsControllerSetDeleteEventsAfter, settingsControllerSetSettingByKey, settingsControllerSwitchDatabase, tagNamesControllerCount, tagNamesControllerCreate, tagNamesControllerFindAll, tagNamesControllerFindOne, tagNamesControllerRemove, tagNamesControllerUpdate, tagsControllerCreate, tagsControllerFindAll, tagsControllerFindOne, tagsControllerRemove, tagsControllerUpdate, timelinesControllerCount, timelinesControllerCreate, timelinesControllerDelete, timelinesControllerFindAll, timelinesControllerFindAllEvents, timelinesControllerFindOne, timelinesControllerReorder, timelinesControllerUpdate, websitesControllerCreate, websitesControllerDelete, websitesControllerFindAll, websitesControllerFindOne } from '../sdk.gen';
+import type { ActiveStatesControllerCreateData, ActiveStatesControllerDeleteData, ActiveStatesControllerFindAllData, ActiveStatesControllerFindAllResponse, ActiveStatesControllerFindOneData, AppControllerStatusData, AutoNotesControllerCountData, AutoNotesControllerCountResponse, AutoNotesControllerCreateData, AutoNotesControllerCreateResponse, AutoNotesControllerFindAllData, AutoNotesControllerFindAllResponse, AutoNotesControllerFindOneData, AutoNotesControllerFindOneResponse, AutoNotesControllerRemoveData, AutoNotesControllerUpdateData, AutoTagsControllerCountData, AutoTagsControllerCountResponse, AutoTagsControllerCreateData, AutoTagsControllerCreateResponse, AutoTagsControllerDeleteData, AutoTagsControllerFindAllData, AutoTagsControllerFindAllResponse, AutoTagsControllerFindOneData, AutoTagsControllerFindOneResponse, AutoTagsControllerMergeDuplicatesData, AutoTagsControllerMergeDuplicatesResponse, AutoTagsControllerReorderData, AutoTagsControllerReorderResponse, AutoTagsControllerUpdateData, CalendarsControllerGetEventsData, CalendarsControllerGetEventsResponse, IntegrationsControllerFindOneData, IntegrationsControllerFindOneResponse, IntegrationsControllerRemoveData, IntegrationsControllerRemoveResponse, IntegrationsControllerUpsertData, IntegrationsControllerUpsertResponse, JiraControllerTestConnectionData, JiraControllerTestConnectionResponse, OverviewsControllerCreateData, OverviewsControllerCreateResponse, OverviewsControllerFindAllData, OverviewsControllerFindAllResponse, OverviewsControllerFindOneData, OverviewsControllerFindOneResponse, OverviewsControllerGetDataData, OverviewsControllerGetDataResponse, OverviewsControllerRemoveData, OverviewsControllerUpdateData, ProductiveControllerGetCompaniesData, ProductiveControllerGetCompaniesResponse, ProductiveControllerGetDealsData, ProductiveControllerGetDealsResponse, ProductiveControllerGetServicesData, ProductiveControllerGetServicesResponse, ProductiveControllerGetServiceTreeData, ProductiveControllerGetServiceTreeResponse, ProductiveControllerGetSyncStatusesData, ProductiveControllerGetSyncStatusesResponse, ProductiveControllerSyncData, ProductiveControllerSyncResponse, ProgramsControllerCreateData, ProgramsControllerDeleteData, ProgramsControllerFindAllData, ProgramsControllerFindAllResponse, ProgramsControllerFindOneData, ProgramsControllerGetTrackingData, ProgramsControllerSetTrackingData, SettingsControllerClearDeleteEventsAfterData, SettingsControllerClearDeleteEventsAfterResponse, SettingsControllerGetAutoMergeTagsData, SettingsControllerGetAutoMergeTagsResponse, SettingsControllerGetDeleteEventsAfterData, SettingsControllerGetDeleteEventsAfterResponse, SettingsControllerGetSettingByKeyData, SettingsControllerGetSettingByKeyResponse, SettingsControllerGetSettingsData, SettingsControllerGetSettingsResponse, SettingsControllerMoveDatabaseData, SettingsControllerMoveDatabaseResponse, SettingsControllerOpenDatabaseFolderData, SettingsControllerPreviewDeleteEventsAfterData, SettingsControllerPreviewDeleteEventsAfterResponse, SettingsControllerSetAutoMergeTagsData, SettingsControllerSetAutoMergeTagsResponse, SettingsControllerSetDeleteEventsAfterData, SettingsControllerSetDeleteEventsAfterResponse, SettingsControllerSetSettingByKeyData, SettingsControllerSetSettingByKeyResponse, SettingsControllerSwitchDatabaseData, SettingsControllerSwitchDatabaseResponse, TagNamesControllerCountData, TagNamesControllerCountResponse, TagNamesControllerCreateData, TagNamesControllerCreateResponse, TagNamesControllerFindAllData, TagNamesControllerFindAllResponse, TagNamesControllerFindOneData, TagNamesControllerFindOneResponse, TagNamesControllerRemoveData, TagNamesControllerUpdateData, TagsControllerCreateData, TagsControllerCreateResponse, TagsControllerFindAllData, TagsControllerFindAllResponse, TagsControllerFindOneData, TagsControllerRemoveData, TagsControllerUpdateData, TimelinesControllerCountData, TimelinesControllerCountResponse, TimelinesControllerCreateData, TimelinesControllerCreateResponse, TimelinesControllerDeleteData, TimelinesControllerFindAllData, TimelinesControllerFindAllEventsData, TimelinesControllerFindAllEventsResponse, TimelinesControllerFindAllResponse, TimelinesControllerFindOneData, TimelinesControllerFindOneResponse, TimelinesControllerReorderData, TimelinesControllerReorderResponse, TimelinesControllerUpdateData, WebsitesControllerCreateData, WebsitesControllerDeleteData, WebsitesControllerFindAllData, WebsitesControllerFindAllResponse, WebsitesControllerFindOneData } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -922,6 +922,64 @@ export const timelinesControllerReorderMutation = (options?: Partial<Options<Tim
     return mutationOptions;
 };
 
+export const jiraControllerTestConnectionQueryKey = (options?: Options<JiraControllerTestConnectionData>) => createQueryKey('jiraControllerTestConnection', options);
+
+export const jiraControllerTestConnectionOptions = (options?: Options<JiraControllerTestConnectionData>) => queryOptions<JiraControllerTestConnectionResponse, DefaultError, JiraControllerTestConnectionResponse, ReturnType<typeof jiraControllerTestConnectionQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await jiraControllerTestConnection({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: jiraControllerTestConnectionQueryKey(options)
+});
+
+export const integrationsControllerRemoveMutation = (options?: Partial<Options<IntegrationsControllerRemoveData>>): UseMutationOptions<IntegrationsControllerRemoveResponse, DefaultError, Options<IntegrationsControllerRemoveData>> => {
+    const mutationOptions: UseMutationOptions<IntegrationsControllerRemoveResponse, DefaultError, Options<IntegrationsControllerRemoveData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await integrationsControllerRemove({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const integrationsControllerFindOneQueryKey = (options: Options<IntegrationsControllerFindOneData>) => createQueryKey('integrationsControllerFindOne', options);
+
+export const integrationsControllerFindOneOptions = (options: Options<IntegrationsControllerFindOneData>) => queryOptions<IntegrationsControllerFindOneResponse, DefaultError, IntegrationsControllerFindOneResponse, ReturnType<typeof integrationsControllerFindOneQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await integrationsControllerFindOne({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: integrationsControllerFindOneQueryKey(options)
+});
+
+export const integrationsControllerUpsertMutation = (options?: Partial<Options<IntegrationsControllerUpsertData>>): UseMutationOptions<IntegrationsControllerUpsertResponse, DefaultError, Options<IntegrationsControllerUpsertData>> => {
+    const mutationOptions: UseMutationOptions<IntegrationsControllerUpsertResponse, DefaultError, Options<IntegrationsControllerUpsertData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await integrationsControllerUpsert({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
 export const productiveControllerGetCompaniesQueryKey = (options?: Options<ProductiveControllerGetCompaniesData>) => createQueryKey('productiveControllerGetCompanies', options);
 
 export const productiveControllerGetCompaniesOptions = (options?: Options<ProductiveControllerGetCompaniesData>) => queryOptions<ProductiveControllerGetCompaniesResponse, DefaultError, ProductiveControllerGetCompaniesResponse, ReturnType<typeof productiveControllerGetCompaniesQueryKey>>({
@@ -996,25 +1054,11 @@ export const productiveControllerSyncMutation = (options?: Partial<Options<Produ
     return mutationOptions;
 };
 
-export const integrationsControllerRemoveMutation = (options?: Partial<Options<IntegrationsControllerRemoveData>>): UseMutationOptions<IntegrationsControllerRemoveResponse, DefaultError, Options<IntegrationsControllerRemoveData>> => {
-    const mutationOptions: UseMutationOptions<IntegrationsControllerRemoveResponse, DefaultError, Options<IntegrationsControllerRemoveData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await integrationsControllerRemove({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
+export const productiveControllerGetSyncStatusesQueryKey = (options: Options<ProductiveControllerGetSyncStatusesData>) => createQueryKey('productiveControllerGetSyncStatuses', options);
 
-export const integrationsControllerFindOneQueryKey = (options: Options<IntegrationsControllerFindOneData>) => createQueryKey('integrationsControllerFindOne', options);
-
-export const integrationsControllerFindOneOptions = (options: Options<IntegrationsControllerFindOneData>) => queryOptions<IntegrationsControllerFindOneResponse, DefaultError, IntegrationsControllerFindOneResponse, ReturnType<typeof integrationsControllerFindOneQueryKey>>({
+export const productiveControllerGetSyncStatusesOptions = (options: Options<ProductiveControllerGetSyncStatusesData>) => queryOptions<ProductiveControllerGetSyncStatusesResponse, DefaultError, ProductiveControllerGetSyncStatusesResponse, ReturnType<typeof productiveControllerGetSyncStatusesQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await integrationsControllerFindOne({
+        const { data } = await productiveControllerGetSyncStatuses({
             ...options,
             ...queryKey[0],
             signal,
@@ -1022,22 +1066,8 @@ export const integrationsControllerFindOneOptions = (options: Options<Integratio
         });
         return data;
     },
-    queryKey: integrationsControllerFindOneQueryKey(options)
+    queryKey: productiveControllerGetSyncStatusesQueryKey(options)
 });
-
-export const integrationsControllerUpsertMutation = (options?: Partial<Options<IntegrationsControllerUpsertData>>): UseMutationOptions<IntegrationsControllerUpsertResponse, DefaultError, Options<IntegrationsControllerUpsertData>> => {
-    const mutationOptions: UseMutationOptions<IntegrationsControllerUpsertResponse, DefaultError, Options<IntegrationsControllerUpsertData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await integrationsControllerUpsert({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
 
 export const overviewsControllerGetDataQueryKey = (options: Options<OverviewsControllerGetDataData>) => createQueryKey('overviewsControllerGetData', options);
 

@@ -7,4 +7,5 @@ export enum TimelineType {
   Calendar = 'Calendar',
   GitCommit = 'GitCommit',
   Productive = 'Productive',
+  Jira = 'Jira',
 }

@@ -39,6 +39,7 @@ export enum ROUTE_PARTS {
   new = 'new',
   integrations = 'integrations',
   productive = 'productive',
+  jira = 'jira',
   updates = 'updates',
 }
 

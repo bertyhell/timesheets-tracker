@@ -17,6 +17,13 @@ export function getEventLabel(timelineInfo: TimelineDto, event: TimelineEventDto
       return info['isActive'] ? 'Active' : 'Inactive';
     case TimelineType.GitCommit:
       return String(info['repoName'] ?? timelineInfo.title ?? '');
+    case TimelineType.Jira: {
+      // The summary is missing while the ticket has not been fetched yet, or when it could not be
+      // read at all — the key alone is still a useful label.
+      const issueKey = String(info['jiraIssueKey'] ?? '');
+      const summary = String(info['jiraSummary'] ?? '');
+      return summary ? `${issueKey}: ${summary}` : issueKey;
+    }
     case TimelineType.Productive: {
       // deal - service - company, skipping whichever parts Productive did not return
       const parts = [info['dealName'], info['serviceName'], info['companyName']]

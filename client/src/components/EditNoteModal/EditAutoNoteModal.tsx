@@ -7,7 +7,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Select, { type ActionMeta, type OnChangeValue } from 'react-select';
 import { toast } from 'react-toastify';
 
-import * as types from '../../../../types/types';
 import { ROUTE_PARTS } from '../../App';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
@@ -18,6 +17,8 @@ import {
   tagNamesControllerFindAllOptions,
 } from '../../generated/api/@tanstack/react-query.gen';
 import { type SelectOption } from '../../helpers/select-option.types';
+// ConditionVariable used to be pulled from the repo-root types/ copy here as well, which had
+// drifted out of sync with this one; there is one client-side source for it now.
 import { type AutoNote, ConditionVariable, type TagName } from '../../types/types';
 import TagSelectMulti from '../TagSelect/TagSelectMulti';
 
@@ -42,27 +43,42 @@ export function EditAutoNoteModal() {
   });
   const autoNote = autoNoteResponse as AutoNote | undefined;
 
-  const VARIABLE_LABELS: Record<types.ConditionVariable, string> = {
-    [types.ConditionVariable.anyVariable]: 'any variable',
-    [types.ConditionVariable.isActive]: 'activeState.isActive',
-    [types.ConditionVariable.programName]: 'program.name',
-    [types.ConditionVariable.windowTitle]: 'program.windowTitle',
-    [types.ConditionVariable.summary]: 'calendar.summary',
-    [types.ConditionVariable.description]: 'calendar.description',
-    [types.ConditionVariable.location]: 'calendar.location',
-    [types.ConditionVariable.allDay]: 'calendar.allDay',
-    [types.ConditionVariable.websiteUrl]: 'website.url',
-    [types.ConditionVariable.websiteTitle]: 'website.title',
-    [types.ConditionVariable.tagNameId]: 'tag.nameId',
-    [types.ConditionVariable.tagNameName]: 'tag.name',
-    [types.ConditionVariable.tagNameColor]: 'tag.color',
-    [types.ConditionVariable.tagNameCode]: 'tag.code',
-    [types.ConditionVariable.repoName]: 'gitCommit.repoName',
-    [types.ConditionVariable.commitMessage]: 'gitCommit.commitMessage',
+  const VARIABLE_LABELS: Record<ConditionVariable, string> = {
+    [ConditionVariable.anyVariable]: 'any variable',
+    [ConditionVariable.isActive]: 'activeState.isActive',
+    [ConditionVariable.programName]: 'program.name',
+    [ConditionVariable.windowTitle]: 'program.windowTitle',
+    [ConditionVariable.summary]: 'calendar.summary',
+    [ConditionVariable.description]: 'calendar.description',
+    [ConditionVariable.location]: 'calendar.location',
+    [ConditionVariable.allDay]: 'calendar.allDay',
+    [ConditionVariable.websiteUrl]: 'website.url',
+    [ConditionVariable.websiteTitle]: 'website.title',
+    [ConditionVariable.tagNameId]: 'tag.nameId',
+    [ConditionVariable.tagNameName]: 'tag.name',
+    [ConditionVariable.tagNameColor]: 'tag.color',
+    [ConditionVariable.tagNameCode]: 'tag.code',
+    [ConditionVariable.repoName]: 'gitCommit.repoName',
+    [ConditionVariable.commitMessage]: 'gitCommit.commitMessage',
+    [ConditionVariable.jiraIssueKey]: 'jira.issueKey',
+    [ConditionVariable.jiraSummary]: 'jira.summary',
+    [ConditionVariable.jiraProjectKey]: 'jira.projectKey',
+    [ConditionVariable.jiraProjectName]: 'jira.projectName',
+    [ConditionVariable.jiraLabels]: 'jira.labels',
+    [ConditionVariable.jiraFixVersions]: 'jira.fixVersions',
+    [ConditionVariable.jiraComponents]: 'jira.components',
+    [ConditionVariable.jiraSprint]: 'jira.sprint',
+    [ConditionVariable.jiraAssignee]: 'jira.assignee',
+    [ConditionVariable.jiraReporter]: 'jira.reporter',
+    [ConditionVariable.jiraStatus]: 'jira.status',
+    [ConditionVariable.jiraIssueType]: 'jira.issueType',
+    [ConditionVariable.jiraPriority]: 'jira.priority',
+    [ConditionVariable.jiraParentKey]: 'jira.parentKey',
+    [ConditionVariable.jiraParentSummary]: 'jira.parentSummary',
   };
 
-  const variableOptions: SelectOption<types.ConditionVariable>[] = Object.values(
-    types.ConditionVariable
+  const variableOptions: SelectOption<ConditionVariable>[] = Object.values(
+    ConditionVariable
   ).map((condition) => ({ label: VARIABLE_LABELS[condition] ?? condition, value: condition }));
 
   useEffect(() => {
@@ -158,7 +174,7 @@ export function EditAutoNoteModal() {
         <TagSelectMulti selectedValues={tagNames} onChange={handleTagNameChange} />
 
         <h4 className="mt-4">Note text</h4>
-        <Select<SelectOption<types.ConditionVariable>>
+        <Select<SelectOption<ConditionVariable>>
           className="c-edit-note__variable-select"
           value={variable ? { label: variable, value: variable } : null}
           options={variableOptions}

@@ -175,7 +175,7 @@ export type UpdateTagNameDto = {
 /**
  * Variable to check
  */
-export type ConditionVariable = 'anyVariable' | 'isActive' | 'programName' | 'windowTitle' | 'summary' | 'description' | 'location' | 'allDay' | 'websiteUrl' | 'websiteTitle' | 'tagNameId' | 'tagNameName' | 'tagNameColor' | 'tagNameCode' | 'repoName' | 'commitMessage';
+export type ConditionVariable = 'anyVariable' | 'isActive' | 'programName' | 'windowTitle' | 'summary' | 'description' | 'location' | 'allDay' | 'websiteUrl' | 'websiteTitle' | 'tagNameId' | 'tagNameName' | 'tagNameColor' | 'tagNameCode' | 'repoName' | 'commitMessage' | 'jiraIssueKey' | 'jiraSummary' | 'jiraProjectKey' | 'jiraProjectName' | 'jiraLabels' | 'jiraFixVersions' | 'jiraComponents' | 'jiraSprint' | 'jiraAssignee' | 'jiraReporter' | 'jiraStatus' | 'jiraIssueType' | 'jiraPriority' | 'jiraParentKey' | 'jiraParentSummary';
 
 /**
  * Operator of the condition
@@ -696,6 +696,73 @@ export type ProductiveEventInfoDto = {
     companyName?: string | null;
 };
 
+export type JiraEventInfoDto = {
+    /**
+     * Key of the Jira issue that was visited
+     */
+    jiraIssueKey: string;
+    /**
+     * Title of the Jira issue
+     */
+    jiraSummary?: string;
+    /**
+     * Key of the Jira project ("space") the issue belongs to
+     */
+    jiraProjectKey?: string;
+    /**
+     * Name of the Jira project ("space") the issue belongs to
+     */
+    jiraProjectName?: string;
+    /**
+     * Labels on the issue, comma separated
+     */
+    jiraLabels?: string;
+    /**
+     * Fix versions of the issue, comma separated
+     */
+    jiraFixVersions?: string;
+    /**
+     * Components of the issue, comma separated
+     */
+    jiraComponents?: string;
+    /**
+     * Name of the sprint the issue is in (the most recent one when it spans several)
+     */
+    jiraSprint?: string;
+    /**
+     * Display name of the assignee
+     */
+    jiraAssignee?: string;
+    /**
+     * Display name of the reporter
+     */
+    jiraReporter?: string;
+    /**
+     * Current status of the issue
+     */
+    jiraStatus?: string;
+    /**
+     * Issue type
+     */
+    jiraIssueType?: string;
+    /**
+     * Priority of the issue
+     */
+    jiraPriority?: string;
+    /**
+     * Key of the parent issue / epic
+     */
+    jiraParentKey?: string;
+    /**
+     * Title of the parent issue / epic
+     */
+    jiraParentSummary?: string;
+    /**
+     * Link to the issue in Jira
+     */
+    jiraUrl?: string;
+};
+
 export type CalendarEventProviderInfoDto = {
     /**
      * A url pointing to the ICS file of the calendar used for fetching events from the calendar
@@ -718,7 +785,7 @@ export type CreateTimelineDto = {
     /**
      * Type of the timeline
      */
-    timelineType: 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit' | 'Productive';
+    timelineType: 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit' | 'Productive' | 'Jira';
     /**
      * The information that is needed for this timeline to fetch events. eg: calendar needs a url to ics file, github needs a link to the git folder, ...
      */
@@ -747,7 +814,7 @@ export type TimelineDto = {
     /**
      * Type of the timeline
      */
-    timelineType: 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit' | 'Productive';
+    timelineType: 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit' | 'Productive' | 'Jira';
     /**
      * Specific info for getting events for this timeline type. eg: calendar needs a url to ics file, github needs a link to the git folder, ...
      */
@@ -773,7 +840,7 @@ export type TimelineDto = {
 /**
  * Type of the timeline
  */
-export type TimelineType = 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit' | 'Productive';
+export type TimelineType = 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit' | 'Productive' | 'Jira';
 
 export type TimelineEventDto = {
     /**
@@ -783,7 +850,7 @@ export type TimelineEventDto = {
     /**
      * Type-specific info for this event. Varies based on the timeline type.
      */
-    info: ActiveStateEventInfoDto | ProgramEventInfoDto | CalendarEventInfoDto | WebsiteEventInfoDto | TagEventInfoDto | AutoTagEventInfoDto | GitCommitEventInfoDto | ProductiveEventInfoDto;
+    info: ActiveStateEventInfoDto | ProgramEventInfoDto | CalendarEventInfoDto | WebsiteEventInfoDto | TagEventInfoDto | AutoTagEventInfoDto | GitCommitEventInfoDto | ProductiveEventInfoDto | JiraEventInfoDto;
     /**
      * Color of the event
      */
@@ -832,7 +899,7 @@ export type UpdateTimelineDto = {
     /**
      * Type of the timeline
      */
-    timelineType?: 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit' | 'Productive';
+    timelineType?: 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit' | 'Productive' | 'Jira';
     /**
      * The information that is needed for this timeline to fetch events. eg: calendar needs a url to ics file, github needs a link to the git folder, ...
      */
@@ -847,6 +914,63 @@ export type UpdateTimelineDto = {
      * Hex color code for this timeline
      */
     color?: string | null;
+};
+
+export type JiraConnectionDto = {
+    /**
+     * Whether the configured base url, email and API token can reach Jira
+     */
+    ok: boolean;
+    /**
+     * Display name of the Atlassian account the token belongs to
+     */
+    displayName?: string | null;
+    /**
+     * Why the connection failed, when it did
+     */
+    error?: string | null;
+};
+
+export type IntegrationDto = {
+    /**
+     * Integration type identifier (e.g. "productive")
+     */
+    type: string;
+    /**
+     * Base URL of the integration API
+     */
+    baseUrl: string;
+    /**
+     * Organisation ID
+     */
+    organisationId: string;
+    /**
+     * User ID
+     */
+    userId: string;
+    /**
+     * API token
+     */
+    token: string;
+};
+
+export type UpsertIntegrationDto = {
+    /**
+     * Base URL of the integration API
+     */
+    baseUrl: string;
+    /**
+     * Organisation ID
+     */
+    organisationId: string;
+    /**
+     * User ID
+     */
+    userId: string;
+    /**
+     * API token
+     */
+    token: string;
 };
 
 export type ProductiveCompanyDto = {
@@ -921,6 +1045,10 @@ export type ProductiveServiceTreeNodeDto = {
 
 export type SyncTimeEntryDto = {
     /**
+     * Client-generated id, echoed back on the result so each outcome can be matched to its entry
+     */
+    id: string;
+    /**
      * Productive service ID to track time on
      */
     serviceId: string;
@@ -932,6 +1060,10 @@ export type SyncTimeEntryDto = {
      * Note / description for the entry
      */
     note?: string;
+    /**
+     * Tag names whose time this entry covers. Entries that merge several tags report their outcome to each of them.
+     */
+    tagNameIds: Array<string>;
 };
 
 export type SyncTimeEntriesDto = {
@@ -945,53 +1077,76 @@ export type SyncTimeEntriesDto = {
     entries: Array<SyncTimeEntryDto>;
 };
 
+export type SyncEntryResultDto = {
+    /**
+     * The id supplied on the matching request entry
+     */
+    id: string;
+    /**
+     * Whether Productive accepted this entry
+     */
+    status: 'created' | 'failed';
+    /**
+     * Productive's reason for rejecting the entry
+     */
+    error?: string;
+};
+
 export type SyncTimeEntriesResultDto = {
     /**
      * Number of time entries created in Productive
      */
     created: number;
+    /**
+     * Number of time entries Productive rejected
+     */
+    failed: number;
+    /**
+     * Per-entry outcome, in request order
+     */
+    results: Array<SyncEntryResultDto>;
 };
 
-export type IntegrationDto = {
+export type SyncStatusEntryDto = {
     /**
-     * Integration type identifier (e.g. "productive")
+     * Productive service the entry was booked on
      */
-    type: string;
+    serviceId: string;
     /**
-     * Base URL of the integration API
+     * Note the entry was booked under, empty when it had none
      */
-    baseUrl: string;
+    note: string;
     /**
-     * Organisation ID
+     * Duration of the entry in minutes
      */
-    organisationId: string;
+    minutes: number;
     /**
-     * User ID
+     * Whether Productive accepted this entry
      */
-    userId: string;
+    status: 'created' | 'failed';
     /**
-     * API token
+     * Productive's reason for rejecting the entry
      */
-    token: string;
+    error?: string;
 };
 
-export type UpsertIntegrationDto = {
+export type SyncStatusDto = {
     /**
-     * Base URL of the integration API
+     * Tag name the status belongs to
      */
-    baseUrl: string;
+    tagNameId: string;
     /**
-     * Organisation ID
+     * synced = every entry landed, partial = some did, failed = none did
      */
-    organisationId: string;
+    status: 'synced' | 'partial' | 'failed';
     /**
-     * User ID
+     * The individual entries of the last attempt
      */
-    userId: string;
+    entries: Array<SyncStatusEntryDto>;
     /**
-     * API token
+     * When the last attempt ran (ISO 8601)
      */
-    token: string;
+    syncedAt: string;
 };
 
 export type OverviewFlatRowDto = {
@@ -1048,6 +1203,10 @@ export type OverviewFlatRowDto = {
      */
     tagCode?: string;
     /**
+     * Configured color of the tag, so charts can use the same colors as the timelines; only present for Tag-sourced rows
+     */
+    tagColor?: string;
+    /**
      * Name of the program; only present for Program-sourced rows. Same value as category for Program rows, exposed under an explicit name for discoverability.
      */
     programName?: string;
@@ -1074,7 +1233,7 @@ export type CreateSavedOverviewConfigDto = {
     /**
      * Which date range this overview loads by default
      */
-    dateRangeMode: 'today' | 'thisWeek' | 'thisMonth' | 'thisYear' | 'last7Days' | 'last30Days' | 'custom';
+    dateRangeMode: 'today' | 'thisWeek' | 'thisMonth' | 'thisYear' | 'last7Days' | 'last30Days' | 'last90Days' | 'last365Days' | 'custom';
     /**
      * Explicit range start, only used when dateRangeMode is "custom"
      */
@@ -1088,9 +1247,9 @@ export type CreateSavedOverviewConfigDto = {
      */
     sourceTypes: Array<OverviewSourceType>;
     /**
-     * react-pivottable state (rows, cols, vals, aggregatorName, rendererName, valueFilter, sorters, derivedAttributes)
+     * Report state: the id of the selected report plus its tweakable options (metric, chart type, grouping, bucket, top N, ...)
      */
-    pivotState: {
+    reportState: {
         [key: string]: unknown;
     };
 };
@@ -1111,7 +1270,7 @@ export type SavedOverviewConfigDto = {
     /**
      * Which date range this overview loads by default
      */
-    dateRangeMode: 'today' | 'thisWeek' | 'thisMonth' | 'thisYear' | 'last7Days' | 'last30Days' | 'custom';
+    dateRangeMode: 'today' | 'thisWeek' | 'thisMonth' | 'thisYear' | 'last7Days' | 'last30Days' | 'last90Days' | 'last365Days' | 'custom';
     /**
      * Explicit range start, only used when dateRangeMode is "custom"
      */
@@ -1125,9 +1284,9 @@ export type SavedOverviewConfigDto = {
      */
     sourceTypes: Array<OverviewSourceType>;
     /**
-     * react-pivottable state (rows, cols, vals, aggregatorName, rendererName, valueFilter, sorters, derivedAttributes)
+     * Report state: the id of the selected report plus its tweakable options (metric, chart type, grouping, bucket, top N, ...)
      */
-    pivotState: {
+    reportState: {
         [key: string]: unknown;
     };
     /**
@@ -1148,7 +1307,7 @@ export type UpdateSavedOverviewConfigDto = {
     /**
      * Which date range this overview loads by default
      */
-    dateRangeMode?: 'today' | 'thisWeek' | 'thisMonth' | 'thisYear' | 'last7Days' | 'last30Days' | 'custom';
+    dateRangeMode?: 'today' | 'thisWeek' | 'thisMonth' | 'thisYear' | 'last7Days' | 'last30Days' | 'last90Days' | 'last365Days' | 'custom';
     /**
      * Explicit range start, only used when dateRangeMode is "custom"
      */
@@ -1162,9 +1321,9 @@ export type UpdateSavedOverviewConfigDto = {
      */
     sourceTypes?: Array<OverviewSourceType>;
     /**
-     * react-pivottable state (rows, cols, vals, aggregatorName, rendererName, valueFilter, sorters, derivedAttributes)
+     * Report state: the id of the selected report plus its tweakable options (metric, chart type, grouping, bucket, top N, ...)
      */
-    pivotState?: {
+    reportState?: {
         [key: string]: unknown;
     };
 };
@@ -2075,6 +2234,67 @@ export type TimelinesControllerReorderResponses = {
 
 export type TimelinesControllerReorderResponse = TimelinesControllerReorderResponses[keyof TimelinesControllerReorderResponses];
 
+export type JiraControllerTestConnectionData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/jira/test-connection';
+};
+
+export type JiraControllerTestConnectionResponses = {
+    /**
+     * Check whether the configured Jira credentials work. Returns ok:false with the reason rather than an error status, so the settings form can show it.
+     */
+    200: JiraConnectionDto;
+};
+
+export type JiraControllerTestConnectionResponse = JiraControllerTestConnectionResponses[keyof JiraControllerTestConnectionResponses];
+
+export type IntegrationsControllerRemoveData = {
+    body?: never;
+    path: {
+        type: string;
+    };
+    query?: never;
+    url: '/api/integrations/{type}';
+};
+
+export type IntegrationsControllerRemoveResponses = {
+    204: void;
+};
+
+export type IntegrationsControllerRemoveResponse = IntegrationsControllerRemoveResponses[keyof IntegrationsControllerRemoveResponses];
+
+export type IntegrationsControllerFindOneData = {
+    body?: never;
+    path: {
+        type: string;
+    };
+    query?: never;
+    url: '/api/integrations/{type}';
+};
+
+export type IntegrationsControllerFindOneResponses = {
+    200: IntegrationDto | unknown;
+};
+
+export type IntegrationsControllerFindOneResponse = IntegrationsControllerFindOneResponses[keyof IntegrationsControllerFindOneResponses];
+
+export type IntegrationsControllerUpsertData = {
+    body: UpsertIntegrationDto;
+    path: {
+        type: string;
+    };
+    query?: never;
+    url: '/api/integrations/{type}';
+};
+
+export type IntegrationsControllerUpsertResponses = {
+    200: IntegrationDto;
+};
+
+export type IntegrationsControllerUpsertResponse = IntegrationsControllerUpsertResponses[keyof IntegrationsControllerUpsertResponses];
+
 export type ProductiveControllerGetCompaniesData = {
     body?: never;
     path?: never;
@@ -2151,50 +2371,20 @@ export type ProductiveControllerSyncResponses = {
 
 export type ProductiveControllerSyncResponse = ProductiveControllerSyncResponses[keyof ProductiveControllerSyncResponses];
 
-export type IntegrationsControllerRemoveData = {
+export type ProductiveControllerGetSyncStatusesData = {
     body?: never;
-    path: {
-        type: string;
+    path?: never;
+    query: {
+        date: string;
     };
-    query?: never;
-    url: '/api/integrations/{type}';
+    url: '/api/productive/sync-status';
 };
 
-export type IntegrationsControllerRemoveResponses = {
-    204: void;
+export type ProductiveControllerGetSyncStatusesResponses = {
+    200: Array<SyncStatusDto>;
 };
 
-export type IntegrationsControllerRemoveResponse = IntegrationsControllerRemoveResponses[keyof IntegrationsControllerRemoveResponses];
-
-export type IntegrationsControllerFindOneData = {
-    body?: never;
-    path: {
-        type: string;
-    };
-    query?: never;
-    url: '/api/integrations/{type}';
-};
-
-export type IntegrationsControllerFindOneResponses = {
-    200: IntegrationDto | unknown;
-};
-
-export type IntegrationsControllerFindOneResponse = IntegrationsControllerFindOneResponses[keyof IntegrationsControllerFindOneResponses];
-
-export type IntegrationsControllerUpsertData = {
-    body: UpsertIntegrationDto;
-    path: {
-        type: string;
-    };
-    query?: never;
-    url: '/api/integrations/{type}';
-};
-
-export type IntegrationsControllerUpsertResponses = {
-    200: IntegrationDto;
-};
-
-export type IntegrationsControllerUpsertResponse = IntegrationsControllerUpsertResponses[keyof IntegrationsControllerUpsertResponses];
+export type ProductiveControllerGetSyncStatusesResponse = ProductiveControllerGetSyncStatusesResponses[keyof ProductiveControllerGetSyncStatusesResponses];
 
 export type OverviewsControllerGetDataData = {
     body?: never;

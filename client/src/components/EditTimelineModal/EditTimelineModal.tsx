@@ -33,7 +33,9 @@ export function EditTimelineModal() {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [title, setTitle] = useState<string>('');
+  const [title, setTitle] = useState<string>('Program');
+  // Once the user types their own title, the type dropdown stops overwriting it.
+  const [isTitleCustom, setIsTitleCustom] = useState<boolean>(false);
   const [timelineType, setTimelineType] = useState<TimelineType>('Program');
   const [icsUrl, setIcsUrl] = useState<string>('');
   const [folderPath, setFolderPath] = useState<string>('');
@@ -80,6 +82,7 @@ export function EditTimelineModal() {
   useEffect(() => {
     if (timelineResponse) {
       setTitle(timelineResponse.title);
+      setIsTitleCustom(true);
       setTimelineType(timelineResponse.timelineType);
       const info = timelineResponse.eventProviderInfo as Record<string, string> | null;
       setIcsUrl(timelineResponse.timelineType === 'Calendar' ? (info?.icsUrl ?? '') : '');
@@ -160,6 +163,7 @@ export function EditTimelineModal() {
           onChange={(evt: ChangeEvent<HTMLSelectElement>) => {
             const newType = evt.target.value as TimelineType;
             setTimelineType(newType);
+            if (!isTitleCustom) setTitle(newType);
             if (newType !== 'Calendar') setIcsUrl('');
             if (newType !== 'GitCommit') setFolderPath('');
           }}
@@ -175,7 +179,10 @@ export function EditTimelineModal() {
         <input
           className="c-input"
           value={title}
-          onChange={(evt: ChangeEvent<HTMLInputElement>) => setTitle(evt.target.value)}
+          onChange={(evt: ChangeEvent<HTMLInputElement>) => {
+            setTitle(evt.target.value);
+            setIsTitleCustom(true);
+          }}
         />
 
         {timelineType === 'Calendar' && (

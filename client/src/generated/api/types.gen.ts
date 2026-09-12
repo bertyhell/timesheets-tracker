@@ -922,9 +922,9 @@ export type JiraConnectionDto = {
      */
     ok: boolean;
     /**
-     * Display name of the Atlassian account the token belongs to
+     * What could not be checked, on an otherwise successful connection
      */
-    displayName?: string | null;
+    warning?: string | null;
     /**
      * Why the connection failed, when it did
      */

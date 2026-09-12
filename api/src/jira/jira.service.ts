@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { IntegrationsService } from '../integrations/integrations.service';
 import { DatabaseService } from '../database/database.service';
@@ -16,6 +17,7 @@ import {
   type FindJiraIssuesByKeysResult,
 } from './queries/findJiraIssuesByKeys';
 import { upsertJiraIssue } from './queries/upsertJiraIssue';
+import { findRecentJiraWebsites } from './queries/findRecentJiraWebsites';
 import { CustomError } from '../shared/CustomError';
 import { logger } from '../shared/logger';
 
@@ -33,6 +35,30 @@ const JIRA_ISSUE_TTL_HOURS = 12;
 /** The sprint custom field id differs per Jira instance, so it is looked up once and cached. */
 const SPRINT_FIELD_CACHE_KEY = 'jira-sprint-field-id';
 const SPRINT_FIELD_SCHEMA = 'com.pyxis.greenhopper.jira:gh-sprint';
+
+/**
+ * Per site *and* per token, because which host answers depends on both: the same site accepts an
+ * unscoped token on its own url and a scoped one only on the gateway. Keying on the site alone let
+ * a host probed with an earlier token outlive it — and since the site url answers some endpoints
+ * for a scoped token while 404ing on issues, that stale host failed in a way that looked like
+ * missing permissions on every ticket.
+ */
+const CLOUD_ID_CACHE_PREFIX = 'jira-api-base-url-';
+
+/**
+ * The request used to check that credentials work, both for the settings page and for the host
+ * probe below. It has to be one the integration itself makes: Jira enforces scopes per endpoint, so
+ * a probe against some other endpoint could pass (or fail) on a scope set that says nothing about
+ * whether the real requests will go through.
+ */
+const JIRA_PROBE_PATH = '/rest/api/3/field';
+
+/**
+ * How many recently visited tickets the connection test reads before it concludes anything. More
+ * than one, because any single ticket can be deleted or restricted; few, because each one is a
+ * request the user waits on.
+ */
+const JIRA_PROBE_ISSUE_COUNT = 3;
 
 interface JiraNamed {
   name?: string;
@@ -155,14 +181,83 @@ export class JiraService {
     });
   }
 
-  /** Verifies the stored credentials, so a wrong token surfaces in settings instead of as an empty timeline. */
+  /**
+   * Verifies the stored credentials, so a wrong token surfaces in settings instead of as an empty
+   * timeline.
+   *
+   * It probes the field list rather than `/rest/api/3/myself`: Jira enforces a scope set per
+   * endpoint, and `myself` demands `read:group:jira` and `read:application-role:jira`, which this
+   * integration never needs otherwise. Testing against it would make the user grant two scopes for
+   * the sake of the test — and, worse, a passing test would say nothing about whether the requests
+   * that matter are in scope. The field list is one of the two requests this integration actually
+   * makes, and it needs no particular ticket to exist.
+   */
   async testConnection(): Promise<JiraConnectionDto> {
     try {
-      const user = await this.request<JiraUser>('/rest/api/3/myself');
-      return { ok: true, displayName: user.displayName };
+      await this.request<JiraFieldResponse[]>(JIRA_PROBE_PATH);
     } catch (err) {
-      return { ok: false, error: err instanceof Error ? err.message : String(err) };
+      return { ok: false, error: JiraService.toMessage(err) };
     }
+
+    // Jira scopes the field list and the issue endpoint separately, so reaching the first says
+    // nothing about the second — a token that cannot read a single ticket would otherwise report a
+    // healthy connection and then produce an empty timeline. A ticket the user has already visited
+    // is the only issue key to be had without the extra scopes a search would need.
+    const issueKeys = this.findRecentlyVisitedIssueKeys(JIRA_PROBE_ISSUE_COUNT);
+    if (!issueKeys.length) {
+      return {
+        ok: true,
+        warning:
+          'Ticket access could not be checked: no page on this Jira site has been visited yet. ' +
+          'Open a ticket and test again.',
+      };
+    }
+
+    let lastError = '';
+    for (const issueKey of issueKeys) {
+      try {
+        await this.fetchIssue(issueKey);
+        return { ok: true };
+      } catch (err) {
+        // Only the credentials themselves are worth failing the test over. A single ticket can be
+        // unreadable for reasons that say nothing about the setup — deleted, or in a project this
+        // account cannot see — so the next one is tried before giving a verdict.
+        if (err instanceof JiraAuthError) {
+          return {
+            ok: false,
+            error: `Signed in, but reading ticket ${issueKey} failed: ${JiraService.toMessage(err)}`,
+          };
+        }
+        lastError = `${issueKey}: ${JiraService.toMessage(err)}`;
+      }
+    }
+
+    return {
+      ok: true,
+      warning:
+        `Signed in, but none of the last ${issueKeys.length} tickets visited could be read — ` +
+        `they may be deleted or restricted, or the token may be missing an issue scope. ` +
+        `Last attempt — ${lastError}`,
+    };
+  }
+
+  /** The most recent Jira tickets in the browsing history, to test the issue endpoint against. */
+  private findRecentlyVisitedIssueKeys(count: number): string[] {
+    const { baseUrl } = this.getIntegration();
+    const recent = findRecentJiraWebsites(this.databaseService.getDb(), {
+      urlPrefix: baseUrl,
+      limit: 50,
+    });
+
+    const issueKeys = new Set<string>();
+    for (const { websiteUrl, websiteTitle } of recent) {
+      const issueKey = websiteUrl ? extractJiraIssueKey(websiteUrl, websiteTitle ?? '') : null;
+      if (issueKey) {
+        issueKeys.add(issueKey);
+        if (issueKeys.size === count) break;
+      }
+    }
+    return [...issueKeys];
   }
 
   /**
@@ -263,28 +358,100 @@ export class JiraService {
       return JSON.parse(cached.responseJson) as string | null;
     }
 
-    const allFields = await this.request<JiraFieldResponse[]>('/rest/api/3/field');
+    const allFields = await this.request<JiraFieldResponse[]>(JIRA_PROBE_PATH);
     const sprintFieldId =
       allFields.find((field) => field.schema?.custom === SPRINT_FIELD_SCHEMA)?.id ?? null;
 
-    db.prepare(
-      'INSERT OR REPLACE INTO cachedNetworkRequests (cacheKey, responseJson) VALUES (?, ?)'
-    ).run(SPRINT_FIELD_CACHE_KEY, JSON.stringify(sprintFieldId));
+    // A miss is not cached. Not finding the field means either that this site has no sprints or
+    // that the lookup itself went wrong — and the second case used to stick, leaving every ticket
+    // without a sprint until the cache was cleared by hand. Re-asking costs one request per batch
+    // of issues on a site that genuinely has no sprint field.
+    if (sprintFieldId) {
+      db.prepare(
+        'INSERT OR REPLACE INTO cachedNetworkRequests (cacheKey, responseJson) VALUES (?, ?)'
+      ).run(SPRINT_FIELD_CACHE_KEY, JSON.stringify(sprintFieldId));
+    }
     return sprintFieldId;
   }
 
-  /** Drops the cached sprint field id, so a refresh in the UI re-discovers it. */
+  /** Drops the cached sprint field id and cloud id, so a refresh in the UI re-discovers them. */
   clearFieldCache(): void {
     this.databaseService
       .getDb()
-      .prepare('DELETE FROM cachedNetworkRequests WHERE cacheKey = ?')
-      .run(SPRINT_FIELD_CACHE_KEY);
+      .prepare('DELETE FROM cachedNetworkRequests WHERE cacheKey = ? OR cacheKey LIKE ?')
+      .run(SPRINT_FIELD_CACHE_KEY, `${CLOUD_ID_CACHE_PREFIX}%`);
   }
 
   /**
-   * Every call this service makes is a GET. An Atlassian API token carries the full permissions of
-   * the account it belongs to — there is no read-only variant — so keeping the verb set to GET is
-   * what makes the integration read-only in practice.
+   * Works out which host this site's token is accepted on, and remembers it.
+   *
+   * A scoped token is only accepted on `api.atlassian.com/ex/jira/{cloudId}` — sent straight to
+   * `your-org.atlassian.net` it 401s — which is why the settings form asks for a scoped token and
+   * why this lookup exists. An unscoped token is accepted on the site url, and Atlassian does not
+   * document whether it is also accepted on the gateway, so rather than guess, both are tried once
+   * and whichever authenticates is cached. Only a successful probe is cached: caching a failure
+   * would pin the integration to a host that never works, and the answer is cached against the
+   * token it was probed with, so pasting a new token re-probes instead of inheriting the old host.
+   */
+  private async getApiBaseUrl(
+    siteUrl: string,
+    token: string,
+    headers: Record<string, string>
+  ): Promise<string> {
+    const db = this.databaseService.getDb();
+    const cacheKey = `${CLOUD_ID_CACHE_PREFIX}${new URL(siteUrl).host}-${JiraService.fingerprint(token)}`;
+    const cached = db
+      .prepare('SELECT responseJson FROM cachedNetworkRequests WHERE cacheKey = ?')
+      .get(cacheKey) as { responseJson: string } | undefined;
+    if (cached) {
+      return JSON.parse(cached.responseJson) as string;
+    }
+
+    const candidates: string[] = [];
+    const cloudId = await this.resolveCloudId(siteUrl);
+    if (cloudId) {
+      candidates.push(`https://api.atlassian.com/ex/jira/${cloudId}`);
+    }
+    candidates.push(siteUrl);
+
+    for (const candidate of candidates) {
+      const accepted = await fetch(`${candidate}${JIRA_PROBE_PATH}`, { headers })
+        .then((response) => response.ok)
+        .catch(() => false);
+      if (accepted) {
+        logger.info(`[Jira] token accepted on ${candidate}, using it for this site`);
+        db.prepare(
+          'INSERT OR REPLACE INTO cachedNetworkRequests (cacheKey, responseJson) VALUES (?, ?)'
+        ).run(cacheKey, JSON.stringify(candidate));
+        return candidate;
+      }
+      logger.info(`[Jira] token not accepted on ${candidate}`);
+    }
+
+    // Nothing authenticated. Return the most likely host so the caller's own request produces the
+    // real error message for the user, and leave the cache empty so the next attempt probes again.
+    return candidates[0];
+  }
+
+  /** `_edge/tenant_info` is unauthenticated, so this resolves even before the token is valid. */
+  private async resolveCloudId(siteUrl: string): Promise<string | null> {
+    try {
+      const response = await fetch(`${siteUrl}/_edge/tenant_info`, {
+        headers: { Accept: 'application/json' },
+      });
+      if (!response.ok) return null;
+      const { cloudId } = (await response.json()) as { cloudId?: string };
+      return cloudId ?? null;
+    } catch (err) {
+      // Self-managed sites and anything behind a proxy have no tenant_info; those take the site url.
+      console.error(new CustomError('Failed to resolve the Jira cloud id', err, { siteUrl }));
+      return null;
+    }
+  }
+
+  /**
+   * Every call this service makes is a GET, so a token scoped to the read scopes listed in the
+   * settings form is all this integration ever needs.
    */
   private async request<T>(path: string): Promise<T> {
     const { baseUrl, userId, token } = this.getIntegration();
@@ -294,14 +461,14 @@ export class JiraService {
       );
     }
 
-    const url = `${baseUrl}${path}`;
+    const headers = {
+      Authorization: `Basic ${Buffer.from(`${userId}:${token}`).toString('base64')}`,
+      Accept: 'application/json',
+    };
+
+    const url = `${await this.getApiBaseUrl(baseUrl, token, headers)}${path}`;
     logger.info('[Jira] fetching: ' + url);
-    const response = await fetch(url, {
-      headers: {
-        Authorization: `Basic ${Buffer.from(`${userId}:${token}`).toString('base64')}`,
-        Accept: 'application/json',
-      },
-    });
+    const response = await fetch(url, { headers });
 
     if (!response.ok) {
       const body = await response.text().catch(() => '');
@@ -335,6 +502,15 @@ export class JiraService {
     } catch {
       return trimmed;
     }
+  }
+
+  /** Identifies a token in a cache key without storing the token itself. */
+  private static fingerprint(token: string): string {
+    return createHash('sha256').update(token).digest('hex').slice(0, 12);
+  }
+
+  private static toMessage(err: unknown): string {
+    return err instanceof Error ? err.message : String(err);
   }
 
   private static joinNames(values: JiraNamed[] | undefined): string {

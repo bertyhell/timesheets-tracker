@@ -1,0 +1,67 @@
+.p-jira-settings__info {
+  display: inline-flex;
+  align-items: center;
+  color: var(--gray-500);
+  cursor: help;
+}
+
+.p-jira-settings__info:hover,
+.p-jira-settings__info:focus-visible {
+  color: var(--gray-700);
+}
+
+.p-jira-settings__tooltip .c-tooltip__content {
+  /* The default 80vw would stretch this across the whole window on a wide screen; the viewport
+     term keeps it inside a narrow one, where 26rem would not fit. */
+  max-width: min(26rem, calc(100vw - 2rem));
+}
+
+/* Scope names and their reason are stacked rather than laid out in columns: three columns inside a
+   tooltip squeezes the reason into a sliver barely a word wide. */
+.p-jira-settings__scopes {
+  /* Overrides the horizontal padding Tooltip.css puts on every ul. */
+  padding: 0 !important;
+  margin: 0.625rem 0 0;
+}
+
+.p-jira-settings__scopes li + li {
+  margin-top: 0.5rem;
+}
+
+/* The scopes are wrapped chips rather than one per line: a dozen of them stacked would make the
+   tooltip taller than the form behind it. */
+.p-jira-settings__scope-names {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.p-jira-settings__scope-names code {
+  font-size: 0.75rem;
+}
+
+.p-jira-settings__scope-reason {
+  display: block;
+  opacity: 0.85;
+  font-size: 0.8125rem;
+}
+
+.p-jira-settings__copy-scopes {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--gray-500);
+  font-size: 0.8125rem;
+
+  &:hover {
+    color: var(--gray-700);
+    text-decoration: underline;
+  }
+}
+
+.p-jira-settings__scope-legend {
+  margin-top: 0.625rem;
+  opacity: 0.75;
+  font-size: 0.75rem;
+}

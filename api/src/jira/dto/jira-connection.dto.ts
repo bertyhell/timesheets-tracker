@@ -9,12 +9,12 @@ export class JiraConnectionDto {
 
   @ApiProperty({
     type: String,
-    description: 'Display name of the Atlassian account the token belongs to',
-    example: 'Jane Doe',
+    description: 'What could not be checked, on an otherwise successful connection',
+    example: 'Ticket access could not be checked: no page on this Jira site has been visited yet.',
     required: false,
     nullable: true,
   })
-  displayName?: string;
+  warning?: string;
 
   @ApiProperty({
     type: String,

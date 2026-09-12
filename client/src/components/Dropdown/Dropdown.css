@@ -29,6 +29,15 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 14rem;
+
+  /* The label is blockified as a flex item of the trigger, so an icon passed alongside the text
+     would sit on its own line. Keeping it inline (rather than making the label a flex container)
+     preserves the ellipsis truncation for text-only labels. */
+  & > svg {
+    display: inline-block;
+    vertical-align: -0.1875em;
+    margin-right: 0.375rem;
+  }
 }
 
 .c-dropdown__chevron {

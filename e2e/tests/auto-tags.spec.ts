@@ -29,7 +29,7 @@ test.describe('Auto tag rules management', () => {
       await tagSelectInput.fill(tagNameTitle);
       await page.getByRole('option', { name: tagNameTitle, exact: true }).click();
 
-      // Fill in one condition: programName contains <ruleTitle>. The operator select
+      // Fill in one condition: "Program name" contains <ruleTitle>. The operator select
       // already defaults to "contains" for every blank condition row, so it's left alone
       // (clicking it would be ambiguous: every still-blank row shows the same selected value).
       const conditionRow = modal.locator('.c-auto-tag-condition').first();
@@ -37,7 +37,7 @@ test.describe('Auto tag rules management', () => {
       await page.getByText('Program name', { exact: true }).click();
       await conditionRow.locator('input.c-auto-tag-condition__value').fill(ruleTitle);
 
-      await modal.getByRole('button', { name: 'Save' }).click();
+      await modal.getByRole('button', { name: 'Create rule' }).click();
       await expect(modal).not.toBeVisible();
     });
 
@@ -55,7 +55,7 @@ test.describe('Auto tag rules management', () => {
 
       const ruleNameInput = modal.locator('input.c-input').first();
       await ruleNameInput.fill(updatedRuleTitle);
-      await modal.getByRole('button', { name: 'Save' }).click();
+      await modal.getByRole('button', { name: 'Save changes' }).click();
       await expect(modal).not.toBeVisible();
     });
 

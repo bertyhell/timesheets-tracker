@@ -10,6 +10,7 @@ import {
   SyncTimeEntriesResultDto,
   SyncTimeEntryDto,
 } from './dto/sync-time-entries.dto';
+import { ProductiveConnectionDto } from './dto/connection.dto';
 import { SyncStatusDto, SyncStatusEntryDto, SyncStatusValue } from './dto/sync-status.dto';
 import { findSyncStatusesByDate } from './queries/findSyncStatusesByDate';
 import { upsertSyncStatus } from './queries/upsertSyncStatus';
@@ -280,6 +281,32 @@ export class ProductiveService {
     db.prepare('DELETE FROM cachedNetworkRequests WHERE cacheKey LIKE ?').run(
       `${ProductiveService.LIST_CACHE_PREFIX}%`
     );
+  }
+
+  /**
+   * Verifies the stored credentials by fetching the configured person. Failures are returned as
+   * ok:false with the reason rather than thrown, so the settings form can show them inline.
+   */
+  async testConnection(): Promise<ProductiveConnectionDto> {
+    try {
+      const { baseUrl, organisationId, token, userId } = this.getIntegration();
+      const res = await fetch(`${baseUrl}/people/${userId}`, {
+        headers: this.buildHeaders(organisationId, token),
+      });
+      if (!res.ok) {
+        const body = await res.text().catch(() => '');
+        const detail = ProductiveService.describeJsonApiError(body);
+        throw new Error(`Productive people request failed: ${res.status} — ${detail ?? body}`);
+      }
+      const json = (await res.json()) as {
+        data?: { attributes?: { first_name?: string; last_name?: string } };
+      };
+      const attributes = json.data?.attributes;
+      const name = [attributes?.first_name, attributes?.last_name].filter(Boolean).join(' ');
+      return { ok: true, name: name || undefined };
+    } catch (err) {
+      return { ok: false, error: err instanceof Error ? err.message : String(err) };
+    }
   }
 
   async getCompanies(): Promise<ProductiveCompanyDto[]> {

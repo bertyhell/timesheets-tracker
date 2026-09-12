@@ -7,11 +7,22 @@ import { ProductiveServiceDto } from './dto/service.dto';
 import { ProductiveServiceTreeNodeDto } from './dto/service-tree.dto';
 import { SyncTimeEntriesDto, SyncTimeEntriesResultDto } from './dto/sync-time-entries.dto';
 import { SyncStatusDto } from './dto/sync-status.dto';
+import { ProductiveConnectionDto } from './dto/connection.dto';
 
 @ApiTags('productive')
 @Controller('api/productive')
 export class ProductiveController {
   constructor(private readonly productiveService: ProductiveService) {}
+
+  @ApiOkResponse({
+    description:
+      'Check whether the configured Productive credentials work. Returns ok:false with the reason rather than an error status, so the settings form can show it.',
+    type: ProductiveConnectionDto,
+  })
+  @Get('test-connection')
+  testConnection(): Promise<ProductiveConnectionDto> {
+    return this.productiveService.testConnection();
+  }
 
   @ApiOkResponse({ type: ProductiveCompanyDto, isArray: true })
   @Get('companies')

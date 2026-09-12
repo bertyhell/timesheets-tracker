@@ -6,6 +6,7 @@ import { Clipboard, ClipboardCheck, Eye, EyeOff } from 'lucide-react';
 import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import Button, { ButtonVariant } from '../../../components/Button/Button';
 import { integrationsApi, type UpsertIntegrationPayload } from '../../../api/integrations';
+import { productiveControllerTestConnection } from '../../../generated/api/sdk.gen';
 
 const INTEGRATION_TYPE = 'productive';
 
@@ -53,10 +54,31 @@ export function ProductiveSettingsPage() {
     onError: () => toast('Failed to save integration', { type: 'error' }),
   });
 
+  // The connection is tested against what is saved, so the form is stored first — otherwise the
+  // button would report on the previous credentials while showing the new ones.
+  const testMutation = useMutation({
+    mutationFn: async () => {
+      await integrationsApi.upsert(INTEGRATION_TYPE, form);
+      const { data } = await productiveControllerTestConnection();
+      return data;
+    },
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ['integrations', INTEGRATION_TYPE] });
+      if (result?.ok) {
+        toast(`Connected to Productive as ${result.name ?? 'your account'}`, { type: 'success' });
+      } else {
+        toast(result?.error ?? 'Could not reach Productive', { type: 'error' });
+      }
+    },
+    onError: () => toast('Could not reach Productive', { type: 'error' }),
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     upsertMutation.mutate(form);
   };
+
+  const isComplete = !!form.baseUrl && !!form.organisationId && !!form.userId && !!form.token;
 
   if (isLoading) return null;
 
@@ -143,6 +165,14 @@ export function ProductiveSettingsPage() {
           <div className="flex gap-2 mt-6">
             <Button variant={ButtonVariant.Primary} type="submit" disabled={upsertMutation.isPending}>
               {upsertMutation.isPending ? 'Saving…' : 'Save'}
+            </Button>
+            <Button
+              variant={ButtonVariant.Secondary}
+              type="button"
+              disabled={!isComplete || testMutation.isPending}
+              onClick={() => testMutation.mutate()}
+            >
+              {testMutation.isPending ? 'Testing…' : 'Test connection'}
             </Button>
             <Button
               variant={ButtonVariant.Secondary}

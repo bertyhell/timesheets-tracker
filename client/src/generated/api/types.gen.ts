@@ -973,6 +973,21 @@ export type UpsertIntegrationDto = {
     token: string;
 };
 
+export type ProductiveConnectionDto = {
+    /**
+     * Whether the configured base url, organisation id, user id and token can reach Productive
+     */
+    ok: boolean;
+    /**
+     * Name of the Productive person the configured user id belongs to
+     */
+    name?: string | null;
+    /**
+     * Why the connection failed, when it did
+     */
+    error?: string | null;
+};
+
 export type ProductiveCompanyDto = {
     /**
      * Productive company ID
@@ -2294,6 +2309,22 @@ export type IntegrationsControllerUpsertResponses = {
 };
 
 export type IntegrationsControllerUpsertResponse = IntegrationsControllerUpsertResponses[keyof IntegrationsControllerUpsertResponses];
+
+export type ProductiveControllerTestConnectionData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/productive/test-connection';
+};
+
+export type ProductiveControllerTestConnectionResponses = {
+    /**
+     * Check whether the configured Productive credentials work. Returns ok:false with the reason rather than an error status, so the settings form can show it.
+     */
+    200: ProductiveConnectionDto;
+};
+
+export type ProductiveControllerTestConnectionResponse = ProductiveControllerTestConnectionResponses[keyof ProductiveControllerTestConnectionResponses];
 
 export type ProductiveControllerGetCompaniesData = {
     body?: never;

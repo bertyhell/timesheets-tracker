@@ -1,5 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { Check, ChevronDown } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 import { useDismiss } from '../../helpers/use-dismiss';
 
@@ -17,6 +18,8 @@ interface SyncOutputMenuProps {
   outputs: SyncOutput[];
   selectedId: string;
   onSelect: (id: string) => void;
+  /** Called when the footnote navigates away, so the owning dialog can close behind it. */
+  onNavigateAway: () => void;
 }
 
 /**
@@ -25,7 +28,12 @@ interface SyncOutputMenuProps {
  * Shared by the Productive and Excel CSV dialogs so switching between them is a menu choice inside
  * one dialog rather than two dialogs that happen to look alike.
  */
-export function SyncOutputMenu({ outputs, selectedId, onSelect }: SyncOutputMenuProps) {
+export function SyncOutputMenu({
+  outputs,
+  selectedId,
+  onSelect,
+  onNavigateAway,
+}: SyncOutputMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const close = useCallback(() => setIsOpen(false), []);
@@ -67,7 +75,18 @@ export function SyncOutputMenu({ outputs, selectedId, onSelect }: SyncOutputMenu
                 {output.id === selectedId && <Check size={14} />}
               </button>
             ))}
-            <div className="c-sync-output__footnote">Manage in Settings · Integrations</div>
+            {/* Reached from a dialog, so the dialog has to come down with the navigation —
+                otherwise the settings page opens behind it. */}
+            <Link
+              to="/settings/integrations"
+              className="c-sync-output__footnote"
+              onClick={() => {
+                setIsOpen(false);
+                onNavigateAway();
+              }}
+            >
+              Manage in Settings · Integrations
+            </Link>
           </div>
         )}
       </div>

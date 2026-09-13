@@ -754,6 +754,7 @@ export function SyncToProductiveModal({
               outputs={outputs}
               selectedId={PRODUCTIVE_OUTPUT_ID}
               onSelect={onSelectOutput}
+              onNavigateAway={onClose}
             />
           </div>
           <div className="c-sync-header__subtitle">

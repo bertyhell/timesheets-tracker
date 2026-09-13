@@ -130,6 +130,7 @@ export function ExportToCsvModal({
               outputs={outputs}
               selectedId={CSV_OUTPUT_ID}
               onSelect={onSelectOutput}
+              onNavigateAway={onClose}
             />
           </div>
           <div className="c-sync-header__subtitle">

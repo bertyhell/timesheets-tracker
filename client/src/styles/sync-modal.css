@@ -184,11 +184,19 @@
 }
 
 .c-sync-output__footnote {
+  display: block;
   border-top: 1px solid #f3f4f6;
   margin-top: 4px;
   padding: 8px 10px;
   font-size: 12px;
   color: #6b7280;
+  cursor: pointer;
+}
+
+.c-sync-output__footnote:hover,
+.c-sync-output__footnote:focus-visible {
+  background: #f5f3ff;
+  color: var(--sync-accent);
 }
 
 .c-sync-endpoint {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import { AlertCircle, CheckCircle2, Download, RefreshCw, RotateCw } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Download, ExternalLink, RefreshCw, RotateCw } from 'lucide-react';
 import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import Button, { ButtonVariant } from '../../../components/Button/Button';
 import { appControllerStatus } from '../../../generated/api/sdk.gen';
@@ -76,16 +76,27 @@ export function UpdatesPage() {
               </p>
             </div>
 
-            {updates && (
-              <Button
-                variant={ButtonVariant.Secondary}
-                icon={<RefreshCw size={14} className={isChecking ? 'animate-spin' : undefined} />}
-                disabled={isChecking || state === 'downloading'}
-                onClick={check}
+            <div className="flex gap-2">
+              {updates && (
+                <Button
+                  variant={ButtonVariant.Secondary}
+                  icon={<RefreshCw size={14} className={isChecking ? 'animate-spin' : undefined} />}
+                  disabled={isChecking || state === 'downloading'}
+                  onClick={check}
+                >
+                  {isChecking ? 'Checking…' : 'Check for new versions'}
+                </Button>
+              )}
+              <a
+                href="https://github.com/bertyhell/timesheets-tracker/releases"
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                {isChecking ? 'Checking…' : 'Check for new versions'}
-              </Button>
-            )}
+                <Button variant={ButtonVariant.Secondary} icon={<ExternalLink size={14} />}>
+                  Release notes
+                </Button>
+              </a>
+            </div>
           </div>
         </div>
 

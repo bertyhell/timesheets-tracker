@@ -4,8 +4,13 @@
  * second output — both dialogs are the same dialog with a different body, and switching between
  * them from the output menu should not visibly change anything around that body.
  */
-/* Tokens taken from the approved design: violet accent, 8px radii, grey borders. */
-.c-sync-modal {
+/* Tokens taken from the approved design: violet accent, 8px radii, grey borders.
+ *
+ * Every rule that contradicts react-responsive-modal's own defaults is doubled up with the
+ * library's class, as `.c-edit-auto-tag-modal` already does. This file is imported with the global
+ * stylesheet, which lands *before* the library's CSS, so a bare `.c-sync-modal` ties on specificity
+ * and loses on source order — taking the panel's padding, width and overflow with it. */
+.react-responsive-modal-modal.c-sync-modal {
   --sync-accent: #7c3aed;
   --sync-border: #e5e7eb;
 
@@ -22,20 +27,20 @@
   color: #111827;
 }
 
-.c-sync-overlay {
+.react-responsive-modal-overlay.c-sync-overlay {
   background: rgba(17, 24, 39, 0.38);
 }
 
 /* Centre the panel with flexbox rather than the library's inline-block + vertical-align trick,
    which only holds while the panel is inline-level — and it is a flex column here. */
-.c-sync-modal-container {
+.react-responsive-modal-container.c-sync-modal-container {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 32px 24px;
 }
 
-.c-sync-modal-container::after {
+.react-responsive-modal-container.c-sync-modal-container::after {
   content: none;
 }
 

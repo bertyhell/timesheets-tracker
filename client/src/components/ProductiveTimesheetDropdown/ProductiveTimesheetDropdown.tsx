@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Building2, ChevronDown, ChevronRight, Folder, Receipt, X } from 'lucide-react';
 
 import { productiveApi } from '../../api/productive';
+import { useDismiss } from '../../helpers/use-dismiss';
 import type {
   ProductiveServiceSelection,
   ProductiveTimesheetDropdownProps,
@@ -206,19 +207,10 @@ export function ProductiveTimesheetDropdown({
 
   const rows = useMemo(() => flattenTree(tree, expanded, isSearching), [tree, expanded, isSearching]);
 
-  // Close on outside click / Escape and hand focus back to the trigger.
-  useEffect(() => {
-    if (!open) return;
-    const handleClickOutside = (evt: MouseEvent) => {
-      const target = evt.target as Node;
-      // The panel lives outside the root in the portal, so it has to be tested separately —
-      // otherwise clicking inside it would count as clicking away.
-      if (rootRef.current?.contains(target) || panelRef.current?.contains(target)) return;
-      setOpen(false);
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [open]);
+  // The panel lives outside the root in the portal, so both are passed as "inside" — otherwise
+  // clicking within the panel would count as clicking away.
+  const close = useCallback(() => setOpen(false), []);
+  useDismiss(open, close, [rootRef, panelRef]);
 
   const GAP = 4;
   const VIEWPORT_MARGIN = 8;

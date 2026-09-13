@@ -1,4 +1,3 @@
-import './AutoTagsPage.css';
 import { Modal } from 'react-responsive-modal';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Button, { ButtonVariant } from '../../../components/Button/Button';

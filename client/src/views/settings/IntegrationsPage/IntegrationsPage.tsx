@@ -10,6 +10,7 @@ import { Dropdown } from '../../../components/Dropdown/Dropdown';
 import { integrationsApi } from '../../../api/integrations';
 import productiveLogo from '../../../assets/integrations/productive.svg';
 import jiraLogo from '../../../assets/integrations/jira.svg';
+import excelCsvLogo from '../../../assets/integrations/excel-csv.svg';
 
 // Adding an integration is this entry plus its own settings page — everything below is driven off
 // this list rather than off the integration name.
@@ -21,6 +22,14 @@ const INTEGRATION_TYPES = [
     logo: productiveLogo,
   },
   { value: 'jira', label: 'Jira', path: '/settings/integrations/jira', logo: jiraLogo },
+  {
+    value: 'excel-csv',
+    label: 'Excel CSV',
+    path: '/settings/integrations/excel-csv',
+    logo: excelCsvLogo,
+    // A local file export has no endpoint, so the card shows what it does instead of a host.
+    subtitle: 'Export to a file on this computer',
+  },
 ] as const;
 
 export function IntegrationsPage() {
@@ -47,7 +56,12 @@ export function IntegrationsPage() {
 
   const integrations = INTEGRATION_TYPES.map((integrationType, index) => ({
     ...integrationType,
-    baseUrl: integrationQueries[index].data?.baseUrl ?? '',
+    // Credential-backed integrations identify themselves by host; one without an endpoint falls
+    // back to the static subtitle on its entry.
+    subtitle:
+      ('subtitle' in integrationType ? integrationType.subtitle : '') ||
+      integrationQueries[index].data?.baseUrl ||
+      '',
     isConfigured: !!integrationQueries[index].data,
   }));
 
@@ -66,7 +80,7 @@ export function IntegrationsPage() {
           <>
             {configuredTypes.length > 0 && (
               <div className="flex flex-col gap-3 mb-6">
-                {configuredTypes.map(({ value, label, path, baseUrl, logo }) => (
+                {configuredTypes.map(({ value, label, path, subtitle, logo }) => (
                   <div key={value} className="border border-gray-200 rounded-lg p-6">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -74,7 +88,7 @@ export function IntegrationsPage() {
                         <div>
                           <p className="font-semibold text-sm">{label}</p>
                           <p className="text-gray-500" style={{ fontSize: '0.8em' }}>
-                            {baseUrl}
+                            {subtitle}
                           </p>
                         </div>
                       </div>

@@ -1,0 +1,11 @@
+/*
+ * Drop indicator for sortable lists: a purple rule on the edge the dragged row would land against.
+ * Shared by the timelines, auto-tag and CSV-column lists so a drag reads the same everywhere.
+ */
+.drag-drop-border-top {
+  box-shadow: inset 0 2px 0 0 #a855f7;
+}
+
+.drag-drop-border-bottom {
+  box-shadow: inset 0 -2px 0 0 #a855f7;
+}

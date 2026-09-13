@@ -1366,6 +1366,48 @@ export type UpdateSavedOverviewConfigDto = {
     };
 };
 
+export type CsvExportColumnDto = {
+    /**
+     * Uuid of the column
+     */
+    id: string;
+    /**
+     * Column name, written into the header row
+     */
+    header: string;
+    /**
+     * Which part of the tag goes in this column
+     */
+    value: 'tagName' | 'tagCode' | 'tagNote' | 'notes' | 'duration' | 'start' | 'end' | 'date' | 'timelineName' | 'staticText';
+    /**
+     * How the value is rendered. Empty for the text values, which have no format.
+     */
+    format?: 'duration:HH:mm:ss' | 'duration:HH:mm' | 'duration:HH.H' | 'duration:HH.HH' | 'duration:m' | 'duration:human' | 'time:HH:mm' | 'time:HH:mm:ss' | 'time:yyyy-MM-dd HH:mm' | 'time:iso' | 'date:yyyy-MM-dd' | 'date:dd/MM/yyyy' | 'date:MM/dd/yyyy' | 'date:dd-MM-yyyy' | '';
+    /**
+     * Constant written in every row, used only when value is "staticText"
+     */
+    staticText?: string;
+};
+
+export type CsvExportConfigDto = {
+    /**
+     * Field separator of the produced file
+     */
+    delimiter: ',' | ';' | '\t';
+    /**
+     * Whether to write the column names as a first row
+     */
+    includeHeader: boolean;
+    /**
+     * File name suggested when saving. "{date}" is replaced by the exported day.
+     */
+    fileNamePattern: string;
+    /**
+     * The columns of the file, in order from left to right
+     */
+    columns: Array<CsvExportColumnDto>;
+};
+
 export type AppControllerStatusData = {
     body?: never;
     path?: never;
@@ -2535,3 +2577,29 @@ export type OverviewsControllerUpdateData = {
 export type OverviewsControllerUpdateResponses = {
     200: unknown;
 };
+
+export type CsvExportControllerGetConfigData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/csv-export/config';
+};
+
+export type CsvExportControllerGetConfigResponses = {
+    200: CsvExportConfigDto;
+};
+
+export type CsvExportControllerGetConfigResponse = CsvExportControllerGetConfigResponses[keyof CsvExportControllerGetConfigResponses];
+
+export type CsvExportControllerSaveConfigData = {
+    body: CsvExportConfigDto;
+    path?: never;
+    query?: never;
+    url: '/api/csv-export/config';
+};
+
+export type CsvExportControllerSaveConfigResponses = {
+    200: CsvExportConfigDto;
+};
+
+export type CsvExportControllerSaveConfigResponse = CsvExportControllerSaveConfigResponses[keyof CsvExportControllerSaveConfigResponses];

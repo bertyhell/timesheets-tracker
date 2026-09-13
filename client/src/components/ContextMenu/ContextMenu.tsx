@@ -1,5 +1,7 @@
 import './ContextMenu.css';
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
+
+import { useDismiss } from '../../helpers/use-dismiss';
 
 export interface ContextMenuItem {
   label: string;
@@ -16,22 +18,8 @@ interface ContextMenuProps {
 export function ContextMenu({ position, items, onClose }: ContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        onClose();
-      }
-    };
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [onClose]);
+  // A context menu is only ever rendered while it is open.
+  useDismiss(true, onClose, [menuRef]);
 
   return (
     <div ref={menuRef} className="c-context-menu" style={{ top: position.y, left: position.x }}>

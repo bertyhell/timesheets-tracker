@@ -40,6 +40,7 @@ export enum ROUTE_PARTS {
   integrations = 'integrations',
   productive = 'productive',
   jira = 'jira',
+  excelCsv = 'excel-csv',
   updates = 'updates',
 }
 

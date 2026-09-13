@@ -23,6 +23,16 @@ contextBridge.exposeInMainWorld('electron', {
   openFile: (): Promise<string | null> => ipcRenderer.invoke('dialog:openFile'),
   saveFile: (defaultPath?: string): Promise<string | null> =>
     ipcRenderer.invoke('dialog:saveFile', defaultPath),
+  /**
+   * Asks where to put a text file and writes it there in one step, returning the chosen path (or
+   * null when cancelled). Unlike `saveFile`, which only hands back a path for the backend to write
+   * to, the content here already lives in the renderer — a CSV it just built.
+   */
+  saveTextFile: (options: {
+    defaultPath?: string;
+    contents: string;
+    filters?: { name: string; extensions: string[] }[];
+  }): Promise<string | null> => ipcRenderer.invoke('dialog:saveTextFile', options),
   showItemInFolder: (targetPath: string): Promise<void> =>
     ipcRenderer.invoke('shell:showItemInFolder', targetPath),
 

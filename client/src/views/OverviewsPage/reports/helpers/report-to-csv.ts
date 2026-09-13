@@ -1,13 +1,10 @@
 import type { ReportResult } from '../report.types';
 import { formatValue } from './format-values';
+import { toCsv } from '../../../../helpers/csv';
 
-function escapeCell(value: string): string {
-  return /[",\n]/.test(value) ? '"' + value.replace(/"/g, '""') + '"' : value;
-}
-
-function toCsv(rows: string[][]): string {
-  return rows.map((row) => row.map(escapeCell).join(',')).join('\n');
-}
+// The CSV primitives moved to helpers/csv.ts when the Excel CSV integration needed them too.
+// Re-exported here so the Overviews page keeps importing its export helpers from one place.
+export { downloadCsv, downloadDataUrl } from '../../../../helpers/csv';
 
 /**
  * Exports exactly what the chart shows, formatted the same way, so the CSV can be pasted into a
@@ -39,21 +36,4 @@ export function reportToCsv(result: ReportResult): string {
     ['Date', 'Value'],
     ...result.days.map((day) => [day.date, formatValue(day.value, result.valueUnit)]),
   ]);
-}
-
-export function downloadCsv(csv: string, filename: string): void {
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename.replace(/[^a-z0-9-_]+/gi, '-').toLowerCase() + '.csv';
-  link.click();
-  URL.revokeObjectURL(url);
-}
-
-export function downloadDataUrl(dataUrl: string, filename: string): void {
-  const link = document.createElement('a');
-  link.href = dataUrl;
-  link.download = filename.replace(/[^a-z0-9-_]+/gi, '-').toLowerCase() + '.png';
-  link.click();
 }

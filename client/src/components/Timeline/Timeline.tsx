@@ -38,6 +38,14 @@ import {
 import { TimelineType } from './Timeline.types';
 import { ColorInput } from '../ColorInput/ColorInput';
 import { SyncToProductiveModal } from '../SyncToProductiveModal/SyncToProductiveModal';
+import { ExportToCsvModal } from '../ExportToCsvModal/ExportToCsvModal';
+import {
+  CSV_OUTPUT_ID,
+  PRODUCTIVE_OUTPUT_ID,
+  readLastSyncOutput,
+  useSyncOutputs,
+  writeLastSyncOutput,
+} from '../SyncOutputMenu/useSyncOutputs';
 
 interface ResizeState {
   tagId: string;
@@ -136,6 +144,26 @@ function Timeline({
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const [titleContextMenu, setTitleContextMenu] = useState<{ x: number; y: number } | null>(null);
   const [syncEvents, setSyncEvents] = useState<TimelineEventDto[] | null>(null);
+  // Which target the open dialog is pointed at. Both dialogs share the header output menu, so
+  // switching target swaps the dialog while keeping the same events selected. It opens on whatever
+  // was exported to last time, which is what keeps a repeated export down to two clicks.
+  const [syncOutput, setSyncOutput] = useState<string>(readLastSyncOutput);
+  const { outputs: syncOutputs } = useSyncOutputs();
+  const configuredOutputs = syncOutputs.filter((output) => output.isReady);
+  const canExport = configuredOutputs.length > 0;
+
+  // The remembered target may since have been removed, so fall back to the first one still set up
+  // rather than opening a dialog for an integration that is no longer there.
+  const openExport = (eventsToExport: TimelineEventDto[]) => {
+    const isStillConfigured = configuredOutputs.some((output) => output.id === syncOutput);
+    if (!isStillConfigured && configuredOutputs[0]) setSyncOutput(configuredOutputs[0].id);
+    setSyncEvents(eventsToExport);
+  };
+
+  const handleSelectOutput = (outputId: string) => {
+    setSyncOutput(outputId);
+    writeLastSyncOutput(outputId);
+  };
   const trackRef = useRef<HTMLDivElement>(null);
   const [trackWidth, setTrackWidth] = useState(0);
   const [pendingCreate, setPendingCreate] = useState<{ title: string; code: string; color: string } | null>(null);
@@ -787,17 +815,15 @@ function Timeline({
               : []),
             ...((timelineInfo.timelineType === TimelineType.Tag ||
               timelineInfo.timelineType === TimelineType.AutoTag) &&
-            (contextMenu.event.info as AutoTagEventInfoDto)?.tagNameId
+            (contextMenu.event.info as AutoTagEventInfoDto)?.tagNameId &&
+            canExport
               ? [
                   {
-                    label:
-                      timelineInfo.timelineType === TimelineType.AutoTag
-                        ? 'Sync this auto tag'
-                        : 'Sync this tag',
+                    label: 'Export',
                     onClick: () => {
                       const event = contextMenu.event;
                       setContextMenu(null);
-                      setSyncEvents([event]);
+                      openExport([event]);
                     },
                   },
                 ]
@@ -820,9 +846,18 @@ function Timeline({
             ...(onRefreshEvents
               ? [{ label: 'Refresh events', onClick: () => { setTitleContextMenu(null); onRefreshEvents(); } }]
               : []),
-            ...(timelineInfo.timelineType === TimelineType.Tag ||
-            timelineInfo.timelineType === TimelineType.AutoTag
-              ? [{ label: 'Sync', onClick: () => { setTitleContextMenu(null); setSyncEvents(events); } }]
+            ...((timelineInfo.timelineType === TimelineType.Tag ||
+              timelineInfo.timelineType === TimelineType.AutoTag) &&
+            canExport
+              ? [
+                  {
+                    label: 'Export',
+                    onClick: () => {
+                      setTitleContextMenu(null);
+                      openExport(events);
+                    },
+                  },
+                ]
               : []),
           ]}
           onClose={() => setTitleContextMenu(null)}
@@ -871,13 +906,24 @@ function Timeline({
         </div>
       </Modal>
 
-      {/* Sync to Productive modal */}
+      {/* Sync dialogs — one per output, sharing the header menu that switches between them. */}
       <SyncToProductiveModal
-        open={!!syncEvents}
+        open={!!syncEvents && syncOutput === PRODUCTIVE_OUTPUT_ID}
         onClose={() => setSyncEvents(null)}
         date={format(minTime, 'yyyy-MM-dd')}
         timelineType={timelineInfo.timelineType}
         events={syncEvents ?? []}
+        onSelectOutput={handleSelectOutput}
+      />
+
+      <ExportToCsvModal
+        open={!!syncEvents && syncOutput === CSV_OUTPUT_ID}
+        onClose={() => setSyncEvents(null)}
+        date={format(minTime, 'yyyy-MM-dd')}
+        timelineType={timelineInfo.timelineType}
+        timelineTitle={timelineInfo.title}
+        events={syncEvents ?? []}
+        onSelectOutput={handleSelectOutput}
       />
     </>
   );

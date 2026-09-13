@@ -10,12 +10,13 @@ import {
   tagNamesControllerUpdateMutation,
   tagsControllerUpdateMutation,
 } from '../../generated/api/@tanstack/react-query.gen';
-import { AlertTriangle, Check, ChevronDown, ChevronRight, X } from 'lucide-react';
+import { AlertTriangle, Check, ChevronRight, X } from 'lucide-react';
 
 import { productiveApi } from '../../api/productive';
 import type { SyncStatus, SyncStatusEntry, SyncStatusValue } from '../../api/productive';
-import { integrationsApi } from '../../api/integrations';
 import { ProductiveTimesheetDropdown } from '../ProductiveTimesheetDropdown/ProductiveTimesheetDropdown';
+import { SyncOutputMenu } from '../SyncOutputMenu/SyncOutputMenu';
+import { PRODUCTIVE_OUTPUT_ID, useSyncOutputs } from '../SyncOutputMenu/useSyncOutputs';
 
 import './SyncToProductiveModal.css';
 
@@ -25,6 +26,8 @@ interface SyncToProductiveModalProps {
   date: string; // yyyy-MM-dd
   timelineType: TimelineDto['timelineType'];
   events: TimelineEventDto[];
+  /** Picked another target in the header menu — the owner swaps in that target's dialog. */
+  onSelectOutput: (outputId: string) => void;
 }
 
 interface EventInfoLike {
@@ -77,19 +80,6 @@ const EMPTY_SELECTION: RowSelection = {
   path: '',
   parts: [],
 };
-
-/** Productive is the only output today; the menu exists so a second one is a data change. */
-const OUTPUT_LOCATIONS = [{ id: 'productive', name: 'Productive' }];
-
-/** Host of the configured Productive API, shown in the header chip. */
-function endpointHost(baseUrl: string | undefined): string {
-  if (!baseUrl) return 'Not configured';
-  try {
-    return new URL(baseUrl).host;
-  } catch {
-    return baseUrl.replace(/^https?:\/\//, '').split('/')[0];
-  }
-}
 
 /** "Thursday 10 September 2026" — the day being booked, spelled out. */
 function formatLongDate(date: string): string {
@@ -454,8 +444,9 @@ export function SyncToProductiveModal({
   date,
   timelineType,
   events,
+  onSelectOutput,
 }: SyncToProductiveModalProps) {
-  const [outputMenuOpen, setOutputMenuOpen] = useState(false);
+  const { outputs } = useSyncOutputs();
   const [selection, setSelection] = useState<Record<string, RowSelection>>({});
   const [isSyncing, setIsSyncing] = useState(false);
   /** Per planned-entry inclusion in the next sync, keyed by `PlannedEntry.key`. */
@@ -465,13 +456,6 @@ export function SyncToProductiveModal({
   const [noteOverrides, setNoteOverrides] = useState<Record<string, string>>({});
   /** Summary of the sync that just ran; only shown while something in it failed. */
   const [report, setReport] = useState<{ created: number; failed: number } | null>(null);
-
-  // Powers the endpoint chip in the header: which Productive account this will actually book to.
-  const { data: integration } = useQuery({
-    queryKey: ['integrations', 'productive'],
-    queryFn: () => integrationsApi.findOne('productive'),
-    enabled: open,
-  });
 
   const queryClient = useQueryClient();
   const { mutateAsync: updateTagName } = useMutation({ ...tagNamesControllerUpdateMutation() });
@@ -750,7 +734,6 @@ export function SyncToProductiveModal({
   };
 
   const itemLabel = timelineType === TimelineType.AutoTag ? 'auto tags' : 'tags';
-  const connected = !!integration?.token;
 
   return (
     <Modal
@@ -767,45 +750,11 @@ export function SyncToProductiveModal({
         <div className="c-sync-header__main">
           <div className="c-sync-header__title">
             <h3>Sync to</h3>
-            <div className="c-sync-output">
-              <button
-                type="button"
-                className="c-sync-output__trigger"
-                onClick={() => setOutputMenuOpen((prev) => !prev)}
-                aria-expanded={outputMenuOpen}
-              >
-                {OUTPUT_LOCATIONS[0].name}
-                <ChevronDown size={15} />
-              </button>
-              {outputMenuOpen && (
-                <div className="c-sync-output__menu">
-                  {OUTPUT_LOCATIONS.map((output) => (
-                    <button
-                      type="button"
-                      key={output.id}
-                      className="c-sync-output__option is-selected"
-                      onClick={() => setOutputMenuOpen(false)}
-                    >
-                      <span className={`c-sync-dot${connected ? ' is-connected' : ''}`} />
-                      <span className="c-sync-output__option-text">
-                        <span className="c-sync-output__option-name">{output.name}</span>
-                        <span className="c-sync-output__option-meta">
-                          {connected
-                            ? `${endpointHost(integration?.baseUrl)} · connected`
-                            : 'Not connected — add in Settings'}
-                        </span>
-                      </span>
-                      <Check size={14} />
-                    </button>
-                  ))}
-                  <div className="c-sync-output__footnote">Manage in Settings · Integrations</div>
-                </div>
-              )}
-            </div>
-            <span className="c-sync-endpoint">
-              <span className={`c-sync-dot${connected ? ' is-connected' : ''}`} />
-              {endpointHost(integration?.baseUrl)}
-            </span>
+            <SyncOutputMenu
+              outputs={outputs}
+              selectedId={PRODUCTIVE_OUTPUT_ID}
+              onSelect={onSelectOutput}
+            />
           </div>
           <div className="c-sync-header__subtitle">
             {formatLongDate(date)} · {itemLabel} timeline

@@ -10,7 +10,6 @@ import React, { type ReactNode, useEffect, useState } from 'react';
 import { ROUTE_PARTS } from '../../../App';
 import { toast } from 'react-toastify';
 import { orderBy } from 'lodash-es';
-import './TimelinesPage.css';
 import { SearchInput } from '../../../components/SearchInput/SearchInput';
 import {
   DndContext,

@@ -19,6 +19,7 @@ import { IntegrationsPage } from './views/settings/IntegrationsPage/Integrations
 import { UpdatesPage } from './views/settings/UpdatesPage/UpdatesPage';
 import { ProductiveSettingsPage } from './views/settings/IntegrationsPage/ProductiveSettingsPage';
 import { JiraSettingsPage } from './views/settings/IntegrationsPage/JiraSettingsPage';
+import { ExcelCsvSettingsPage } from './views/settings/IntegrationsPage/ExcelCsvSettingsPage';
 import { OverviewsPage } from './views/OverviewsPage/OverviewsPage';
 import { OverviewView } from './views/OverviewsPage/OverviewView/OverviewView';
 import { EditOverviewConfigModal } from './components/EditOverviewConfigModal/EditOverviewConfigModal';
@@ -100,6 +101,10 @@ export const routes: RouteObject[] = [
           {
             path: ROUTE_PARTS.integrations + '/' + ROUTE_PARTS.jira,
             element: <JiraSettingsPage />,
+          },
+          {
+            path: ROUTE_PARTS.integrations + '/' + ROUTE_PARTS.excelCsv,
+            element: <ExcelCsvSettingsPage />,
           },
           {
             path: ROUTE_PARTS.updates,

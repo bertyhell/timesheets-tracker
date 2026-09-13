@@ -1,0 +1,110 @@
+.c-format-select {
+  position: relative;
+  min-width: 0;
+}
+
+.c-format-select__trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  height: 36px;
+  padding: 0 0.5rem 0 0.625rem;
+  border: 1px solid var(--gray-100);
+  border-radius: 8px;
+  background-color: white;
+  font-family: inherit;
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.c-format-select__trigger:hover:not(:disabled) {
+  border-color: var(--gray-200);
+}
+
+.c-format-select__trigger:focus-visible {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-4);
+}
+
+.c-format-select__trigger:disabled {
+  background-color: #f9fafb;
+  color: var(--gray-500);
+  cursor: not-allowed;
+}
+
+/* The pattern keeps its own width; the example gives up space first and truncates. */
+.c-format-select__pattern {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  color: #111827;
+}
+
+.c-format-select__example {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+  font-size: 0.8125rem;
+  color: var(--gray-500);
+}
+
+.c-format-select__placeholder {
+  flex: 1;
+  color: var(--gray-500);
+}
+
+.c-format-select__chevron {
+  flex: none;
+  color: #9ca3af;
+}
+
+.c-format-select__menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 30;
+  min-width: 100%;
+  /* Wider than the trigger so the pattern and its example never collide in the list. */
+  width: max-content;
+  max-width: 22rem;
+  max-height: 18rem;
+  overflow-y: auto;
+  padding: 4px;
+  background: white;
+  border: 1px solid var(--gray-100);
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.16);
+}
+
+.c-format-select__option {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+  padding: 7px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.c-format-select__option:hover {
+  background: var(--hover-highlight);
+}
+
+.c-format-select__option.is-selected {
+  background: var(--hover-highlight);
+}
+
+.c-format-select__check {
+  flex: none;
+  color: var(--primary);
+}

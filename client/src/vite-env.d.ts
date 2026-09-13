@@ -23,6 +23,12 @@ interface Window {
     selectDirectory: () => Promise<string | null>;
     openFile: () => Promise<string | null>;
     saveFile: (defaultPath?: string) => Promise<string | null>;
+    /** Opens a Save dialog and writes `contents` to the chosen path. Null when cancelled. */
+    saveTextFile: (options: {
+      defaultPath?: string;
+      contents: string;
+      filters?: { name: string; extensions: string[] }[];
+    }) => Promise<string | null>;
     showItemInFolder: (targetPath: string) => Promise<void>;
     updates?: {
       getStatus: () => Promise<UpdateStatus>;

@@ -148,3 +148,17 @@ CREATE TABLE IF NOT EXISTS productiveSyncStatuses
     "syncedAt"  text NOT NULL,
     PRIMARY KEY ("tagNameId", "date")
 );
+
+
+-- Column definitions for the Excel CSV export integration: one row per column in the produced
+-- file, ordered left-to-right by "visualOrder". See the matching migration for the details of
+-- "format" and "staticText".
+CREATE TABLE IF NOT EXISTS csvExportColumns
+(
+    "id"          text NOT NULL PRIMARY KEY,
+    "header"      text NOT NULL,
+    "value"       text NOT NULL,
+    "format"      text NOT NULL DEFAULT '',
+    "staticText"  text NOT NULL DEFAULT '',
+    "visualOrder" int  NOT NULL
+);

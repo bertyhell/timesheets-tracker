@@ -25,6 +25,7 @@ import {
 import { autoUpdater } from 'electron-updater';
 import { spawn, ChildProcess } from 'child_process';
 import * as path from 'path';
+import * as fs from 'fs';
 
 const UPDATE_CHECK_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000; // 1 week
 
@@ -419,6 +420,33 @@ ipcMain.handle('dialog:saveFile', async (_event, defaultPath?: string) => {
   });
   return result.canceled ? null : (result.filePath ?? null);
 });
+
+/**
+ * Save-dialog + write in one call, for content the renderer already holds (the CSV export).
+ * `dialog:saveFile` above stays as it is: it only returns a path, and its caller has the backend
+ * do the writing.
+ */
+ipcMain.handle(
+  'dialog:saveTextFile',
+  async (
+    _event,
+    options: {
+      defaultPath?: string;
+      contents: string;
+      filters?: { name: string; extensions: string[] }[];
+    }
+  ) => {
+    const result = await dialog.showSaveDialog({
+      defaultPath: options.defaultPath,
+      filters: options.filters ?? [{ name: 'CSV', extensions: ['csv'] }],
+    });
+    if (result.canceled || !result.filePath) {
+      return null;
+    }
+    fs.writeFileSync(result.filePath, options.contents, 'utf-8');
+    return result.filePath;
+  }
+);
 
 ipcMain.handle('shell:showItemInFolder', (_event, targetPath: string) => {
   shell.showItemInFolder(targetPath);

@@ -16,6 +16,7 @@ flowchart TB
       FGENERAL["GeneralSettingsPage<br/>Move/SwitchDatabaseModal"]
       FINTEGR["IntegrationsPage"]
       FPRODUCTIVE["ProductiveSettingsPage"]
+      FEXCELCSV["ExcelCsvSettingsPage"]
     end
     subgraph FMANAGEGRP["Manage"]
       FMTIMELINES["TimelinesPage<br/>EditTimelineModal"]
@@ -47,6 +48,7 @@ flowchart TB
     BSETTINGS["SettingsModule"]
     BOVERVIEWS["OverviewsModule"]
     BINTEGRATIONS["IntegrationsModule"]
+    BCSVEXPORT["CsvExportModule"]
     BPRODUCTIVE["ProductiveModule"]
     BGITCOMMITS["GitCommitsModule"]
   end
@@ -67,6 +69,7 @@ flowchart TB
   FSETTINGS --> FGENERAL
   FSETTINGS --> FINTEGR
   FINTEGR --> FPRODUCTIVE
+  FINTEGR --> FEXCELCSV
   FSETTINGSGRP ~~~ FMANAGEGRP
 
   %% Frontend -> Backend REST calls (generated OpenAPI SDK)
@@ -76,6 +79,7 @@ flowchart TB
   FGENERAL -->|REST| BSETTINGS
   FINTEGR -->|REST| BINTEGRATIONS
   FPRODUCTIVE -->|REST| BPRODUCTIVE
+  FEXCELCSV -->|REST| BCSVEXPORT
   FMTIMELINES -->|REST| BTIMELINES
   FAUTOTAGS -->|REST| BAUTOTAGS
   FTAGNAMES -->|REST| BTAGNAMES
@@ -95,6 +99,7 @@ flowchart TB
   BAPPMOD --> BSETTINGS
   BAPPMOD --> BOVERVIEWS
   BAPPMOD --> BINTEGRATIONS
+  BAPPMOD --> BCSVEXPORT
   BAPPMOD --> BPRODUCTIVE
   BAPPMOD --> BGITCOMMITS
 

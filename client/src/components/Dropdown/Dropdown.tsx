@@ -1,6 +1,8 @@
 import './Dropdown.css';
-import React, { useEffect, useRef, useState, type ReactNode } from 'react';
+import React, { useCallback, useRef, useState, type ReactNode } from 'react';
 import { ChevronDown } from 'lucide-react';
+
+import { useDismiss } from '../../helpers/use-dismiss';
 
 interface DropdownProps {
   label: ReactNode;
@@ -13,22 +15,8 @@ export function Dropdown({ label, className, panelClassName, children }: Dropdow
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!open) return;
-
-    const handleClickOutside = (evt: MouseEvent) => {
-      if (ref.current && !ref.current.contains(evt.target as Node)) setOpen(false);
-    };
-    const handleKeyDown = (evt: KeyboardEvent) => {
-      if (evt.key === 'Escape') setOpen(false);
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [open]);
+  const close = useCallback(() => setOpen(false), []);
+  useDismiss(open, close, [ref]);
 
   return (
     <div className={`c-dropdown${className ? ' ' + className : ''}`} ref={ref}>

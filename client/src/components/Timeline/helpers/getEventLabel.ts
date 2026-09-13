@@ -17,6 +17,9 @@ export function getEventLabel(timelineInfo: TimelineDto, event: TimelineEventDto
       return info['isActive'] ? 'Active' : 'Inactive';
     case TimelineType.GitCommit:
       return String(info['repoName'] ?? timelineInfo.title ?? '');
+    case TimelineType.FileEdit:
+      // The file name alone: the bars are narrow, and the full path is a click away in the tooltip.
+      return String(info['fileName'] ?? '');
     case TimelineType.Jira: {
       // The summary is missing while the ticket has not been fetched yet, or when it could not be
       // read at all — the key alone is still a useful label.

@@ -51,6 +51,13 @@ export function getMostProminentConditions(
       addIfPresent(conditions, ConditionVariable.jiraFixVersions, info['jiraFixVersions']);
       addIfPresent(conditions, ConditionVariable.jiraSprint, info['jiraSprint']);
       break;
+    case TimelineType.FileEdit:
+      // Broadest first, same as Jira: a rule almost always tags a whole repository, and the
+      // narrower ones are offered so they can be deleted down to the one that is wanted.
+      addIfPresent(conditions, ConditionVariable.repoName, info['repoName']);
+      addIfPresent(conditions, ConditionVariable.filePath, info['filePath']);
+      addIfPresent(conditions, ConditionVariable.fileName, info['fileName']);
+      break;
     default:
       break;
   }

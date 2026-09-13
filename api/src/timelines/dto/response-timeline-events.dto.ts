@@ -573,6 +573,64 @@ export class JiraEventInfoDto {
   jiraUrl?: string;
 }
 
+/**
+ * The file worked on during a block of editing time, read from the IDE's local history.
+ *
+ * `repoName` deliberately reuses the ConditionVariable the git commit timeline already defines, so
+ * a single auto-tag rule on a repository name attributes both commits and editing time to the same
+ * client.
+ */
+export class FileEditEventInfoDto {
+  @IsString()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Name of the edited file',
+    example: 'timelines.service.ts',
+    required: true,
+  })
+  fileName: string;
+
+  @IsString()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Path of the edited file, relative to the repository root',
+    example: 'api/src/timelines/timelines.service.ts',
+    required: true,
+  })
+  filePath: string;
+
+  @IsString()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Name of the repository folder the file belongs to',
+    example: 'timesheets-tracker',
+    required: true,
+  })
+  repoName: string;
+
+  @IsString()
+  @Type(() => String)
+  @ApiProperty({
+    type: String,
+    description: 'Extension of the edited file, without the leading dot',
+    example: 'ts',
+    required: true,
+  })
+  fileExtension: string;
+
+  @IsNumber()
+  @ApiProperty({
+    type: Number,
+    description: 'How many revisions the IDE recorded during this block of editing',
+    example: 12,
+    required: true,
+  })
+  editCount: number;
+}
+
 export class TimelineEventDto {
   @IsString()
   @Type(() => String)
@@ -597,6 +655,7 @@ export class TimelineEventDto {
       { $ref: getSchemaPath(GitCommitEventInfoDto) },
       { $ref: getSchemaPath(ProductiveEventInfoDto) },
       { $ref: getSchemaPath(JiraEventInfoDto) },
+      { $ref: getSchemaPath(FileEditEventInfoDto) },
     ],
   })
   info:
@@ -608,7 +667,8 @@ export class TimelineEventDto {
     | AutoTagEventInfoDto
     | GitCommitEventInfoDto
     | ProductiveEventInfoDto
-    | JiraEventInfoDto;
+    | JiraEventInfoDto
+    | FileEditEventInfoDto;
 
   @IsString()
   @Type(() => String)

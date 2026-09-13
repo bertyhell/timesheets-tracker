@@ -175,7 +175,7 @@ export type UpdateTagNameDto = {
 /**
  * Variable to check
  */
-export type ConditionVariable = 'anyVariable' | 'isActive' | 'programName' | 'windowTitle' | 'summary' | 'description' | 'location' | 'allDay' | 'websiteUrl' | 'websiteTitle' | 'tagNameId' | 'tagNameName' | 'tagNameColor' | 'tagNameCode' | 'repoName' | 'commitMessage' | 'jiraIssueKey' | 'jiraSummary' | 'jiraProjectKey' | 'jiraProjectName' | 'jiraLabels' | 'jiraFixVersions' | 'jiraComponents' | 'jiraSprint' | 'jiraAssignee' | 'jiraReporter' | 'jiraStatus' | 'jiraIssueType' | 'jiraPriority' | 'jiraParentKey' | 'jiraParentSummary';
+export type ConditionVariable = 'anyVariable' | 'isActive' | 'programName' | 'windowTitle' | 'summary' | 'description' | 'location' | 'allDay' | 'websiteUrl' | 'websiteTitle' | 'tagNameId' | 'tagNameName' | 'tagNameColor' | 'tagNameCode' | 'repoName' | 'commitMessage' | 'fileName' | 'filePath' | 'fileExtension' | 'jiraIssueKey' | 'jiraSummary' | 'jiraProjectKey' | 'jiraProjectName' | 'jiraLabels' | 'jiraFixVersions' | 'jiraComponents' | 'jiraSprint' | 'jiraAssignee' | 'jiraReporter' | 'jiraStatus' | 'jiraIssueType' | 'jiraPriority' | 'jiraParentKey' | 'jiraParentSummary';
 
 /**
  * Operator of the condition
@@ -763,6 +763,29 @@ export type JiraEventInfoDto = {
     jiraUrl?: string;
 };
 
+export type FileEditEventInfoDto = {
+    /**
+     * Name of the edited file
+     */
+    fileName: string;
+    /**
+     * Path of the edited file, relative to the repository root
+     */
+    filePath: string;
+    /**
+     * Name of the repository folder the file belongs to
+     */
+    repoName: string;
+    /**
+     * Extension of the edited file, without the leading dot
+     */
+    fileExtension: string;
+    /**
+     * How many revisions the IDE recorded during this block of editing
+     */
+    editCount: number;
+};
+
 export type CalendarEventProviderInfoDto = {
     /**
      * A url pointing to the ICS file of the calendar used for fetching events from the calendar
@@ -785,7 +808,7 @@ export type CreateTimelineDto = {
     /**
      * Type of the timeline
      */
-    timelineType: 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit' | 'Productive' | 'Jira';
+    timelineType: 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit' | 'Productive' | 'Jira' | 'FileEdit';
     /**
      * The information that is needed for this timeline to fetch events. eg: calendar needs a url to ics file, github needs a link to the git folder, ...
      */
@@ -814,7 +837,7 @@ export type TimelineDto = {
     /**
      * Type of the timeline
      */
-    timelineType: 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit' | 'Productive' | 'Jira';
+    timelineType: 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit' | 'Productive' | 'Jira' | 'FileEdit';
     /**
      * Specific info for getting events for this timeline type. eg: calendar needs a url to ics file, github needs a link to the git folder, ...
      */
@@ -840,7 +863,7 @@ export type TimelineDto = {
 /**
  * Type of the timeline
  */
-export type TimelineType = 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit' | 'Productive' | 'Jira';
+export type TimelineType = 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit' | 'Productive' | 'Jira' | 'FileEdit';
 
 export type TimelineEventDto = {
     /**
@@ -850,7 +873,7 @@ export type TimelineEventDto = {
     /**
      * Type-specific info for this event. Varies based on the timeline type.
      */
-    info: ActiveStateEventInfoDto | ProgramEventInfoDto | CalendarEventInfoDto | WebsiteEventInfoDto | TagEventInfoDto | AutoTagEventInfoDto | GitCommitEventInfoDto | ProductiveEventInfoDto | JiraEventInfoDto;
+    info: ActiveStateEventInfoDto | ProgramEventInfoDto | CalendarEventInfoDto | WebsiteEventInfoDto | TagEventInfoDto | AutoTagEventInfoDto | GitCommitEventInfoDto | ProductiveEventInfoDto | JiraEventInfoDto | FileEditEventInfoDto;
     /**
      * Color of the event
      */
@@ -899,7 +922,7 @@ export type UpdateTimelineDto = {
     /**
      * Type of the timeline
      */
-    timelineType?: 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit' | 'Productive' | 'Jira';
+    timelineType?: 'Program' | 'Website' | 'Tag' | 'AutoTag' | 'Calendar' | 'ActiveState' | 'GitCommit' | 'Productive' | 'Jira' | 'FileEdit';
     /**
      * The information that is needed for this timeline to fetch events. eg: calendar needs a url to ics file, github needs a link to the git folder, ...
      */

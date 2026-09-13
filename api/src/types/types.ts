@@ -108,6 +108,10 @@ export enum ConditionVariable {
   repoName = 'repoName',
   commitMessage = 'commitMessage',
 
+  fileName = 'fileName',
+  filePath = 'filePath',
+  fileExtension = 'fileExtension',
+
   jiraIssueKey = 'jiraIssueKey',
   jiraSummary = 'jiraSummary',
   jiraProjectKey = 'jiraProjectKey',
@@ -151,6 +155,7 @@ export enum TimelineType {
   GitCommit = 'GitCommit',
   Productive = 'Productive',
   Jira = 'Jira',
+  FileEdit = 'FileEdit',
 }
 
 // Database-backed timeline types that can be aggregated in Overviews.

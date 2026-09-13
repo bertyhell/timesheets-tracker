@@ -8,4 +8,5 @@ export enum TimelineType {
   GitCommit = 'GitCommit',
   Productive = 'Productive',
   Jira = 'Jira',
+  FileEdit = 'FileEdit',
 }

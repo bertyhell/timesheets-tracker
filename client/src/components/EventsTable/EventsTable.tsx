@@ -89,6 +89,14 @@ function getDynamicColumns(timelineType: string | undefined): ColumnDef[] {
         { id: 'jiraSprint', title: 'Sprint', allowsSorting: true, width: 130 },
       ];
 
+    case TimelineType.FileEdit:
+      return [
+        { id: 'fileName', title: 'File', allowsSorting: true, width: 200 },
+        { id: 'filePath', title: 'Path', allowsSorting: true },
+        { id: 'repoName', title: 'Repository', allowsSorting: true, width: 150 },
+        { id: 'editCount', title: 'Edits', allowsSorting: true, width: 80 },
+      ];
+
     default:
       return [];
   }
@@ -125,6 +133,12 @@ function getCellValue(event: TimelineEventDto, columnKey: string): string {
       return String(info['jiraProjectName'] ?? info['jiraProjectKey'] ?? '');
     case 'jiraSprint':
       return String(info['jiraSprint'] ?? '');
+    case 'fileName':
+      return String(info['fileName'] ?? '');
+    case 'filePath':
+      return String(info['filePath'] ?? '');
+    case 'editCount':
+      return String(info['editCount'] ?? '');
     case 'startedAt':
       return format(roundToNearestMinutes(parseISO(event.startedAt)), 'HH:mm');
     case 'endedAt':
@@ -207,6 +221,12 @@ export function EventsTable({ timeline, events, className, onAddBulkTag, onSelec
               return (event.info as any)['serviceProject'];
             case 'serviceName':
               return (event.info as any)['serviceName'];
+            case 'fileName':
+              return (event.info as any)['fileName'];
+            case 'filePath':
+              return (event.info as any)['filePath'];
+            case 'editCount':
+              return (event.info as any)['editCount'];
             case 'startedAt':
               return event.startedAt;
             case 'endedAt':

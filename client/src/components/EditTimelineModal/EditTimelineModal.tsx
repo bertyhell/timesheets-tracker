@@ -18,11 +18,13 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { ColorInput } from '../ColorInput/ColorInput';
 import { getRandomColor } from '../Timeline/helpers/getColorForEvent';
+import { timelineTypeLabel } from '../Timeline/helpers/timelineTypeLabel';
 
 const BASE_TIMELINE_TYPES: TimelineType[] = [
   'ActiveState',
   'AutoTag',
   'Calendar',
+  'FileEdit',
   'GitCommit',
   'Program',
   'Tag',
@@ -163,14 +165,14 @@ export function EditTimelineModal() {
           onChange={(evt: ChangeEvent<HTMLSelectElement>) => {
             const newType = evt.target.value as TimelineType;
             setTimelineType(newType);
-            if (!isTitleCustom) setTitle(newType);
+            if (!isTitleCustom) setTitle(timelineTypeLabel(newType));
             if (newType !== 'Calendar') setIcsUrl('');
             if (newType !== 'GitCommit') setFolderPath('');
           }}
         >
           {timelineTypes.map((type) => (
             <option key={type} value={type}>
-              {type}
+              {timelineTypeLabel(type)}
             </option>
           ))}
         </select>

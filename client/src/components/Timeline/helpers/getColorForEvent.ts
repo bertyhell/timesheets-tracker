@@ -89,6 +89,12 @@ export function getColorForEvent(timelineInfo: TimelineDto, event: TimelineEvent
       return getColorFromString((event.info as { tagNameName?: string })?.tagNameName);
     }
 
+    case TimelineType.FileEdit: {
+      // Coloured per repository, so a day spent in one project reads as one colour rather than a
+      // new colour for every file opened.
+      const info = event.info as { repoName?: string; filePath?: string };
+      return getColorFromString(info?.repoName || info?.filePath);
+    }
     case TimelineType.Jira: {
       // Coloured per project rather than per ticket, so a day spent in one project reads as one
       // colour instead of a different colour for every ticket opened.

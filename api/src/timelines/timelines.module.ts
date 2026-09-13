@@ -13,6 +13,7 @@ import { TagNamesModule } from '../tag-names/tag-names.module';
 import { GitCommitsModule } from '../git-commits/git-commits.module';
 import { ProductiveModule } from '../productive/productive.module';
 import { JiraModule } from '../jira/jira.module';
+import { FileEditsModule } from '../file-edits/file-edits.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { JiraModule } from '../jira/jira.module';
     AutoTagsModule,
     CalendarsModule,
     DatabaseModule,
+    FileEditsModule,
     GitCommitsModule,
     JiraModule,
     ProductiveModule,

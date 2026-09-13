@@ -75,6 +75,9 @@ export function EditAutoNoteModal() {
     [ConditionVariable.jiraPriority]: 'jira.priority',
     [ConditionVariable.jiraParentKey]: 'jira.parentKey',
     [ConditionVariable.jiraParentSummary]: 'jira.parentSummary',
+    [ConditionVariable.fileName]: 'fileEdit.fileName',
+    [ConditionVariable.filePath]: 'fileEdit.filePath',
+    [ConditionVariable.fileExtension]: 'fileEdit.fileExtension',
   };
 
   const variableOptions: SelectOption<ConditionVariable>[] = Object.values(

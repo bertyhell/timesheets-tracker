@@ -55,6 +55,36 @@ export const CONDITION_VARIABLE_GROUPS: GroupBase<SelectOption<ConditionVariable
       { value: ConditionVariable.commitMessage, label: 'Commit message' },
     ],
   },
+  {
+    label: 'Jira',
+    options: [
+      { value: ConditionVariable.jiraIssueKey, label: 'Ticket key' },
+      { value: ConditionVariable.jiraSummary, label: 'Ticket summary' },
+      { value: ConditionVariable.jiraProjectKey, label: 'Project key' },
+      { value: ConditionVariable.jiraProjectName, label: 'Project name' },
+      { value: ConditionVariable.jiraIssueType, label: 'Issue type' },
+      { value: ConditionVariable.jiraStatus, label: 'Status' },
+      { value: ConditionVariable.jiraPriority, label: 'Priority' },
+      { value: ConditionVariable.jiraSprint, label: 'Sprint' },
+      { value: ConditionVariable.jiraLabels, label: 'Labels' },
+      { value: ConditionVariable.jiraComponents, label: 'Components' },
+      { value: ConditionVariable.jiraFixVersions, label: 'Fix versions' },
+      { value: ConditionVariable.jiraAssignee, label: 'Assignee' },
+      { value: ConditionVariable.jiraReporter, label: 'Reporter' },
+      { value: ConditionVariable.jiraParentKey, label: 'Parent key' },
+      { value: ConditionVariable.jiraParentSummary, label: 'Parent summary' },
+    ],
+  },
+  {
+    label: 'File edits',
+    options: [
+      // Repository name is deliberately absent here: it is the same variable the Git group already
+      // offers, and one rule on it matches both commits and editing time.
+      { value: ConditionVariable.filePath, label: 'File path' },
+      { value: ConditionVariable.fileName, label: 'File name' },
+      { value: ConditionVariable.fileExtension, label: 'File extension' },
+    ],
+  },
 ];
 
 export const CONDITION_OPERATOR_OPTIONS: SelectOption<ConditionOperator>[] = [

@@ -15,6 +15,7 @@ import {
   ActiveStateEventInfoDto,
   AutoTagEventInfoDto,
   CalendarEventInfoDto,
+  FileEditEventInfoDto,
   GitCommitEventInfoDto,
   JiraEventInfoDto,
   MatchedAutoTagConditionDto,
@@ -36,6 +37,7 @@ import {
   GitCommitEventInfoDto,
   ProductiveEventInfoDto,
   JiraEventInfoDto,
+  FileEditEventInfoDto,
   CalendarEventProviderInfoDto,
   GitCommitEventProviderInfoDto
 )

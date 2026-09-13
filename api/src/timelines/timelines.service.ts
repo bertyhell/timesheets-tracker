@@ -36,6 +36,7 @@ import { AutoTagDto } from '../auto-tags/dto/response-auto-tag.dto';
 import { TagNamesService } from '../tag-names/tag-names.service';
 import { GitCommitsService, GitCommitEvent } from '../git-commits/git-commits.service';
 import { ProductiveService } from '../productive/productive.service';
+import { FileEditsService } from '../file-edits/file-edits.service';
 import { JiraService } from '../jira/jira.service';
 import { CustomError } from '../shared/CustomError';
 
@@ -53,7 +54,8 @@ export class TimelinesService {
     @Inject(TagNamesService) private tagNamesService: TagNamesService,
     @Inject(WebsitesService) private websitesService: WebsitesService,
     @Inject(ProductiveService) private productiveService: ProductiveService,
-    @Inject(JiraService) private jiraService: JiraService
+    @Inject(JiraService) private jiraService: JiraService,
+    @Inject(FileEditsService) private fileEditsService: FileEditsService
   ) {}
 
   adapt(rawTimeline: Record<string, any>): Timeline {
@@ -224,11 +226,12 @@ export class TimelinesService {
     clearCache = false
   ): Promise<TimelineWithEventsDto[]> {
     try {
-      // A refresh should also drop the cached Productive company/deal/service lists and the cached
-      // Jira sprint field id.
+      // A refresh should also drop the cached Productive company/deal/service lists, the cached
+      // Jira sprint field id and the parsed local history.
       if (clearCache) {
         this.productiveService.clearListCache();
         this.jiraService.clearFieldCache();
+        this.fileEditsService.clearScanCache();
       }
 
       const timelines = await this.findAllTimelines(undefined);
@@ -433,6 +436,26 @@ export class TimelinesService {
                 } catch (err) {
                   console.error(
                     new CustomError('Failed to fetch events from Jira', err, {
+                      startedAt,
+                      endedAt,
+                    })
+                  );
+                  return []; // TODO pass errors to client to show as toast messages
+                }
+              })();
+
+            case TimelineType.FileEdit:
+              return (async () => {
+                try {
+                  return await this.fileEditsService.getEventsForRange(
+                    startedAt,
+                    endedAt,
+                    timelineInfo.id,
+                    clearCache
+                  );
+                } catch (err) {
+                  console.error(
+                    new CustomError('Failed to read file edits from the IDE local history', err, {
                       startedAt,
                       endedAt,
                     })

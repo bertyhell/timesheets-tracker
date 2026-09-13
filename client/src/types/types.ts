@@ -89,6 +89,10 @@ export enum ConditionVariable {
   repoName = 'repoName',
   commitMessage = 'commitMessage',
 
+  fileName = 'fileName',
+  filePath = 'filePath',
+  fileExtension = 'fileExtension',
+
   jiraIssueKey = 'jiraIssueKey',
   jiraSummary = 'jiraSummary',
   jiraProjectKey = 'jiraProjectKey',

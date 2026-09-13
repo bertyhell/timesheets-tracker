@@ -11,6 +11,7 @@ import {
   AutoTagEventInfoDto,
   CalendarEventInfoDto,
   GitCommitEventInfoDto,
+  FileEditEventInfoDto,
   JiraEventInfoDto,
   ProductiveEventInfoDto,
   ProgramEventInfoDto,
@@ -84,6 +85,9 @@ function getCategoryLabel(event: TimelineEventDto, timelineType: TimelineType): 
       const jira = info as JiraEventInfoDto;
       return jira.jiraSummary ? `${jira.jiraIssueKey}: ${jira.jiraSummary}` : jira.jiraIssueKey;
     }
+    case 'FileEdit':
+      // Grouped per file: "how long was I in this file today" is the number this table exists for.
+      return (info as FileEditEventInfoDto).filePath;
     default:
       return 'Unknown';
   }

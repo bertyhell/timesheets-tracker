@@ -91,6 +91,10 @@ export enum ConditionVariable {
   tagNameCode = 'tagNameCode',
   repoName = 'repoName',
   commitMessage = 'commitMessage',
+
+  fileName = 'fileName',
+  filePath = 'filePath',
+  fileExtension = 'fileExtension',
 }
 
 export enum ConditionOperator {

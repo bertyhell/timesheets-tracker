@@ -25,6 +25,7 @@ import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } 
 import type { TimelineDto } from '../../../generated/api/types.gen';
 import { GripHandle } from '../../../components/GripHandle/GripHandle';
 import { reorderTimelines as reorderTimelinesApi } from '../../../api/reorder';
+import { timelineTypeLabel } from '../../../components/Timeline/helpers/timelineTypeLabel';
 
 function TimelineDragOverlay({ timeline }: { timeline: TimelineDto }) {
   return (
@@ -36,7 +37,7 @@ function TimelineDragOverlay({ timeline }: { timeline: TimelineDto }) {
             <span style={{ display: 'block', height: 20, width: 20, borderRadius: 6, backgroundColor: timeline.color ?? 'transparent' }} />
           </td>
           <td style={{ paddingLeft: 12 }}>{timeline.title}</td>
-          <td style={{ paddingLeft: 12 }}>{timeline.timelineType}</td>
+          <td style={{ paddingLeft: 12 }}>{timelineTypeLabel(timeline.timelineType)}</td>
           <td style={{ paddingLeft: 12 }}>{timeline.visualOrder}</td>
           <td /><td />
         </tr>
@@ -98,7 +99,7 @@ function SortableTimelineRow({
         />
       </td>
       <td className="pl-3">{timeline.title}</td>
-      <td className="pl-3">{timeline.timelineType}</td>
+      <td className="pl-3">{timelineTypeLabel(timeline.timelineType)}</td>
       <td className="pl-3">{timeline.visualOrder}</td>
       <td className="w-px whitespace-nowrap">
         <Button

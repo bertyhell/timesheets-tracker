@@ -227,10 +227,11 @@ export class TimelinesService {
   ): Promise<TimelineWithEventsDto[]> {
     try {
       // A refresh should also drop the cached Productive company/deal/service lists, the cached
-      // Jira sprint field id and the parsed local history.
+      // Jira sprint field id, the downloaded calendars and the parsed local history.
       if (clearCache) {
         this.productiveService.clearListCache();
         this.jiraService.clearFieldCache();
+        this.calendarsService.clearIcsCache();
         this.fileEditsService.clearScanCache();
       }
 

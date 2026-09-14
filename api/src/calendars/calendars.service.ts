@@ -15,8 +15,28 @@ type ICalEvent = {
   datetype?: 'date' | 'date-time';
 };
 
+/**
+ * How long a downloaded calendar is reused for. An ics url returns the whole calendar rather than
+ * the range being asked about, so paging through days re-downloaded the same file every time — and
+ * it is the one fetch on this path with no local copy to fall back on, which makes it set the wall
+ * clock for the whole events request whenever the provider is slow. Short enough that an event
+ * added elsewhere still appears on its own; the refresh button bypasses it entirely.
+ */
+const ICS_CACHE_TTL_MS = 5 * 60 * 1000;
+
 @Injectable()
 export class CalendarsService {
+  /**
+   * Kept in memory rather than in `cachedNetworkRequests`: a parsed calendar is large, it is only
+   * worth holding for minutes, and losing it on restart costs one download.
+   */
+  private readonly icsCache = new Map<string, { fetchedAt: number; events: CalendarResponse }>();
+
+  /** Drops the downloaded calendars, so a refresh in the UI re-downloads them. */
+  clearIcsCache(): void {
+    this.icsCache.clear();
+  }
+
   async getEvents(
     icsUrl: string | undefined | null,
     startedAt: string,
@@ -26,17 +46,7 @@ export class CalendarsService {
       if (!icsUrl) {
         return [];
       }
-      let eventData: CalendarResponse;
-      const icsFile: string | undefined = process.env.CALENDAR_FALLBACK_ICS_FILE;
-      if (icsFile) {
-        // for local testing
-        eventData = await ical.async.parseFile(icsFile);
-      } else {
-        // parse the real url
-        eventData = await ical.async.fromURL(icsUrl);
-      }
-
-      const events = Object.values(eventData) as ICalEvent[];
+      const events = Object.values(await this.loadCalendar(icsUrl)) as ICalEvent[];
 
       const filteredEvents = events.filter((event) => {
         if (event.type !== 'VEVENT' || !event.start || !event.end) return false;
@@ -65,5 +75,23 @@ export class CalendarsService {
         endedAt,
       });
     }
+  }
+
+  private async loadCalendar(icsUrl: string): Promise<CalendarResponse> {
+    const icsFile: string | undefined = process.env.CALENDAR_FALLBACK_ICS_FILE;
+    if (icsFile) {
+      // for local testing
+      return ical.async.parseFile(icsFile);
+    }
+
+    const cached = this.icsCache.get(icsUrl);
+    if (cached && Date.now() - cached.fetchedAt < ICS_CACHE_TTL_MS) {
+      return cached.events;
+    }
+
+    // parse the real url
+    const events = await ical.async.fromURL(icsUrl);
+    this.icsCache.set(icsUrl, { fetchedAt: Date.now(), events });
+    return events;
   }
 }

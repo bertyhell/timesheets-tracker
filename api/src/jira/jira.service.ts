@@ -29,8 +29,12 @@ export const JIRA_INTEGRATION_TYPE = 'jira';
  */
 const JIRA_MERGE_GAP_MINUTES = 5;
 
-/** How long a stored issue is trusted before it is re-fetched. */
-const JIRA_ISSUE_TTL_HOURS = 12;
+/**
+ * How many issues are fetched at once. Jira has no documented per-second limit for this endpoint,
+ * but a day can easily hold dozens of tickets and firing all of them at once is what rate limiting
+ * exists to punish, so the fan-out is bounded.
+ */
+const JIRA_ISSUE_FETCH_CONCURRENCY = 8;
 
 /** The sprint custom field id differs per Jira instance, so it is looked up once and cached. */
 const SPRINT_FIELD_CACHE_KEY = 'jira-sprint-field-id';
@@ -261,11 +265,16 @@ export class JiraService {
   }
 
   /**
-   * Reads the given issues from the local store, fetching the ones that are missing or stale.
+   * Reads the given issues from the local store, fetching only the ones that are not there yet.
+   *
+   * A stored issue is trusted indefinitely: ticket metadata changes rarely, and re-checking it on a
+   * timer meant the first load of the day paid a network round trip per ticket for something the
+   * user had not asked to be updated. Refreshing is the refresh button's job — that sets
+   * `forceRefresh` and re-fetches everything on the day being viewed.
    *
    * A failure to fetch one issue is swallowed: a single deleted or restricted ticket should not
-   * blank out the whole day. Credential failures are not swallowed — those mean every subsequent
-   * fetch would fail too, so it stops after the first one.
+   * blank out the whole day. Credential failures are not swallowed — those mean every other fetch
+   * would fail too, so the first one aborts the batch.
    */
   private async ensureIssues(
     issueKeys: string[],
@@ -276,36 +285,74 @@ export class JiraService {
       findJiraIssuesByKeys(db, { issueKeys }).map((issue) => [issue.issueKey, issue])
     );
 
-    const staleBefore = new Date(Date.now() - JIRA_ISSUE_TTL_HOURS * 60 * 60 * 1000).toISOString();
-    const keysToFetch = issueKeys.filter((issueKey) => {
-      const issue = stored.get(issueKey);
-      return !issue || forceRefresh || issue.fetchedAt < staleBefore;
-    });
+    const keysToFetch = issueKeys.filter((issueKey) => forceRefresh || !stored.has(issueKey));
+    if (!keysToFetch.length) {
+      return stored;
+    }
 
-    for (const issueKey of keysToFetch) {
-      let issue: StoredJiraIssue;
-      try {
-        issue = await this.fetchIssue(issueKey);
-      } catch (err) {
-        if (err instanceof JiraAuthError) {
-          throw err;
-        }
-        // Store an empty row so an issue that will never resolve is not re-requested on every
-        // render of this day; it still refreshes once the TTL lapses, in case access is restored.
-        issue = JiraService.emptyIssue(issueKey);
-        console.error(new CustomError('Failed to fetch a Jira issue', err, { issueKey }));
-      }
+    // Resolved once up front and handed to every fetch. A site with no sprint field caches no
+    // answer (see getSprintFieldId), so leaving each fetch to look it up itself would cost a field
+    // list request per ticket rather than one per day.
+    const sprintFieldId = await this.getSprintFieldId();
 
+    const fetched = await this.fetchIssuesInBatches(keysToFetch, sprintFieldId);
+    for (const issue of fetched) {
       const row = { ...issue, fetchedAt: new Date().toISOString() };
       upsertJiraIssue(db, row);
-      stored.set(issueKey, row);
+      stored.set(row.issueKey, row);
     }
 
     return stored;
   }
 
-  private async fetchIssue(issueKey: string): Promise<StoredJiraIssue> {
-    const sprintFieldId = await this.getSprintFieldId();
+  /**
+   * Fetches issues a slice at a time. An auth error propagates and drops the whole batch, since it
+   * says the credentials are wrong rather than anything about the ticket that hit it; any other
+   * error yields an empty row, so an issue that will never resolve is not re-requested on every
+   * render of the day. The refresh button clears those, in case access has since been restored.
+   */
+  private async fetchIssuesInBatches(
+    issueKeys: string[],
+    sprintFieldId: string | null
+  ): Promise<StoredJiraIssue[]> {
+    const results: StoredJiraIssue[] = [];
+
+    for (let index = 0; index < issueKeys.length; index += JIRA_ISSUE_FETCH_CONCURRENCY) {
+      const batch = issueKeys.slice(index, index + JIRA_ISSUE_FETCH_CONCURRENCY);
+      const settled = await Promise.all(
+        batch.map(async (issueKey): Promise<StoredJiraIssue | JiraAuthError> => {
+          try {
+            return await this.fetchIssue(issueKey, sprintFieldId);
+          } catch (err) {
+            if (err instanceof JiraAuthError) {
+              return err;
+            }
+            console.error(new CustomError('Failed to fetch a Jira issue', err, { issueKey }));
+            return JiraService.emptyIssue(issueKey);
+          }
+        })
+      );
+
+      const authError = settled.find((result): result is JiraAuthError => result instanceof Error);
+      if (authError) {
+        throw authError;
+      }
+      results.push(...(settled as StoredJiraIssue[]));
+    }
+
+    return results;
+  }
+
+  /**
+   * `sprintFieldId` is passed in when a batch has already resolved it, so a batch costs one field
+   * list lookup instead of one per ticket. Callers fetching a single issue can leave it out.
+   */
+  private async fetchIssue(
+    issueKey: string,
+    sprintFieldId?: string | null
+  ): Promise<StoredJiraIssue> {
+    const resolvedSprintFieldId =
+      sprintFieldId === undefined ? await this.getSprintFieldId() : sprintFieldId;
     const fields = [
       'summary',
       'labels',
@@ -318,7 +365,7 @@ export class JiraService {
       'issuetype',
       'priority',
       'parent',
-      ...(sprintFieldId ? [sprintFieldId] : []),
+      ...(resolvedSprintFieldId ? [resolvedSprintFieldId] : []),
     ];
 
     const issue = await this.request<JiraIssueResponse>(
@@ -333,7 +380,9 @@ export class JiraService {
       labels: (issue.fields.labels ?? []).join(', '),
       fixVersions: JiraService.joinNames(issue.fields.fixVersions),
       components: JiraService.joinNames(issue.fields.components),
-      sprint: sprintFieldId ? JiraService.resolveSprintName(issue.fields[sprintFieldId]) : '',
+      sprint: resolvedSprintFieldId
+        ? JiraService.resolveSprintName(issue.fields[resolvedSprintFieldId])
+        : '',
       assignee: issue.fields.assignee?.displayName ?? '',
       reporter: issue.fields.reporter?.displayName ?? '',
       status: issue.fields.status?.name ?? '',
@@ -374,12 +423,20 @@ export class JiraService {
     return sprintFieldId;
   }
 
-  /** Drops the cached sprint field id and cloud id, so a refresh in the UI re-discovers them. */
+  /**
+   * Drops the cached sprint field id, so a refresh in the UI re-discovers it — a field can be added
+   * to a site that did not have one.
+   *
+   * The probed api base url is deliberately kept. Which host accepts a token does not change
+   * between refreshes, and re-discovering it costs a tenant_info call plus up to two probe requests
+   * before the first ticket is even requested. It is already invalidated where it can actually go
+   * stale: the cache key includes a fingerprint of the token, so a new token re-probes on its own.
+   */
   clearFieldCache(): void {
     this.databaseService
       .getDb()
-      .prepare('DELETE FROM cachedNetworkRequests WHERE cacheKey = ? OR cacheKey LIKE ?')
-      .run(SPRINT_FIELD_CACHE_KEY, `${CLOUD_ID_CACHE_PREFIX}%`);
+      .prepare('DELETE FROM cachedNetworkRequests WHERE cacheKey = ?')
+      .run(SPRINT_FIELD_CACHE_KEY);
   }
 
   /**

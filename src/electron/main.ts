@@ -170,11 +170,77 @@ function createTray(): Tray {
   return t;
 }
 
+// ── Auto start ───────────────────────────────────────────────────────────────
+// app.get/setLoginItemSettings are macOS/Windows only — on Linux they silently
+// no-op and the getter always reports false. Manage an XDG autostart entry
+// instead, which is what desktop environments actually read at login.
+const AUTOSTART_FILE = path.join(
+  app.getPath('home'),
+  '.config/autostart/timesheets-tracker.desktop',
+);
+
+/** Path to re-launch: the AppImage itself when packaged that way, else the binary. */
+function autoStartExecPath(): string {
+  return process.env.APPIMAGE || process.execPath;
+}
+
+function isAutoStartEnabled(): boolean {
+  if (process.platform !== 'linux') {
+    return app.getLoginItemSettings().openAtLogin;
+  }
+  try {
+    // lstat, not existsSync: the entry is commonly a symlink into
+    // /usr/share/applications, and a broken one should still count as "off".
+    fs.lstatSync(AUTOSTART_FILE);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function setAutoStartEnabled(enabled: boolean): void {
+  if (process.platform !== 'linux') {
+    app.setLoginItemSettings({ openAtLogin: enabled });
+    return;
+  }
+
+  if (!enabled) {
+    try {
+      fs.unlinkSync(AUTOSTART_FILE);
+    } catch {
+      // already absent
+    }
+    return;
+  }
+
+  // Exec must be quoted — the install path contains a space.
+  const entry = [
+    '[Desktop Entry]',
+    'Type=Application',
+    'Name=Timesheets Tracker',
+    'Comment=Track active window and tag programs to easily track timesheets',
+    `Exec="${autoStartExecPath()}"`,
+    `Icon=${app.getName().toLowerCase().replace(/\s+/g, '-')}`,
+    'Terminal=false',
+    'X-GNOME-Autostart-enabled=true',
+    '',
+  ].join('\n');
+
+  fs.mkdirSync(path.dirname(AUTOSTART_FILE), { recursive: true });
+  // Replace rather than write through an existing symlink into /usr/share.
+  try {
+    fs.unlinkSync(AUTOSTART_FILE);
+  } catch {
+    // nothing to replace
+  }
+  fs.writeFileSync(AUTOSTART_FILE, entry, { mode: 0o644 });
+}
+
 function updateTrayMenu(): void {
   if (!tray) return;
 
   const isVisible = mainWindow?.isVisible() ?? false;
-  const isAutoStart = app.getLoginItemSettings().openAtLogin;
+  const isAutoStart = isAutoStartEnabled();
 
   // Fetch tracking state then rebuild menu
   fetch(`${APP_URL}/api/programs/tracking`)
@@ -202,8 +268,7 @@ function updateTrayMenu(): void {
           type: 'checkbox',
           checked: isAutoStart,
           click: () => {
-            const next = !isAutoStart;
-            app.setLoginItemSettings({ openAtLogin: next });
+            setAutoStartEnabled(!isAutoStart);
             updateTrayMenu();
           },
         },

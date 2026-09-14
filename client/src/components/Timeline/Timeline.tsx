@@ -81,7 +81,7 @@ interface TimelineProps {
   snapPointTimesMs: number[];
   hoverPercent: number | null;
   onCreateTagName: (data: { title: string; code: string; color: string }) => Promise<TagName>;
-  onCreateTag: (tagNameId: string) => Promise<void>;
+  onCreateTag: (tagName: TagName) => Promise<void>;
   selectedEventIds: string[];
   setSelectedEventIds: (eventIds: string[], timeline: TimelineDto) => void;
   isActive: boolean;
@@ -461,7 +461,7 @@ function Timeline({
       const color = getRandomColor();
       setPendingCreate({ title, code: '', color });
     } else {
-      await onCreateTag(newValue.id);
+      await onCreateTag(newValue);
     }
   };
 
@@ -469,7 +469,7 @@ function Timeline({
     if (!pendingCreate) return;
     const createdTagName = await onCreateTagName(pendingCreate);
     setPendingCreate(null);
-    await onCreateTag(createdTagName.id);
+    await onCreateTag(createdTagName);
   };
 
   // Derive a consistent dot color for the timeline label from its title (or use configured color)

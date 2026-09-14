@@ -582,31 +582,86 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
     [createTagName]
   );
 
+  // The tag is added to the tag timeline optimistically so the bar shows up instantly,
+  // the same way creating a tag from an auto tag does.
   const handleCreateTag = useCallback(
-    async (tagNameId: string): Promise<void> => {
+    async (tagName: TagName): Promise<void> => {
       // Carry over the notes of the auto tags the new tag overlaps with
       const note = getOverlappingAutoTagNotes(
         timelinesWithEvents,
         selectionStartTime,
         selectionEndTime
       ).join(', ');
-      await createTag({
-        body: {
-          tagNameId,
-          startedAt: selectionStartTime.toISOString(),
-          endedAt: selectionEndTime.toISOString(),
-          ...(note ? { note } : {}),
+      const body = {
+        tagNameId: tagName.id,
+        startedAt: selectionStartTime.toISOString(),
+        endedAt: selectionEndTime.toISOString(),
+        ...(note ? { note } : {}),
+      };
+
+      const queryKey = timelinesControllerFindAllEventsQueryKey({
+        query: {
+          startedAt: startOfDay(viewDate).toISOString(),
+          endedAt: endOfDay(viewDate).toISOString(),
         },
       });
-      await Promise.all([refetchTimelinesWithEvents(), refetchTagNamesCount()]);
+
+      // Cancel any in-flight refetches so they don't overwrite the optimistic update
+      await queryClient.cancelQueries({ queryKey });
+
+      // Snapshot the current data for rollback on error
+      const previousData =
+        queryClient.getQueryData<TimelinesControllerFindAllEventsResponse>(queryKey);
+
+      const tagTimelineId = timelinesWithEvents?.find(
+        (timelineWithEvents) => timelineWithEvents.type === TimelineType.Tag
+      )?.id;
+
+      // Show the new tag right away, using the tag name the user just picked
+      if (tagTimelineId) {
+        const optimisticEvent: TimelineEventDto = {
+          id: 'optimistic-tag-' + crypto.randomUUID(),
+          startedAt: body.startedAt,
+          endedAt: body.endedAt,
+          timelineId: tagTimelineId,
+          info: {
+            tagNameId: tagName.id,
+            tagNameName: tagName.title,
+            tagNameColor: tagName.color,
+            tagNameCode: tagName.code,
+            tagNameNote: tagName.note,
+            note: note || null,
+          } satisfies TagEventInfoDto,
+        };
+        queryClient.setQueryData<TimelinesControllerFindAllEventsResponse>(queryKey, (old) => {
+          if (!old) return old;
+          return old.map((timeline) =>
+            timeline.id === tagTimelineId
+              ? { ...timeline, events: [...timeline.events, optimisticEvent] }
+              : timeline
+          );
+        });
+      }
+
       // Close the tooltip by clearing the selection
       setSelectionStartPercent(null);
       setSelectionEndPercent(null);
       setSelectionMovePercent(null);
       setActiveSelectionTimeline(null);
+
+      try {
+        await createTag({ body });
+        await Promise.all([refetchTimelinesWithEvents(), refetchTagNamesCount()]);
+      } catch {
+        // Roll back the optimistic tag if the save failed
+        queryClient.setQueryData(queryKey, previousData);
+        toast('Tag could not be created', { type: 'error' });
+      }
     },
     [
       createTag,
+      viewDate,
+      queryClient,
       timelinesWithEvents,
       selectionStartTime,
       selectionEndTime,

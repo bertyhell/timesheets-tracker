@@ -66,6 +66,9 @@ if (!gotSingleInstanceLock) {
 // ── Spawn NestJS backend as a child process ──────────────────────────────────
 // Use Electron's bundled Node runtime (ELECTRON_RUN_AS_NODE) so no system Node
 // installation is required in the packaged app.
+let apiExitCode: number | null = null;
+let apiStderr = '';
+
 function startApiServer(): ChildProcess {
   const apiScript = path.join(API_DIR, 'dist/src/main.js');
 
@@ -83,8 +86,15 @@ function startApiServer(): ChildProcess {
   });
 
   proc.stdout?.on('data', (data) => process.stdout.write('[api] ' + data));
-  proc.stderr?.on('data', (data) => process.stderr.write('[api] ' + data));
-  proc.on('exit', (code) => console.log('[electron] NestJS subprocess exited with code:', code));
+  proc.stderr?.on('data', (data) => {
+    process.stderr.write('[api] ' + data);
+    // Keep the tail so a crash can be surfaced in the error dialog.
+    apiStderr = (apiStderr + data).slice(-4000);
+  });
+  proc.on('exit', (code) => {
+    console.log('[electron] NestJS subprocess exited with code:', code);
+    apiExitCode = code ?? 0;
+  });
 
   return proc;
 }
@@ -93,6 +103,12 @@ function startApiServer(): ChildProcess {
 async function waitForServer(url: string, timeoutMs = 120_000): Promise<void> {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
+    // If the backend already died there is nothing left to wait for.
+    if (apiExitCode !== null) {
+      throw new Error(
+        `The backend exited with code ${apiExitCode} before it became reachable.\n\n${apiStderr.trim()}`,
+      );
+    }
     try {
       const res = await fetch(url);
       if (res.status < 500) return;
@@ -510,11 +526,28 @@ ipcMain.handle('updates:install', () => {
 
 // ── App lifecycle ─────────────────────────────────────────────────────────────
 app.whenReady().then(async () => {
+  // app.quit() above is asynchronous and does not stop this module from running,
+  // so a second instance would otherwise get here and spawn a rival API server
+  // that cannot bind the port.
+  if (!gotSingleInstanceLock) return;
+
   console.log('[electron] Starting NestJS API server...');
   serverProcess = startApiServer();
 
   console.log('[electron] Waiting for NestJS server to start...');
-  await waitForServer(APP_URL);
+  try {
+    await waitForServer(APP_URL);
+  } catch (error) {
+    // Never sit here invisibly holding the single-instance lock: a hung instance
+    // with no window makes every later launch a doomed second instance.
+    console.error('[electron]', error);
+    dialog.showErrorBox(
+      'Timesheets Tracker could not start',
+      error instanceof Error ? error.message : String(error),
+    );
+    quit();
+    return;
+  }
   console.log('[electron] NestJS server is ready');
 
   setAppMenu();

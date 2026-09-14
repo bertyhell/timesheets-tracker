@@ -6,6 +6,7 @@ import { orderBy } from 'lodash-es';
 import { useAtom } from 'jotai';
 import { searchTermAtom } from '../../store/store';
 import { ContextMenu } from '../ContextMenu/ContextMenu';
+import { contextMenuIcons } from '../ContextMenu/context-menu-icons';
 import {
   ActiveStateEventInfoDto,
   AutoTagEventInfoDto,
@@ -283,13 +284,19 @@ export function EventsTotalsTable({
         <ContextMenu
           position={contextMenu}
           items={[
-            { label: 'Edit tag', onClick: () => onEditTag?.(contextMenu.firstEventId) },
+            {
+              label: 'Edit tag',
+              icon: contextMenuIcons.edit,
+              onClick: () => onEditTag?.(contextMenu.firstEventId),
+            },
             {
               label: 'Copy name',
+              icon: contextMenuIcons.copy,
               onClick: () => navigator.clipboard.writeText(contextMenu.row.category),
             },
             {
               label: 'Copy duration',
+              icon: contextMenuIcons.duration,
               onClick: () => navigator.clipboard.writeText(contextMenu.row.duration),
             },
           ]}

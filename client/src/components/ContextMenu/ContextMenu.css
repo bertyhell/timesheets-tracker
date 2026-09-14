@@ -10,7 +10,9 @@
 }
 
 .c-context-menu__item {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   width: 100%;
   padding: 0.5rem 0.875rem;
   font-size: 0.875rem;
@@ -31,4 +33,14 @@
       background-color: #fef2f2;
     }
   }
+}
+
+/* Reserve the icon column even for items without an icon, so labels stay aligned */
+.c-context-menu__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 14px;
+  width: 14px;
+  height: 14px;
 }

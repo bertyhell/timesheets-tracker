@@ -6,6 +6,7 @@ import Button, { ButtonVariant } from '../Button/Button';
 import { useNavigate } from 'react-router-dom';
 import { ROUTE_PARTS } from '../../App';
 import { ContextMenu } from '../ContextMenu/ContextMenu';
+import { contextMenuIcons } from '../ContextMenu/context-menu-icons';
 import { useAtom } from 'jotai';
 import { searchTermAtom } from '../../store/store';
 import Tooltip from '../Tooltip/Tooltip';
@@ -831,6 +832,7 @@ function Timeline({
                 ? [
                     {
                       label: 'Edit rule',
+                      icon: contextMenuIcons.editRule,
                       onClick: () =>
                         onEditAutoTagRule?.(
                           (contextMenu.event.info as AutoTagEventInfoDto).autoTagId
@@ -840,11 +842,10 @@ function Timeline({
                 : []
               : timelineInfo.timelineType === TimelineType.Tag
                 ? [
-                    { label: 'Edit tag', onClick: () => onEditTag?.(contextMenu.eventId) },
                     {
-                      label: 'Delete tag',
-                      onClick: () => onDeleteTag?.(contextMenu.eventId),
-                      variant: 'danger' as const,
+                      label: 'Edit tag',
+                      icon: contextMenuIcons.edit,
+                      onClick: () => onEditTag?.(contextMenu.eventId),
                     },
                   ]
                 : []),
@@ -856,6 +857,7 @@ function Timeline({
                 ? [
                     {
                       label: 'Create tag',
+                      icon: contextMenuIcons.createTag,
                       onClick: () => onCreateTagFromAutoTagEvent(contextMenu.event),
                     },
                   ]
@@ -864,6 +866,7 @@ function Timeline({
                 ? [
                     {
                       label: 'Create tag',
+                      icon: contextMenuIcons.createTag,
                       onClick: () =>
                         onCreateTagFromEvent(
                           contextMenu.eventStartedAt!,
@@ -878,6 +881,7 @@ function Timeline({
               ? [
                   {
                     label: 'Create autotag rule',
+                    icon: contextMenuIcons.createAutoTagRule,
                     onClick: () => {
                       const conditions = getMostProminentConditions(
                         timelineInfo,
@@ -892,6 +896,7 @@ function Timeline({
               ? [
                   {
                     label: 'Grow auto tags',
+                    icon: contextMenuIcons.growAutoTags,
                     onClick: () => {
                       setContextMenu(null);
                       onGrowAutoTags();
@@ -906,6 +911,7 @@ function Timeline({
               ? [
                   {
                     label: 'Export',
+                    icon: contextMenuIcons.export,
                     onClick: () => {
                       const event = contextMenu.event;
                       setContextMenu(null);
@@ -916,8 +922,20 @@ function Timeline({
               : []),
             {
               label: 'Copy to clipboard',
+              icon: contextMenuIcons.copy,
               onClick: () => handleCopyEventToClipboard(contextMenu.event),
             },
+            // Destructive actions go last, away from the ones you reach for often
+            ...(timelineInfo.timelineType === TimelineType.Tag
+              ? [
+                  {
+                    label: 'Delete tag',
+                    icon: contextMenuIcons.delete,
+                    onClick: () => onDeleteTag?.(contextMenu.eventId),
+                    variant: 'danger' as const,
+                  },
+                ]
+              : []),
           ]}
           onClose={() => setContextMenu(null)}
         />
@@ -928,11 +946,16 @@ function Timeline({
         <ContextMenu
           position={titleContextMenu}
           items={[
-            { label: 'Edit timeline', onClick: handleEditFromTitleContextMenu },
+            {
+              label: 'Edit timeline',
+              icon: contextMenuIcons.edit,
+              onClick: handleEditFromTitleContextMenu,
+            },
             ...(timelineInfo.timelineType === TimelineType.AutoTag && onGrowAutoTags
               ? [
                   {
                     label: 'Grow auto tags',
+                    icon: contextMenuIcons.growAutoTags,
                     onClick: () => {
                       setTitleContextMenu(null);
                       onGrowAutoTags();
@@ -944,6 +967,7 @@ function Timeline({
               ? [
                   {
                     label: 'Refresh events',
+                    icon: contextMenuIcons.refresh,
                     onClick: () => {
                       setTitleContextMenu(null);
                       onRefreshEvents();
@@ -957,6 +981,7 @@ function Timeline({
               ? [
                   {
                     label: 'Export',
+                    icon: contextMenuIcons.export,
                     onClick: () => {
                       setTitleContextMenu(null);
                       openExport(events);

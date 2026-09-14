@@ -1,10 +1,11 @@
 import './ContextMenu.css';
-import React, { useRef } from 'react';
+import React, { ReactNode, useRef } from 'react';
 
 import { useDismiss } from '../../helpers/use-dismiss';
 
 export interface ContextMenuItem {
   label: string;
+  icon?: ReactNode;
   onClick: () => void;
   variant?: 'default' | 'danger';
 }
@@ -35,6 +36,7 @@ export function ContextMenu({ position, items, onClose }: ContextMenuProps) {
             onClose();
           }}
         >
+          <span className="c-context-menu__icon">{item.icon}</span>
           {item.label}
         </button>
       ))}

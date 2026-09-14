@@ -18,6 +18,7 @@ import {
   type ProminentCondition,
 } from '../Timeline/helpers/getMostProminentConditions';
 import { ContextMenu } from '../ContextMenu/ContextMenu';
+import { contextMenuIcons } from '../ContextMenu/context-menu-icons';
 
 function copyEventToClipboard(event: TimelineEventDto) {
   const startStr = format(roundToNearestMinutes(parseISO(event.startedAt)), 'yyyy-MM-dd HH:mm');
@@ -428,6 +429,7 @@ export function EventsTable({
               ? [
                   {
                     label: `Add tag to ${selectedKeys.size} events`,
+                    icon: contextMenuIcons.bulkTag,
                     onClick: () => {
                       const selected = sortedItems.filter((e) => selectedKeys.has(e.id));
                       onAddBulkTag?.(selected);
@@ -437,15 +439,22 @@ export function EventsTable({
               : []),
             ...(isTagTimeline
               ? [
-                  { label: 'Edit tag', onClick: () => onEditTag?.(contextMenu.eventId) },
                   {
-                    label: 'Delete tag',
-                    onClick: () => onDeleteTag?.(contextMenu.eventId),
-                    variant: 'danger' as const,
+                    label: 'Edit tag',
+                    icon: contextMenuIcons.edit,
+                    onClick: () => onEditTag?.(contextMenu.eventId),
                   },
                   {
                     label: 'Copy to clipboard',
+                    icon: contextMenuIcons.copy,
                     onClick: () => copyEventToClipboard(contextMenu.event),
+                  },
+                  // Destructive actions go last, away from the ones you reach for often
+                  {
+                    label: 'Delete tag',
+                    icon: contextMenuIcons.delete,
+                    onClick: () => onDeleteTag?.(contextMenu.eventId),
+                    variant: 'danger' as const,
                   },
                 ]
               : [
@@ -453,6 +462,7 @@ export function EventsTable({
                     ? [
                         {
                           label: 'Create tag',
+                          icon: contextMenuIcons.createTag,
                           onClick: () =>
                             onCreateTagFromEvent(
                               contextMenu.event.startedAt,
@@ -465,6 +475,7 @@ export function EventsTable({
                     ? [
                         {
                           label: 'Create autotag rule',
+                          icon: contextMenuIcons.createAutoTagRule,
                           onClick: () => {
                             const conditions = fakeTimelineDto
                               ? getMostProminentConditions(fakeTimelineDto, contextMenu.event)
@@ -476,6 +487,7 @@ export function EventsTable({
                     : []),
                   {
                     label: 'Copy to clipboard',
+                    icon: contextMenuIcons.copy,
                     onClick: () => copyEventToClipboard(contextMenu.event),
                   },
                 ]),

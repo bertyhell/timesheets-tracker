@@ -144,7 +144,9 @@ function getCellValue(event: TimelineEventDto, columnKey: string): string {
     case 'endedAt':
       return format(roundToNearestMinutes(parseISO(event.endedAt)), 'HH:mm');
     case 'duration':
-      return formatDuration(differenceInSeconds(parseISO(event.endedAt), parseISO(event.startedAt)));
+      return formatDuration(
+        differenceInSeconds(parseISO(event.endedAt), parseISO(event.startedAt))
+      );
     default:
       return '';
   }
@@ -174,7 +176,18 @@ interface ContextMenuState {
   isBulk: boolean;
 }
 
-export function EventsTable({ timeline, events, className, onAddBulkTag, onSelectionChange, selectedEventIds, onEditTag, onDeleteTag, onCreateTagFromEvent, onCreateAutoTagRuleFromEvent }: EventsTableProps) {
+export function EventsTable({
+  timeline,
+  events,
+  className,
+  onAddBulkTag,
+  onSelectionChange,
+  selectedEventIds,
+  onEditTag,
+  onDeleteTag,
+  onCreateTagFromEvent,
+  onCreateAutoTagRuleFromEvent,
+}: EventsTableProps) {
   const [searchTerm] = useAtom(searchTermAtom);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [lastClickedIndex, setLastClickedIndex] = useState<number | null>(null);
@@ -382,7 +395,16 @@ export function EventsTable({ timeline, events, className, onAddBulkTag, onSelec
                   <td
                     key={col.id}
                     title={col.id === 'commitMessage' ? getCellValue(event, col.id) : undefined}
-                    style={col.id === 'commitMessage' ? { maxWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : undefined}
+                    style={
+                      col.id === 'commitMessage'
+                        ? {
+                            maxWidth: 0,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }
+                        : undefined
+                    }
                   >
                     {getCellValue(event, col.id)}
                   </td>

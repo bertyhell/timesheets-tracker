@@ -50,16 +50,25 @@ export const overviewsApi = {
   },
 
   findOne: async (id: string): Promise<SavedOverviewConfigDto> => {
-    const { data } = await client.get<SavedOverviewConfigDto>({ url: '/api/overviews/{id}', path: { id } });
+    const { data } = await client.get<SavedOverviewConfigDto>({
+      url: '/api/overviews/{id}',
+      path: { id },
+    });
     return data as SavedOverviewConfigDto;
   },
 
   create: async (payload: SaveOverviewConfigPayload): Promise<SavedOverviewConfigDto> => {
-    const { data } = await client.post<SavedOverviewConfigDto>({ url: '/api/overviews', body: payload });
+    const { data } = await client.post<SavedOverviewConfigDto>({
+      url: '/api/overviews',
+      body: payload,
+    });
     return data as SavedOverviewConfigDto;
   },
 
-  update: async (id: string, payload: Partial<SaveOverviewConfigPayload>): Promise<SavedOverviewConfigDto> => {
+  update: async (
+    id: string,
+    payload: Partial<SaveOverviewConfigPayload>
+  ): Promise<SavedOverviewConfigDto> => {
     const { data } = await client.patch<SavedOverviewConfigDto>({
       url: '/api/overviews/{id}',
       path: { id },

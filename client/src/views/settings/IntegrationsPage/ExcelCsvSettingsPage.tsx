@@ -52,9 +52,21 @@ const newDraftColumn = (): DraftColumn => ({
 
 /** What a fresh integration starts with, so the first export produces something usable. */
 const STARTER_COLUMNS: Omit<DraftColumn, 'key'>[] = [
-  { id: '', header: 'Date', value: CsvColumnValue.Date, format: defaultFormatForValue(CsvColumnValue.Date), staticText: '' },
+  {
+    id: '',
+    header: 'Date',
+    value: CsvColumnValue.Date,
+    format: defaultFormatForValue(CsvColumnValue.Date),
+    staticText: '',
+  },
   { id: '', header: 'Task', value: CsvColumnValue.TagName, format: '', staticText: '' },
-  { id: '', header: 'Hours', value: CsvColumnValue.Duration, format: defaultFormatForValue(CsvColumnValue.Duration), staticText: '' },
+  {
+    id: '',
+    header: 'Hours',
+    value: CsvColumnValue.Duration,
+    format: defaultFormatForValue(CsvColumnValue.Duration),
+    staticText: '',
+  },
   { id: '', header: 'Notes', value: CsvColumnValue.Notes, format: '', staticText: '' },
 ];
 
@@ -338,9 +350,7 @@ export function ExcelCsvSettingsPage() {
                             prev.map((c, i) => (i === index ? { ...c, ...patch } : c))
                           )
                         }
-                        onDelete={() =>
-                          setColumns((prev) => prev.filter((_, i) => i !== index))
-                        }
+                        onDelete={() => setColumns((prev) => prev.filter((_, i) => i !== index))}
                       />
                     ))}
                   </SortableContext>

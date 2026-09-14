@@ -21,5 +21,11 @@ export function createTag(db: DatabaseSync, params: CreateTagParams): CreateTagR
 	`;
   return db
     .prepare(sql)
-    .run(params.id, params.tagNameId, params.startedAt, params.endedAt, params.note ?? null) as CreateTagResult;
+    .run(
+      params.id,
+      params.tagNameId,
+      params.startedAt,
+      params.endedAt,
+      params.note ?? null
+    ) as CreateTagResult;
 }

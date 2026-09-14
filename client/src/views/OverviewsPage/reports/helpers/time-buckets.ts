@@ -147,6 +147,7 @@ export function formatBucketLabel(key: string, bucket: TimeBucket): string {
 
 export const WEEKDAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-export const HOUR_LABELS = Array.from({ length: 24 }, (_, hour) =>
-  String(hour).padStart(2, '0') + 'h'
+export const HOUR_LABELS = Array.from(
+  { length: 24 },
+  (_, hour) => String(hour).padStart(2, '0') + 'h'
 );

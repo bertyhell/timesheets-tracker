@@ -20,7 +20,12 @@ import {
   DragOverlay,
 } from '@dnd-kit/core';
 import type { DragEndEvent, DragStartEvent, DragOverEvent } from '@dnd-kit/core';
-import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+  arrayMove,
+} from '@dnd-kit/sortable';
 import type { TimelineDto } from '../../../generated/api/types.gen';
 import { GripHandle } from '../../../components/GripHandle/GripHandle';
 import { reorderTimelines as reorderTimelinesApi } from '../../../api/reorder';
@@ -28,17 +33,37 @@ import { timelineTypeLabel } from '../../../components/Timeline/helpers/timeline
 
 function TimelineDragOverlay({ timeline }: { timeline: TimelineDto }) {
   return (
-    <table style={{ width: '100%', tableLayout: 'fixed', borderCollapse: 'collapse', boxShadow: '0 4px 16px rgba(0,0,0,0.18)', background: 'white', opacity: 0.95 }}>
+    <table
+      style={{
+        width: '100%',
+        tableLayout: 'fixed',
+        borderCollapse: 'collapse',
+        boxShadow: '0 4px 16px rgba(0,0,0,0.18)',
+        background: 'white',
+        opacity: 0.95,
+      }}
+    >
       <tbody>
         <tr>
-          <td style={{ width: 28, paddingLeft: 8, color: '#888' }}><GripHandle /></td>
+          <td style={{ width: 28, paddingLeft: 8, color: '#888' }}>
+            <GripHandle />
+          </td>
           <td style={{ width: 28, paddingLeft: 8 }}>
-            <span style={{ display: 'block', height: 20, width: 20, borderRadius: 6, backgroundColor: timeline.color ?? 'transparent' }} />
+            <span
+              style={{
+                display: 'block',
+                height: 20,
+                width: 20,
+                borderRadius: 6,
+                backgroundColor: timeline.color ?? 'transparent',
+              }}
+            />
           </td>
           <td style={{ paddingLeft: 12 }}>{timeline.title}</td>
           <td style={{ paddingLeft: 12 }}>{timelineTypeLabel(timeline.timelineType)}</td>
           <td style={{ paddingLeft: 12 }}>{timeline.visualOrder}</td>
-          <td /><td />
+          <td />
+          <td />
         </tr>
       </tbody>
     </table>
@@ -160,9 +185,7 @@ export function TimelinesPage() {
     setLocalTimelines(timelines ?? []);
   }, [timelines]);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
-  );
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
   const sortedTimelines = orderBy(
     localTimelines,
@@ -170,7 +193,7 @@ export function TimelinesPage() {
     sortDir
   );
 
-  const activeTimeline = activeId ? sortedTimelines.find((t) => t.id === activeId) ?? null : null;
+  const activeTimeline = activeId ? (sortedTimelines.find((t) => t.id === activeId) ?? null) : null;
 
   const handleDragStart = ({ active }: DragStartEvent) => {
     setActiveId(active.id as string);

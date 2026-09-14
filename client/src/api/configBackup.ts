@@ -52,6 +52,7 @@ export interface ExportedTagName {
   code?: string;
   color?: string;
   note?: string;
+  canGrow?: boolean;
 }
 
 export interface ExportedTimeline {
@@ -166,6 +167,7 @@ export async function fetchConfigBackup(): Promise<ConfigBackup> {
       code: tagName.code,
       color: tagName.color,
       note: tagName.note,
+      canGrow: tagName.canGrow,
     })),
     timelines: (timelines as TimelineDto[]).map((timeline) => ({
       id: timeline.id,
@@ -292,6 +294,7 @@ export async function importConfigBackup(backup: ConfigBackup): Promise<ImportRe
       code: imported.code ?? '',
       color: imported.color ?? '',
       note: imported.note,
+      canGrow: imported.canGrow ?? true,
     };
     const existing = tagNamesByTitle.get(titleKey(imported.title));
 

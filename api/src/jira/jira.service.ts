@@ -5,10 +5,7 @@ import { DatabaseService } from '../database/database.service';
 import { WebsitesService } from '../websites/websites.service';
 import { ProgramsService } from '../programs/programs.service';
 import { resolveWebsiteEndTimes } from '../websites/helpers/resolve-website-end-times';
-import {
-  JiraEventInfoDto,
-  TimelineEventDto,
-} from '../timelines/dto/response-timeline-events.dto';
+import { JiraEventInfoDto, TimelineEventDto } from '../timelines/dto/response-timeline-events.dto';
 import { JiraConnectionDto } from './dto/jira-connection.dto';
 import { extractJiraIssueKey, isSameJiraHost } from './helpers/extract-jira-issue-key';
 import { mergeJiraVisits, type JiraVisit } from './helpers/merge-jira-visits';
@@ -536,6 +533,14 @@ export class JiraService {
     }
 
     return (await response.json()) as T;
+  }
+
+  /**
+   * A Jira timeline can exist without the integration being set up (yet). Callers use this to skip
+   * fetching instead of hitting a "not configured" error on every events request.
+   */
+  isConfigured(): boolean {
+    return !!this.integrationsService.findOne(JIRA_INTEGRATION_TYPE);
   }
 
   private getIntegration() {

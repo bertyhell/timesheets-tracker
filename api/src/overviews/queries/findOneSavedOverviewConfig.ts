@@ -27,7 +27,5 @@ export function findOneSavedOverviewConfig(
 	WHERE id = ?
 	LIMIT 1
 	`;
-  return (
-    (db.prepare(sql).get(params.id) as FindOneSavedOverviewConfigResult | null) ?? null
-  );
+  return (db.prepare(sql).get(params.id) as FindOneSavedOverviewConfigResult | null) ?? null;
 }

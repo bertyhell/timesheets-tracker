@@ -271,10 +271,7 @@ export const REPORTS: ReportDefinition[] = [
       stacked: true,
     },
     defaultDateRangeMode: DateRangeMode.ThisWeek,
-    sourceTypes: (options) => [
-      DIMENSION_SOURCE_TYPE[options.dimension],
-      OverviewSourceType.Tag,
-    ],
+    sourceTypes: (options) => [DIMENSION_SOURCE_TYPE[options.dimension], OverviewSourceType.Tag],
     compute: computeCoverage,
   },
 

@@ -88,9 +88,9 @@ export function AutoTagsSettingsPage() {
         <section>
           <h3 className="font-semibold mb-1">Auto merge tags</h3>
           <p className="text-gray-500 mb-3" style={{ fontSize: '0.9em' }}>
-            Consecutive auto tags that resolve to the same tag are merged into a single block, and the
-            conditions that matched them are combined. Pick 0 to keep every auto tag separate. Changes
-            are saved immediately.
+            Consecutive auto tags that resolve to the same tag are merged into a single block, and
+            the conditions that matched them are combined. Pick 0 to keep every auto tag separate.
+            Changes are saved immediately.
           </p>
 
           <div className="flex gap-2 items-center">

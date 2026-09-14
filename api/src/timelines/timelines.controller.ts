@@ -86,7 +86,13 @@ export class TimelinesController {
     @Query('timelineIds') timelineIds?: string[],
     @Query('clearCache') clearCache?: string
   ) {
-    return this.timelinesService.findAllEvents(startedAt, endedAt, term, timelineIds, clearCache === 'true');
+    return this.timelinesService.findAllEvents(
+      startedAt,
+      endedAt,
+      term,
+      timelineIds,
+      clearCache === 'true'
+    );
   }
 
   @ApiOkResponse({

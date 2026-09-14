@@ -284,6 +284,16 @@ export class AutoTagEventInfoDto {
   })
   tagNameNote?: string;
 
+  @IsBoolean()
+  @ApiProperty({
+    type: Boolean,
+    description:
+      'Whether the tag name allows this auto tag to be stretched into neighbouring free time by the "grow auto tags" action',
+    example: false,
+    required: true,
+  })
+  tagNameCanGrow: boolean;
+
   @IsNumber()
   @Type(() => Number)
   @ApiProperty({

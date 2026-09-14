@@ -1,0 +1,243 @@
+.c-grow-auto-tags-modal {
+  width: 60rem;
+  max-width: 95vw;
+
+  .c-grow-auto-tags-modal__intro {
+    margin-top: 0.5rem;
+    color: var(--gray-700);
+    font-size: 0.875rem;
+  }
+
+  .c-grow-auto-tags-modal__options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .c-grow-auto-tags-modal__option {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+
+    &.c-grow-auto-tags-modal__option--column {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.375rem;
+    }
+  }
+
+  .c-grow-auto-tags-modal__minutes {
+    width: 5rem;
+  }
+
+  .c-grow-auto-tags-modal__checkbox {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.375rem;
+    cursor: pointer;
+  }
+
+  .c-grow-auto-tags-modal__hint {
+    color: var(--gray-500, #6b7280);
+    font-size: 0.8125rem;
+  }
+
+  .c-grow-auto-tags-modal__section {
+    margin-top: 1.25rem;
+    border: 1px solid var(--gray-200);
+    border-radius: 0.375rem;
+    overflow: hidden;
+  }
+
+  /* The proposal, not the day as it stands: pulled away from the plain timelines with its own
+     frame and tint so the two are never read as the same kind of thing. */
+  .c-grow-auto-tags-modal__section--preview {
+    margin-top: 1.5rem;
+    border: 2px dashed var(--primary-0);
+    background-color: var(--primary-4, #eef4ff);
+  }
+
+  .c-grow-auto-tags-modal__preview-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+    color: var(--gray-700);
+  }
+
+  .c-grow-auto-tags-modal__preview-badge {
+    padding: 0.125rem 0.5rem;
+    border-radius: 999px;
+    background-color: var(--primary-0);
+    color: #fff;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  /* Stacked rather than side by side: the button reads as the last step of the settings above it. */
+  .c-grow-auto-tags-modal__apply {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    background-color: var(--bg-alternative);
+  }
+
+  .c-grow-auto-tags-modal__accordion {
+    font-size: 0.875rem;
+
+    summary {
+      cursor: pointer;
+      color: var(--gray-700);
+    }
+
+    /* Same tinted panel as the copy block further down, so both settings read as one kind. */
+    &.c-grow-auto-tags-modal__accordion--boxed {
+      align-self: stretch;
+      padding: 0.75rem;
+      border-radius: 0.375rem;
+      background-color: var(--bg-alternative);
+    }
+  }
+
+  /* One per line: a column is easier to scan and to hit than a wrapping row. */
+  .c-grow-auto-tags-modal__checkbox-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-top: 0.375rem;
+    padding-left: 0.5rem;
+  }
+
+  .c-grow-auto-tags-modal__tag-dot {
+    width: 0.625rem;
+    height: 0.625rem;
+    flex-shrink: 0;
+    border-radius: 50%;
+  }
+
+  /* Sits just under the copy panel, outside its tint: it is about the tags already there, not
+     about which auto tags are picked. */
+  .c-grow-auto-tags-modal__existing-tags {
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+  }
+
+  .c-grow-auto-tags-modal__footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .c-grow-auto-tags-modal__empty {
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    color: var(--gray-700);
+  }
+}
+
+.c-grow-preview {
+  display: flex;
+  flex-direction: row;
+  height: 3rem;
+  background-color: #fff;
+  border-bottom: 1px solid var(--gray-100);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  &.c-grow-preview--ruler {
+    height: 1.5rem;
+    background-color: var(--bg-alternative);
+  }
+
+  .c-grow-preview__title {
+    display: flex;
+    align-items: center;
+    width: 9rem;
+    flex-shrink: 0;
+    padding: 0 0.75rem;
+    border-right: 1px solid var(--gray-100);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--gray-700);
+  }
+
+  .c-grow-preview__track {
+    position: relative;
+    flex-grow: 1;
+    overflow: hidden;
+  }
+
+  .c-grow-preview__empty {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding-left: 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--gray-500, #6b7280);
+  }
+
+  .c-grow-preview__tick {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    border-left: 1px solid var(--gray-200);
+
+    span {
+      padding-left: 0.25rem;
+      font-size: 0.6875rem;
+      color: var(--gray-500, #6b7280);
+      white-space: nowrap;
+    }
+  }
+
+  .c-grow-preview__original {
+    position: absolute;
+    top: 4px;
+    height: calc(100% - 8px);
+    border: 1px dashed;
+    border-radius: 4px;
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  .c-grow-preview__bar {
+    position: absolute;
+    top: 8px;
+    height: calc(100% - 16px);
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+    overflow: hidden;
+
+    &.c-grow-preview__bar--grown {
+      top: 4px;
+      height: calc(100% - 8px);
+    }
+  }
+
+  .c-grow-preview__bar-label {
+    padding: 0 0.375rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

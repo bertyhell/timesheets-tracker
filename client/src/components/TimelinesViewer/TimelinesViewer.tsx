@@ -23,7 +23,7 @@ import {
   subMinutes,
 } from 'date-fns';
 import { TimelineRuler } from '../Timeline/TimelineRuler';
-import { getTicks } from '../Timeline/helpers/getTicks';
+import { prepareEvents, type PreparedEvent } from '../Timeline/helpers/prepareEvents';
 import { isApproxEqual } from '../../helpers/is-approx-equal';
 import { ROUTE_PARTS } from '../../App';
 import { useNavigate } from 'react-router-dom';
@@ -46,6 +46,7 @@ import {
   timelinesControllerFindAllEventsQueryKey,
 } from '../../generated/api/@tanstack/react-query.gen';
 import { toast } from 'react-toastify';
+import { GrowAutoTagsModal } from '../GrowAutoTagsModal/GrowAutoTagsModal';
 
 // Default visible window when opening the timelines view: 8:00 - 19:00
 const DEFAULT_VIEW_START_HOUR = 8;
@@ -76,6 +77,12 @@ const TIMELINE_MIN_HEIGHT = 40;
 const TIMELINE_MAX_HEIGHT = 90;
 const TIMELINE_BORDER_HEIGHT = 1;
 
+/** Quarter-hour grid, the same spacing the timelines draw their minor ticks at. */
+const SNAP_GRID_MS = 15 * 60 * 1000;
+
+/** Shared empty array, so timelines without events keep a stable prop identity across renders. */
+const NO_EVENTS: PreparedEvent[] = [];
+
 export const TimelinesViewer: FC<TimelinesViewerProps> = ({
   timelineInfos,
   timelinesWithEvents,
@@ -93,14 +100,30 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
   const MIN_SPAN = 0.0007; // ~60 seconds minimum visible window
 
   const [activeSelectionTimeline, setActiveSelectionTimeline] = useState<string | null>(null);
+  const [isGrowAutoTagsOpen, setIsGrowAutoTagsOpen] = useState(false);
   const allEvents = useMemo(
     () => timelinesWithEvents?.flatMap((timelineWithEvents) => timelineWithEvents.events),
     [timelinesWithEvents]
   );
+  // Timestamps, labels and colours are worked out once per data load here rather than per bar on
+  // every zoom or pan tick, which is what the timelines spent most of their render time on.
+  const preparedEventsByTimelineId = useMemo(() => {
+    const byTimelineId = new Map<string, PreparedEvent[]>();
+    (timelineInfos || []).forEach((timelineInfo) => {
+      const events = timelinesWithEvents?.find(
+        (timelineWithEvents) => timelineWithEvents.id === timelineInfo.id
+      )?.events;
+      if (!events?.length) return;
+      byTimelineId.set(timelineInfo.id, prepareEvents(timelineInfo, events));
+    });
+    return byTimelineId;
+  }, [timelineInfos, timelinesWithEvents]);
+
   const selectedTimeline: TimelineWithEventsDto | null = useMemo(
     () =>
       timelinesWithEvents?.find(
-        (timelinesWithEvent) => timelinesWithEvent.id === selectedTimelineAndEvent?.selectedTimelineId
+        (timelinesWithEvent) =>
+          timelinesWithEvent.id === selectedTimelineAndEvent?.selectedTimelineId
       ) || null,
     [timelinesWithEvents, selectedTimelineAndEvent?.selectedTimelineId]
   );
@@ -157,10 +180,7 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
   // Full day is the zoom boundary — viewStart/viewEnd are fractions of the full day
   const dayStart = useMemo(() => startOfDay(viewDate), [viewDate]);
   const dayEnd = useMemo(() => endOfDay(viewDate), [viewDate]);
-  const dayWindowMs = useMemo(
-    () => differenceInMilliseconds(dayEnd, dayStart),
-    [dayStart, dayEnd]
-  );
+  const dayWindowMs = useMemo(() => differenceInMilliseconds(dayEnd, dayStart), [dayStart, dayEnd]);
 
   // Zoom/pan state: fractions [0,1] of the full minTime–maxTime window
   const [viewStart, setViewStart] = useState(DEFAULT_VIEW_START);
@@ -217,27 +237,25 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
     [selectionStartPercent, selectionEndPercent, selectionMovePercent]
   );
 
-  const snapPointPercents = useMemo(() => {
-    if (!timelinesWithEvents) return [];
+  // Snap targets as timestamps rather than percentages of the visible window: there is one per
+  // event edge, and keeping them in time space means zooming and panning do not rebuild the list.
+  const eventSnapTimesMs = useMemo(() => {
     const points = new Set<number>();
-    timelinesWithEvents.forEach((twe) => {
-      twe.events.forEach((evt) => {
-        const startPct =
-          (differenceInMilliseconds(parseISO(evt.startedAt), visibleMinTime) / visibleWindowMs) * 100;
-        const endPct =
-          (differenceInMilliseconds(parseISO(evt.endedAt), visibleMinTime) / visibleWindowMs) * 100;
-        if (startPct >= 0 && startPct <= 100) points.add(startPct);
-        if (endPct >= 0 && endPct <= 100) points.add(endPct);
+    preparedEventsByTimelineId.forEach((events) => {
+      events.forEach((event) => {
+        points.add(event.startMs);
+        points.add(event.endMs);
       });
     });
-    getTicks(visibleMinTime, visibleMaxTime, 15).forEach((tick) => {
-      const pct = (differenceInMilliseconds(tick, visibleMinTime) / visibleWindowMs) * 100;
-      if (pct >= 0 && pct <= 100) points.add(pct);
-    });
-    const nowPct = (differenceInMilliseconds(now, visibleMinTime) / visibleWindowMs) * 100;
-    if (nowPct >= 0 && nowPct <= 100) points.add(nowPct);
+    for (let ms = dayStart.getTime(); ms <= dayEnd.getTime(); ms += SNAP_GRID_MS) points.add(ms);
     return Array.from(points);
-  }, [timelinesWithEvents, visibleMinTime, visibleMaxTime, visibleWindowMs, now]);
+  }, [preparedEventsByTimelineId, dayStart, dayEnd]);
+
+  // The clock tick only appends one point, so it does not rebuild the list above every 30 seconds
+  const snapPointTimesMs = useMemo(
+    () => [...eventSnapTimesMs, now.getTime()],
+    [eventSnapTimesMs, now]
+  );
 
   const { mutateAsync: updateTag } = useMutation({ ...tagsControllerUpdateMutation() });
 
@@ -551,15 +569,18 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
     setZoom(newEnd - span, newEnd);
   }, [setZoom]);
 
-  const handleCreateTagName = useCallback(async (data: { title: string; code: string; color: string }): Promise<TagName> => {
-    return (await createTagName({
-      body: {
-        title: data.title,
-        code: data.code || undefined,
-        color: data.color,
-      },
-    })) as unknown as TagName;
-  }, [createTagName]);
+  const handleCreateTagName = useCallback(
+    async (data: { title: string; code: string; color: string }): Promise<TagName> => {
+      return (await createTagName({
+        body: {
+          title: data.title,
+          code: data.code || undefined,
+          color: data.color,
+        },
+      })) as unknown as TagName;
+    },
+    [createTagName]
+  );
 
   const handleCreateTag = useCallback(
     async (tagNameId: string): Promise<void> => {
@@ -793,6 +814,13 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
     [navigate]
   );
 
+  const handleOpenGrowAutoTags = useCallback(() => setIsGrowAutoTagsOpen(true), []);
+
+  const handleGrownTagsCopied = useCallback(
+    () => refetchTimelinesWithEvents(),
+    [refetchTimelinesWithEvents]
+  );
+
   const renderTimelines = useMemo((): ReactNode | ReactNode[] => {
     if (timelineInfos?.length === 0) {
       return <div className="u-center">No timelines</div>;
@@ -802,11 +830,7 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
         <Timeline
           key={timelineInfo.id}
           timelineInfo={timelineInfo}
-          events={
-            timelinesWithEvents?.find((timelineWithEvents) => {
-              return timelineWithEvents.id === timelineInfo.id;
-            })?.events || ([] as TimelineEventDto[])
-          }
+          events={preparedEventsByTimelineId.get(timelineInfo.id) ?? NO_EVENTS}
           minTime={visibleMinTime}
           maxTime={visibleMaxTime}
           onMouseDown={handleMouseDown}
@@ -814,7 +838,7 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseLeave}
           selectionPercentages={activeSelectionTimeline === timelineInfo.id ? selection : null}
-          snapPointPercents={snapPointPercents}
+          snapPointTimesMs={snapPointTimesMs}
           hoverPercent={hoverPercent}
           onCreateTagName={handleCreateTagName}
           onCreateTag={handleCreateTag}
@@ -829,13 +853,14 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
           onCreateTagFromEvent={handleCreateTagFromEvent}
           onCreateTagFromAutoTagEvent={handleCreateTagFromAutoTagEvent}
           onCreateAutoTagRuleFromEvent={handleCreateAutoTagRuleFromEvent}
+          onGrowAutoTags={handleOpenGrowAutoTags}
           onRefreshEvents={onRefreshEvents}
         ></Timeline>
       );
     });
   }, [
     timelineInfos,
-    timelinesWithEvents,
+    preparedEventsByTimelineId,
     visibleMinTime,
     visibleMaxTime,
     handleMouseDown,
@@ -844,7 +869,7 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
     handleMouseLeave,
     activeSelectionTimeline,
     selection,
-    snapPointPercents,
+    snapPointTimesMs,
     hoverPercent,
     handleCreateTagName,
     handleCreateTag,
@@ -859,6 +884,7 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
     handleCreateTagFromEvent,
     handleCreateTagFromAutoTagEvent,
     handleCreateAutoTagRuleFromEvent,
+    handleOpenGrowAutoTags,
     onRefreshEvents,
   ]);
 
@@ -924,6 +950,14 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
         }
       />
       {renderTimelines}
+
+      <GrowAutoTagsModal
+        open={isGrowAutoTagsOpen}
+        onClose={() => setIsGrowAutoTagsOpen(false)}
+        timelineInfos={timelineInfos}
+        timelinesWithEvents={timelinesWithEvents}
+        onTagsChanged={handleGrownTagsCopied}
+      />
     </div>
   );
 };

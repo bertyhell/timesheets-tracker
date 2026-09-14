@@ -27,7 +27,9 @@
   background-color: white;
   color: var(--gray-500);
   cursor: pointer;
-  transition: background-color 150ms ease-in, color 150ms ease-in;
+  transition:
+    background-color 150ms ease-in,
+    color 150ms ease-in;
 
   &:last-child {
     border-right: 0;

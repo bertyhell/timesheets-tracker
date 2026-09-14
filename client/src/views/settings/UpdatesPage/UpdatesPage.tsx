@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import { AlertCircle, CheckCircle2, Download, ExternalLink, RefreshCw, RotateCw } from 'lucide-react';
+import {
+  AlertCircle,
+  CheckCircle2,
+  Download,
+  ExternalLink,
+  RefreshCw,
+  RotateCw,
+} from 'lucide-react';
 import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import Button, { ButtonVariant } from '../../../components/Button/Button';
 import { appControllerStatus } from '../../../generated/api/sdk.gen';
 
 // Electron exposes the updater over the preload bridge. Outside Electron the
 // page still renders, showing the version reported by the API.
-const updates = typeof window.electron?.updates?.check === 'function'
-  ? window.electron.updates
-  : undefined;
+const updates =
+  typeof window.electron?.updates?.check === 'function' ? window.electron.updates : undefined;
 
 async function fetchApiStatus(): Promise<{ status: string; version: string } | null> {
   // The generated types leave /api/status' 200 body as `unknown` — it is the

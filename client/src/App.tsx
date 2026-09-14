@@ -74,17 +74,23 @@ function App() {
           {/* Logo */}
           <div className="m-nav-logo">
             <div className="m-nav-logo__icon">
-              <svg width="22" height="22" viewBox="0 0 512 512" role="img" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="256" cy="276" r="224" fill="#111"/>
-                <circle cx="256" cy="66"  r="59"  fill="#111"/>
-                <circle cx="121" cy="115" r="59"  fill="#111"/>
-                <circle cx="391" cy="115" r="59"  fill="#111"/>
-                <circle cx="256" cy="276" r="210" fill="#7c3aed"/>
-                <circle cx="256" cy="66"  r="45"  fill="#7c3aed"/>
-                <circle cx="121" cy="115" r="45"  fill="#7c3aed"/>
-                <circle cx="391" cy="115" r="45"  fill="#7c3aed"/>
-                <circle cx="256" cy="276" r="163" fill="white"/>
-                <path d="M 256,276 L 256,96 A 180,180 0 0,1 436,276 Z" fill="#7c3aed"/>
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 512 512"
+                role="img"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle cx="256" cy="276" r="224" fill="#111" />
+                <circle cx="256" cy="66" r="59" fill="#111" />
+                <circle cx="121" cy="115" r="59" fill="#111" />
+                <circle cx="391" cy="115" r="59" fill="#111" />
+                <circle cx="256" cy="276" r="210" fill="#7c3aed" />
+                <circle cx="256" cy="66" r="45" fill="#7c3aed" />
+                <circle cx="121" cy="115" r="45" fill="#7c3aed" />
+                <circle cx="391" cy="115" r="45" fill="#7c3aed" />
+                <circle cx="256" cy="276" r="163" fill="white" />
+                <path d="M 256,276 L 256,96 A 180,180 0 0,1 436,276 Z" fill="#7c3aed" />
               </svg>
             </div>
             <div className="m-nav-logo__text-group">

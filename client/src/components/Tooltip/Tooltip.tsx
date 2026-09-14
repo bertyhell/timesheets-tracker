@@ -14,7 +14,12 @@ import {
 import './Tooltip.css';
 
 interface TooltipProps {
-  content: React.ReactNode;
+  /**
+   * Pass a function to build the content only once the tooltip opens. Timelines mount a tooltip
+   * per event bar, so building every content tree up front costs far more than the handful of
+   * tooltips that are ever shown.
+   */
+  content: React.ReactNode | (() => React.ReactNode);
   children: React.ReactElement<React.HTMLAttributes<HTMLElement> & { ref?: React.Ref<unknown> }>;
   visible?: boolean;
   placement?: Placement;
@@ -48,7 +53,9 @@ function Tooltip({ content, children, visible, placement = 'top', className }: T
             {...getFloatingProps()}
           >
             <FloatingArrow ref={arrowRef} context={context} className="c-tooltip__arrow" />
-            <div className="c-tooltip__content">{content}</div>
+            <div className="c-tooltip__content">
+              {typeof content === 'function' ? content() : content}
+            </div>
           </div>
         </FloatingPortal>
       )}

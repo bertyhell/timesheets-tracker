@@ -21,7 +21,12 @@ export function ProductiveSettingsPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const [form, setForm] = useState<FormState>({ baseUrl: 'https://api.productive.io', organisationId: '', userId: '', token: '' });
+  const [form, setForm] = useState<FormState>({
+    baseUrl: 'https://api.productive.io',
+    organisationId: '',
+    userId: '',
+    token: '',
+  });
   const [showToken, setShowToken] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -39,7 +44,12 @@ export function ProductiveSettingsPage() {
 
   useEffect(() => {
     if (existing) {
-      setForm({ baseUrl: existing.baseUrl, organisationId: existing.organisationId, userId: existing.userId, token: existing.token });
+      setForm({
+        baseUrl: existing.baseUrl,
+        organisationId: existing.organisationId,
+        userId: existing.userId,
+        token: existing.token,
+      });
     }
   }, [existing]);
 
@@ -84,10 +94,7 @@ export function ProductiveSettingsPage() {
 
   return (
     <div className="p-productive-settings">
-      <PageHeader
-        title="Productive"
-        description="Configure the Productive integration."
-      />
+      <PageHeader title="Productive" description="Configure the Productive integration." />
 
       <div className="px-6 mt-4 max-w-2xl">
         <form onSubmit={handleSubmit}>
@@ -163,7 +170,11 @@ export function ProductiveSettingsPage() {
           </div>
 
           <div className="flex gap-2 mt-6">
-            <Button variant={ButtonVariant.Primary} type="submit" disabled={upsertMutation.isPending}>
+            <Button
+              variant={ButtonVariant.Primary}
+              type="submit"
+              disabled={upsertMutation.isPending}
+            >
               {upsertMutation.isPending ? 'Saving…' : 'Save'}
             </Button>
             <Button

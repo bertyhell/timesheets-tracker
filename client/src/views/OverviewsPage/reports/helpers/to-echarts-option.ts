@@ -51,9 +51,20 @@ function axisTooltip(unit: ValueUnit, showTotal: boolean) {
         );
       if (showTotal && lines.length > 1) {
         const total = list.reduce((sum, param) => sum + (param.value ?? 0), 0);
-        lines.push('<span style="color:' + GRAY_500 + '">Total: <b>' + formatValue(total, unit) + '</b></span>');
+        lines.push(
+          '<span style="color:' +
+            GRAY_500 +
+            '">Total: <b>' +
+            formatValue(total, unit) +
+            '</b></span>'
+        );
       }
-      return '<b>' + list[0].axisValueLabel + '</b><br/>' + (lines.length ? lines.join('<br/>') : 'No data');
+      return (
+        '<b>' +
+        list[0].axisValueLabel +
+        '</b><br/>' +
+        (lines.length ? lines.join('<br/>') : 'No data')
+      );
     },
   };
 }
@@ -128,7 +139,9 @@ function buildAxisChart(
   const horizontal = chartType === ChartType.BarHorizontal;
   const isLine = chartType === ChartType.Line || chartType === ChartType.Area;
   const stack =
-    options.stacked && result.series.length > 1 && (chartType === ChartType.Bar || chartType === ChartType.Area)
+    options.stacked &&
+    result.series.length > 1 &&
+    (chartType === ChartType.Bar || chartType === ChartType.Area)
       ? 'total'
       : undefined;
 

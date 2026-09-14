@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class CreateTagNameDto {
   @IsString()
@@ -40,4 +40,15 @@ export class CreateTagNameDto {
     default: undefined,
   })
   note?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  @Type(() => Boolean)
+  @ApiPropertyOptional({
+    type: Boolean,
+    description:
+      'Whether auto tags for this tag name may be stretched into neighbouring free time by the "grow auto tags" action. Defaults to true when omitted.',
+    default: true,
+  })
+  canGrow?: boolean;
 }

@@ -56,9 +56,7 @@ export function NotesPage() {
       >
         <Button
           onClick={() =>
-            navigate(
-              '/' + ROUTE_PARTS.manage + '/' + ROUTE_PARTS.notes + '/' + ROUTE_PARTS.create
-            )
+            navigate('/' + ROUTE_PARTS.manage + '/' + ROUTE_PARTS.notes + '/' + ROUTE_PARTS.create)
           }
           variant={ButtonVariant.Primary}
         >
@@ -102,9 +100,15 @@ export function NotesPage() {
                 }
               >
                 <td className="pl-3">{note.title}</td>
-                <td className="pl-3 text-sm text-gray-500">{(note as unknown as AutoNote).variable}</td>
-                <td className="pl-3 text-sm font-mono text-gray-500">{(note as unknown as AutoNote).extractRegex}</td>
-                <td className="pl-3 text-sm font-mono text-gray-500">{(note as unknown as AutoNote).extractRegexReplacement}</td>
+                <td className="pl-3 text-sm text-gray-500">
+                  {(note as unknown as AutoNote).variable}
+                </td>
+                <td className="pl-3 text-sm font-mono text-gray-500">
+                  {(note as unknown as AutoNote).extractRegex}
+                </td>
+                <td className="pl-3 text-sm font-mono text-gray-500">
+                  {(note as unknown as AutoNote).extractRegexReplacement}
+                </td>
                 <td className="w-px whitespace-nowrap">
                   <Button
                     onClick={(e) => {

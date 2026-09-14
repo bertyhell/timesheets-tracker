@@ -1,3 +1,6 @@
+// Must stay first: shims a Node built-in that dbus-next's socket layer needs at import time.
+import './shared/node-compat';
+
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';

@@ -75,6 +75,9 @@ export class SavedOverviewConfigDto implements SavedOverviewConfig {
 
   @IsString()
   @Type(() => String)
-  @ApiProperty({ type: String, description: 'ISO timestamp at which this overview was last updated' })
+  @ApiProperty({
+    type: String,
+    description: 'ISO timestamp at which this overview was last updated',
+  })
   updatedAt: string;
 }

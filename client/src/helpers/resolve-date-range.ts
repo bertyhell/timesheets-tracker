@@ -36,17 +36,33 @@ export function resolveDateRange(
     case DateRangeMode.ThisYear:
       return { startedAt: startOfYear(now).toISOString(), endedAt: endOfYear(now).toISOString() };
     case DateRangeMode.Last7Days:
-      return { startedAt: startOfDay(subDays(now, 6)).toISOString(), endedAt: endOfDay(now).toISOString() };
+      return {
+        startedAt: startOfDay(subDays(now, 6)).toISOString(),
+        endedAt: endOfDay(now).toISOString(),
+      };
     case DateRangeMode.Last30Days:
-      return { startedAt: startOfDay(subDays(now, 29)).toISOString(), endedAt: endOfDay(now).toISOString() };
+      return {
+        startedAt: startOfDay(subDays(now, 29)).toISOString(),
+        endedAt: endOfDay(now).toISOString(),
+      };
     case DateRangeMode.Last90Days:
-      return { startedAt: startOfDay(subDays(now, 89)).toISOString(), endedAt: endOfDay(now).toISOString() };
+      return {
+        startedAt: startOfDay(subDays(now, 89)).toISOString(),
+        endedAt: endOfDay(now).toISOString(),
+      };
     case DateRangeMode.Last365Days:
-      return { startedAt: startOfDay(subDays(now, 364)).toISOString(), endedAt: endOfDay(now).toISOString() };
+      return {
+        startedAt: startOfDay(subDays(now, 364)).toISOString(),
+        endedAt: endOfDay(now).toISOString(),
+      };
     case DateRangeMode.Custom:
       return {
-        startedAt: customStartedAt ? startOfDay(new Date(customStartedAt)).toISOString() : startOfDay(now).toISOString(),
-        endedAt: customEndedAt ? endOfDay(new Date(customEndedAt)).toISOString() : endOfDay(now).toISOString(),
+        startedAt: customStartedAt
+          ? startOfDay(new Date(customStartedAt)).toISOString()
+          : startOfDay(now).toISOString(),
+        endedAt: customEndedAt
+          ? endOfDay(new Date(customEndedAt)).toISOString()
+          : endOfDay(now).toISOString(),
       };
   }
 }

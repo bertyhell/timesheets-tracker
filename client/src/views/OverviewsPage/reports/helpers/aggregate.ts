@@ -133,8 +133,7 @@ export function intersectIntervals(a: Interval[], b: Interval[]): Interval[] {
 }
 
 export function rowsToIntervals(rows: OverviewFlatRowDto[]): Interval[] {
-  return rows.map((row): Interval => [
-    parseISO(row.startedAt).getTime(),
-    parseISO(row.endedAt).getTime(),
-  ]);
+  return rows.map(
+    (row): Interval => [parseISO(row.startedAt).getTime(), parseISO(row.endedAt).getTime()]
+  );
 }

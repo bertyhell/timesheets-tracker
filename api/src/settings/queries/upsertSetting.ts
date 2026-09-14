@@ -1,6 +1,9 @@
 import type { DatabaseSync } from 'node:sqlite';
 
-export function upsertSetting(db: DatabaseSync, params: { key: string; value: string | null }): void {
+export function upsertSetting(
+  db: DatabaseSync,
+  params: { key: string; value: string | null }
+): void {
   const sql = `
     INSERT INTO settings (key, value, createdAt, updatedAt)
     VALUES (?, ?, datetime('now'), datetime('now'))

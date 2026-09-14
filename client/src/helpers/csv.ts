@@ -16,7 +16,9 @@ export function escapeCell(value: string, delimiter: string = ','): string {
 }
 
 export function toCsv(rows: string[][], delimiter: string = ','): string {
-  return rows.map((row) => row.map((cell) => escapeCell(cell, delimiter)).join(delimiter)).join('\n');
+  return rows
+    .map((row) => row.map((cell) => escapeCell(cell, delimiter)).join(delimiter))
+    .join('\n');
 }
 
 /** Strips anything a filesystem might object to, without touching the extension. */

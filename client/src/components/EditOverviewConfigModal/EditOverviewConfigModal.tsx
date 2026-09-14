@@ -9,8 +9,15 @@ import { DateRangeSelect } from '../DateRangeSelect/DateRangeSelect';
 import { ROUTE_PARTS } from '../../App';
 import { DateRangeMode, OverviewSourceType } from '../../types/types';
 import { overviewsApi } from '../../api/overviews';
-import { DEFAULT_REPORT_ID, findReport, REPORTS } from '../../views/OverviewsPage/reports/report-catalog';
-import { resolveReportOptions, toReportState } from '../../views/OverviewsPage/reports/helpers/report-state';
+import {
+  DEFAULT_REPORT_ID,
+  findReport,
+  REPORTS,
+} from '../../views/OverviewsPage/reports/report-catalog';
+import {
+  resolveReportOptions,
+  toReportState,
+} from '../../views/OverviewsPage/reports/helpers/report-state';
 import type { ReportState } from '../../views/OverviewsPage/reports/report.types';
 
 /** State handed over by "Save as new", so the saved overview keeps the tweaks made in the view. */
@@ -43,7 +50,9 @@ export function EditOverviewConfigModal() {
   const [dateRangeMode, setDateRangeMode] = useState<DateRangeMode>(
     forkState?.dateRangeMode ?? DEFAULT_REPORT.defaultDateRangeMode
   );
-  const [customStartedAt, setCustomStartedAt] = useState<string | undefined>(forkState?.customStartedAt);
+  const [customStartedAt, setCustomStartedAt] = useState<string | undefined>(
+    forkState?.customStartedAt
+  );
   const [customEndedAt, setCustomEndedAt] = useState<string | undefined>(forkState?.customEndedAt);
 
   useEffect(() => {
@@ -105,7 +114,10 @@ export function EditOverviewConfigModal() {
     <Modal
       open={true}
       onClose={handleClose}
-      classNames={{ modal: 'c-edit-overview-config-modal', closeButton: 'c-button c-button--small' }}
+      classNames={{
+        modal: 'c-edit-overview-config-modal',
+        closeButton: 'c-button c-button--small',
+      }}
     >
       <h3>{id ? 'Edit overview details' : 'New custom overview'}</h3>
 

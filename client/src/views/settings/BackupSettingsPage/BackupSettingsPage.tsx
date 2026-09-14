@@ -158,7 +158,10 @@ export function BackupSettingsPage() {
             </table>
 
             {lastImport.warnings.length > 0 && (
-              <ul className="mt-3 text-gray-500" style={{ fontSize: '0.85em', paddingLeft: '1.25rem', listStyle: 'disc' }}>
+              <ul
+                className="mt-3 text-gray-500"
+                style={{ fontSize: '0.85em', paddingLeft: '1.25rem', listStyle: 'disc' }}
+              >
                 {lastImport.warnings.map((warning) => (
                   <li key={warning}>{warning}</li>
                 ))}

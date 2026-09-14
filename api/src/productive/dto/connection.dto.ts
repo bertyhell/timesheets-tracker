@@ -3,7 +3,8 @@ import { ApiProperty } from '@nestjs/swagger';
 export class ProductiveConnectionDto {
   @ApiProperty({
     type: Boolean,
-    description: 'Whether the configured base url, organisation id, user id and token can reach Productive',
+    description:
+      'Whether the configured base url, organisation id, user id and token can reach Productive',
   })
   ok: boolean;
 

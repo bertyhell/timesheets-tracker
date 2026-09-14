@@ -25,10 +25,7 @@ export function OverviewsPage() {
     refetch();
   }, [location]);
 
-  const restOfPath = location.pathname
-    .split('/')
-    .filter(Boolean)
-    .slice(1);
+  const restOfPath = location.pathname.split('/').filter(Boolean).slice(1);
   const configId =
     restOfPath.length === 1 && restOfPath[0] !== ROUTE_PARTS.new ? restOfPath[0] : undefined;
 

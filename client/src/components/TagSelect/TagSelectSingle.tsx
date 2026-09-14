@@ -14,7 +14,13 @@ interface TagSelectProps {
   className?: string;
 }
 
-function TagSelectSingle({ className, value, onChange, onCreateOption, autoFocus }: TagSelectProps) {
+function TagSelectSingle({
+  className,
+  value,
+  onChange,
+  onCreateOption,
+  autoFocus,
+}: TagSelectProps) {
   return (
     <AsyncCreatableSelect
       className={'c-tag-input ' + className}

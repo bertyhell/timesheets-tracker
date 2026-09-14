@@ -67,9 +67,7 @@ function OptionSelect<T extends string | number>({
             {options.map((option) => (
               <button
                 key={String(option.value)}
-                className={
-                  'c-report-option__item' + (option.value === value ? ' is-active' : '')
-                }
+                className={'c-report-option__item' + (option.value === value ? ' is-active' : '')}
                 onClick={() => {
                   onChange(option.value);
                   close();
@@ -93,12 +91,7 @@ interface ReportOptionsBarProps {
   canStack: boolean;
 }
 
-export function ReportOptionsBar({
-  report,
-  options,
-  onChange,
-  canStack,
-}: ReportOptionsBarProps) {
+export function ReportOptionsBar({ report, options, onChange, canStack }: ReportOptionsBarProps) {
   const { optionSpec } = report;
   // With a single series the limit would have nothing to trim: it only caps how many series a
   // "split by" breakdown draws, or how many categories a distribution chart shows.
@@ -184,7 +177,10 @@ export function ReportOptionsBar({
           <OptionSelect
             label="Sort"
             value={options.sort}
-            options={Object.values(SortMode).map((sort) => ({ value: sort, label: SORT_LABELS[sort] }))}
+            options={Object.values(SortMode).map((sort) => ({
+              value: sort,
+              label: SORT_LABELS[sort],
+            }))}
             onChange={(sort) => onChange({ sort })}
           />
         )}

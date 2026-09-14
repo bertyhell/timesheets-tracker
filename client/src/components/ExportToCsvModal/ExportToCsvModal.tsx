@@ -61,8 +61,7 @@ export function ExportToCsvModal({
   });
 
   const columns = useMemo<CsvExportColumn[]>(
-    () =>
-      (config?.columns ?? []).map((column, index) => ({ ...column, visualOrder: index })),
+    () => (config?.columns ?? []).map((column, index) => ({ ...column, visualOrder: index })),
     [config]
   );
 
@@ -73,10 +72,7 @@ export function ExportToCsvModal({
 
   // The preview is the file: same rows, same columns, same formatting, so a wrong format or
   // delimiter is visible before anything is written.
-  const grid = useMemo(
-    () => buildCsvGrid(rows, columns, false),
-    [rows, columns]
-  );
+  const grid = useMemo(() => buildCsvGrid(rows, columns, false), [rows, columns]);
 
   const fileName = (config?.fileNamePattern || 'timesheet-{date}').replace('{date}', date);
   const itemLabel = timelineType === 'AutoTag' ? 'auto tag' : 'tag';
@@ -84,7 +80,8 @@ export function ExportToCsvModal({
   const handleExport = async () => {
     if (!config || !columns.length || !rows.length) return;
 
-    const csv = UTF8_BOM + toCsv(buildCsvGrid(rows, columns, config.includeHeader), config.delimiter);
+    const csv =
+      UTF8_BOM + toCsv(buildCsvGrid(rows, columns, config.includeHeader), config.delimiter);
 
     if (!isElectron) {
       downloadCsv(csv, fileName);
@@ -152,7 +149,9 @@ export function ExportToCsvModal({
           to describe what your timesheet expects.
         </div>
       ) : !hasRows ? (
-        <div className="c-csv-empty">Nothing tagged on this day, so there is nothing to export.</div>
+        <div className="c-csv-empty">
+          Nothing tagged on this day, so there is nothing to export.
+        </div>
       ) : (
         <div className="c-csv-preview">
           <table>

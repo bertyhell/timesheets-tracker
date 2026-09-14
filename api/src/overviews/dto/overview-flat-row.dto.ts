@@ -6,7 +6,10 @@ import { type OverviewFlatRow, OverviewSourceType } from '../../types/types';
 export class OverviewFlatRowDto implements OverviewFlatRow {
   @IsString()
   @Type(() => String)
-  @ApiProperty({ type: String, description: 'Id of the underlying source row (tag/program/website/active-state)' })
+  @ApiProperty({
+    type: String,
+    description: 'Id of the underlying source row (tag/program/website/active-state)',
+  })
   id: string;
 
   @IsString()
@@ -44,7 +47,7 @@ export class OverviewFlatRowDto implements OverviewFlatRow {
 
   @IsString()
   @Type(() => String)
-  @ApiProperty({ type: String, description: "Week bucket, e.g. \"2026-W07\"" })
+  @ApiProperty({ type: String, description: 'Week bucket, e.g. "2026-W07"' })
   week: string;
 
   @IsString()
@@ -62,7 +65,8 @@ export class OverviewFlatRowDto implements OverviewFlatRow {
   @Type(() => String)
   @ApiPropertyOptional({
     type: String,
-    description: 'Domain (hostname) parsed from the website URL; only present for Website-sourced rows',
+    description:
+      'Domain (hostname) parsed from the website URL; only present for Website-sourced rows',
     default: undefined,
   })
   websiteDomain?: string;
@@ -72,7 +76,8 @@ export class OverviewFlatRowDto implements OverviewFlatRow {
   @Type(() => String)
   @ApiPropertyOptional({
     type: String,
-    description: 'Title of the website page; only present for Website-sourced rows. Same value as category for Website rows, exposed under an explicit name for discoverability.',
+    description:
+      'Title of the website page; only present for Website-sourced rows. Same value as category for Website rows, exposed under an explicit name for discoverability.',
     default: undefined,
   })
   websiteTitle?: string;
@@ -82,7 +87,8 @@ export class OverviewFlatRowDto implements OverviewFlatRow {
   @Type(() => String)
   @ApiPropertyOptional({
     type: String,
-    description: 'Title of the tag name (tag.tagName.title); only present for Tag-sourced rows. Same value as category for Tag rows, exposed under an explicit name for discoverability.',
+    description:
+      'Title of the tag name (tag.tagName.title); only present for Tag-sourced rows. Same value as category for Tag rows, exposed under an explicit name for discoverability.',
     default: undefined,
   })
   tagName?: string;
@@ -113,7 +119,8 @@ export class OverviewFlatRowDto implements OverviewFlatRow {
   @Type(() => String)
   @ApiPropertyOptional({
     type: String,
-    description: 'Name of the program; only present for Program-sourced rows. Same value as category for Program rows, exposed under an explicit name for discoverability.',
+    description:
+      'Name of the program; only present for Program-sourced rows. Same value as category for Program rows, exposed under an explicit name for discoverability.',
     default: undefined,
   })
   programName?: string;
@@ -133,7 +140,8 @@ export class OverviewFlatRowDto implements OverviewFlatRow {
   @Type(() => String)
   @ApiPropertyOptional({
     type: String,
-    description: "'Active' or 'Inactive'; only present for ActiveState-sourced rows. Same value as category for ActiveState rows, exposed under an explicit name for discoverability.",
+    description:
+      "'Active' or 'Inactive'; only present for ActiveState-sourced rows. Same value as category for ActiveState rows, exposed under an explicit name for discoverability.",
     default: undefined,
   })
   activeState?: string;

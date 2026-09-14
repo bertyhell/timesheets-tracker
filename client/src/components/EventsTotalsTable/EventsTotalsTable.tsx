@@ -93,8 +93,12 @@ function getCategoryLabel(event: TimelineEventDto, timelineType: TimelineType): 
   }
 }
 
-
-export function EventsTotalsTable({ events, timelineType, className, onEditTag }: EventsTotalsTableProps) {
+export function EventsTotalsTable({
+  events,
+  timelineType,
+  className,
+  onEditTag,
+}: EventsTotalsTableProps) {
   const [searchTerm] = useAtom(searchTermAtom);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);

@@ -342,6 +342,7 @@ export function calculateAutoTagEvents(
         tagNameTitle: tagName.title,
         tagNameCode: tagName.code,
         tagNameNote: tagName.note || undefined,
+        tagNameCanGrow: !!tagName.canGrow,
         priority: autoTag.priority,
         matchedConditions,
       };

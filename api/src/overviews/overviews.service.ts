@@ -3,7 +3,12 @@ import { v4 as uuid } from 'uuid';
 import { format } from 'date-fns';
 import { DatabaseService } from '../database/database.service';
 import { CustomError } from '../shared/CustomError';
-import { DateRangeMode, OverviewFlatRow, OverviewSourceType, SavedOverviewConfig } from '../types/types';
+import {
+  DateRangeMode,
+  OverviewFlatRow,
+  OverviewSourceType,
+  SavedOverviewConfig,
+} from '../types/types';
 import { TagsService } from '../tags/tags.service';
 import { ProgramsService } from '../programs/programs.service';
 import { WebsitesService } from '../websites/websites.service';
@@ -63,7 +68,11 @@ export class OverviewsService {
       const rawConfigs = findAllSavedOverviewConfigs(db);
       return rawConfigs.map((raw) => this.adapt(raw));
     } catch (err) {
-      const error = new CustomError('Failed to fetch all saved overview configs from the database', err, {});
+      const error = new CustomError(
+        'Failed to fetch all saved overview configs from the database',
+        err,
+        {}
+      );
       console.error(error);
       throw error;
     }
@@ -75,7 +84,11 @@ export class OverviewsService {
       const raw = findOneSavedOverviewConfig(db, { id });
       return this.adapt(raw);
     } catch (err) {
-      const error = new CustomError('Failed to fetch one saved overview config from the database', err, { id });
+      const error = new CustomError(
+        'Failed to fetch one saved overview config from the database',
+        err,
+        { id }
+      );
       console.error(error);
       throw error;
     }
@@ -105,10 +118,14 @@ export class OverviewsService {
 
       return this.findOne(id);
     } catch (err) {
-      const error = new CustomError('Failed to create a saved overview config in the database', err, {
-        id,
-        dto,
-      });
+      const error = new CustomError(
+        'Failed to create a saved overview config in the database',
+        err,
+        {
+          id,
+          dto,
+        }
+      );
       console.error(error);
       throw error;
     }
@@ -126,7 +143,8 @@ export class OverviewsService {
           dateRangeMode: dto.dateRangeMode ?? existing.dateRangeMode,
           customStartedAt:
             dto.customStartedAt !== undefined ? dto.customStartedAt : existing.customStartedAt,
-          customEndedAt: dto.customEndedAt !== undefined ? dto.customEndedAt : existing.customEndedAt,
+          customEndedAt:
+            dto.customEndedAt !== undefined ? dto.customEndedAt : existing.customEndedAt,
           sourceTypes: JSON.stringify(dto.sourceTypes ?? existing.sourceTypes),
           reportState: JSON.stringify(dto.reportState ?? existing.reportState),
           updatedAt: new Date().toISOString(),
@@ -150,9 +168,13 @@ export class OverviewsService {
       const db = this.databaseService.getDb();
       await deleteSavedOverviewConfig(db, { id });
     } catch (err) {
-      const error = new CustomError('Failed to delete saved overview config from the database', err, {
-        id,
-      });
+      const error = new CustomError(
+        'Failed to delete saved overview config from the database',
+        err,
+        {
+          id,
+        }
+      );
       console.error(error);
       throw error;
     }

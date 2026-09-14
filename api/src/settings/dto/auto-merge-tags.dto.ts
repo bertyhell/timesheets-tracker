@@ -9,7 +9,8 @@ export const MAX_AUTO_MERGE_TAGS_MINUTES = 8 * 60;
 export class AutoMergeTagsDto {
   @ApiProperty({
     type: Number,
-    description: 'Auto tags resolving to the same tag are merged when less than this many minutes apart. 0 disables merging.',
+    description:
+      'Auto tags resolving to the same tag are merged when less than this many minutes apart. 0 disables merging.',
   })
   minutes: number;
 }

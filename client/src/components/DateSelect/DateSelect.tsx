@@ -11,7 +11,9 @@ function DateSelect({ className }: { className?: string }) {
   const [viewDate, setViewDate] = useAtom(viewDateAtom);
 
   return (
-    <div className={`c-date-select flex flex-row items-center gap-1${className ? ' ' + className : ''}`}>
+    <div
+      className={`c-date-select flex flex-row items-center gap-1${className ? ' ' + className : ''}`}
+    >
       <Button
         className="hidden wide:inline-flex"
         onClick={() => setViewDate(new Date())}

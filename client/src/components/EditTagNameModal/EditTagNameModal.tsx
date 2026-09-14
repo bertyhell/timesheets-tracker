@@ -16,6 +16,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { ColorInput } from '../ColorInput/ColorInput';
 import { getRandomColor } from '../Timeline/helpers/getColorForEvent';
+import ToggleButton from '../ToggleButton/ToggleButton';
 
 export function EditTagNameModal() {
   const { id } = useParams();
@@ -24,6 +25,8 @@ export function EditTagNameModal() {
   const [code, setCode] = useState<string>('');
   const [color, setColor] = useState<string>(getRandomColor());
   const [note, setNote] = useState<string>('');
+  // Growing is the useful default, so a new tag starts opted in
+  const [canGrow, setCanGrow] = useState<boolean>(true);
   const { mutateAsync: createTagName } = useMutation({ ...tagNamesControllerCreateMutation() });
   const { mutateAsync: updateTagName } = useMutation({ ...tagNamesControllerUpdateMutation() });
   const { mutateAsync: deleteTagName } = useMutation({ ...tagNamesControllerRemoveMutation() });
@@ -39,6 +42,7 @@ export function EditTagNameModal() {
       setCode(tagName.code);
       setColor(tagName.color);
       setNote(tagName.note ?? '');
+      setCanGrow(!!tagName.canGrow);
     }
   }, [tagName]);
 
@@ -55,6 +59,7 @@ export function EditTagNameModal() {
           code: tagName.code,
           color: tagName.color,
           note: tagName.note ?? undefined,
+          canGrow: tagName.canGrow ?? true,
         },
       });
 
@@ -68,6 +73,7 @@ export function EditTagNameModal() {
           code: tagName.code,
           color: tagName.color,
           note: tagName.note ?? undefined,
+          canGrow: tagName.canGrow ?? true,
         },
       });
 
@@ -118,6 +124,13 @@ export function EditTagNameModal() {
           rows={3}
           onChange={(evt: ChangeEvent<HTMLTextAreaElement>) => setNote(evt.target?.value)}
         />
+
+        <h4 className="mt-4">Tag can grow</h4>
+        <ToggleButton optionTwoSelected={canGrow} onChange={setCanGrow} label1="No" label2="Yes" />
+        <p className="text-gray-500" style={{ fontSize: '0.85em' }}>
+          Only auto tags for a tag that can grow are stretched into the free time around them by
+          &quot;Grow auto tags&quot; on the auto tags timeline.
+        </p>
       </div>
 
       <div className="flex flex-row justify-between gap-2 mt-48">
@@ -140,6 +153,7 @@ export function EditTagNameModal() {
                 code,
                 color,
                 note: note || undefined,
+                canGrow,
               });
             }}
             variant={ButtonVariant.Primary}

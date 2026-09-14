@@ -35,6 +35,8 @@ export interface TagName {
   code: string;
   color: string;
   note?: string | null;
+  /** Whether auto tags for this tag name may be stretched into neighbouring free time. */
+  canGrow?: boolean;
 }
 
 export interface AutoNote {

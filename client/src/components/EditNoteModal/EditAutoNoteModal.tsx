@@ -80,9 +80,9 @@ export function EditAutoNoteModal() {
     [ConditionVariable.fileExtension]: 'fileEdit.fileExtension',
   };
 
-  const variableOptions: SelectOption<ConditionVariable>[] = Object.values(
-    ConditionVariable
-  ).map((condition) => ({ label: VARIABLE_LABELS[condition] ?? condition, value: condition }));
+  const variableOptions: SelectOption<ConditionVariable>[] = Object.values(ConditionVariable).map(
+    (condition) => ({ label: VARIABLE_LABELS[condition] ?? condition, value: condition })
+  );
 
   useEffect(() => {
     if (autoNote) {
@@ -93,8 +93,7 @@ export function EditAutoNoteModal() {
         ) as TagName[]
       );
       setVariable(autoNote.variable as ConditionVariable);
-      const isRegex =
-        autoNote.extractRegex !== '(.*)' || autoNote.extractRegexReplacement !== '$1';
+      const isRegex = autoNote.extractRegex !== '(.*)' || autoNote.extractRegexReplacement !== '$1';
       setUseRegex(isRegex);
       setExtractRegex(autoNote.extractRegex);
       setExtractRegexReplacement(autoNote.extractRegexReplacement);

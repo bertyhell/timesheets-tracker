@@ -59,9 +59,7 @@ export function FormatSelect({ options, value, onChange, disabled }: FormatSelec
               key={option.value}
               role="option"
               aria-selected={option.value === value}
-              className={
-                'c-format-select__option' + (option.value === value ? ' is-selected' : '')
-              }
+              className={'c-format-select__option' + (option.value === value ? ' is-selected' : '')}
               onClick={() => {
                 onChange(option.value);
                 setIsOpen(false);

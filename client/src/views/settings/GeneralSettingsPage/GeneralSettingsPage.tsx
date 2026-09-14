@@ -84,7 +84,9 @@ export function GeneralSettingsPage() {
       } else {
         await saveDeleteEventsAfter({ body: { numeric: parsedNumeric, unit } });
       }
-      await queryClient.invalidateQueries({ queryKey: settingsControllerGetDeleteEventsAfterQueryKey() });
+      await queryClient.invalidateQueries({
+        queryKey: settingsControllerGetDeleteEventsAfterQueryKey(),
+      });
       toast('Cleanup setting saved', { type: 'success' });
     } catch (err: any) {
       toast(err?.message ?? 'Failed to save cleanup setting', { type: 'error' });
@@ -152,8 +154,8 @@ export function GeneralSettingsPage() {
         <section className="mt-8">
           <h3 className="font-semibold mb-1">Automatic cleanup</h3>
           <p className="text-gray-500 mb-3" style={{ fontSize: '0.9em' }}>
-            Automatically delete programs, websites, activity, tags and cached network requests older than a
-            given age. Runs once a day and every time the app starts.
+            Automatically delete programs, websites, activity, tags and cached network requests
+            older than a given age. Runs once a day and every time the app starts.
           </p>
 
           <div className="flex gap-2 items-center">

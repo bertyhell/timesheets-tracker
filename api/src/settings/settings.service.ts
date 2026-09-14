@@ -73,7 +73,12 @@ export class SettingsService {
     const numeric = numericRaw ? Number(numericRaw) : NaN;
     const unit = unitRaw as DeleteEventsAfterUnit;
 
-    if (!numeric || Number.isNaN(numeric) || numeric <= 0 || !Object.values(DeleteEventsAfterUnit).includes(unit)) {
+    if (
+      !numeric ||
+      Number.isNaN(numeric) ||
+      numeric <= 0 ||
+      !Object.values(DeleteEventsAfterUnit).includes(unit)
+    ) {
       return { cutoffDate: null };
     }
 

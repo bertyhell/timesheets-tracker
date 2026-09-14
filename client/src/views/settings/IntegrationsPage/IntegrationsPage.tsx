@@ -115,14 +115,24 @@ export function IntegrationsPage() {
             )}
 
             {unconfiguredTypes.length > 0 && (
-              <Dropdown label={<><Plus size={14} />Add integration</>}>
+              <Dropdown
+                label={
+                  <>
+                    <Plus size={14} />
+                    Add integration
+                  </>
+                }
+              >
                 {(close) => (
                   <>
                     {unconfiguredTypes.map(({ value, label, path, logo }) => (
                       <button
                         key={value}
                         className="m-integrations-dropdown__item"
-                        onClick={() => { navigate(path); close(); }}
+                        onClick={() => {
+                          navigate(path);
+                          close();
+                        }}
                       >
                         <img src={logo} alt="" className="m-integrations__logo" />
                         {label}

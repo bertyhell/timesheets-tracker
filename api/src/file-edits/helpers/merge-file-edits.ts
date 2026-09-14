@@ -66,9 +66,7 @@ export function mergeFileEdits(
   return sessions.map((session) => ({
     filePath: session.filePath,
     startedAt: new Date(session.startedAt).toISOString(),
-    endedAt: new Date(
-      Math.max(session.endedAt, session.startedAt + minDurationMs)
-    ).toISOString(),
+    endedAt: new Date(Math.max(session.endedAt, session.startedAt + minDurationMs)).toISOString(),
     editCount: session.editCount,
   }));
 }

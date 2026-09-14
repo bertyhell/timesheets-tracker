@@ -22,7 +22,11 @@ import { updateTimeline } from './queries/updateTimeline';
 import { deleteTimeline } from './queries/deleteTimeline';
 import { reorderTimelines, type ReorderTimelineItem } from './queries/reorderTimelines';
 import { incrementTimelineOrders } from './queries/incrementTimelineOrders';
-import { TagEventInfoDto, TimelineEventDto, TimelineWithEventsDto } from './dto/response-timeline-events.dto';
+import {
+  TagEventInfoDto,
+  TimelineEventDto,
+  TimelineWithEventsDto,
+} from './dto/response-timeline-events.dto';
 import { TimelineDto } from './dto/response-timeline.dto';
 import { CalendarsService } from '../calendars/calendars.service';
 import { ProgramsService } from '../programs/programs.service';
@@ -374,23 +378,27 @@ export class TimelinesService {
                   );
                   const thirtyMinutesMs = 30 * 60 * 1000;
                   const now = Date.now();
-                  return sortedCommits.map((commit: GitCommitEvent, index: number): TimelineEventDto => {
-                    const commitStart = new Date(commit.startedAt).getTime();
-                    const nextCommitStart =
-                      index < sortedCommits.length - 1
-                        ? new Date(sortedCommits[index + 1].startedAt).getTime()
-                        : Infinity;
-                    return {
-                      id: commit.id,
-                      startedAt: commit.startedAt,
-                      endedAt: new Date(Math.min(commitStart + thirtyMinutesMs, nextCommitStart, now)).toISOString(),
-                      info: {
-                        repoName: commit.repoName,
-                        commitMessage: commit.commitMessage,
-                      },
-                      timelineId: timelineInfo.id,
-                    };
-                  });
+                  return sortedCommits.map(
+                    (commit: GitCommitEvent, index: number): TimelineEventDto => {
+                      const commitStart = new Date(commit.startedAt).getTime();
+                      const nextCommitStart =
+                        index < sortedCommits.length - 1
+                          ? new Date(sortedCommits[index + 1].startedAt).getTime()
+                          : Infinity;
+                      return {
+                        id: commit.id,
+                        startedAt: commit.startedAt,
+                        endedAt: new Date(
+                          Math.min(commitStart + thirtyMinutesMs, nextCommitStart, now)
+                        ).toISOString(),
+                        info: {
+                          repoName: commit.repoName,
+                          commitMessage: commit.commitMessage,
+                        },
+                        timelineId: timelineInfo.id,
+                      };
+                    }
+                  );
                 } catch (err) {
                   console.error(
                     new CustomError('Failed to fetch git commit events', err, {
@@ -406,6 +414,9 @@ export class TimelinesService {
 
             case TimelineType.Productive:
               return (async () => {
+                // The timeline can exist before the integration is set up; there is nothing to
+                // fetch then.
+                if (!this.productiveService.isConfigured()) return [];
                 try {
                   const d = new Date(startedAt);
                   const date = [
@@ -413,7 +424,11 @@ export class TimelinesService {
                     String(d.getMonth() + 1).padStart(2, '0'),
                     String(d.getDate()).padStart(2, '0'),
                   ].join('-');
-                  return await this.productiveService.getEventsForDay(date, timelineInfo.id, clearCache);
+                  return await this.productiveService.getEventsForDay(
+                    date,
+                    timelineInfo.id,
+                    clearCache
+                  );
                 } catch (err) {
                   console.error(
                     new CustomError('Failed to fetch events from Productive', err, {
@@ -427,6 +442,9 @@ export class TimelinesService {
 
             case TimelineType.Jira:
               return (async () => {
+                // The timeline can exist before the integration is set up; there is nothing to
+                // fetch then.
+                if (!this.jiraService.isConfigured()) return [];
                 try {
                   return await this.jiraService.getEventsForRange(
                     startedAt,
@@ -501,7 +519,10 @@ export class TimelinesService {
     }
   }
 
-  private applyAutoNotes(timelinesWithEvents: TimelineWithEventsDto[], autoNotes: AutoNote[]): void {
+  private applyAutoNotes(
+    timelinesWithEvents: TimelineWithEventsDto[],
+    autoNotes: AutoNote[]
+  ): void {
     if (!autoNotes.length) return;
 
     const tagTimelines = timelinesWithEvents.filter((t) => t.type === TimelineType.Tag);

@@ -117,7 +117,8 @@ export function TimelinesAndEventsPage() {
   const selectedTimeline: TimelineWithEventsDto | null = useMemo(
     () =>
       timelinesWithEvents?.find(
-        (timelinesWithEvent) => timelinesWithEvent.id === selectedTimelineAndEvent.selectedTimelineId
+        (timelinesWithEvent) =>
+          timelinesWithEvent.id === selectedTimelineAndEvent.selectedTimelineId
       ) || null,
     [timelinesWithEvents, selectedTimelineAndEvent.selectedTimelineId]
   );
@@ -159,10 +160,9 @@ export function TimelinesAndEventsPage() {
             for (const event of selectedTimelineEvents) {
               await deleteTag({ path: { id: event.id } });
             }
-            toast(
-              selectedTimelineEvents.length > 1 ? 'Tags were deleted' : 'Tag was deleted',
-              { type: 'success' }
-            );
+            toast(selectedTimelineEvents.length > 1 ? 'Tags were deleted' : 'Tag was deleted', {
+              type: 'success',
+            });
           })();
         } else {
           toast('No tag was selected', { type: 'warning' });
@@ -316,9 +316,7 @@ export function TimelinesAndEventsPage() {
               {!selectedTimeline?.events?.length ? null : (
                 <EventsTotalsTable
                   className="c-events-totals-table"
-                  events={
-                    selectedEvents.length >= 2 ? selectedEvents : selectedTimeline.events
-                  }
+                  events={selectedEvents.length >= 2 ? selectedEvents : selectedTimeline.events}
                   timelineType={selectedTimeline.type}
                   onEditTag={(eventId) =>
                     navigate(
@@ -386,7 +384,12 @@ export function TimelinesAndEventsPage() {
             icon={<Plus size={14} />}
             onClick={() =>
               navigate(
-                '/' + ROUTE_PARTS.timelinesAndEvents + '/' + ROUTE_PARTS.create + '?date=' + dateParam
+                '/' +
+                  ROUTE_PARTS.timelinesAndEvents +
+                  '/' +
+                  ROUTE_PARTS.create +
+                  '?date=' +
+                  dateParam
               )
             }
             title="Create tag"

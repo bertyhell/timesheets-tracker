@@ -205,7 +205,10 @@ export function ProductiveTimesheetDropdown({
         }
       : undefined;
 
-  const rows = useMemo(() => flattenTree(tree, expanded, isSearching), [tree, expanded, isSearching]);
+  const rows = useMemo(
+    () => flattenTree(tree, expanded, isSearching),
+    [tree, expanded, isSearching]
+  );
 
   // The panel lives outside the root in the portal, so both are passed as "inside" — otherwise
   // clicking within the panel would count as clicking away.
@@ -398,7 +401,10 @@ export function ProductiveTimesheetDropdown({
             <X size={13} />
           </span>
         )}
-        <ChevronDown size={14} className={`c-productive-dropdown__chevron${open ? ' is-open' : ''}`} />
+        <ChevronDown
+          size={14}
+          className={`c-productive-dropdown__chevron${open ? ' is-open' : ''}`}
+        />
       </button>
 
       {open &&
@@ -416,94 +422,103 @@ export function ProductiveTimesheetDropdown({
               maxHeight: panelPos.maxHeight,
             }}
           >
-          <input
-            ref={searchRef}
-            type="text"
-            className="c-productive-dropdown__search"
-            placeholder="Type to search"
-            autoComplete="off"
-            spellCheck={false}
-            value={search}
-            onChange={(evt) => {
-              setSearch(evt.target.value);
-              setActiveIndex(-1);
-            }}
-          />
+            <input
+              ref={searchRef}
+              type="text"
+              className="c-productive-dropdown__search"
+              placeholder="Type to search"
+              autoComplete="off"
+              spellCheck={false}
+              value={search}
+              onChange={(evt) => {
+                setSearch(evt.target.value);
+                setActiveIndex(-1);
+              }}
+            />
 
-          <div className="c-productive-dropdown__list" role="tree" ref={listRef}>
-            {loading && <div className="c-productive-dropdown__message">Loading services…</div>}
+            <div className="c-productive-dropdown__list" role="tree" ref={listRef}>
+              {loading && <div className="c-productive-dropdown__message">Loading services…</div>}
 
-            {!loading && isError && (
-              <div className="c-productive-dropdown__message">
-                {error instanceof Error ? error.message : 'Failed to load services.'}{' '}
-                <button type="button" className="c-productive-dropdown__link" onClick={() => refetch()}>
-                  Retry
-                </button>
-              </div>
-            )}
-
-            {!loading && !isError && rows.length === 0 && (
-              <div className="c-productive-dropdown__message">No services found</div>
-            )}
-
-            {!loading &&
-              !isError &&
-              rows.map((row, index) => {
-                const { node } = row;
-                const isSelected = node.kind === 'service' && node.id === value;
-                return (
-                  <div
-                    key={row.key}
-                    role="treeitem"
-                    aria-level={row.level}
-                    aria-expanded={row.hasChildren ? row.expanded : undefined}
-                    aria-selected={node.selectable ? isSelected : undefined}
-                    data-row-index={index}
-                    className={[
-                      'c-productive-dropdown__row',
-                      `is-${node.kind}`,
-                      index === activeIndex ? 'is-active' : '',
-                      isSelected ? 'is-selected' : '',
-                    ]
-                      .filter(Boolean)
-                      .join(' ')}
-                    style={{ paddingLeft: `${0.25 + (row.level - 1) * 1.125}rem` }}
-                    onMouseEnter={() => setActiveIndex(index)}
-                    onClick={() => (node.selectable ? select(node) : row.hasChildren && toggle(row.key))}
+              {!loading && isError && (
+                <div className="c-productive-dropdown__message">
+                  {error instanceof Error ? error.message : 'Failed to load services.'}{' '}
+                  <button
+                    type="button"
+                    className="c-productive-dropdown__link"
+                    onClick={() => refetch()}
                   >
-                    <span className="c-productive-dropdown__caret">
-                      {row.hasChildren &&
-                        (row.expanded ? <ChevronDown size={13} /> : <ChevronRight size={13} />)}
-                    </span>
-                    <span className="c-productive-dropdown__icon">{nodeIcon(node)}</span>
-                    <span className="c-productive-dropdown__label">{node.label}</span>
-                    {node.kind === 'service' && (
-                      <span className="c-productive-dropdown__meta">
-                        {formatHours(node.workedMinutes)} / {formatHours(node.budgetedMinutes)}
-                        <ProgressRing worked={node.workedMinutes} budgeted={node.budgetedMinutes} />
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
-          </div>
+                    Retry
+                  </button>
+                </div>
+              )}
 
-          <div className="c-productive-dropdown__footer">
-            <button
-              type="button"
-              className="c-productive-dropdown__link"
-              onClick={() => setExpanded(new Set())}
-            >
-              Collapse all
-            </button>
-            <button
-              type="button"
-              className="c-productive-dropdown__link"
-              onClick={() => setExpanded(new Set(allExpandableKeys(tree)))}
-            >
-              Expand all
-            </button>
-          </div>
+              {!loading && !isError && rows.length === 0 && (
+                <div className="c-productive-dropdown__message">No services found</div>
+              )}
+
+              {!loading &&
+                !isError &&
+                rows.map((row, index) => {
+                  const { node } = row;
+                  const isSelected = node.kind === 'service' && node.id === value;
+                  return (
+                    <div
+                      key={row.key}
+                      role="treeitem"
+                      aria-level={row.level}
+                      aria-expanded={row.hasChildren ? row.expanded : undefined}
+                      aria-selected={node.selectable ? isSelected : undefined}
+                      data-row-index={index}
+                      className={[
+                        'c-productive-dropdown__row',
+                        `is-${node.kind}`,
+                        index === activeIndex ? 'is-active' : '',
+                        isSelected ? 'is-selected' : '',
+                      ]
+                        .filter(Boolean)
+                        .join(' ')}
+                      style={{ paddingLeft: `${0.25 + (row.level - 1) * 1.125}rem` }}
+                      onMouseEnter={() => setActiveIndex(index)}
+                      onClick={() =>
+                        node.selectable ? select(node) : row.hasChildren && toggle(row.key)
+                      }
+                    >
+                      <span className="c-productive-dropdown__caret">
+                        {row.hasChildren &&
+                          (row.expanded ? <ChevronDown size={13} /> : <ChevronRight size={13} />)}
+                      </span>
+                      <span className="c-productive-dropdown__icon">{nodeIcon(node)}</span>
+                      <span className="c-productive-dropdown__label">{node.label}</span>
+                      {node.kind === 'service' && (
+                        <span className="c-productive-dropdown__meta">
+                          {formatHours(node.workedMinutes)} / {formatHours(node.budgetedMinutes)}
+                          <ProgressRing
+                            worked={node.workedMinutes}
+                            budgeted={node.budgetedMinutes}
+                          />
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+            </div>
+
+            <div className="c-productive-dropdown__footer">
+              <button
+                type="button"
+                className="c-productive-dropdown__link"
+                onClick={() => setExpanded(new Set())}
+              >
+                Collapse all
+              </button>
+              <button
+                type="button"
+                className="c-productive-dropdown__link"
+                onClick={() => setExpanded(new Set(allExpandableKeys(tree)))}
+              >
+                Expand all
+              </button>
+            </div>
           </div>,
           document.body
         )}

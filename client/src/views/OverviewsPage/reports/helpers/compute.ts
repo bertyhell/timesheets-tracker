@@ -15,7 +15,12 @@ import {
   TimeBucket,
   type ValueUnit,
 } from '../report.types';
-import { DIMENSION_LABELS, DIMENSION_SOURCE_TYPE, getDimensionValue, getDimensionColor } from './dimensions';
+import {
+  DIMENSION_LABELS,
+  DIMENSION_SOURCE_TYPE,
+  getDimensionValue,
+  getDimensionColor,
+} from './dimensions';
 import {
   applyTopN,
   indexRowsByDimension,
@@ -81,7 +86,9 @@ export function computeDistribution(context: ReportContext): ReportResult {
     kind: 'series',
     categories: entries.map((entry) => entry.label),
     categoryColors: entries.map((entry) =>
-      entry.label === OTHER_LABEL ? '#9ca3af' : getDimensionColor(entry.label, dimension, rowsByLabel)
+      entry.label === OTHER_LABEL
+        ? '#9ca3af'
+        : getDimensionColor(entry.label, dimension, rowsByLabel)
     ),
     series: [
       {
@@ -123,7 +130,10 @@ function bucketKeyOfStart(row: OverviewFlatRowDto, kind: BucketKind, bucket: Tim
   return WEEKDAY_LABELS[(start.getDay() + 6) % 7];
 }
 
-function bucketCategories(context: ReportContext, kind: BucketKind): { keys: string[]; labels: string[] } {
+function bucketCategories(
+  context: ReportContext,
+  kind: BucketKind
+): { keys: string[]; labels: string[] } {
   if (kind === 'hourOfDay') return { keys: HOUR_LABELS, labels: HOUR_LABELS };
   if (kind === 'weekday') return { keys: WEEKDAY_LABELS, labels: WEEKDAY_LABELS };
   const keys = enumerateBuckets(context.startedAt, context.endedAt, context.options.bucket);
@@ -217,9 +227,7 @@ function buildSeries(
   const { options } = context;
 
   if (!splitDimension) {
-    return [
-      { name: singleSeriesName, data: totalsBySeries.get('Total') ?? zeros(bucketCount) },
-    ];
+    return [{ name: singleSeriesName, data: totalsBySeries.get('Total') ?? zeros(bucketCount) }];
   }
 
   const totals: LabelledTotal[] = [...totalsBySeries].map(([label, values]) => ({
@@ -270,7 +278,12 @@ function computeUniquePerBucket(
   return {
     kind: 'series',
     categories: labels,
-    series: [{ name: 'Distinct ' + DIMENSION_LABELS[dimension].toLowerCase() + 's', data: seen.map((set) => set.size) }],
+    series: [
+      {
+        name: 'Distinct ' + DIMENSION_LABELS[dimension].toLowerCase() + 's',
+        data: seen.map((set) => set.size),
+      },
+    ],
     valueUnit: 'count',
     categoryLabel: bucketCategoryLabel(context, config.kind),
     categoriesAreTimeBuckets: config.kind === 'time',
@@ -362,7 +375,8 @@ export function computeCalendar(context: ReportContext): ReportResult {
   for (const row of rows) {
     if (context.options.metric === ReportMetric.Hours) {
       for (const slice of splitIntervalByBucket(row.startedAt, row.endedAt, TimeBucket.Day)) {
-        if (totals.has(slice.key)) totals.set(slice.key, (totals.get(slice.key) ?? 0) + slice.hours);
+        if (totals.has(slice.key))
+          totals.set(slice.key, (totals.get(slice.key) ?? 0) + slice.hours);
       }
     } else {
       const key = format(parseISO(row.startedAt), 'yyyy-MM-dd');
@@ -373,7 +387,10 @@ export function computeCalendar(context: ReportContext): ReportResult {
   return {
     kind: 'calendar',
     days: [...totals].map(([date, value]) => ({ date, value })),
-    range: [days[0] ?? format(new Date(), 'yyyy-MM-dd'), days.at(-1) ?? format(new Date(), 'yyyy-MM-dd')],
+    range: [
+      days[0] ?? format(new Date(), 'yyyy-MM-dd'),
+      days.at(-1) ?? format(new Date(), 'yyyy-MM-dd'),
+    ],
     valueUnit: unitFor(context.options.metric),
     categoryLabel: 'Day',
   };
@@ -385,7 +402,8 @@ export function computeCoverage(context: ReportContext): ReportResult {
   const { options } = context;
   const minHours = options.minDurationSeconds / 3600;
   const trackedRows = context.rows.filter(
-    (row) => row.sourceType === DIMENSION_SOURCE_TYPE[options.dimension] && row.durationHours >= minHours
+    (row) =>
+      row.sourceType === DIMENSION_SOURCE_TYPE[options.dimension] && row.durationHours >= minHours
   );
   const tagRows = context.rows.filter((row) => row.sourceType === OverviewSourceType.Tag);
 
@@ -440,8 +458,7 @@ export function computeWorkdaySpan(context: ReportContext): ReportResult {
   const first: (number | null)[] = days.map(() => null);
   const last: (number | null)[] = days.map(() => null);
 
-  const hourOfDay = (date: Date) =>
-    (date.getTime() - startOfDay(date).getTime()) / MS_PER_HOUR;
+  const hourOfDay = (date: Date) => (date.getTime() - startOfDay(date).getTime()) / MS_PER_HOUR;
 
   for (const row of rows) {
     const start = parseISO(row.startedAt);
@@ -450,7 +467,10 @@ export function computeWorkdaySpan(context: ReportContext): ReportResult {
     const startHour = hourOfDay(start);
     const end = parseISO(row.endedAt);
     // An event running past midnight still ends "that day" as far as the workday span goes.
-    const endHour = Math.min(24, hourOfDay(start) + (end.getTime() - start.getTime()) / MS_PER_HOUR);
+    const endHour = Math.min(
+      24,
+      hourOfDay(start) + (end.getTime() - start.getTime()) / MS_PER_HOUR
+    );
     if (first[index] === null || startHour < (first[index] as number)) first[index] = startHour;
     if (last[index] === null || endHour > (last[index] as number)) last[index] = endHour;
   }
@@ -481,8 +501,7 @@ export function computeTopSessions(context: ReportContext): ReportResult {
   if (!sessions.length) return emptySeriesResult(DIMENSION_LABELS[options.dimension], 'hours');
 
   const rowsByLabel = indexRowsByDimension(rows, options.dimension);
-  const ordered =
-    options.sort === SortMode.ValueAsc ? [...sessions].reverse() : sessions;
+  const ordered = options.sort === SortMode.ValueAsc ? [...sessions].reverse() : sessions;
 
   return {
     kind: 'series',

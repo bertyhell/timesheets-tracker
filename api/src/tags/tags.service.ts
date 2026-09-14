@@ -163,9 +163,17 @@ export class TagsService {
 
   async update(id: string, updateTagDto: UpdateTagDto): Promise<Tag> {
     try {
-      if (updateTagDto.tagNameId == null && updateTagDto.startedAt == null && updateTagDto.endedAt == null) {
+      if (
+        updateTagDto.tagNameId == null &&
+        updateTagDto.startedAt == null &&
+        updateTagDto.endedAt == null
+      ) {
         // Only the note is being updated (e.g. rewriting the note before syncing to Productive)
-        await updateTagNote(this.databaseService.getDb(), { note: updateTagDto.note ?? null }, { id });
+        await updateTagNote(
+          this.databaseService.getDb(),
+          { note: updateTagDto.note ?? null },
+          { id }
+        );
       } else if (updateTagDto.tagNameId == null) {
         // Only time fields are being updated (e.g. from a resize drag)
         await updateTagTime(

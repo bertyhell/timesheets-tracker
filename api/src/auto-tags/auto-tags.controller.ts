@@ -54,7 +54,10 @@ export class AutoTagsController {
     return this.tagNamesService.findOne(id);
   }
 
-  @ApiOkResponse({ description: 'Merge all auto-tag rules that share the same tag name', type: AutoTagMergeResultDto })
+  @ApiOkResponse({
+    description: 'Merge all auto-tag rules that share the same tag name',
+    type: AutoTagMergeResultDto,
+  })
   @Post('merge-duplicates')
   mergeDuplicates(): Promise<AutoTagMergeResultDto> {
     return this.tagNamesService.mergeDuplicates();

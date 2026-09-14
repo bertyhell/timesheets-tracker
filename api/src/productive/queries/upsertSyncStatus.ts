@@ -32,5 +32,11 @@ export function upsertSyncStatus(
 	`;
   return db
     .prepare(sql)
-    .run(params.tagNameId, params.date, data.status, data.entries, data.syncedAt) as UpsertSyncStatusResult;
+    .run(
+      params.tagNameId,
+      params.date,
+      data.status,
+      data.entries,
+      data.syncedAt
+    ) as UpsertSyncStatusResult;
 }

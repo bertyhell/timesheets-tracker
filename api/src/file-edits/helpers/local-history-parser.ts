@@ -95,7 +95,11 @@ function isPlausiblePath(buffer: Buffer, start: number, length: number): boolean
  * revision's content is stored out of line or inline, and which one a record uses cannot be told
  * up front — so variant A is tried first and variant B is the fallback.
  */
-function readRecordTail(buffer: Buffer, offset: number, now: number): [value: number, next: number] | null {
+function readRecordTail(
+  buffer: Buffer,
+  offset: number,
+  now: number
+): [value: number, next: number] | null {
   // Variant A: a 4-byte content id, then the timestamp.
   const direct = readTime(buffer, offset + 4);
   if (direct && isPlausibleTime(direct[0], now)) return direct;
@@ -141,7 +145,11 @@ export function parseLocalHistory(buffer: Buffer, now: number = Date.now()): Raw
     }
 
     const [length, pathStart] = pathLength;
-    if (length < MIN_PATH_LENGTH || length > MAX_PATH_LENGTH || pathStart + length > buffer.length) {
+    if (
+      length < MIN_PATH_LENGTH ||
+      length > MAX_PATH_LENGTH ||
+      pathStart + length > buffer.length
+    ) {
       offset++;
       continue;
     }

@@ -27,9 +27,10 @@ import type {
   TimelineDto,
   TimelineEventDto,
 } from '../../generated/api/types.gen';
-import { getColorForEvent, getColorFromString, getDarkerTextColor, getRandomColor } from './helpers/getColorForEvent';
+import { getColorFromString, getRandomColor } from './helpers/getColorForEvent';
 import { getTicks } from './helpers/getTicks';
-import { getEventLabel } from './helpers/getEventLabel';
+import type { PreparedEvent } from './helpers/prepareEvents';
+import { cullAndMergeEvents, summarizeMergedEvents } from './helpers/cullAndMergeEvents';
 import { formatMatchedCondition } from './helpers/formatMatchedCondition';
 import {
   getMostProminentConditions,
@@ -65,7 +66,7 @@ interface ContextMenuState {
 
 interface TimelineProps {
   timelineInfo: TimelineDto;
-  events: TimelineEventDto[];
+  events: PreparedEvent[];
   minTime: Date;
   maxTime: Date;
   onMouseDown: (timelineId: string, posX: number) => void;
@@ -73,7 +74,11 @@ interface TimelineProps {
   onMouseUp: (timelineId: string, posX: number, eventId: string | null) => void;
   onMouseLeave?: () => void;
   selectionPercentages: { start: number; end: number } | null;
-  snapPointPercents: number[];
+  /**
+   * Snap targets as absolute timestamps rather than percentages, so panning and zooming do not
+   * rebuild a list that is as long as the event count.
+   */
+  snapPointTimesMs: number[];
   hoverPercent: number | null;
   onCreateTagName: (data: { title: string; code: string; color: string }) => Promise<TagName>;
   onCreateTag: (tagNameId: string) => Promise<void>;
@@ -88,26 +93,42 @@ interface TimelineProps {
   onCreateTagFromEvent?: (startedAt: string, endedAt: string) => void;
   onCreateTagFromAutoTagEvent?: (event: TimelineEventDto) => void;
   onCreateAutoTagRuleFromEvent?: (conditions: ProminentCondition[]) => void;
+  onGrowAutoTags?: () => void;
   onRefreshEvents?: () => void;
 }
 
-function findSnap(posX: number, snapPoints: number[], trackWidthPx: number): number | null {
-  if (trackWidthPx === 0 || snapPoints.length === 0) return null;
-  const thresholdPercent = (10 / trackWidthPx) * 100;
-  let closestDist = Infinity;
-  let closestSnap = posX;
-  for (const snap of snapPoints) {
-    const dist = Math.abs(posX - snap);
-    if (dist < closestDist) {
-      closestDist = dist;
-      closestSnap = snap;
-    }
-  }
-  return closestDist <= thresholdPercent ? closestSnap : null;
+interface SnapContext {
+  snapTimesMs: number[];
+  windowStartMs: number;
+  windowMs: number;
+  trackWidthPx: number;
 }
 
-function applySnap(posX: number, snapPoints: number[], trackWidthPx: number): number {
-  return findSnap(posX, snapPoints, trackWidthPx) ?? posX;
+/**
+ * Nearest snap target to `posX` (a percentage of the track), as a percentage again, or null when
+ * nothing is within 10 pixels. Snap targets live in time space, so the comparison happens there
+ * and only the result is converted back.
+ */
+function findSnap(posX: number, snap: SnapContext): number | null {
+  const { snapTimesMs, windowStartMs, windowMs, trackWidthPx } = snap;
+  if (trackWidthPx === 0 || snapTimesMs.length === 0 || windowMs <= 0) return null;
+  const thresholdMs = (10 / trackWidthPx) * windowMs;
+  const posMs = windowStartMs + (posX / 100) * windowMs;
+  let closestDist = Infinity;
+  let closestSnapMs = posMs;
+  for (const snapMs of snapTimesMs) {
+    const dist = Math.abs(posMs - snapMs);
+    if (dist < closestDist) {
+      closestDist = dist;
+      closestSnapMs = snapMs;
+    }
+  }
+  if (closestDist > thresholdMs) return null;
+  return ((closestSnapMs - windowStartMs) / windowMs) * 100;
+}
+
+function applySnap(posX: number, snap: SnapContext): number {
+  return findSnap(posX, snap) ?? posX;
 }
 
 function Timeline({
@@ -120,7 +141,7 @@ function Timeline({
   onMouseUp,
   onMouseLeave: onMouseLeaveProp,
   selectionPercentages,
-  snapPointPercents,
+  snapPointTimesMs,
   hoverPercent,
   onCreateTagName,
   onCreateTag,
@@ -135,6 +156,7 @@ function Timeline({
   onCreateTagFromEvent,
   onCreateTagFromAutoTagEvent,
   onCreateAutoTagRuleFromEvent,
+  onGrowAutoTags,
   onRefreshEvents,
 }: TimelineProps) {
   const navigate = useNavigate();
@@ -166,7 +188,11 @@ function Timeline({
   };
   const trackRef = useRef<HTMLDivElement>(null);
   const [trackWidth, setTrackWidth] = useState(0);
-  const [pendingCreate, setPendingCreate] = useState<{ title: string; code: string; color: string } | null>(null);
+  const [pendingCreate, setPendingCreate] = useState<{
+    title: string;
+    code: string;
+    color: string;
+  } | null>(null);
 
   useEffect(() => {
     const el = trackRef.current;
@@ -178,6 +204,10 @@ function Timeline({
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
+
+  // Membership is tested once per bar per render, so the list is turned into a set rather than
+  // scanned for every event on the timeline.
+  const selectedEventIdSet = useMemo(() => new Set(selectedEventIds), [selectedEventIds]);
 
   useEffect(() => {
     if (timelineInfo.timelineType !== TimelineType.Tag || !onDeleteTag) return;
@@ -191,29 +221,28 @@ function Timeline({
           (activeEl as HTMLElement).isContentEditable)
       )
         return;
-      const ownSelectedEvents = events.filter((ev) => selectedEventIds.includes(ev.id));
+      const ownSelectedEvents = events.filter((ev) => selectedEventIdSet.has(ev.id));
       if (!ownSelectedEvents.length) return;
       ownSelectedEvents.forEach((ev) => onDeleteTag(ev.id));
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [timelineInfo.timelineType, onDeleteTag, selectedEventIds, events]);
+  }, [timelineInfo.timelineType, onDeleteTag, selectedEventIdSet, events]);
 
   const lastSelectedEventIdRef = useRef<string | null>(null);
 
   const handleSelectEvent = (clickEvent: MouseEvent, event: TimelineEventDto) => {
-    const ownSelectedIds = events
-      .filter((ev) => selectedEventIds.includes(ev.id))
-      .map((ev) => ev.id);
+    const ownSelectedIds = events.filter((ev) => selectedEventIdSet.has(ev.id)).map((ev) => ev.id);
 
     if (clickEvent.shiftKey && lastSelectedEventIdRef.current) {
-      const anchorIndex = events.findIndex((ev) => ev.id === lastSelectedEventIdRef.current);
-      const clickedIndex = events.findIndex((ev) => ev.id === event.id);
+      // Ranges run over the bars on screen, which is what the user drew the range across
+      const anchorIndex = visibleEvents.findIndex((ev) => ev.id === lastSelectedEventIdRef.current);
+      const clickedIndex = visibleEvents.findIndex((ev) => ev.id === event.id);
       if (anchorIndex !== -1 && clickedIndex !== -1) {
         const from = Math.min(anchorIndex, clickedIndex);
         const to = Math.max(anchorIndex, clickedIndex);
         setSelectedEventIds(
-          events.slice(from, to + 1).map((ev) => ev.id),
+          visibleEvents.slice(from, to + 1).map((ev) => ev.id),
           timelineInfo
         );
         return;
@@ -255,6 +284,38 @@ function Timeline({
   };
 
   const windowInMilliseconds = differenceInMilliseconds(maxTime, minTime);
+  const windowStartMs = minTime.getTime();
+
+  const snapContext: SnapContext = {
+    snapTimesMs: snapPointTimesMs,
+    windowStartMs,
+    windowMs: windowInMilliseconds,
+    trackWidthPx: trackWidth,
+  };
+
+  // Tags and auto tags are edited one by one — resizing, deleting and editing all need the bar to
+  // stand for exactly one event — and there are few enough of them that merging buys nothing.
+  const canMergeEvents =
+    timelineInfo.timelineType !== TimelineType.Tag &&
+    timelineInfo.timelineType !== TimelineType.AutoTag;
+
+  // Only the bars that fall inside the zoomed window are rendered, and neighbouring bars that the
+  // current zoom cannot keep apart are drawn as one. At day zoom this turns thousands of DOM
+  // nodes into a couple of hundred without changing what the user sees.
+  const visibleEvents = useMemo(
+    () =>
+      cullAndMergeEvents(
+        events,
+        windowStartMs,
+        windowStartMs + windowInMilliseconds,
+        trackWidth,
+        canMergeEvents
+      ),
+    [events, windowStartMs, windowInMilliseconds, trackWidth, canMergeEvents]
+  );
+
+  // Floor for the bar width so a very short event still leaves a mark instead of vanishing
+  const minWidthPercent = trackWidth > 0 ? (1 / trackWidth) * 100 : 0;
 
   const selectionStartTime = addMilliseconds(
     minTime,
@@ -287,7 +348,7 @@ function Timeline({
     if (posX < 0 || posX > 100) {
       return;
     }
-    onMouseDown(timelineInfo.id, applySnap(posX, snapPointPercents, trackWidth));
+    onMouseDown(timelineInfo.id, applySnap(posX, snapContext));
   };
 
   const handleMouseMove = (evt: MouseEvent) => {
@@ -296,10 +357,10 @@ function Timeline({
       return;
     }
     if (resizeState) {
-      setResizeCurrentPosX(applySnap(posX, snapPointPercents, trackWidth));
+      setResizeCurrentPosX(applySnap(posX, snapContext));
       return;
     }
-    const snapped = findSnap(posX, snapPointPercents, trackWidth);
+    const snapped = findSnap(posX, snapContext);
     onMouseMove(timelineInfo.id, snapped ?? posX, snapped);
   };
 
@@ -308,8 +369,7 @@ function Timeline({
       const rawPosX = getMousePositionXPercent(evt);
       const posX = applySnap(
         rawPosX >= 0 && rawPosX <= 100 ? rawPosX : (resizeCurrentPosX ?? 0),
-        snapPointPercents,
-        trackWidth
+        snapContext
       );
       const originalEndMs = differenceInMilliseconds(
         parseISO(resizeState.originalEndedAt),
@@ -347,7 +407,7 @@ function Timeline({
     ) {
       return;
     }
-    onMouseUp(timelineInfo.id, applySnap(posX, snapPointPercents, trackWidth), eventId);
+    onMouseUp(timelineInfo.id, applySnap(posX, snapContext), eventId);
   };
 
   const handleMouseLeave = () => {
@@ -361,7 +421,10 @@ function Timeline({
   const handleContextMenu = (e: MouseEvent, eventId: string) => {
     e.preventDefault();
     e.stopPropagation();
-    const event = events.find((ev) => ev.id === eventId);
+    // Look the event up among the bars on screen, so acting on a merged bar covers the whole
+    // stretch it represents rather than just the first event inside it.
+    const event =
+      visibleEvents.find((ev) => ev.id === eventId) ?? events.find((ev) => ev.id === eventId);
     if (!event) return;
     setContextMenu({
       x: e.clientX,
@@ -412,9 +475,7 @@ function Timeline({
   // Derive a consistent dot color for the timeline label from its title (or use configured color)
   const timelineDotColor = timelineInfo.color
     ? timelineInfo.color
-    : events[0]
-      ? getColorForEvent(timelineInfo, events[0])
-      : getColorFromString(timelineInfo.title);
+    : (events[0]?.color ?? getColorFromString(timelineInfo.title));
 
   const hourTicks = useMemo(() => getTicks(minTime, maxTime, 60), [minTime, maxTime]);
   const quarterTicks = useMemo(() => getTicks(minTime, maxTime, 15), [minTime, maxTime]);
@@ -478,21 +539,13 @@ function Timeline({
 
           {/* Hover / snap indicator */}
           {hoverPercent !== null && (
-            <div
-              className="c-timeline__hover-indicator"
-              style={{ left: hoverPercent + '%' }}
-            />
+            <div className="c-timeline__hover-indicator" style={{ left: hoverPercent + '%' }} />
           )}
 
           {/* Events */}
-          {events.map((event) => {
-            const startPercent =
-              (differenceInMilliseconds(parseISO(event.startedAt), minTime) /
-                windowInMilliseconds) *
-              100;
-            const endPercent =
-              (differenceInMilliseconds(parseISO(event.endedAt), minTime) / windowInMilliseconds) *
-              100;
+          {visibleEvents.map((event) => {
+            const startPercent = ((event.startMs - windowStartMs) / windowInMilliseconds) * 100;
+            const endPercent = ((event.endMs - windowStartMs) / windowInMilliseconds) * 100;
 
             // Apply visual override when this event is being resized
             let effectiveLeft = startPercent;
@@ -506,151 +559,166 @@ function Timeline({
             }
 
             const widthPercent = effectiveRight - effectiveLeft;
-            const width = widthPercent + '%';
+            // A bar thinner than a pixel would not show up at all, so it is nudged up to one
+            const width = Math.max(widthPercent, minWidthPercent) + '%';
             const pixelWidth = (widthPercent / 100) * trackWidth;
             const isNarrow = pixelWidth <= 40;
 
-            const eventInfo = event.info as Record<string, string | number | boolean>;
-            const label = getEventLabel(timelineInfo, event);
-            const timeRange = `${format(parseISO(event.startedAt), 'HH:mm')} - ${format(parseISO(event.endedAt), 'HH:mm')}`;
-            const color = getColorForEvent(timelineInfo, event);
+            const { label, color, textColor, timeRange } = event;
             const isTagTimeline = timelineInfo.timelineType === TimelineType.Tag && !!onTagResized;
-            const isAutoTagTimeline = timelineInfo.timelineType === TimelineType.AutoTag;
-            const autoTagInfo = isAutoTagTimeline
-              ? (event.info as AutoTagEventInfoDto)
-              : null;
-            const matchedConditions = autoTagInfo?.matchedConditions ?? [];
-            const isProductiveTimeline = timelineInfo.timelineType === TimelineType.Productive;
-            const isDimmed =
-              !!lowerSearch && !JSON.stringify(event).toLowerCase().includes(lowerSearch);
+            const isDimmed = !!lowerSearch && !event.haystack.includes(lowerSearch);
 
             return (
               <Tooltip
                 key={'c-timeline__' + timelineInfo.title + '__event__tippy__' + event.id}
-                content={
-                  <ul
-                    className="c-timeline__event__tooltip"
-                    key={
-                      'c-timeline__' + timelineInfo.title + '__event__tippy__ul__' + event.id
-                    }
-                  >
-                    <li>
-                      <b>Date:</b> {format(roundToNearestMinutes(parseISO(event.startedAt)), 'HH:mm')} -{' '}
-                      {format(roundToNearestMinutes(parseISO(event.endedAt)), 'HH:mm')} (
-                      {formatDuration(
-                        differenceInSeconds(parseISO(event.endedAt), parseISO(event.startedAt))
+                content={() => {
+                  const eventInfo = event.info as Record<string, string | number | boolean>;
+                  const isAutoTagTimeline = timelineInfo.timelineType === TimelineType.AutoTag;
+                  const autoTagInfo = isAutoTagTimeline
+                    ? (event.info as AutoTagEventInfoDto)
+                    : null;
+                  const matchedConditions = autoTagInfo?.matchedConditions ?? [];
+                  const isProductiveTimeline =
+                    timelineInfo.timelineType === TimelineType.Productive;
+                  const merged = event.mergedFrom ? summarizeMergedEvents(event.mergedFrom) : null;
+                  return (
+                    <ul
+                      className="c-timeline__event__tooltip"
+                      key={'c-timeline__' + timelineInfo.title + '__event__tippy__ul__' + event.id}
+                    >
+                      <li>
+                        <b>Date:</b>{' '}
+                        {format(roundToNearestMinutes(parseISO(event.startedAt)), 'HH:mm')} -{' '}
+                        {format(roundToNearestMinutes(parseISO(event.endedAt)), 'HH:mm')} (
+                        {formatDuration(
+                          differenceInSeconds(parseISO(event.endedAt), parseISO(event.startedAt))
+                        )}
+                        )
+                      </li>
+                      {merged && !!merged.entries.length && (
+                        <li className="c-timeline__event__tooltip__conditions">
+                          <b>Merged {event.mergedFrom!.length} events:</b>
+                          <ul>
+                            {merged.entries.map((entry) => (
+                              <li key={'c-timeline__merged__' + event.id + '__' + entry.detail}>
+                                {entry.detail} (
+                                {formatDuration(Math.round(entry.durationMs / 1000))})
+                              </li>
+                            ))}
+                            {!!merged.remaining && <li>and {merged.remaining} more</li>}
+                          </ul>
+                        </li>
                       )}
-                      )
-                    </li>
-                    {isTagTimeline ? (
-                      <>
-                        <li>
-                          <b>Name:</b> {getEventLabel(timelineInfo, event)}
-                        </li>
-                        {(event.info as any).note && (
+                      {isTagTimeline ? (
+                        <>
                           <li>
-                            <b>Note:</b> {(event.info as any).note}
+                            <b>Name:</b> {label}
                           </li>
-                        )}
-                      </>
-                    ) : isAutoTagTimeline ? (
-                      <>
-                        <li>
-                          <b>Title:</b> {String(eventInfo['tagNameTitle'] ?? '')}
-                        </li>
-                        <li>
-                          <b>Priority:</b> {String(eventInfo['priority'] ?? '')}
-                        </li>
-                        {autoTagInfo?.tagNameNote && (
+                          {(event.info as any).note && (
+                            <li>
+                              <b>Note:</b> {(event.info as any).note}
+                            </li>
+                          )}
+                        </>
+                      ) : isAutoTagTimeline ? (
+                        <>
                           <li>
-                            <b>Note:</b> {autoTagInfo.tagNameNote}
+                            <b>Title:</b> {String(eventInfo['tagNameTitle'] ?? '')}
                           </li>
-                        )}
-                        {!!matchedConditions.length && (
-                          <li className="c-timeline__event__tooltip__conditions">
-                            <b>{matchedConditions.length > 1 ? 'Conditions' : 'Condition'}:</b>
-                            <ul>
-                              {matchedConditions.map((condition, conditionIndex) => (
-                                <li
-                                  key={
-                                    'c-timeline__' +
-                                    timelineInfo.title +
-                                    '__event__' +
-                                    event.id +
-                                    '__condition__' +
-                                    conditionIndex
-                                  }
-                                >
-                                  {formatMatchedCondition(condition)}
-                                </li>
-                              ))}
-                            </ul>
-                          </li>
-                        )}
-                      </>
-                    ) : isProductiveTimeline ? (
-                      <>
-                        <li>
-                          <b>Note:</b> {String(eventInfo['tagNameName'] ?? '')}
-                        </li>
-                        {eventInfo['serviceName'] && (
                           <li>
-                            <b>Service:</b> {String(eventInfo['serviceName'])}
+                            <b>Priority:</b> {String(eventInfo['priority'] ?? '')}
                           </li>
-                        )}
-                        {eventInfo['serviceProject'] && (
+                          {autoTagInfo?.tagNameNote && (
+                            <li>
+                              <b>Note:</b> {autoTagInfo.tagNameNote}
+                            </li>
+                          )}
+                          {!!matchedConditions.length && (
+                            <li className="c-timeline__event__tooltip__conditions">
+                              <b>{matchedConditions.length > 1 ? 'Conditions' : 'Condition'}:</b>
+                              <ul>
+                                {matchedConditions.map((condition, conditionIndex) => (
+                                  <li
+                                    key={
+                                      'c-timeline__' +
+                                      timelineInfo.title +
+                                      '__event__' +
+                                      event.id +
+                                      '__condition__' +
+                                      conditionIndex
+                                    }
+                                  >
+                                    {formatMatchedCondition(condition)}
+                                  </li>
+                                ))}
+                              </ul>
+                            </li>
+                          )}
+                        </>
+                      ) : isProductiveTimeline ? (
+                        <>
                           <li>
-                            <b>Project:</b> {String(eventInfo['serviceProject'])}
+                            <b>Note:</b> {String(eventInfo['tagNameName'] ?? '')}
                           </li>
-                        )}
-                        {eventInfo['dealName'] && (
-                          <li>
-                            <b>Deal:</b> {String(eventInfo['dealName'])}
-                          </li>
-                        )}
-                        {eventInfo['companyName'] && (
-                          <li>
-                            <b>Company:</b> {String(eventInfo['companyName'])}
-                          </li>
-                        )}
-                      </>
-                    ) : (
-                      Object.keys(eventInfo)
-                        .filter((key) => {
-                          const val = eventInfo[key];
-                          if (val === '' || val === null || val === undefined) return false;
-                          if (key === 'allDay' && val === false) return false;
-                          return true;
-                        })
-                        .map((key) => (
-                          <li
-                            key={
-                              'c-timeline__' +
-                              timelineInfo.title +
-                              '__event__' +
-                              event.startedAt +
-                              '__info__' +
-                              key +
-                              '__' +
-                              eventInfo[key]
-                            }
-                          >
-                            <b>{key}</b>:{' '}
-                            {typeof eventInfo[key] === 'boolean'
-                              ? eventInfo[key]
-                                ? 'active'
-                                : 'inactive'
-                              : eventInfo[key]}
-                          </li>
-                        ))
-                    )}
-                  </ul>
-                }
+                          {eventInfo['serviceName'] && (
+                            <li>
+                              <b>Service:</b> {String(eventInfo['serviceName'])}
+                            </li>
+                          )}
+                          {eventInfo['serviceProject'] && (
+                            <li>
+                              <b>Project:</b> {String(eventInfo['serviceProject'])}
+                            </li>
+                          )}
+                          {eventInfo['dealName'] && (
+                            <li>
+                              <b>Deal:</b> {String(eventInfo['dealName'])}
+                            </li>
+                          )}
+                          {eventInfo['companyName'] && (
+                            <li>
+                              <b>Company:</b> {String(eventInfo['companyName'])}
+                            </li>
+                          )}
+                        </>
+                      ) : (
+                        Object.keys(eventInfo)
+                          .filter((key) => {
+                            const val = eventInfo[key];
+                            if (val === '' || val === null || val === undefined) return false;
+                            if (key === 'allDay' && val === false) return false;
+                            return true;
+                          })
+                          .map((key) => (
+                            <li
+                              key={
+                                'c-timeline__' +
+                                timelineInfo.title +
+                                '__event__' +
+                                event.startedAt +
+                                '__info__' +
+                                key +
+                                '__' +
+                                eventInfo[key]
+                              }
+                            >
+                              <b>{key}</b>:{' '}
+                              {typeof eventInfo[key] === 'boolean'
+                                ? eventInfo[key]
+                                  ? 'active'
+                                  : 'inactive'
+                                : eventInfo[key]}
+                            </li>
+                          ))
+                      )}
+                    </ul>
+                  );
+                }}
               >
                 <div
                   className={
                     'c-timeline__event' +
-                    (selectedEventIds.includes(event.id) ? ' c-timeline__event--selected' : '') +
+                    (selectedEventIdSet.has(event.id) ? ' c-timeline__event--selected' : '') +
                     (isNarrow ? ' c-timeline__event--narrow' : '') +
                     (isDimmed ? ' c-timeline__event--dimmed' : '')
                   }
@@ -669,7 +737,7 @@ function Timeline({
                 >
                   {!isNarrow && (
                     <div className="c-timeline__event-content">
-                      <span className="c-timeline__event-label" style={{ color: getDarkerTextColor(color) }}>
+                      <span className="c-timeline__event-label" style={{ color: textColor }}>
                         {label}
                       </span>
                       <span className="c-timeline__event-time">{timeRange}</span>
@@ -732,7 +800,11 @@ function Timeline({
                   <TagSelectSingle value={null} onChange={handleTagNameChange} autoFocus />
                 </ul>
               }
-              visible={!!selectionPercentages.start && !!selectionPercentages.end && !selectedEventIds.length}
+              visible={
+                !!selectionPercentages.start &&
+                !!selectionPercentages.end &&
+                !selectedEventIds.length
+              }
               placement="top-end"
             >
               <div
@@ -780,14 +852,14 @@ function Timeline({
               ? // An auto tag already carries its tag name, note and time range,
                 // so the tag is created straight away without asking for anything else
                 onCreateTagFromAutoTagEvent &&
-                  (contextMenu.event.info as AutoTagEventInfoDto)?.tagNameId
-                  ? [
-                      {
-                        label: 'Create tag',
-                        onClick: () => onCreateTagFromAutoTagEvent(contextMenu.event),
-                      },
-                    ]
-                  : []
+                (contextMenu.event.info as AutoTagEventInfoDto)?.tagNameId
+                ? [
+                    {
+                      label: 'Create tag',
+                      onClick: () => onCreateTagFromAutoTagEvent(contextMenu.event),
+                    },
+                  ]
+                : []
               : onCreateTagFromEvent && contextMenu.eventStartedAt && contextMenu.eventEndedAt
                 ? [
                     {
@@ -807,8 +879,22 @@ function Timeline({
                   {
                     label: 'Create autotag rule',
                     onClick: () => {
-                      const conditions = getMostProminentConditions(timelineInfo, contextMenu.event);
+                      const conditions = getMostProminentConditions(
+                        timelineInfo,
+                        contextMenu.event
+                      );
                       onCreateAutoTagRuleFromEvent(conditions);
+                    },
+                  },
+                ]
+              : []),
+            ...(timelineInfo.timelineType === TimelineType.AutoTag && onGrowAutoTags
+              ? [
+                  {
+                    label: 'Grow auto tags',
+                    onClick: () => {
+                      setContextMenu(null);
+                      onGrowAutoTags();
                     },
                   },
                 ]
@@ -843,8 +929,27 @@ function Timeline({
           position={titleContextMenu}
           items={[
             { label: 'Edit timeline', onClick: handleEditFromTitleContextMenu },
+            ...(timelineInfo.timelineType === TimelineType.AutoTag && onGrowAutoTags
+              ? [
+                  {
+                    label: 'Grow auto tags',
+                    onClick: () => {
+                      setTitleContextMenu(null);
+                      onGrowAutoTags();
+                    },
+                  },
+                ]
+              : []),
             ...(onRefreshEvents
-              ? [{ label: 'Refresh events', onClick: () => { setTitleContextMenu(null); onRefreshEvents(); } }]
+              ? [
+                  {
+                    label: 'Refresh events',
+                    onClick: () => {
+                      setTitleContextMenu(null);
+                      onRefreshEvents();
+                    },
+                  },
+                ]
               : []),
             ...((timelineInfo.timelineType === TimelineType.Tag ||
               timelineInfo.timelineType === TimelineType.AutoTag) &&

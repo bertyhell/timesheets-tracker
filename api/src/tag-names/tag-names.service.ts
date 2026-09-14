@@ -25,6 +25,8 @@ export class TagNamesService {
       code: rawTagName.code,
       color: rawTagName.color,
       note: rawTagName.note ?? null,
+      // Sqlite has no boolean type, so the column round-trips as 0 / 1
+      canGrow: !!rawTagName.canGrow,
     };
   }
 
@@ -85,6 +87,8 @@ export class TagNamesService {
         code: tagName.code ?? null,
         color: tagName.color,
         note: tagName.note ?? null,
+        // Growing is the useful default: a tag has to be opted out of it, not into it
+        canGrow: (tagName.canGrow ?? true) ? 1 : 0,
       });
 
       return await this.findOne(id);
@@ -111,6 +115,7 @@ export class TagNamesService {
           code: updateTagDto.code !== undefined ? updateTagDto.code : existing.code,
           color: updateTagDto.color ?? existing.color,
           note: updateTagDto.note !== undefined ? updateTagDto.note : (existing.note ?? null),
+          canGrow: (updateTagDto.canGrow ?? existing.canGrow) ? 1 : 0,
         },
         { id }
       );

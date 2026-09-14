@@ -13,7 +13,8 @@ export class OverviewsController {
   constructor(private readonly overviewsService: OverviewsService) {}
 
   @ApiOkResponse({
-    description: 'Get flat, per-event rows for the given date range and source types, ready to feed a pivot table',
+    description:
+      'Get flat, per-event rows for the given date range and source types, ready to feed a pivot table',
     type: OverviewFlatRowDto,
     isArray: true,
   })
@@ -59,7 +60,10 @@ export class OverviewsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSavedOverviewConfigDto: UpdateSavedOverviewConfigDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateSavedOverviewConfigDto: UpdateSavedOverviewConfigDto
+  ) {
     return this.overviewsService.update(id, updateSavedOverviewConfigDto);
   }
 

@@ -7,7 +7,11 @@ export class DeleteEventsAfterDto {
   @ApiProperty({ type: Number, nullable: true, description: 'Numeric amount, e.g. 6' })
   numeric: number | null;
 
-  @ApiProperty({ enum: DeleteEventsAfterUnit, nullable: true, description: 'Unit for the numeric amount' })
+  @ApiProperty({
+    enum: DeleteEventsAfterUnit,
+    nullable: true,
+    description: 'Unit for the numeric amount',
+  })
   unit: DeleteEventsAfterUnit | null;
 
   @ApiProperty({

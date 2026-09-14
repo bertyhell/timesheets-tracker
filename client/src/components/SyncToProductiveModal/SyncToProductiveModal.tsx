@@ -227,8 +227,13 @@ function buildPlannedEntries(row: SyncRow, serviceId: string): PlannedEntry[] {
 }
 
 /** The stored outcome for a planned entry, matched on the service and note it was booked under. */
-function findEntryStatus(status: SyncStatus | undefined, entry: PlannedEntry): SyncStatusEntry | undefined {
-  return status?.entries.find((stored) => stored.serviceId === entry.serviceId && stored.note === entry.note);
+function findEntryStatus(
+  status: SyncStatus | undefined,
+  entry: PlannedEntry
+): SyncStatusEntry | undefined {
+  return status?.entries.find(
+    (stored) => stored.serviceId === entry.serviceId && stored.note === entry.note
+  );
 }
 
 /**
@@ -329,7 +334,12 @@ function SyncRowItem({
           size="row"
           label={`Include ${row.name} in the next sync`}
           title="Sync all entries for this tag"
-          onToggle={() => onToggleEntries(plannedEntries.map((entry) => entry.key), !allIncluded)}
+          onToggle={() =>
+            onToggleEntries(
+              plannedEntries.map((entry) => entry.key),
+              !allIncluded
+            )
+          }
         />
 
         <div className="c-sync-row__chevron-cell">
@@ -487,10 +497,11 @@ export function SyncToProductiveModal({
   const plannedByTagNameId = useMemo(() => {
     const map = new Map<string, PlannedEntry[]>();
     for (const row of rows) {
-      const entries = buildPlannedEntries(row, selection[row.tagNameId]?.serviceId ?? '').map((entry) =>
-        // The key keeps the note the entry was grouped under, so an edit renames what is booked
-        // without splitting the entry or losing its tick.
-        entry.key in noteOverrides ? { ...entry, note: noteOverrides[entry.key] } : entry
+      const entries = buildPlannedEntries(row, selection[row.tagNameId]?.serviceId ?? '').map(
+        (entry) =>
+          // The key keeps the note the entry was grouped under, so an edit renames what is booked
+          // without splitting the entry or losing its tick.
+          entry.key in noteOverrides ? { ...entry, note: noteOverrides[entry.key] } : entry
       );
       map.set(row.tagNameId, entries);
     }
@@ -588,7 +599,10 @@ export function SyncToProductiveModal({
     [queuedEntries]
   );
 
-  const allEntries = useMemo(() => Array.from(plannedByTagNameId.values()).flat(), [plannedByTagNameId]);
+  const allEntries = useMemo(
+    () => Array.from(plannedByTagNameId.values()).flat(),
+    [plannedByTagNameId]
+  );
 
   // "Select all" flips to "Deselect all" once everything mappable is already ticked.
   const allSelected = allEntries.length > 0 && queuedEntries.length === allEntries.length;
@@ -598,7 +612,10 @@ export function SyncToProductiveModal({
   const failedEntryKeys = useMemo(
     () =>
       allEntries
-        .filter((entry) => findEntryStatus(statusByTagNameId.get(entry.tagNameId), entry)?.status === 'failed')
+        .filter(
+          (entry) =>
+            findEntryStatus(statusByTagNameId.get(entry.tagNameId), entry)?.status === 'failed'
+        )
         .map((entry) => entry.key),
     [allEntries, statusByTagNameId]
   );
@@ -632,7 +649,6 @@ export function SyncToProductiveModal({
     : canSync
       ? `Will book ${formatMinutes(selectedMinutes)} to Productive`
       : 'Tick at least one entry to sync';
-
 
   const handleSync = async () => {
     setIsSyncing(true);
@@ -692,12 +708,16 @@ export function SyncToProductiveModal({
 
       // Drop the cached tag names so the next opening prefills from the codes
       // just written instead of the pre-sync snapshot.
-      await queryClient.invalidateQueries({ queryKey: tagNamesControllerFindAllOptions({ query: { term: '' } }).queryKey });
+      await queryClient.invalidateQueries({
+        queryKey: tagNamesControllerFindAllOptions({ query: { term: '' } }).queryKey,
+      });
       // Pull the statuses this sync just wrote so the icons and the accordions update in place.
       await queryClient.invalidateQueries({ queryKey: ['productive', 'sync-status', date] });
 
       // What landed is now booked, so untick it; what failed stays ticked for a retry.
-      const statusById = new Map(result.results.map((entryResult) => [entryResult.id, entryResult.status]));
+      const statusById = new Map(
+        result.results.map((entryResult) => [entryResult.id, entryResult.status])
+      );
       setIncludedKeys((prev) => {
         const next = { ...prev };
         for (const [id, status] of statusById) next[id] = status !== 'created';
@@ -705,9 +725,12 @@ export function SyncToProductiveModal({
       });
 
       if (result.failed === 0) {
-        toast(`Synced ${result.created} time ${result.created === 1 ? 'entry' : 'entries'} to Productive`, {
-          type: 'success',
-        });
+        toast(
+          `Synced ${result.created} time ${result.created === 1 ? 'entry' : 'entries'} to Productive`,
+          {
+            type: 'success',
+          }
+        );
         onClose();
         return;
       }
@@ -771,11 +794,12 @@ export function SyncToProductiveModal({
           <AlertTriangle size={18} />
           <div>
             <strong>
-              {report.created} of {report.created + report.failed} entries booked — {report.failed} failed.
+              {report.created} of {report.created + report.failed} entries booked — {report.failed}{' '}
+              failed.
             </strong>{' '}
             <span>
-              Failed entries stay ticked so you can fix the mapping and sync again — the ones that landed are
-              unticked.
+              Failed entries stay ticked so you can fix the mapping and sync again — the ones that
+              landed are unticked.
             </span>
           </div>
         </div>
@@ -784,7 +808,12 @@ export function SyncToProductiveModal({
       <div className="c-sync-toolbar">
         <div className="c-sync-toolbar__summary">{selectionSummary}</div>
         <div className="c-sync-toolbar__actions">
-          <button type="button" className="c-sync-chip" onClick={handleSelectAll} disabled={allEntries.length === 0}>
+          <button
+            type="button"
+            className="c-sync-chip"
+            onClick={handleSelectAll}
+            disabled={allEntries.length === 0}
+          >
             {allSelected ? 'Deselect all' : 'Select all'}
           </button>
           {failedEntryKeys.length > 0 && (

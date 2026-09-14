@@ -7,7 +7,9 @@ export function getWebsiteDomain(websiteUrl: string): string {
     return hostname || websiteUrl;
   } catch (err) {
     console.error(
-      new CustomError('Failed to parse website URL while deriving domain for Overviews', err, { websiteUrl })
+      new CustomError('Failed to parse website URL while deriving domain for Overviews', err, {
+        websiteUrl,
+      })
     );
     return websiteUrl;
   }

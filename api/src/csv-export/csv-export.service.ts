@@ -37,9 +37,10 @@ export class CsvExportService {
       delimiter: this.parseDelimiter(delimiter),
       // Anything that was never written reads as the default, so a fresh install exports a normal
       // headered file rather than a bare one.
-      includeHeader: includeHeader === null || includeHeader === undefined
-        ? DEFAULT_INCLUDE_HEADER
-        : includeHeader === 'true',
+      includeHeader:
+        includeHeader === null || includeHeader === undefined
+          ? DEFAULT_INCLUDE_HEADER
+          : includeHeader === 'true',
       fileNamePattern: fileNamePattern || DEFAULT_FILE_NAME_PATTERN,
       columns: findCsvExportColumns(db).map((column) => ({
         id: column.id,

@@ -49,28 +49,30 @@ export class GitCommitsService {
       const repoName = path.basename(repoPath);
       const rangeStart = new Date(startedAt).getTime();
       const rangeEnd = new Date(endedAt).getTime();
-      return trimmed
-        .split('\n')
-        .filter(Boolean)
-        .map((line): GitCommitEvent => {
-          const [dateStr, ...rest] = line.split('|');
-          const message = rest.join('|'); // subject (may contain '|' characters)
-          const commitTime = new Date(dateStr.trim()).getTime();
-          return {
-            id: uuid(),
-            repoName,
-            commitMessage: message.trim(),
-            startedAt: new Date(commitTime).toISOString(),
-            endedAt: new Date(commitTime + COMMIT_DURATION_MS).toISOString(),
-          };
-        })
-        // git's --since/--until filter on the commit date, but we place events on the
-        // author date (%ai). Rebased or cherry-picked commits therefore come back with an
-        // author date far outside the requested range, so drop those here.
-        .filter((commit) => {
-          const commitTime = new Date(commit.startedAt).getTime();
-          return commitTime >= rangeStart && commitTime < rangeEnd;
-        });
+      return (
+        trimmed
+          .split('\n')
+          .filter(Boolean)
+          .map((line): GitCommitEvent => {
+            const [dateStr, ...rest] = line.split('|');
+            const message = rest.join('|'); // subject (may contain '|' characters)
+            const commitTime = new Date(dateStr.trim()).getTime();
+            return {
+              id: uuid(),
+              repoName,
+              commitMessage: message.trim(),
+              startedAt: new Date(commitTime).toISOString(),
+              endedAt: new Date(commitTime + COMMIT_DURATION_MS).toISOString(),
+            };
+          })
+          // git's --since/--until filter on the commit date, but we place events on the
+          // author date (%ai). Rebased or cherry-picked commits therefore come back with an
+          // author date far outside the requested range, so drop those here.
+          .filter((commit) => {
+            const commitTime = new Date(commit.startedAt).getTime();
+            return commitTime >= rangeStart && commitTime < rangeEnd;
+          })
+      );
     } catch {
       // repo may not have commits in range or git may fail — silently skip
       return [];

@@ -219,7 +219,11 @@ export function EditTagModal() {
           <label>Tag name</label>
           <div className="flex flex-row gap-2 items-center">
             <div className="flex-1">
-              <TagSelectSingle value={selectedTagName} onChange={setSelectedTagName} autoFocus={true} />
+              <TagSelectSingle
+                value={selectedTagName}
+                onChange={setSelectedTagName}
+                autoFocus={true}
+              />
             </div>
             <Button
               variant={ButtonVariant.Secondary}

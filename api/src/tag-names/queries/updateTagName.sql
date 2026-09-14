@@ -3,5 +3,6 @@ SET
     title = :title,
     code = :code,
     color = :color,
-    note = :note
+    note = :note,
+    canGrow = :canGrow
 WHERE id = :id

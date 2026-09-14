@@ -25,7 +25,11 @@ function buildTiles(result: ReportResult): Tile[] {
         value: withData.length ? formatValue(total / withData.length, result.valueUnit) : '–',
       },
       best
-        ? { label: 'Busiest day', value: formatValue(best.value, result.valueUnit), hint: best.date }
+        ? {
+            label: 'Busiest day',
+            value: formatValue(best.value, result.valueUnit),
+            hint: best.date,
+          }
         : { label: 'Busiest day', value: '–' },
     ];
   }
@@ -79,7 +83,10 @@ function buildTiles(result: ReportResult): Tile[] {
       .filter((span): span is number => span !== null);
     return [
       { label: 'Days with data', value: String(spans.length) },
-      { label: 'Earliest start', value: nonEmpty.length ? formatValue(earliest, 'timeOfDay') : '–' },
+      {
+        label: 'Earliest start',
+        value: nonEmpty.length ? formatValue(earliest, 'timeOfDay') : '–',
+      },
       { label: 'Latest end', value: spans.length ? formatValue(latest, 'timeOfDay') : '–' },
       {
         label: 'Average span',

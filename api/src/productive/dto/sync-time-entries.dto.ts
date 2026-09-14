@@ -6,7 +6,8 @@ export class SyncTimeEntryDto {
   @IsString()
   @ApiProperty({
     type: String,
-    description: 'Client-generated id, echoed back on the result so each outcome can be matched to its entry',
+    description:
+      'Client-generated id, echoed back on the result so each outcome can be matched to its entry',
   })
   id: string;
 
@@ -51,10 +52,17 @@ export class SyncEntryResultDto {
   @ApiProperty({ type: String, description: 'The id supplied on the matching request entry' })
   id: string;
 
-  @ApiProperty({ enum: ['created', 'failed'], description: 'Whether Productive accepted this entry' })
+  @ApiProperty({
+    enum: ['created', 'failed'],
+    description: 'Whether Productive accepted this entry',
+  })
   status: 'created' | 'failed';
 
-  @ApiProperty({ type: String, required: false, description: "Productive's reason for rejecting the entry" })
+  @ApiProperty({
+    type: String,
+    required: false,
+    description: "Productive's reason for rejecting the entry",
+  })
   error?: string;
 }
 
@@ -65,6 +73,10 @@ export class SyncTimeEntriesResultDto {
   @ApiProperty({ type: Number, description: 'Number of time entries Productive rejected' })
   failed: number;
 
-  @ApiProperty({ type: SyncEntryResultDto, isArray: true, description: 'Per-entry outcome, in request order' })
+  @ApiProperty({
+    type: SyncEntryResultDto,
+    isArray: true,
+    description: 'Per-entry outcome, in request order',
+  })
   results: SyncEntryResultDto[];
 }

@@ -20,10 +20,7 @@ function isOneOf<T extends string>(value: unknown, allowed: readonly T[]): value
  * the report engine (or edited by hand) can hold anything, so every field falls back to the
  * report's own default instead of trusting the stored value.
  */
-export function resolveReportOptions(
-  report: ReportDefinition,
-  stored: unknown
-): ReportOptions {
+export function resolveReportOptions(report: ReportDefinition, stored: unknown): ReportOptions {
   const defaults = getReportDefaults(report);
   const raw = (stored ?? {}) as Partial<ReportOptions>;
 

@@ -20,7 +20,11 @@ export function Dropdown({ label, className, panelClassName, children }: Dropdow
 
   return (
     <div className={`c-dropdown${className ? ' ' + className : ''}`} ref={ref}>
-      <button type="button" className="c-dropdown__trigger" onClick={() => setOpen((prev) => !prev)}>
+      <button
+        type="button"
+        className="c-dropdown__trigger"
+        onClick={() => setOpen((prev) => !prev)}
+      >
         <span className="c-dropdown__trigger-label">{label}</span>
         <ChevronDown size={14} className={`c-dropdown__chevron${open ? ' is-open' : ''}`} />
       </button>

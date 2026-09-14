@@ -1,6 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export type ProductiveServiceTreeNodeKind = 'company' | 'project' | 'budget' | 'section' | 'service';
+export type ProductiveServiceTreeNodeKind =
+  | 'company'
+  | 'project'
+  | 'budget'
+  | 'section'
+  | 'service';
 
 export class ProductiveServiceTreeNodeDto {
   @ApiProperty({ type: String, description: 'Productive id of the resource this node represents' })
@@ -22,7 +27,11 @@ export class ProductiveServiceTreeNodeDto {
   @ApiProperty({ type: String, required: false, description: 'Company avatar (companies only)' })
   avatarUrl?: string;
 
-  @ApiProperty({ type: Number, required: false, description: 'Minutes already worked (services only)' })
+  @ApiProperty({
+    type: Number,
+    required: false,
+    description: 'Minutes already worked (services only)',
+  })
   workedMinutes?: number;
 
   @ApiProperty({ type: Number, required: false, description: 'Minutes budgeted (services only)' })

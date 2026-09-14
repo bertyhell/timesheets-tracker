@@ -37,7 +37,8 @@ export class FileEditsService {
    * Reading and parsing ~18MB costs around 120ms, which is cheap but not free when several
    * timelines refresh at once, and today's events can never be served from the day cache.
    */
-  private scanCache: { key: string; sessionsByDay: Map<string, FileEditSessionDto[]> } | null = null;
+  private scanCache: { key: string; sessionsByDay: Map<string, FileEditSessionDto[]> } | null =
+    null;
 
   /** Stale-version caches are dropped once per process, on the first scan that needs the db. */
   private hasPrunedStaleCaches = false;

@@ -18,5 +18,11 @@ export function upsertIntegration(db: DatabaseSync, params: UpsertIntegrationPar
       userId = excluded.userId,
       token = excluded.token
   `;
-  db.prepare(sql).run(params.type, params.baseUrl, params.organisationId, params.userId, params.token);
+  db.prepare(sql).run(
+    params.type,
+    params.baseUrl,
+    params.organisationId,
+    params.userId,
+    params.token
+  );
 }

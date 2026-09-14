@@ -99,19 +99,23 @@ interface ProductiveBooking {
 export class ProductiveService {
   constructor(
     private readonly integrationsService: IntegrationsService,
-    private readonly databaseService: DatabaseService,
+    private readonly databaseService: DatabaseService
   ) {}
 
-  async getEventsForDay(date: string, timelineId: string, clearCache = false): Promise<TimelineEventDto[]> {
+  async getEventsForDay(
+    date: string,
+    timelineId: string,
+    clearCache = false
+  ): Promise<TimelineEventDto[]> {
     const db = this.databaseService.getDb();
     // The `-v2` suffix retires the caches written before deal/company were
     // sideloaded, so old rows are not replayed without those names.
     const cacheKey = `${date}-v2`; // yyyy-MM-dd
 
     if (!clearCache) {
-      const cached = db.prepare(
-        'SELECT responseJson FROM cachedNetworkRequests WHERE cacheKey = ?'
-      ).get(cacheKey) as { responseJson: string } | undefined;
+      const cached = db
+        .prepare('SELECT responseJson FROM cachedNetworkRequests WHERE cacheKey = ?')
+        .get(cacheKey) as { responseJson: string } | undefined;
 
       if (cached) {
         const bookingsJson = JSON.parse(cached.responseJson) as Record<string, unknown>;
@@ -124,7 +128,9 @@ export class ProductiveService {
     const { baseUrl, organisationId, token, userId } = this.getIntegration();
 
     if (!userId) {
-      throw new Error('Productive user ID is not configured — fill in the User ID field in Settings → Integrations → Productive');
+      throw new Error(
+        'Productive user ID is not configured — fill in the User ID field in Settings → Integrations → Productive'
+      );
     }
 
     const headers = {
@@ -148,7 +154,7 @@ export class ProductiveService {
       throw new Error(`Productive bookings request failed: ${bookingsRes.status} — ${body}`);
     }
 
-    const bookingsJson = await bookingsRes.json() as Record<string, unknown>;
+    const bookingsJson = (await bookingsRes.json()) as Record<string, unknown>;
 
     const today = new Date();
     const todayKey = [
@@ -167,6 +173,14 @@ export class ProductiveService {
     const included: JsonApiResource[] = (bookingsJson.included as JsonApiResource[]) ?? [];
 
     return this.mapBookingsToEvents(bookings, included, date, timelineId);
+  }
+
+  /**
+   * A Productive timeline can exist without the integration being set up (yet). Callers use this to
+   * skip fetching instead of hitting a "not configured" error on every events request.
+   */
+  isConfigured(): boolean {
+    return !!this.integrationsService.findOne('productive');
   }
 
   private getIntegration() {
@@ -359,7 +373,10 @@ export class ProductiveService {
     return result;
   }
 
-  async createTimeEntries(date: string, entries: SyncTimeEntryDto[]): Promise<SyncTimeEntriesResultDto> {
+  async createTimeEntries(
+    date: string,
+    entries: SyncTimeEntryDto[]
+  ): Promise<SyncTimeEntriesResultDto> {
     if (entries.length === 0) {
       return { created: 0, failed: 0, results: [] };
     }
@@ -411,7 +428,9 @@ export class ProductiveService {
           results.push({
             id: entry.id,
             status: 'failed',
-            error: ProductiveService.describeJsonApiError(errorBody) ?? `${res.status} ${errorBody}`.trim(),
+            error:
+              ProductiveService.describeJsonApiError(errorBody) ??
+              `${res.status} ${errorBody}`.trim(),
           });
         }
       } catch (err) {
@@ -437,7 +456,11 @@ export class ProductiveService {
    *
    * An entry that merges several tags reports the same outcome to each of them.
    */
-  private recordSyncStatuses(date: string, entries: SyncTimeEntryDto[], results: SyncEntryResultDto[]): void {
+  private recordSyncStatuses(
+    date: string,
+    entries: SyncTimeEntryDto[],
+    results: SyncEntryResultDto[]
+  ): void {
     const resultById = new Map(results.map((result) => [result.id, result]));
     const byTagName = new Map<string, SyncStatusEntryDto[]>();
 
@@ -462,12 +485,22 @@ export class ProductiveService {
     const db = this.databaseService.getDb();
 
     for (const [tagNameId, statusEntries] of byTagName) {
-      const createdCount = statusEntries.filter((statusEntry) => statusEntry.status === 'created').length;
+      const createdCount = statusEntries.filter(
+        (statusEntry) => statusEntry.status === 'created'
+      ).length;
       const status: SyncStatusValue =
-        createdCount === statusEntries.length ? 'synced' : createdCount === 0 ? 'failed' : 'partial';
+        createdCount === statusEntries.length
+          ? 'synced'
+          : createdCount === 0
+            ? 'failed'
+            : 'partial';
 
       try {
-        upsertSyncStatus(db, { status, entries: JSON.stringify(statusEntries), syncedAt }, { tagNameId, date });
+        upsertSyncStatus(
+          db,
+          { status, entries: JSON.stringify(statusEntries), syncedAt },
+          { tagNameId, date }
+        );
       } catch (err) {
         // The time entries are already booked in Productive; losing the local
         // bookkeeping must not turn a successful sync into a failed request.
@@ -522,7 +555,9 @@ export class ProductiveService {
     // company hang off that service via `include=service.deal.company`.
     const collect = <T extends { id: string }>(type: string) =>
       new Map<string, T>(
-        included.filter((record) => record.type === type).map((record) => [record.id, record as unknown as T])
+        included
+          .filter((record) => record.type === type)
+          .map((record) => [record.id, record as unknown as T])
       );
     const serviceMap = collect<ProductiveServiceRecord>('services');
     const dealMap = collect<ProductiveDealRecord>('deals');
@@ -724,7 +759,10 @@ export class ProductiveService {
     ): TreeBucket => {
       let existing = parent.get(id);
       if (!existing) {
-        existing = { node: { id, kind, label, selectable: false, children: [], ...extra }, children: new Map() };
+        existing = {
+          node: { id, kind, label, selectable: false, children: [], ...extra },
+          children: new Map(),
+        };
         parent.set(id, existing);
       }
       return existing;

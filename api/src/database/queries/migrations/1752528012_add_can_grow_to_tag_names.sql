@@ -1,0 +1,1 @@
+ALTER TABLE tagNames ADD COLUMN canGrow integer NOT NULL DEFAULT 1;

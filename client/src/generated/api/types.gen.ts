@@ -128,6 +128,10 @@ export type CreateTagNameDto = {
      * Optional note for this tag name, copied to all tags created with it
      */
     note?: string;
+    /**
+     * Whether auto tags for this tag name may be stretched into neighbouring free time by the "grow auto tags" action
+     */
+    canGrow?: boolean;
 };
 
 export type TagNameDto = {
@@ -151,6 +155,10 @@ export type TagNameDto = {
      * Optional note for this tag name, copied to all tags created with it
      */
     note?: string;
+    /**
+     * Whether auto tags for this tag name may be stretched into neighbouring free time by the "grow auto tags" action
+     */
+    canGrow: boolean;
 };
 
 export type UpdateTagNameDto = {
@@ -170,6 +178,10 @@ export type UpdateTagNameDto = {
      * Optional note for this tag name, copied to all tags created with it
      */
     note?: string;
+    /**
+     * Whether auto tags for this tag name may be stretched into neighbouring free time by the "grow auto tags" action
+     */
+    canGrow?: boolean;
 };
 
 /**
@@ -652,6 +664,10 @@ export type AutoTagEventInfoDto = {
      * Optional note from the tag name definition
      */
     tagNameNote?: string | null;
+    /**
+     * Whether the tag name allows this auto tag to be stretched into neighbouring free time by the "grow auto tags" action
+     */
+    tagNameCanGrow: boolean;
     /**
      * Priority of the auto tag that produced this event
      */

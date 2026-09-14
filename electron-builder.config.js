@@ -92,7 +92,11 @@ module.exports = {
       { target: 'AppImage', arch: ['x64'] },
       { target: 'deb', arch: ['x64'] },
     ],
-    icon: 'icon/icon.png',
+    // A folder of pre-rendered sizes rather than icon/icon.png. That source is
+    // 1024x1024, and electron-builder installs a single png verbatim into
+    // hicolor/1024x1024/apps — a size the hicolor index does not even declare,
+    // so the desktop never finds an icon for the .desktop entry.
+    icon: 'icon/linux',
     category: 'Utility',
   },
 };

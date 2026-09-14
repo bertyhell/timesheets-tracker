@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
-import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiExtraModels, ApiOkResponse, ApiQuery, ApiTags, getSchemaPath } from '@nestjs/swagger';
 import { SettingsService } from './settings.service';
 import { SettingsResponseDto } from './dto/settings-response.dto';
 import { SwitchDatabaseDto } from './dto/switch-database.dto';
@@ -13,6 +13,7 @@ import {
 import { AutoMergeTagsDto, UpsertAutoMergeTagsDto } from './dto/auto-merge-tags.dto';
 
 @ApiTags('settings')
+@ApiExtraModels(SettingDto)
 @Controller('api/settings')
 export class SettingsController {
   constructor(private readonly settingsService: SettingsService) {}
@@ -23,7 +24,11 @@ export class SettingsController {
     return this.settingsService.getSettings();
   }
 
-  @ApiOkResponse({ type: SettingDto, nullable: true })
+  // `nullable` is not valid alongside `type` in @nestjs/swagger v11; express the
+  // nullable response through an explicit schema instead.
+  @ApiOkResponse({
+    schema: { allOf: [{ $ref: getSchemaPath(SettingDto) }], nullable: true },
+  })
   @Get('key/:key')
   getSettingByKey(@Param('key') key: string): SettingDto | null {
     return this.settingsService.getSettingByKey(key);

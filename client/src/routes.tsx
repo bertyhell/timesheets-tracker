@@ -17,6 +17,7 @@ import { GeneralSettingsPage } from './views/settings/GeneralSettingsPage/Genera
 import { AutoTagsSettingsPage } from './views/settings/AutoTagsSettingsPage/AutoTagsSettingsPage';
 import { IntegrationsPage } from './views/settings/IntegrationsPage/IntegrationsPage';
 import { UpdatesPage } from './views/settings/UpdatesPage/UpdatesPage';
+import { BackupSettingsPage } from './views/settings/BackupSettingsPage/BackupSettingsPage';
 import { ProductiveSettingsPage } from './views/settings/IntegrationsPage/ProductiveSettingsPage';
 import { JiraSettingsPage } from './views/settings/IntegrationsPage/JiraSettingsPage';
 import { ExcelCsvSettingsPage } from './views/settings/IntegrationsPage/ExcelCsvSettingsPage';
@@ -105,6 +106,10 @@ export const routes: RouteObject[] = [
           {
             path: ROUTE_PARTS.integrations + '/' + ROUTE_PARTS.excelCsv,
             element: <ExcelCsvSettingsPage />,
+          },
+          {
+            path: ROUTE_PARTS.backup,
+            element: <BackupSettingsPage />,
           },
           {
             path: ROUTE_PARTS.updates,

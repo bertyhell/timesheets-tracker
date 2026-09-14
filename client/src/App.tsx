@@ -42,6 +42,7 @@ export enum ROUTE_PARTS {
   jira = 'jira',
   excelCsv = 'excel-csv',
   updates = 'updates',
+  backup = 'backup',
 }
 
 const OVERVIEW_NAV = [{ to: ROUTE_PARTS.timelinesAndEvents, label: 'Overview', icon: BarChart2 }];

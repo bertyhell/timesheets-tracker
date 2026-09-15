@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
-import { ProgramsService } from './programs.service';
-import { ProgramsController } from './programs.controller';
+
 import { DatabaseModule } from '../database/database.module';
+import { ProgramsController } from './programs.controller';
 import { ProgramsListener } from './programs.listener';
+import { ProgramsService } from './programs.service';
 
 @Module({
   imports: [DatabaseModule],

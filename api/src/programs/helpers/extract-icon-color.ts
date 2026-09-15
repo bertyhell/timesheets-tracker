@@ -1,5 +1,6 @@
 import { FastAverageColor } from 'fast-average-color';
 import { PNG } from 'pngjs';
+
 import { CustomError } from '../../shared/CustomError';
 
 const fac = new FastAverageColor();

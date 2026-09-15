@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
-import { CalendarsService } from './calendars.service';
-import { CalendarsController } from './calendars.controller';
+
 import { DatabaseModule } from '../database/database.module';
+import { CalendarsController } from './calendars.controller';
+import { CalendarsService } from './calendars.service';
 
 @Module({
   imports: [DatabaseModule],

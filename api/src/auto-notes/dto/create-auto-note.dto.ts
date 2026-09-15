@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsArray, IsEnum, IsOptional, IsString } from 'class-validator';
+
 import { ConditionVariable } from '../../types/types';
 
 export class CreateAutoNoteDto {

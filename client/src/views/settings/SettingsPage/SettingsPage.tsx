@@ -1,6 +1,7 @@
+import { ArrowDownUp, Database, Plug, RefreshCw, Zap } from 'lucide-react';
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { ArrowDownUp, Database, Plug, RefreshCw, Zap } from 'lucide-react';
+
 import './SettingsPage.css';
 
 const NAV_ITEMS = [

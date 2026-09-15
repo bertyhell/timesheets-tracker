@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import * as ical from 'node-ical';
-import { CalendarEventDto } from './dto/calendar-event.dto';
-import { CustomError } from '../shared/CustomError';
 import { CalendarResponse } from 'node-ical';
+
+import { CustomError } from '../shared/CustomError';
+import { CalendarEventDto } from './dto/calendar-event.dto';
 
 type ICalEvent = {
   type: string;

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+
 import { uniqueName } from '../utils/unique-name';
 
 /**
@@ -9,7 +10,9 @@ import { uniqueName } from '../utils/unique-name';
  * parser or the store lookup starts throwing.
  */
 test.describe('File edits timeline', () => {
-  test('create a file edits timeline and render it without local history', async ({ page }, testInfo) => {
+  test('create a file edits timeline and render it without local history', async ({
+    page,
+  }, testInfo) => {
     const title = uniqueName('e2e-file-edits', testInfo);
 
     await test.step('create a FileEdit timeline', async () => {

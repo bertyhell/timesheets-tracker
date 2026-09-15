@@ -1,14 +1,12 @@
 import './EditAutoNoteModal.css';
-
+import { useMutation, useQuery } from '@tanstack/react-query';
 import React, { type ChangeEvent, useEffect, useMemo, useState } from 'react';
-import Button, { ButtonVariant } from '../Button/Button';
 import { Modal } from 'react-responsive-modal';
 import { useNavigate, useParams } from 'react-router-dom';
 import Select, { type ActionMeta, type OnChangeValue } from 'react-select';
 import { toast } from 'react-toastify';
 
 import { ROUTE_PARTS } from '../../App';
-import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   autoNotesControllerCreateMutation,
   autoNotesControllerFindOneOptions,
@@ -21,6 +19,7 @@ import { type SelectOption } from '../../helpers/select-option.types';
 // ConditionVariable used to be pulled from the repo-root types/ copy here as well, which had
 // drifted out of sync with this one; there is one client-side source for it now.
 import { type AutoNote, ConditionVariable, type TagName } from '../../types/types';
+import Button, { ButtonVariant } from '../Button/Button';
 import TagSelectMulti from '../TagSelect/TagSelectMulti';
 
 export function EditAutoNoteModal() {

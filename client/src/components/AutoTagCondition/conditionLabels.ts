@@ -1,7 +1,8 @@
 import type { GroupBase } from 'react-select';
 
-import { ConditionOperator, ConditionVariable } from '../../types/types';
 import type { SelectOption } from '../../helpers/select-option.types';
+
+import { ConditionOperator, ConditionVariable } from '../../types/types';
 
 /**
  * Human readable names for the raw enum values. The enums are API contract, the labels are

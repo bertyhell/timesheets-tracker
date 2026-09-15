@@ -9,6 +9,7 @@ import {
   startOfMonth,
   startOfWeek,
 } from 'date-fns';
+
 import { TimeBucket } from '../report.types';
 
 const MS_PER_HOUR = 3_600_000;

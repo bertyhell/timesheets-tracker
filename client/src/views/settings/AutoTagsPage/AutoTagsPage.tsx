@@ -1,23 +1,5 @@
-import { Modal } from 'react-responsive-modal';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import Button, { ButtonVariant } from '../../../components/Button/Button';
-import { PageHeader } from '../../../components/PageHeader/PageHeader';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import {
-  autoTagsControllerCreateMutation,
-  autoTagsControllerDeleteMutation,
-  autoTagsControllerFindAllOptions,
-  autoTagsControllerMergeDuplicatesMutation,
-} from '../../../generated/api/@tanstack/react-query.gen';
-import React, { type ReactNode, useCallback, useEffect, useState } from 'react';
-import { orderBy } from 'lodash-es';
-import { ROUTE_PARTS } from '../../../App';
-import { toast } from 'react-toastify';
-import { type AutoTag } from '../../../types/types';
-import copy from 'copy-to-clipboard';
-import { mapLimit } from 'blend-promise-utils';
-import type { AutoTagConditionDto, AutoTagDto } from '../../../generated/api/types.gen';
-import { SearchInput } from '../../../components/SearchInput/SearchInput';
+import type { DragEndEvent, DragStartEvent, DragOverEvent } from '@dnd-kit/core';
+
 import {
   DndContext,
   closestCenter,
@@ -26,15 +8,36 @@ import {
   useSensors,
   DragOverlay,
 } from '@dnd-kit/core';
-import type { DragEndEvent, DragStartEvent, DragOverEvent } from '@dnd-kit/core';
 import {
   SortableContext,
   useSortable,
   verticalListSortingStrategy,
   arrayMove,
 } from '@dnd-kit/sortable';
-import { GripHandle } from '../../../components/GripHandle/GripHandle';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { mapLimit } from 'blend-promise-utils';
+import copy from 'copy-to-clipboard';
+import { orderBy } from 'lodash-es';
+import React, { type ReactNode, useCallback, useEffect, useState } from 'react';
+import { Modal } from 'react-responsive-modal';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
+import type { AutoTagConditionDto, AutoTagDto } from '../../../generated/api/types.gen';
+
 import { reorderAutoTags as reorderAutoTagsApi } from '../../../api/reorder';
+import { ROUTE_PARTS } from '../../../App';
+import Button, { ButtonVariant } from '../../../components/Button/Button';
+import { GripHandle } from '../../../components/GripHandle/GripHandle';
+import { PageHeader } from '../../../components/PageHeader/PageHeader';
+import { SearchInput } from '../../../components/SearchInput/SearchInput';
+import {
+  autoTagsControllerCreateMutation,
+  autoTagsControllerDeleteMutation,
+  autoTagsControllerFindAllOptions,
+  autoTagsControllerMergeDuplicatesMutation,
+} from '../../../generated/api/@tanstack/react-query.gen';
+import { type AutoTag } from '../../../types/types';
 
 const AUTOTAGS_PROPERTY_NAME_FOR_PASTE_DETECTION = 'timesheetTrackerAutoTags';
 

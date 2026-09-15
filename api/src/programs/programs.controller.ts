@@ -1,10 +1,12 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
-import { ProgramsService } from './programs.service';
-import { ProgramsListener } from './programs.listener';
-import type { Program } from '../types/types';
 import { ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { endOfDay, startOfDay } from 'date-fns';
+
+import type { Program } from '../types/types';
+
 import { ResponseProgramDto } from './dto/response-activity.dto';
+import { ProgramsListener } from './programs.listener';
+import { ProgramsService } from './programs.service';
 
 @ApiTags('programs')
 @Controller('api/programs')

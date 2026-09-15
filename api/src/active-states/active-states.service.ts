@@ -1,16 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { ActiveState } from '../types/types';
-import { DatabaseService } from '../database/database.service';
-import { v4 as uuid } from 'uuid';
-import { CreateActiveStateDto } from './dto/create-active-state.dto';
 import { unflatten } from 'nested-objects-util';
-import { UpdateActiveStateDto } from './dto/update-active-state.dto';
+import { v4 as uuid } from 'uuid';
+
+import type { ActiveState } from '../types/types';
+
+import { DatabaseService } from '../database/database.service';
 import { CustomError } from '../shared/CustomError';
+import { CreateActiveStateDto } from './dto/create-active-state.dto';
+import { UpdateActiveStateDto } from './dto/update-active-state.dto';
+import { createActiveState } from './queries/createActiveState';
+import { deleteActiveState } from './queries/deleteActiveState';
 import { findAllActiveStates } from './queries/findAllActiveStates';
 import { findOneActiveState } from './queries/findOneActiveState';
-import { createActiveState } from './queries/createActiveState';
 import { updateActiveState } from './queries/updateActiveState';
-import { deleteActiveState } from './queries/deleteActiveState';
 
 @Injectable()
 export class ActiveStatesService {

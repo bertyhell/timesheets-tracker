@@ -1,6 +1,4 @@
 import './Chart.css';
-import React, { useEffect, useRef } from 'react';
-import * as echarts from 'echarts/core';
 import { BarChart, HeatmapChart, LineChart, PieChart, TreemapChart } from 'echarts/charts';
 import {
   CalendarComponent,
@@ -10,7 +8,9 @@ import {
   TooltipComponent,
   VisualMapComponent,
 } from 'echarts/components';
+import * as echarts from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
+import React, { useEffect, useRef } from 'react';
 
 // Only the pieces the reports actually draw are registered, so the rest of ECharts
 // (maps, 3d, gl, graph/sankey/gauge/radar, ...) is tree-shaken out of the bundle.

@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+
 import { type OverviewFlatRow, OverviewSourceType } from '../../types/types';
 
 export class OverviewFlatRowDto implements OverviewFlatRow {

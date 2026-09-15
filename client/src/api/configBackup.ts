@@ -9,6 +9,15 @@
  */
 
 import { mapLimit } from 'blend-promise-utils';
+
+import type {
+  AutoNoteDto,
+  AutoTagConditionDto,
+  AutoTagDto,
+  TagNameDto,
+  TimelineDto,
+} from '../generated/api/types.gen';
+
 import {
   autoNotesControllerCreate,
   autoNotesControllerFindAll,
@@ -23,13 +32,6 @@ import {
   timelinesControllerFindAll,
   timelinesControllerUpdate,
 } from '../generated/api/sdk.gen';
-import type {
-  AutoNoteDto,
-  AutoTagConditionDto,
-  AutoTagDto,
-  TagNameDto,
-  TimelineDto,
-} from '../generated/api/types.gen';
 
 /** Wrapper key, also what identifies a file as one of ours. */
 export const CONFIG_BACKUP_KEY = 'timesheetTrackerConfig';

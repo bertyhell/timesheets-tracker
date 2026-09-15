@@ -1,29 +1,31 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
+
 import './EventsTotalsTable.css';
 import { parseISO } from 'date-fns';
-import { formatDuration } from '../../helpers/format-duration';
-import { orderBy } from 'lodash-es';
 import { useAtom } from 'jotai';
-import { searchTermAtom } from '../../store/store';
-import { ContextMenu } from '../ContextMenu/ContextMenu';
-import { contextMenuIcons } from '../ContextMenu/context-menu-icons';
+import { orderBy } from 'lodash-es';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+
 import {
-  ActiveStateEventInfoDto,
-  AutoTagEventInfoDto,
-  CalendarEventInfoDto,
-  GitCommitEventInfoDto,
-  FileEditEventInfoDto,
-  JiraEventInfoDto,
-  ProductiveEventInfoDto,
-  ProgramEventInfoDto,
-  TagEventInfoDto,
-  TimelineDto,
-  TimelineEventDto,
-  TimelineType,
-  WebsiteEventInfoDto,
+  type ActiveStateEventInfoDto,
+  type AutoTagEventInfoDto,
+  type CalendarEventInfoDto,
+  type GitCommitEventInfoDto,
+  type FileEditEventInfoDto,
+  type JiraEventInfoDto,
+  type ProductiveEventInfoDto,
+  type ProgramEventInfoDto,
+  type TagEventInfoDto,
+  type TimelineDto,
+  type TimelineEventDto,
+  type TimelineType,
+  type WebsiteEventInfoDto,
 } from '../../generated/api/types.gen';
+import { formatDuration } from '../../helpers/format-duration';
+import { searchTermAtom } from '../../store/store';
+import { contextMenuIcons } from '../ContextMenu/context-menu-icons';
+import { ContextMenu } from '../ContextMenu/ContextMenu';
 import { getColorForEvent } from '../Timeline/helpers/getColorForEvent';
-import { useVirtualizer } from '@tanstack/react-virtual';
 
 interface SortDescriptor {
   column: string;

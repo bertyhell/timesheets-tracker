@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { exec } from 'child_process';
-import { promisify } from 'util';
 import * as fg from 'fast-glob';
 import * as path from 'path';
+import { promisify } from 'util';
 import { v4 as uuid } from 'uuid';
+
 import { CustomError } from '../shared/CustomError';
 
 const execAsync = promisify(exec);

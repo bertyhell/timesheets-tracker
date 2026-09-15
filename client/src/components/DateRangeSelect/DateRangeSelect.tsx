@@ -1,10 +1,11 @@
 import './DateRangeSelect.css';
-import React from 'react';
 import { format, parseISO } from 'date-fns';
-import { DateRangeMode } from '../../types/types';
+import React from 'react';
+
 import { resolveDateRange } from '../../helpers/resolve-date-range';
-import { Dropdown } from '../Dropdown/Dropdown';
+import { DateRangeMode } from '../../types/types';
 import { DateField } from '../DateField/DateField';
+import { Dropdown } from '../Dropdown/Dropdown';
 
 // Custom is deliberately absent: typing in one of the two date fields is what makes a range
 // custom, so it never has to be picked from the list.

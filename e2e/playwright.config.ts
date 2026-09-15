@@ -16,7 +16,10 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI
-    ? [['html', { open: 'never', outputFolder: path.join(__dirname, '..', 'playwright-report') }], ['github']]
+    ? [
+        ['html', { open: 'never', outputFolder: path.join(__dirname, '..', 'playwright-report') }],
+        ['github'],
+      ]
     : 'list',
   use: {
     baseURL: 'http://localhost:55577',

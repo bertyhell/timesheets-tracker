@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { toast } from 'react-toastify';
 import {
   AlertCircle,
   CheckCircle2,
@@ -9,8 +7,11 @@ import {
   RefreshCw,
   RotateCw,
 } from 'lucide-react';
-import { PageHeader } from '../../../components/PageHeader/PageHeader';
+import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+
 import Button, { ButtonVariant } from '../../../components/Button/Button';
+import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import { appControllerStatus } from '../../../generated/api/sdk.gen';
 
 // Electron exposes the updater over the preload bridge. Outside Electron the

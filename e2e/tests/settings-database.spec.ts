@@ -1,7 +1,7 @@
+import { test, expect } from '@playwright/test';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { test, expect } from '@playwright/test';
 
 // This spec swaps out the ONE shared backend's active database file, which every other
 // test in the run depends on. It's routed to its own Playwright project

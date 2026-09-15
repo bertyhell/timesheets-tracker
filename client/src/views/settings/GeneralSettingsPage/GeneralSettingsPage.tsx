@@ -1,7 +1,12 @@
-import React, { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'react-toastify';
 import { ExternalLink, FolderOpen } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+
+import type { DeleteEventsAfterDto } from '../../../generated/api/types.gen';
+
+import Button, { ButtonVariant } from '../../../components/Button/Button';
+import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import {
   settingsControllerGetSettingsOptions,
   settingsControllerGetDeleteEventsAfterOptions,
@@ -11,11 +16,8 @@ import {
   settingsControllerClearDeleteEventsAfterMutation,
 } from '../../../generated/api/@tanstack/react-query.gen';
 import { client } from '../../../generated/api/client.gen';
-import type { DeleteEventsAfterDto } from '../../../generated/api/types.gen';
-import { PageHeader } from '../../../components/PageHeader/PageHeader';
-import Button, { ButtonVariant } from '../../../components/Button/Button';
-import { SwitchDatabaseModal } from './SwitchDatabaseModal/SwitchDatabaseModal';
 import { MoveDatabaseModal } from './MoveDatabaseModal/MoveDatabaseModal';
+import { SwitchDatabaseModal } from './SwitchDatabaseModal/SwitchDatabaseModal';
 
 const NEVER = 'never' as const;
 type DeleteEventsAfterUnitSelection = DeleteEventsAfterDto['unit'] | typeof NEVER;

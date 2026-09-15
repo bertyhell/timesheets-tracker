@@ -1,15 +1,14 @@
 import './MoveDatabaseModal.css';
-
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import { Modal } from 'react-responsive-modal';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 
+import Button, { ButtonVariant } from '../../../../components/Button/Button';
 import {
   settingsControllerGetSettingsQueryKey,
   settingsControllerMoveDatabaseMutation,
 } from '../../../../generated/api/@tanstack/react-query.gen';
-import Button, { ButtonVariant } from '../../../../components/Button/Button';
 
 const isElectron = typeof window.electron?.saveFile === 'function';
 

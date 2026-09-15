@@ -1,19 +1,20 @@
 import './NotesPage.css';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { orderBy } from 'lodash-es';
 import React, { type ReactNode, useEffect, useState } from 'react';
-import Button, { ButtonVariant } from '../../../components/Button/Button';
-import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
+import type { AutoNote } from '../../../types/types';
+
 import { ROUTE_PARTS } from '../../../App';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import Button, { ButtonVariant } from '../../../components/Button/Button';
+import { PageHeader } from '../../../components/PageHeader/PageHeader';
+import { SearchInput } from '../../../components/SearchInput/SearchInput';
 import {
   autoNotesControllerFindAllOptions,
   autoNotesControllerRemoveMutation,
 } from '../../../generated/api/@tanstack/react-query.gen';
-import type { AutoNote } from '../../../types/types';
-import { orderBy } from 'lodash-es';
-import { SearchInput } from '../../../components/SearchInput/SearchInput';
 
 // interface NotesPageProps {}
 

@@ -1,4 +1,5 @@
 import { parseISO } from 'date-fns';
+
 import type { AutoTagEventInfoDto, TimelineWithEventsDto } from '../generated/api/types.gen';
 
 /**

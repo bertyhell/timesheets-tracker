@@ -1,24 +1,26 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { orderBy } from 'lodash-es';
 import { differenceInSeconds, format, parseISO, roundToNearestMinutes } from 'date-fns';
-import { formatDuration } from '../../helpers/format-duration';
 import { useAtom } from 'jotai';
-import { searchTermAtom } from '../../store/store';
+import { orderBy } from 'lodash-es';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
 import type {
   TimelineDto,
   TimelineEventDto,
   TimelineWithEventsDto,
 } from '../../generated/api/types.gen';
-import { TimelineType } from '../Timeline/Timeline.types';
-import { ColumnDef } from './Table.types';
+
+import { formatDuration } from '../../helpers/format-duration';
+import { searchTermAtom } from '../../store/store';
+import { contextMenuIcons } from '../ContextMenu/context-menu-icons';
+import { ContextMenu } from '../ContextMenu/ContextMenu';
 import { getColorForEvent } from '../Timeline/helpers/getColorForEvent';
 import {
   getMostProminentConditions,
   type ProminentCondition,
 } from '../Timeline/helpers/getMostProminentConditions';
-import { ContextMenu } from '../ContextMenu/ContextMenu';
-import { contextMenuIcons } from '../ContextMenu/context-menu-icons';
+import { TimelineType } from '../Timeline/Timeline.types';
+import { type ColumnDef } from './Table.types';
 
 function copyEventToClipboard(event: TimelineEventDto) {
   const startStr = format(roundToNearestMinutes(parseISO(event.startedAt)), 'yyyy-MM-dd HH:mm');

@@ -1,5 +1,5 @@
-import { EventEmitter } from 'events';
 import dbus from 'dbus-next';
+import { EventEmitter } from 'events';
 
 const DBUS_DEST = 'org.gnome.Shell';
 const DBUS_PATH = '/org/gnome/shell/extensions/FocusedWindow';

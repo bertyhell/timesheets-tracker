@@ -1,19 +1,19 @@
-import { CreateAutoNoteDto } from './dto/create-auto-note.dto';
 import { Inject, Injectable } from '@nestjs/common';
+import { v4 as uuid } from 'uuid';
+
 import { DatabaseService } from '../database/database.service';
 import { CustomError } from '../shared/CustomError';
-import { v4 as uuid } from 'uuid';
 import { type AutoNote, ConditionVariable } from '../types/types';
+import { CreateAutoNoteDto } from './dto/create-auto-note.dto';
 import { UpdateAutoNoteDto } from './dto/update-auto-note.dto';
 import { countAutoNotes } from './queries/countAutoNotes';
 import { createAutoNote } from './queries/createAutoNote';
 import { deleteAutoNote } from './queries/deleteAutoNote';
-import { findAllAutoNotes } from './queries/findAllAutoNotes';
+import { findAllAutoNotes, FindAllAutoNotesResult } from './queries/findAllAutoNotes';
 import {
   findAllAutoNotesBySearchTerm,
   FindAllAutoNotesBySearchTermResult,
 } from './queries/findAllAutoNotesBySearchTerm';
-import { FindAllAutoNotesResult } from './queries/findAllAutoNotes';
 import { findOneAutoNote, FindOneAutoNoteResult } from './queries/findOneAutoNote';
 import { updateAutoNote } from './queries/updateAutoNote';
 

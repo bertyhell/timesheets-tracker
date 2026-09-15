@@ -1,5 +1,6 @@
 import RealIdle, { IdleState } from '@paymoapp/real-idle';
 import * as dbus from 'dbus-next';
+
 import { logger } from '../../shared/logger';
 
 const IDLE_STATE_TO_IS_ACTIVE: Record<string, boolean> = {

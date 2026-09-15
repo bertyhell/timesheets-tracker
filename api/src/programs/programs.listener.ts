@@ -1,11 +1,11 @@
 import { Inject, Injectable, type OnApplicationBootstrap } from '@nestjs/common';
 
-import { ProgramsService } from './programs.service';
-import { CreateProgramDto } from './dto/create-activity.dto';
-import { extractIconColor } from './helpers/extract-icon-color';
-import { createWindowListener } from './helpers/create-window-listener';
-import { type IWindowListener } from './helpers/window-listener.types';
 import { isActivityTrackingDisabled } from '../shared/is-activity-tracking-disabled';
+import { CreateProgramDto } from './dto/create-activity.dto';
+import { createWindowListener } from './helpers/create-window-listener';
+import { extractIconColor } from './helpers/extract-icon-color';
+import { type IWindowListener } from './helpers/window-listener.types';
+import { ProgramsService } from './programs.service';
 
 @Injectable()
 export class ProgramsListener implements OnApplicationBootstrap {

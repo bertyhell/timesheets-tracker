@@ -1,6 +1,8 @@
 import { parseISO } from 'date-fns';
+
 import type { OverviewFlatRowDto } from '../../../../api/overviews';
-import { Dimension, SortMode } from '../report.types';
+
+import { type Dimension, SortMode } from '../report.types';
 import { getDimensionValue } from './dimensions';
 
 export const OTHER_LABEL = 'Other';

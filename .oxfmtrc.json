@@ -1,8 +1,15 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
-  "ignorePatterns": ["client/src/generated"],
+  "ignorePatterns": [
+    "client/src/generated",
+    "client/src/**/queries/*.ts",
+    "**/*.json",
+    "**/*.md",
+    "**/*.yml",
+    "**/*.yaml"
+  ],
   "singleQuote": true,
   "trailingComma": "es5",
   "endOfLine": "lf",
-  "ignore": "client/src/**/queries/*.ts"
+  "experimentalSortImports": {}
 }

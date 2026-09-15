@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
+
 import { DatabaseService } from '../database/database.service';
 import { findSettingByKey } from '../settings/queries/findSettingByKey';
 import { upsertSetting } from '../settings/queries/upsertSetting';

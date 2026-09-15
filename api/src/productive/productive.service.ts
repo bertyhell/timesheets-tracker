@@ -1,23 +1,24 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
-import { IntegrationsService } from '../integrations/integrations.service';
+
 import { DatabaseService } from '../database/database.service';
+import { IntegrationsService } from '../integrations/integrations.service';
 import { TimelineEventDto } from '../timelines/dto/response-timeline-events.dto';
 import { ProductiveCompanyDto } from './dto/company.dto';
+import { ProductiveConnectionDto } from './dto/connection.dto';
 import { ProductiveDealDto } from './dto/deal.dto';
+import {
+  ProductiveServiceTreeNodeDto,
+  ProductiveServiceTreeNodeKind,
+} from './dto/service-tree.dto';
 import { ProductiveServiceDto } from './dto/service.dto';
+import { SyncStatusDto, SyncStatusEntryDto, SyncStatusValue } from './dto/sync-status.dto';
 import {
   SyncEntryResultDto,
   SyncTimeEntriesResultDto,
   SyncTimeEntryDto,
 } from './dto/sync-time-entries.dto';
-import { ProductiveConnectionDto } from './dto/connection.dto';
-import { SyncStatusDto, SyncStatusEntryDto, SyncStatusValue } from './dto/sync-status.dto';
 import { findSyncStatusesByDate } from './queries/findSyncStatusesByDate';
 import { upsertSyncStatus } from './queries/upsertSyncStatus';
-import {
-  ProductiveServiceTreeNodeDto,
-  ProductiveServiceTreeNodeKind,
-} from './dto/service-tree.dto';
 
 /** Carries Productive's error text through to the HTTP response. */
 class BadGatewayLikeError extends HttpException {

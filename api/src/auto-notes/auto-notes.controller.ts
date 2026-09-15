@@ -1,10 +1,11 @@
 import { Controller, Get, Post, Body, Query, Param, Patch, Delete } from '@nestjs/common';
+import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
+
+import { type AutoNote } from '../types/types';
 import { AutoNotesService } from './auto-notes.service';
 import { CreateAutoNoteDto } from './dto/create-auto-note.dto';
-import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AutoNoteDto } from './dto/response-auto-note.dto';
 import { UpdateAutoNoteDto } from './dto/update-auto-note.dto';
-import { type AutoNote } from '../types/types';
 
 @ApiTags('autoNotes')
 @Controller('api/auto-notes')

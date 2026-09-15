@@ -1,24 +1,26 @@
 import './EditOverviewConfigModal.css';
+import { useQuery } from '@tanstack/react-query';
 import React, { type ChangeEvent, useEffect, useState } from 'react';
 import { Modal } from 'react-responsive-modal';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import Button, { ButtonVariant } from '../Button/Button';
-import { DateRangeSelect } from '../DateRangeSelect/DateRangeSelect';
-import { ROUTE_PARTS } from '../../App';
-import { DateRangeMode, OverviewSourceType } from '../../types/types';
+
+import type { ReportState } from '../../views/OverviewsPage/reports/report.types';
+
 import { overviewsApi } from '../../api/overviews';
+import { ROUTE_PARTS } from '../../App';
+import { type DateRangeMode, type OverviewSourceType } from '../../types/types';
+import {
+  resolveReportOptions,
+  toReportState,
+} from '../../views/OverviewsPage/reports/helpers/report-state';
 import {
   DEFAULT_REPORT_ID,
   findReport,
   REPORTS,
 } from '../../views/OverviewsPage/reports/report-catalog';
-import {
-  resolveReportOptions,
-  toReportState,
-} from '../../views/OverviewsPage/reports/helpers/report-state';
-import type { ReportState } from '../../views/OverviewsPage/reports/report.types';
+import Button, { ButtonVariant } from '../Button/Button';
+import { DateRangeSelect } from '../DateRangeSelect/DateRangeSelect';
 
 /** State handed over by "Save as new", so the saved overview keeps the tweaks made in the view. */
 interface ForkState {

@@ -1,27 +1,28 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { spawn } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
-import { spawn } from 'child_process';
+
 import { DatabaseService } from '../database/database.service';
-import { SettingsResponseDto } from './dto/settings-response.dto';
-import { SettingDto } from './dto/setting.dto';
-import {
-  DeleteEventsAfterDto,
-  DeleteEventsAfterPreviewDto,
-  UpsertDeleteEventsAfterDto,
-} from './dto/delete-events-after.dto';
-import { SettingKey } from './settings-key.enum';
 import { DeleteEventsAfterUnit } from './delete-events-after-unit.enum';
-import { findSettingByKey } from './queries/findSettingByKey';
-import { upsertSetting } from './queries/upsertSetting';
-import { deleteSettingByKey } from './queries/deleteSettingByKey';
-import { computeDeleteEventsCutoff } from './helpers/compute-delete-events-cutoff.helper';
 import {
   AutoMergeTagsDto,
   DEFAULT_AUTO_MERGE_TAGS_MINUTES,
   MAX_AUTO_MERGE_TAGS_MINUTES,
   UpsertAutoMergeTagsDto,
 } from './dto/auto-merge-tags.dto';
+import {
+  DeleteEventsAfterDto,
+  DeleteEventsAfterPreviewDto,
+  UpsertDeleteEventsAfterDto,
+} from './dto/delete-events-after.dto';
+import { SettingDto } from './dto/setting.dto';
+import { SettingsResponseDto } from './dto/settings-response.dto';
+import { computeDeleteEventsCutoff } from './helpers/compute-delete-events-cutoff.helper';
+import { deleteSettingByKey } from './queries/deleteSettingByKey';
+import { findSettingByKey } from './queries/findSettingByKey';
+import { upsertSetting } from './queries/upsertSetting';
+import { SettingKey } from './settings-key.enum';
 
 @Injectable()
 export class SettingsService {

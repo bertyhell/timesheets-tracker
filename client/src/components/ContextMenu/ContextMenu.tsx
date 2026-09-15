@@ -1,5 +1,5 @@
 import './ContextMenu.css';
-import React, { ReactNode, useRef } from 'react';
+import React, { type ReactNode, useRef } from 'react';
 
 import { useDismiss } from '../../helpers/use-dismiss';
 

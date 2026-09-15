@@ -50,7 +50,9 @@ test.describe('Integrations settings', () => {
     // Never actually clicked: that would reach out to a real Jira instance.
     await expect(page.getByRole('button', { name: 'Test connection' })).toBeDisabled();
 
-    await page.getByPlaceholder('https://your-org.atlassian.net').fill('https://example.atlassian.net');
+    await page
+      .getByPlaceholder('https://your-org.atlassian.net')
+      .fill('https://example.atlassian.net');
     await page.getByPlaceholder('you@example.com').fill('someone@example.com');
     await page.getByPlaceholder('••••••••').fill('fake-token');
     await expect(page.getByRole('button', { name: 'Test connection' })).toBeEnabled();

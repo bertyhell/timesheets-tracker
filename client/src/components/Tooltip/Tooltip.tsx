@@ -1,4 +1,3 @@
-import React, { useRef, useState } from 'react';
 import {
   arrow,
   flip,
@@ -11,6 +10,8 @@ import {
   useInteractions,
   type Placement,
 } from '@floating-ui/react';
+import React, { useRef, useState } from 'react';
+
 import './Tooltip.css';
 
 interface TooltipProps {

@@ -1,6 +1,7 @@
 import * as util from 'util';
-import { logger } from './shared/logger';
+
 import { bootstrap } from './bootstrap';
+import { logger } from './shared/logger';
 
 // Entry point for web-service mode (nest start).
 // from ./bootstrap and this file is never executed.

@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import './JiraSettingsPage.css';
-import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'react-toastify';
+
+import './JiraSettingsPage.css';
 import { Clipboard, ClipboardCheck, Eye, EyeOff, InfoIcon } from 'lucide-react';
-import { PageHeader } from '../../../components/PageHeader/PageHeader';
-import Button, { ButtonVariant } from '../../../components/Button/Button';
-import Tooltip from '../../../components/Tooltip/Tooltip';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
 import { integrationsApi, type UpsertIntegrationPayload } from '../../../api/integrations';
+import Button, { ButtonVariant } from '../../../components/Button/Button';
+import { PageHeader } from '../../../components/PageHeader/PageHeader';
+import Tooltip from '../../../components/Tooltip/Tooltip';
 import { jiraControllerTestConnection } from '../../../generated/api/sdk.gen';
 
 const INTEGRATION_TYPE = 'jira';

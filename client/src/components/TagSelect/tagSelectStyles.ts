@@ -3,7 +3,7 @@ import type { StylesConfig } from 'react-select';
 const PRIMARY = '#7c3aed';
 const PRIMARY_LIGHT = '#ede9fe';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line typescript/no-explicit-any
 export const tagSelectStyles: StylesConfig<any, any> = {
   option: (base, state) => ({
     ...base,

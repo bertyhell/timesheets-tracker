@@ -1,4 +1,5 @@
 import type { TimelineDto, TimelineEventDto } from '../../../generated/api/types.gen';
+
 import { TimelineType } from '../Timeline.types';
 
 export function getEventLabel(timelineInfo: TimelineDto, event: TimelineEventDto): string {

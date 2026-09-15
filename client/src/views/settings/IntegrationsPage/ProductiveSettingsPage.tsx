@@ -1,11 +1,12 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Clipboard, ClipboardCheck, Eye, EyeOff } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import { Clipboard, ClipboardCheck, Eye, EyeOff } from 'lucide-react';
-import { PageHeader } from '../../../components/PageHeader/PageHeader';
-import Button, { ButtonVariant } from '../../../components/Button/Button';
+
 import { integrationsApi, type UpsertIntegrationPayload } from '../../../api/integrations';
+import Button, { ButtonVariant } from '../../../components/Button/Button';
+import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import { productiveControllerTestConnection } from '../../../generated/api/sdk.gen';
 
 const INTEGRATION_TYPE = 'productive';

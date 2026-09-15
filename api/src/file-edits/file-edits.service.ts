@@ -1,11 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
+
 import { DatabaseService } from '../database/database.service';
 import { TimelineEventDto } from '../timelines/dto/response-timeline-events.dto';
 import { isNoisePath } from './helpers/is-noise-path';
-import { findLocalHistoryStores } from './helpers/local-history-stores';
 import { parseLocalHistory, RawFileEdit } from './helpers/local-history-parser';
+import { findLocalHistoryStores } from './helpers/local-history-stores';
 import { mergeFileEdits } from './helpers/merge-file-edits';
 import { createRepoNameResolver } from './helpers/resolve-repo-name';
 

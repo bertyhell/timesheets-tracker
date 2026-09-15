@@ -12,7 +12,18 @@ import {
   Timer,
   TrendingUp,
 } from 'lucide-react';
+
 import { DateRangeMode, OverviewSourceType } from '../../../types/types';
+import {
+  computeCalendar,
+  computeCoverage,
+  computeDistribution,
+  computeHourOfDay,
+  computeTopSessions,
+  computeWorkdaySpan,
+  createBucketedReport,
+} from './helpers/compute';
+import { DIMENSION_LABELS, DIMENSION_SOURCE_TYPE } from './helpers/dimensions';
 import {
   ChartType,
   Dimension,
@@ -24,16 +35,6 @@ import {
   type SplitOption,
   TimeBucket,
 } from './report.types';
-import { DIMENSION_LABELS, DIMENSION_SOURCE_TYPE } from './helpers/dimensions';
-import {
-  computeCalendar,
-  computeCoverage,
-  computeDistribution,
-  computeHourOfDay,
-  computeTopSessions,
-  computeWorkdaySpan,
-  createBucketedReport,
-} from './helpers/compute';
 
 export const REPORT_GROUPS = {
   distribution: 'Where the time goes',

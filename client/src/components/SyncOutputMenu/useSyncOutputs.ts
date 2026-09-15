@@ -1,7 +1,8 @@
 import { useQueries } from '@tanstack/react-query';
 
-import { integrationsApi } from '../../api/integrations';
 import type { SyncOutput } from './SyncOutputMenu';
+
+import { integrationsApi } from '../../api/integrations';
 
 export const PRODUCTIVE_OUTPUT_ID = 'productive';
 export const CSV_OUTPUT_ID = 'excel-csv';

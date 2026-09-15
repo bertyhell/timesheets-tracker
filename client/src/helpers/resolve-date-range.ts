@@ -9,6 +9,7 @@ import {
   endOfYear,
   subDays,
 } from 'date-fns';
+
 import { DateRangeMode } from '../types/types';
 
 export interface DateRange {

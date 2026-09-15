@@ -1,5 +1,4 @@
 import './ToggleButton.css';
-
 import React, { type FC } from 'react';
 
 interface ToggleButtonProps {

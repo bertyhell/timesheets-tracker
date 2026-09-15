@@ -1,13 +1,14 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { ProductiveService } from './productive.service';
+
 import { ProductiveCompanyDto } from './dto/company.dto';
-import { ProductiveDealDto } from './dto/deal.dto';
-import { ProductiveServiceDto } from './dto/service.dto';
-import { ProductiveServiceTreeNodeDto } from './dto/service-tree.dto';
-import { SyncTimeEntriesDto, SyncTimeEntriesResultDto } from './dto/sync-time-entries.dto';
-import { SyncStatusDto } from './dto/sync-status.dto';
 import { ProductiveConnectionDto } from './dto/connection.dto';
+import { ProductiveDealDto } from './dto/deal.dto';
+import { ProductiveServiceTreeNodeDto } from './dto/service-tree.dto';
+import { ProductiveServiceDto } from './dto/service.dto';
+import { SyncStatusDto } from './dto/sync-status.dto';
+import { SyncTimeEntriesDto, SyncTimeEntriesResultDto } from './dto/sync-time-entries.dto';
+import { ProductiveService } from './productive.service';
 
 @ApiTags('productive')
 @Controller('api/productive')

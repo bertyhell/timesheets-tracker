@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsInt, Min } from 'class-validator';
 import { Type } from 'class-transformer';
+import { IsEnum, IsInt, Min } from 'class-validator';
+
 import { DeleteEventsAfterUnit } from '../delete-events-after-unit.enum';
 
 export class DeleteEventsAfterDto {

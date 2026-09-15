@@ -1,13 +1,18 @@
 import './EditTagModal.css';
-
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { endOfDay, format, parseISO, startOfDay } from 'date-fns';
+import { Pencil } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { Modal } from 'react-responsive-modal';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { endOfDay, format, parseISO, startOfDay } from 'date-fns';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { Pencil } from 'lucide-react';
+import type {
+  TagDto,
+  TagNameDto,
+  TimelinesControllerFindAllEventsResponse,
+} from '../../generated/api/types.gen';
+import type { TagName } from '../../types/types';
 
 import { ROUTE_PARTS } from '../../App';
 import {
@@ -20,16 +25,10 @@ import {
   timelinesControllerFindAllEventsOptions,
   timelinesControllerFindAllEventsQueryKey,
 } from '../../generated/api/@tanstack/react-query.gen';
-import type {
-  TagDto,
-  TagNameDto,
-  TimelinesControllerFindAllEventsResponse,
-} from '../../generated/api/types.gen';
 import { getOverlappingAutoTagNotes } from '../../helpers/get-overlapping-auto-tag-notes';
-import { getRandomColor } from '../Timeline/helpers/getColorForEvent';
-import type { TagName } from '../../types/types';
-import TagSelectSingle from '../TagSelect/TagSelectSingle';
 import Button, { ButtonSize, ButtonVariant } from '../Button/Button';
+import TagSelectSingle from '../TagSelect/TagSelectSingle';
+import { getRandomColor } from '../Timeline/helpers/getColorForEvent';
 
 export function EditTagModal() {
   const { uuid } = useParams();

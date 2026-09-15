@@ -38,6 +38,6 @@ export function useDismiss(
     };
     // The refs array is rebuilt on every render by callers that inline it, so it is deliberately
     // not a dependency — its contents are read at event time, never at subscribe time.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react/exhaustive-deps
   }, [isOpen, onDismiss]);
 }

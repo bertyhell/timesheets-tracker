@@ -1,16 +1,16 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Building2, ChevronDown, ChevronRight, Folder, Receipt, X } from 'lucide-react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
-import { productiveApi } from '../../api/productive';
-import { useDismiss } from '../../helpers/use-dismiss';
 import type {
   ProductiveServiceSelection,
   ProductiveTimesheetDropdownProps,
   TreeNode,
 } from './ProductiveTimesheetDropdown.types';
 
+import { productiveApi } from '../../api/productive';
+import { useDismiss } from '../../helpers/use-dismiss';
 import './ProductiveTimesheetDropdown.css';
 
 const SEARCH_DEBOUNCE_MS = 250;

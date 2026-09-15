@@ -1,11 +1,13 @@
 import { format, parseISO, startOfDay } from 'date-fns';
+
 import type { OverviewFlatRowDto } from '../../../../api/overviews';
+
 import { OverviewSourceType } from '../../../../types/types';
 import {
   ChartType,
-  Dimension,
+  type Dimension,
   type MatrixReportResult,
-  ReportContext,
+  type ReportContext,
   ReportMetric,
   type ReportResult,
   type ReportSeries,
@@ -16,12 +18,6 @@ import {
   type ValueUnit,
 } from '../report.types';
 import {
-  DIMENSION_LABELS,
-  DIMENSION_SOURCE_TYPE,
-  getDimensionValue,
-  getDimensionColor,
-} from './dimensions';
-import {
   applyTopN,
   indexRowsByDimension,
   intersectIntervals,
@@ -31,6 +27,12 @@ import {
   toSessions,
   unionIntervals,
 } from './aggregate';
+import {
+  DIMENSION_LABELS,
+  DIMENSION_SOURCE_TYPE,
+  getDimensionValue,
+  getDimensionColor,
+} from './dimensions';
 import {
   enumerateBuckets,
   enumerateDays,

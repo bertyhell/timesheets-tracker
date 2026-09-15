@@ -1,11 +1,12 @@
 import { Controller, Get, Post, Body, Query, Param, Patch, Delete, HttpCode } from '@nestjs/common';
-import { CreateAutoTagDto } from './dto/create-auto-tag.dto';
 import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { AutoTagsService } from './auto-tags.service';
-import { AutoTagCountDto, AutoTagDto, AutoTagMergeResultDto } from './dto/response-auto-tag.dto';
+
 import { type AutoTag } from '../types/types';
-import { UpdateAutoTagsDto } from './dto/update-auto-tags.dto';
+import { AutoTagsService } from './auto-tags.service';
+import { CreateAutoTagDto } from './dto/create-auto-tag.dto';
 import { ReorderAutoTagItemDto } from './dto/reorder-auto-tags.dto';
+import { AutoTagCountDto, AutoTagDto, AutoTagMergeResultDto } from './dto/response-auto-tag.dto';
+import { UpdateAutoTagsDto } from './dto/update-auto-tags.dto';
 
 @ApiTags('auto-tags')
 @Controller('api/auto-tags')

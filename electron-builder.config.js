@@ -30,12 +30,7 @@ module.exports = {
     {
       from: 'api',
       to: 'api',
-      filter: [
-        'dist/**',
-        'package.json',
-        '!**/*.map',
-        '!**/*.d.ts',
-      ],
+      filter: ['dist/**', 'package.json', '!**/*.map', '!**/*.d.ts'],
     },
     // node_modules must be a separate entry so electron-builder doesn't apply
     // api/.gitignore (which excludes /node_modules) to this copy step.

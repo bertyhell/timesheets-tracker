@@ -1,6 +1,7 @@
 import type { TimelineDto, TimelineEventDto } from '../../../generated/api/types.gen';
-import { TimelineType } from '../Timeline.types';
+
 import { ConditionVariable } from '../../../types/types';
+import { TimelineType } from '../Timeline.types';
 
 export interface ProminentCondition {
   variable: ConditionVariable;

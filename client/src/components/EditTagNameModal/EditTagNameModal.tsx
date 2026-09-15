@@ -1,19 +1,19 @@
 import './EditTagNameModal.css';
-
-import React, { type ChangeEvent, useEffect, useState } from 'react';
-import Button, { ButtonVariant } from '../Button/Button';
-import { Modal } from 'react-responsive-modal';
-import { type TagName } from '../../types/types';
-import { ROUTE_PARTS } from '../../App';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import React, { type ChangeEvent, useEffect, useState } from 'react';
+import { Modal } from 'react-responsive-modal';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
+import { ROUTE_PARTS } from '../../App';
 import {
   tagNamesControllerCreateMutation,
   tagNamesControllerRemoveMutation,
   tagNamesControllerFindOneOptions,
   tagNamesControllerUpdateMutation,
 } from '../../generated/api/@tanstack/react-query.gen';
-import { useNavigate, useParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { type TagName } from '../../types/types';
+import Button, { ButtonVariant } from '../Button/Button';
 import { ColorInput } from '../ColorInput/ColorInput';
 import { getRandomColor } from '../Timeline/helpers/getColorForEvent';
 import ToggleButton from '../ToggleButton/ToggleButton';

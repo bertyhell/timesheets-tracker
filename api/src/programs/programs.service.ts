@@ -1,15 +1,17 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { Program } from '../types/types';
-import { DatabaseService } from '../database/database.service';
-import { v4 as uuid } from 'uuid';
 import { differenceInSeconds, max, min } from 'date-fns';
+import { v4 as uuid } from 'uuid';
+
+import type { Program } from '../types/types';
+
+import { DatabaseService } from '../database/database.service';
+import { CustomError } from '../shared/CustomError';
 import { CreateProgramDto } from './dto/create-activity.dto';
-import { findAllPrograms } from './queries/findAllPrograms';
-import { findOneProgram } from './queries/findOneProgram';
-import { findByNextStartedAt } from './queries/findByNextStartedAt';
 import { createProgram } from './queries/createProgram';
 import { deleteProgram } from './queries/deleteProgram';
-import { CustomError } from '../shared/CustomError';
+import { findAllPrograms } from './queries/findAllPrograms';
+import { findByNextStartedAt } from './queries/findByNextStartedAt';
+import { findOneProgram } from './queries/findOneProgram';
 
 const MINIMUM_ACTIVITY_DURATION_SECONDS = 5;
 

@@ -1,10 +1,14 @@
 import './EditTimelineModal.css';
-
-import React, { type ChangeEvent, useEffect, useState } from 'react';
-import Button, { ButtonVariant } from '../Button/Button';
-import { Modal } from 'react-responsive-modal';
-import { ROUTE_PARTS } from '../../App';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import React, { type ChangeEvent, useEffect, useState } from 'react';
+import { Modal } from 'react-responsive-modal';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
+import type { TimelineDto, TimelineType } from '../../generated/api/types.gen';
+
+import { integrationsApi } from '../../api/integrations';
+import { ROUTE_PARTS } from '../../App';
 import {
   timelinesControllerCreateMutation,
   timelinesControllerDeleteMutation,
@@ -12,10 +16,7 @@ import {
   timelinesControllerFindOneOptions,
   timelinesControllerUpdateMutation,
 } from '../../generated/api/@tanstack/react-query.gen';
-import type { TimelineDto, TimelineType } from '../../generated/api/types.gen';
-import { integrationsApi } from '../../api/integrations';
-import { useNavigate, useParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import Button, { ButtonVariant } from '../Button/Button';
 import { ColorInput } from '../ColorInput/ColorInput';
 import { getRandomColor } from '../Timeline/helpers/getColorForEvent';
 import { timelineTypeLabel } from '../Timeline/helpers/timelineTypeLabel';

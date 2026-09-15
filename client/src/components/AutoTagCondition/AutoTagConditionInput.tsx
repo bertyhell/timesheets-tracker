@@ -1,5 +1,4 @@
 import './AutoTagConditionInput.css';
-
 import { Trash2Icon } from 'lucide-react';
 import React from 'react';
 import Select, { type GroupBase, type StylesConfig } from 'react-select';
@@ -22,7 +21,7 @@ const PRIMARY_LIGHT = '#ede9fe';
  * The selects sit in a dense grid next to a plain input, so they are pulled down to the same
  * 36px box as that input and lose react-select's default chrome.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line typescript/no-explicit-any
 const conditionSelectStyles: StylesConfig<any, false, any> = {
   control: (base, state) => ({
     ...base,

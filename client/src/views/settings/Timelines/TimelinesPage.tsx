@@ -1,16 +1,5 @@
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import Button, { ButtonVariant } from '../../../components/Button/Button';
-import { PageHeader } from '../../../components/PageHeader/PageHeader';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import {
-  timelinesControllerDeleteMutation,
-  timelinesControllerFindAllOptions,
-} from '../../../generated/api/@tanstack/react-query.gen';
-import React, { type ReactNode, useEffect, useState } from 'react';
-import { ROUTE_PARTS } from '../../../App';
-import { toast } from 'react-toastify';
-import { orderBy } from 'lodash-es';
-import { SearchInput } from '../../../components/SearchInput/SearchInput';
+import type { DragEndEvent, DragStartEvent, DragOverEvent } from '@dnd-kit/core';
+
 import {
   DndContext,
   closestCenter,
@@ -19,17 +8,31 @@ import {
   useSensors,
   DragOverlay,
 } from '@dnd-kit/core';
-import type { DragEndEvent, DragStartEvent, DragOverEvent } from '@dnd-kit/core';
 import {
   SortableContext,
   useSortable,
   verticalListSortingStrategy,
   arrayMove,
 } from '@dnd-kit/sortable';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { orderBy } from 'lodash-es';
+import React, { type ReactNode, useEffect, useState } from 'react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
 import type { TimelineDto } from '../../../generated/api/types.gen';
-import { GripHandle } from '../../../components/GripHandle/GripHandle';
+
 import { reorderTimelines as reorderTimelinesApi } from '../../../api/reorder';
+import { ROUTE_PARTS } from '../../../App';
+import Button, { ButtonVariant } from '../../../components/Button/Button';
+import { GripHandle } from '../../../components/GripHandle/GripHandle';
+import { PageHeader } from '../../../components/PageHeader/PageHeader';
+import { SearchInput } from '../../../components/SearchInput/SearchInput';
 import { timelineTypeLabel } from '../../../components/Timeline/helpers/timelineTypeLabel';
+import {
+  timelinesControllerDeleteMutation,
+  timelinesControllerFindAllOptions,
+} from '../../../generated/api/@tanstack/react-query.gen';
 
 function TimelineDragOverlay({ timeline }: { timeline: TimelineDto }) {
   return (

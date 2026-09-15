@@ -1,5 +1,5 @@
-import React, { useCallback, useRef, useState } from 'react';
 import { Check, ChevronDown } from 'lucide-react';
+import React, { useCallback, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useDismiss } from '../../helpers/use-dismiss';

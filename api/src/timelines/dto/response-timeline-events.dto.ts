@@ -9,6 +9,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+
 import { ConditionOperator, ConditionVariable, TimelineType } from '../../types/types';
 
 export class ActiveStateEventInfoDto {

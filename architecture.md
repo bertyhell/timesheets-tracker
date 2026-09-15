@@ -125,6 +125,7 @@ flowchart TB
 ```
 
 **Legend**
+
 - Solid arrows = direct calls / imports / REST requests
 - Dotted arrows = listener/module composition relationships
 - `TimelinesAndEventsPage` is the app's **overview page** (default route `/`); `OverviewsPage` is a separate reporting/analysis page with saved configs

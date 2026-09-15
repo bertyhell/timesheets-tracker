@@ -1,10 +1,11 @@
 import type { OverviewFlatRowDto } from '../../../../api/overviews';
-import { OverviewSourceType } from '../../../../types/types';
+
 import {
   ACTIVE_COLOR,
   getColorFromString,
   INACTIVE_COLOR,
 } from '../../../../components/Timeline/helpers/getColorForEvent';
+import { OverviewSourceType } from '../../../../types/types';
 import { Dimension } from '../report.types';
 
 export const DIMENSION_LABELS: Record<Dimension, string> = {

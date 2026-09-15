@@ -1,6 +1,5 @@
-import util from 'node:util';
-
 import { InternalServerErrorException } from '@nestjs/common';
+import util from 'node:util';
 
 export function customError(
   message: string,

@@ -1,4 +1,5 @@
 import { parseISO } from 'date-fns';
+
 import type { AutoTagEventInfoDto, TimelineEventDto } from '../../../generated/api/types.gen';
 
 /** Outer limits the grown auto tags have to stay inside, in epoch milliseconds. */

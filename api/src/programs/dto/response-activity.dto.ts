@@ -1,6 +1,7 @@
-import { IsOptional, IsString } from 'class-validator';
-import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsOptional, IsString } from 'class-validator';
+
 import { type Program } from '../../types/types';
 
 export class ResponseProgramDto implements Program {

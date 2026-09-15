@@ -1,6 +1,7 @@
-import { IsBoolean, IsString } from 'class-validator';
-import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsBoolean, IsString } from 'class-validator';
+
 import { type ActiveState } from '../../types/types';
 
 export class ResponseActiveStateDto implements ActiveState {

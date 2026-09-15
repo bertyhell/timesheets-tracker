@@ -1,9 +1,3 @@
-import React, { useEffect, useState } from 'react';
-import './ExcelCsvSettingsPage.css';
-import { useNavigate } from 'react-router-dom';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'react-toastify';
-import { Plus, Trash2 } from 'lucide-react';
 import {
   DndContext,
   closestCenter,
@@ -14,26 +8,33 @@ import {
   type DragOverEvent,
   type DragStartEvent,
 } from '@dnd-kit/core';
+
+import './ExcelCsvSettingsPage.css';
 import {
   SortableContext,
   useSortable,
   verticalListSortingStrategy,
   arrayMove,
 } from '@dnd-kit/sortable';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Plus, Trash2 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
-import { PageHeader } from '../../../components/PageHeader/PageHeader';
-import Button, { ButtonVariant } from '../../../components/Button/Button';
-import { GripHandle } from '../../../components/GripHandle/GripHandle';
-import { FormatSelect } from '../../../components/FormatSelect/FormatSelect';
-import { integrationsApi } from '../../../api/integrations';
 import { csvExportApi, type CsvExportColumnPayload } from '../../../api/csvExport';
-import { CsvColumnValue, CsvDelimiter } from '../../../types/types';
+import { integrationsApi } from '../../../api/integrations';
+import Button, { ButtonVariant } from '../../../components/Button/Button';
+import { FormatSelect } from '../../../components/FormatSelect/FormatSelect';
+import { GripHandle } from '../../../components/GripHandle/GripHandle';
+import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import {
   CSV_COLUMN_VALUE_OPTIONS,
   CSV_DELIMITER_OPTIONS,
   defaultFormatForValue,
   formatOptionsForValue,
 } from '../../../helpers/csv-column-options';
+import { CsvColumnValue, CsvDelimiter } from '../../../types/types';
 
 const INTEGRATION_TYPE = 'excel-csv';
 

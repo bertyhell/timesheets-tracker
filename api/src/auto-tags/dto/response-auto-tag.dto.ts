@@ -1,6 +1,8 @@
-import { IsArray, IsEnum, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
-import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsArray, IsEnum, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
+
+import { TagNameDto } from '../../tag-names/dto/response-tag-name.dto';
 import {
   type AutoTag,
   type AutoTagCondition,
@@ -9,7 +11,6 @@ import {
   ConditionVariable,
   type TagName,
 } from '../../types/types';
-import { TagNameDto } from '../../tag-names/dto/response-tag-name.dto';
 
 export class AutoTagConditionDto implements AutoTagCondition {
   @IsString()

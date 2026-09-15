@@ -1,18 +1,20 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { Website } from '../types/types';
-import { DatabaseService } from '../database/database.service';
-import { v4 as uuid } from 'uuid';
-import { CreateWebsiteDto } from './dto/create-website.dto';
 import { unflatten } from 'nested-objects-util';
+import { v4 as uuid } from 'uuid';
+
+import type { Website } from '../types/types';
+
+import { DatabaseService } from '../database/database.service';
+import { CustomError } from '../shared/CustomError';
+import { CreateWebsiteDto } from './dto/create-website.dto';
 import { UpdateWebsiteDto } from './dto/update-website.dto';
+import { createWebsite } from './queries/createWebsite';
+import { deleteWebsite } from './queries/deleteWebsite';
 import { findAllWebsites } from './queries/findAllWebsites';
 import { findOneWebsite } from './queries/findOneWebsite';
 import { findOneWebsiteByStartTime } from './queries/findOneWebsiteByStartTime';
 import { findWebsiteByNextStartedAt } from './queries/findWebsiteByNextStartedAt';
-import { createWebsite } from './queries/createWebsite';
 import { updateWebsite } from './queries/updateWebsite';
-import { deleteWebsite } from './queries/deleteWebsite';
-import { CustomError } from '../shared/CustomError';
 
 @Injectable()
 export class WebsitesService {

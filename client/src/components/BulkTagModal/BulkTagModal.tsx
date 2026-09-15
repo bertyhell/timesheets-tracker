@@ -1,22 +1,22 @@
 import './BulkTagModal.css';
-
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { endOfDay, parseISO, startOfDay } from 'date-fns';
 import React, { useState } from 'react';
 import { Modal } from 'react-responsive-modal';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { endOfDay, parseISO, startOfDay } from 'date-fns';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+import type { TimelineEventDto } from '../../generated/api/types.gen';
+import type { TagName } from '../../types/types';
 
 import { ROUTE_PARTS } from '../../App';
 import {
   tagsControllerCreateMutation,
   timelinesControllerFindAllEventsOptions,
 } from '../../generated/api/@tanstack/react-query.gen';
-import type { TimelineEventDto } from '../../generated/api/types.gen';
-import type { TagName } from '../../types/types';
-import TagSelectSingle from '../TagSelect/TagSelectSingle';
-import Button, { ButtonVariant } from '../Button/Button';
 import { getOverlappingAutoTagNotes } from '../../helpers/get-overlapping-auto-tag-notes';
+import Button, { ButtonVariant } from '../Button/Button';
+import TagSelectSingle from '../TagSelect/TagSelectSingle';
 
 interface MergedInterval {
   startedAt: string;

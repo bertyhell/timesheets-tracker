@@ -1,4 +1,5 @@
 import type { EChartsCoreOption } from 'echarts/core';
+
 import {
   ChartType,
   type CalendarReportResult,

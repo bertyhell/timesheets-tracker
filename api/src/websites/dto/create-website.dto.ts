@@ -1,6 +1,6 @@
-import { IsString } from 'class-validator';
-import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsString } from 'class-validator';
 
 export class CreateWebsiteDto {
   @IsString()

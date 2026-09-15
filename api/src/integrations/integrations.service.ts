@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+
 import { DatabaseService } from '../database/database.service';
 import { IntegrationDto, UpsertIntegrationDto } from './dto/integration.dto';
+import { deleteIntegration } from './queries/deleteIntegration';
 import { findIntegrationByType } from './queries/findIntegrationByType';
 import { upsertIntegration } from './queries/upsertIntegration';
-import { deleteIntegration } from './queries/deleteIntegration';
 
 @Injectable()
 export class IntegrationsService {

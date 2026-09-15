@@ -1,5 +1,5 @@
 import './EditAutoTagModal.css';
-
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   addMonths,
   addWeeks,
@@ -25,13 +25,17 @@ import {
   ZapIcon,
 } from 'lucide-react';
 import React, { type ChangeEvent, useEffect, useRef, useState } from 'react';
-import Button, { ButtonSize, ButtonVariant } from '../Button/Button';
 import { Modal } from 'react-responsive-modal';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
+import type {
+  CreateAutoTagDto,
+  TagNameDto,
+  UpdateAutoTagsDto,
+} from '../../generated/api/types.gen';
+
 import { ROUTE_PARTS } from '../../App';
-import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   autoTagsControllerCountOptions,
   autoTagsControllerCreateMutation,
@@ -40,7 +44,6 @@ import {
   autoTagsControllerUpdateMutation,
   tagNamesControllerCreateMutation,
 } from '../../generated/api/@tanstack/react-query.gen';
-import type { CreateAutoTagDto, UpdateAutoTagsDto } from '../../generated/api/types.gen';
 import {
   type AutoTag,
   type AutoTagCondition,
@@ -56,11 +59,11 @@ import {
   conditionOperatorLabel,
   conditionVariableLabel,
 } from '../AutoTagCondition/conditionLabels';
+import Button, { ButtonSize, ButtonVariant } from '../Button/Button';
 import { DateField } from '../DateField/DateField';
 import TagSelectSingle from '../TagSelect/TagSelectSingle';
-import Tooltip from '../Tooltip/Tooltip';
 import { getRandomColor } from '../Timeline/helpers/getColorForEvent';
-import type { TagNameDto } from '../../generated/api/types.gen';
+import Tooltip from '../Tooltip/Tooltip';
 
 const NEW_CONDITION: AutoTagCondition = {
   booleanOperator: BooleanOperator.OR,

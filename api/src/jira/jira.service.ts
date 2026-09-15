@@ -1,11 +1,14 @@
-import { createHash } from 'node:crypto';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { IntegrationsService } from '../integrations/integrations.service';
+import { createHash } from 'node:crypto';
+
 import { DatabaseService } from '../database/database.service';
-import { WebsitesService } from '../websites/websites.service';
+import { IntegrationsService } from '../integrations/integrations.service';
 import { ProgramsService } from '../programs/programs.service';
-import { resolveWebsiteEndTimes } from '../websites/helpers/resolve-website-end-times';
+import { CustomError } from '../shared/CustomError';
+import { logger } from '../shared/logger';
 import { JiraEventInfoDto, TimelineEventDto } from '../timelines/dto/response-timeline-events.dto';
+import { resolveWebsiteEndTimes } from '../websites/helpers/resolve-website-end-times';
+import { WebsitesService } from '../websites/websites.service';
 import { JiraConnectionDto } from './dto/jira-connection.dto';
 import { extractJiraIssueKey, isSameJiraHost } from './helpers/extract-jira-issue-key';
 import { mergeJiraVisits, type JiraVisit } from './helpers/merge-jira-visits';
@@ -13,10 +16,8 @@ import {
   findJiraIssuesByKeys,
   type FindJiraIssuesByKeysResult,
 } from './queries/findJiraIssuesByKeys';
-import { upsertJiraIssue } from './queries/upsertJiraIssue';
 import { findRecentJiraWebsites } from './queries/findRecentJiraWebsites';
-import { CustomError } from '../shared/CustomError';
-import { logger } from '../shared/logger';
+import { upsertJiraIssue } from './queries/upsertJiraIssue';
 
 export const JIRA_INTEGRATION_TYPE = 'jira';
 

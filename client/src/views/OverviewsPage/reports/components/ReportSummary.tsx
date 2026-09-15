@@ -1,6 +1,8 @@
 import './ReportSummary.css';
 import React from 'react';
+
 import type { ReportResult } from '../report.types';
+
 import { formatValue } from '../helpers/format-values';
 
 interface Tile {

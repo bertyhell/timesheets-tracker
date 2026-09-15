@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+
 import { uniqueName } from '../utils/unique-name';
 
 test.describe('Auto tag rules management', () => {

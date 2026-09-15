@@ -1,23 +1,22 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { AlertTriangle, Check, ChevronRight, X } from 'lucide-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Modal } from 'react-responsive-modal';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 
-import { TimelineType } from '../Timeline/Timeline.types';
+import type { SyncStatus, SyncStatusEntry, SyncStatusValue } from '../../api/productive';
 import type { TimelineDto, TimelineEventDto } from '../../generated/api/types.gen';
+
+import { productiveApi } from '../../api/productive';
 import {
   tagNamesControllerFindAllOptions,
   tagNamesControllerUpdateMutation,
   tagsControllerUpdateMutation,
 } from '../../generated/api/@tanstack/react-query.gen';
-import { AlertTriangle, Check, ChevronRight, X } from 'lucide-react';
-
-import { productiveApi } from '../../api/productive';
-import type { SyncStatus, SyncStatusEntry, SyncStatusValue } from '../../api/productive';
 import { ProductiveTimesheetDropdown } from '../ProductiveTimesheetDropdown/ProductiveTimesheetDropdown';
 import { SyncOutputMenu } from '../SyncOutputMenu/SyncOutputMenu';
 import { PRODUCTIVE_OUTPUT_ID, useSyncOutputs } from '../SyncOutputMenu/useSyncOutputs';
-
+import { TimelineType } from '../Timeline/Timeline.types';
 import './SyncToProductiveModal.css';
 
 interface SyncToProductiveModalProps {

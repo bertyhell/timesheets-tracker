@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+
+import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import {
   settingsControllerGetAutoMergeTagsOptions,
   settingsControllerGetAutoMergeTagsQueryKey,
   settingsControllerSetAutoMergeTagsMutation,
 } from '../../../generated/api/@tanstack/react-query.gen';
-import { PageHeader } from '../../../components/PageHeader/PageHeader';
 
 /** Matches DEFAULT_AUTO_MERGE_TAGS_MINUTES on the api, used only while the setting is loading. */
 const DEFAULT_MERGE_MINUTES = 5;

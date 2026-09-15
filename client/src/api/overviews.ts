@@ -1,5 +1,5 @@
 import { client } from '../generated/api/client.gen';
-import { DateRangeMode, OverviewSourceType } from '../types/types';
+import { type DateRangeMode, type OverviewSourceType } from '../types/types';
 
 export interface SavedOverviewConfigDto {
   id: string;

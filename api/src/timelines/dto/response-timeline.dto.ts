@@ -1,6 +1,7 @@
 import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
+
 import { type Timeline, TimelineType } from '../../types/types';
 
 export class CalendarEventProviderInfoDto {

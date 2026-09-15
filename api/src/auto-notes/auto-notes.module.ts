@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
-import { AutoNotesService } from './auto-notes.service';
-import { AutoNotesController } from './auto-notes.controller';
+
 import { DatabaseModule } from '../database/database.module';
+import { AutoNotesController } from './auto-notes.controller';
+import { AutoNotesService } from './auto-notes.service';
 
 @Module({
   imports: [DatabaseModule],

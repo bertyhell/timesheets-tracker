@@ -8,16 +8,18 @@ import {
   Delete,
   NotFoundException,
 } from '@nestjs/common';
-import { WebsitesService } from './websites.service';
-import type { Website } from '../types/types';
 import { ApiBody, ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { endOfDay, startOfDay } from 'date-fns';
+import { compact } from 'lodash';
+
+import type { Website } from '../types/types';
+
+import { ProgramsService } from '../programs/programs.service';
+import { logger } from '../shared/logger';
 import { CreateWebsiteDto } from './dto/create-website.dto';
 import { ResponseWebsiteDto } from './dto/response-website.dto';
-import { ProgramsService } from '../programs/programs.service';
-import { compact } from 'lodash';
-import { logger } from '../shared/logger';
 import { resolveWebsiteEndTimes } from './helpers/resolve-website-end-times';
+import { WebsitesService } from './websites.service';
 
 @ApiTags('websites')
 @Controller('api/websites')

@@ -1,7 +1,8 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { JiraService } from './jira.service';
+
 import { JiraConnectionDto } from './dto/jira-connection.dto';
+import { JiraService } from './jira.service';
 
 @ApiTags('jira')
 @Controller('api/jira')

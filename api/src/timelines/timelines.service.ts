@@ -1,7 +1,20 @@
-import { CreateTimelineDto } from './dto/create-timeline.dto';
 import { Inject, Injectable } from '@nestjs/common';
-import { DatabaseService } from '../database/database.service';
 import { v4 as uuid } from 'uuid';
+
+import { ActiveStatesService } from '../active-states/active-states.service';
+import { AutoNotesService } from '../auto-notes/auto-notes.service';
+import { AutoTagsService } from '../auto-tags/auto-tags.service';
+import { AutoTagDto } from '../auto-tags/dto/response-auto-tag.dto';
+import { CalendarsService } from '../calendars/calendars.service';
+import { DatabaseService } from '../database/database.service';
+import { FileEditsService } from '../file-edits/file-edits.service';
+import { GitCommitsService, GitCommitEvent } from '../git-commits/git-commits.service';
+import { JiraService } from '../jira/jira.service';
+import { ProductiveService } from '../productive/productive.service';
+import { ProgramsService } from '../programs/programs.service';
+import { CustomError } from '../shared/CustomError';
+import { TagNamesService } from '../tag-names/tag-names.service';
+import { TagsService } from '../tags/tags.service';
 import {
   ActiveState,
   AutoNote,
@@ -12,37 +25,25 @@ import {
   Timeline,
   TimelineType,
 } from '../types/types';
-import { UpdateTimelineDto } from './dto/update-timeline.dto';
-import { findAllTimelines } from './queries/findAllTimelines';
-import { findAllTimelinesBySearchTerm } from './queries/findAllTimelinesBySearchTerm';
-import { countTimelines } from './queries/countTimelines';
-import { findOneTimeline } from './queries/findOneTimeline';
-import { createTimeline } from './queries/createTimeline';
-import { updateTimeline } from './queries/updateTimeline';
-import { deleteTimeline } from './queries/deleteTimeline';
-import { reorderTimelines, type ReorderTimelineItem } from './queries/reorderTimelines';
-import { incrementTimelineOrders } from './queries/incrementTimelineOrders';
+import { resolveWebsiteEndTimes } from '../websites/helpers/resolve-website-end-times';
+import { WebsitesService } from '../websites/websites.service';
+import { CreateTimelineDto } from './dto/create-timeline.dto';
 import {
   TagEventInfoDto,
   TimelineEventDto,
   TimelineWithEventsDto,
 } from './dto/response-timeline-events.dto';
 import { TimelineDto } from './dto/response-timeline.dto';
-import { CalendarsService } from '../calendars/calendars.service';
-import { ProgramsService } from '../programs/programs.service';
-import { WebsitesService } from '../websites/websites.service';
-import { resolveWebsiteEndTimes } from '../websites/helpers/resolve-website-end-times';
-import { TagsService } from '../tags/tags.service';
-import { AutoTagsService } from '../auto-tags/auto-tags.service';
-import { AutoNotesService } from '../auto-notes/auto-notes.service';
-import { ActiveStatesService } from '../active-states/active-states.service';
-import { AutoTagDto } from '../auto-tags/dto/response-auto-tag.dto';
-import { TagNamesService } from '../tag-names/tag-names.service';
-import { GitCommitsService, GitCommitEvent } from '../git-commits/git-commits.service';
-import { ProductiveService } from '../productive/productive.service';
-import { FileEditsService } from '../file-edits/file-edits.service';
-import { JiraService } from '../jira/jira.service';
-import { CustomError } from '../shared/CustomError';
+import { UpdateTimelineDto } from './dto/update-timeline.dto';
+import { countTimelines } from './queries/countTimelines';
+import { createTimeline } from './queries/createTimeline';
+import { deleteTimeline } from './queries/deleteTimeline';
+import { findAllTimelines } from './queries/findAllTimelines';
+import { findAllTimelinesBySearchTerm } from './queries/findAllTimelinesBySearchTerm';
+import { findOneTimeline } from './queries/findOneTimeline';
+import { incrementTimelineOrders } from './queries/incrementTimelineOrders';
+import { reorderTimelines, type ReorderTimelineItem } from './queries/reorderTimelines';
+import { updateTimeline } from './queries/updateTimeline';
 
 @Injectable()
 export class TimelinesService {

@@ -1,11 +1,11 @@
 import {
-  ActiveStateEventInfoDto,
-  AutoTagEventInfoDto,
-  CalendarEventDto,
-  ProgramEventInfoDto,
-  TagEventInfoDto,
-  TimelineDto,
-  TimelineEventDto,
+  type ActiveStateEventInfoDto,
+  type AutoTagEventInfoDto,
+  type CalendarEventDto,
+  type ProgramEventInfoDto,
+  type TagEventInfoDto,
+  type TimelineDto,
+  type TimelineEventDto,
 } from '../../../generated/api/types.gen';
 import { stringToColorIndex } from '../../../helpers/string-to-color-index';
 import { TimelineType } from '../Timeline.types';

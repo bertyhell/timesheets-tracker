@@ -1,16 +1,17 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { ApiExtraModels, ApiOkResponse, ApiQuery, ApiTags, getSchemaPath } from '@nestjs/swagger';
-import { SettingsService } from './settings.service';
-import { SettingsResponseDto } from './dto/settings-response.dto';
-import { SwitchDatabaseDto } from './dto/switch-database.dto';
-import { SettingDto } from './dto/setting.dto';
-import { UpsertSettingDto } from './dto/upsert-setting.dto';
+
+import { AutoMergeTagsDto, UpsertAutoMergeTagsDto } from './dto/auto-merge-tags.dto';
 import {
   DeleteEventsAfterDto,
   DeleteEventsAfterPreviewDto,
   UpsertDeleteEventsAfterDto,
 } from './dto/delete-events-after.dto';
-import { AutoMergeTagsDto, UpsertAutoMergeTagsDto } from './dto/auto-merge-tags.dto';
+import { SettingDto } from './dto/setting.dto';
+import { SettingsResponseDto } from './dto/settings-response.dto';
+import { SwitchDatabaseDto } from './dto/switch-database.dto';
+import { UpsertSettingDto } from './dto/upsert-setting.dto';
+import { SettingsService } from './settings.service';
 
 @ApiTags('settings')
 @ApiExtraModels(SettingDto)

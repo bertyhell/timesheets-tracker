@@ -1,30 +1,31 @@
-import App, { ROUTE_PARTS } from './App';
-import { TimelinesAndEventsPage } from './views/TimelinesAndEventsPage/TimelinesAndEventsPage';
-import { AutoTagsPage } from './views/settings/AutoTagsPage/AutoTagsPage';
-import { EditAutoTagModal } from './components/EditAutoTagModal/EditAutoTagModal';
-import { EditTagModal } from './components/EditTagModal/EditTagModal';
-import { BulkTagModal } from './components/BulkTagModal/BulkTagModal';
-import { TagNamesPage } from './views/settings/TagNamesPage/TagNamesPage';
-import { EditTagNameModal } from './components/EditTagNameModal/EditTagNameModal';
 import React from 'react';
 import { redirect, type RouteObject } from 'react-router-dom';
-import { NotesPage } from './views/settings/NotesPage/NotesPage';
+
+import App, { ROUTE_PARTS } from './App';
+import { BulkTagModal } from './components/BulkTagModal/BulkTagModal';
+import { EditAutoTagModal } from './components/EditAutoTagModal/EditAutoTagModal';
 import { EditAutoNoteModal } from './components/EditNoteModal/EditAutoNoteModal';
-import { TimelinesPage } from './views/settings/Timelines/TimelinesPage';
+import { EditOverviewConfigModal } from './components/EditOverviewConfigModal/EditOverviewConfigModal';
+import { EditTagModal } from './components/EditTagModal/EditTagModal';
+import { EditTagNameModal } from './components/EditTagNameModal/EditTagNameModal';
 import { EditTimelineModal } from './components/EditTimelineModal/EditTimelineModal';
-import { SettingsPage } from './views/settings/SettingsPage/SettingsPage';
-import { GeneralSettingsPage } from './views/settings/GeneralSettingsPage/GeneralSettingsPage';
-import { AutoTagsSettingsPage } from './views/settings/AutoTagsSettingsPage/AutoTagsSettingsPage';
-import { IntegrationsPage } from './views/settings/IntegrationsPage/IntegrationsPage';
-import { UpdatesPage } from './views/settings/UpdatesPage/UpdatesPage';
-import { BackupSettingsPage } from './views/settings/BackupSettingsPage/BackupSettingsPage';
-import { ProductiveSettingsPage } from './views/settings/IntegrationsPage/ProductiveSettingsPage';
-import { JiraSettingsPage } from './views/settings/IntegrationsPage/JiraSettingsPage';
-import { ExcelCsvSettingsPage } from './views/settings/IntegrationsPage/ExcelCsvSettingsPage';
 import { OverviewsPage } from './views/OverviewsPage/OverviewsPage';
 import { OverviewView } from './views/OverviewsPage/OverviewView/OverviewView';
-import { EditOverviewConfigModal } from './components/EditOverviewConfigModal/EditOverviewConfigModal';
 import { DEFAULT_REPORT_ID } from './views/OverviewsPage/reports/report-catalog';
+import { AutoTagsPage } from './views/settings/AutoTagsPage/AutoTagsPage';
+import { AutoTagsSettingsPage } from './views/settings/AutoTagsSettingsPage/AutoTagsSettingsPage';
+import { BackupSettingsPage } from './views/settings/BackupSettingsPage/BackupSettingsPage';
+import { GeneralSettingsPage } from './views/settings/GeneralSettingsPage/GeneralSettingsPage';
+import { ExcelCsvSettingsPage } from './views/settings/IntegrationsPage/ExcelCsvSettingsPage';
+import { IntegrationsPage } from './views/settings/IntegrationsPage/IntegrationsPage';
+import { JiraSettingsPage } from './views/settings/IntegrationsPage/JiraSettingsPage';
+import { ProductiveSettingsPage } from './views/settings/IntegrationsPage/ProductiveSettingsPage';
+import { NotesPage } from './views/settings/NotesPage/NotesPage';
+import { SettingsPage } from './views/settings/SettingsPage/SettingsPage';
+import { TagNamesPage } from './views/settings/TagNamesPage/TagNamesPage';
+import { TimelinesPage } from './views/settings/Timelines/TimelinesPage';
+import { UpdatesPage } from './views/settings/UpdatesPage/UpdatesPage';
+import { TimelinesAndEventsPage } from './views/TimelinesAndEventsPage/TimelinesAndEventsPage';
 
 export const routes: RouteObject[] = [
   {

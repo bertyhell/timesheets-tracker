@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
-import { CsvExportService } from './csv-export.service';
-import { CsvExportController } from './csv-export.controller';
+
 import { DatabaseModule } from '../database/database.module';
+import { CsvExportController } from './csv-export.controller';
+import { CsvExportService } from './csv-export.service';
 
 @Module({
   imports: [DatabaseModule],

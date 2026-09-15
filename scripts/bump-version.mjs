@@ -24,7 +24,9 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const at = (file) => join(ROOT, file);
 
 const PACKAGES = ['package.json', 'api/package.json', 'client/package.json'].map(at);
-const LOCKFILES = ['package-lock.json', 'api/package-lock.json', 'client/package-lock.json'].map(at);
+const LOCKFILES = ['package-lock.json', 'api/package-lock.json', 'client/package-lock.json'].map(
+  at
+);
 
 const args = process.argv.slice(2);
 const argOf = (name) => args.find((a) => a.startsWith(`--${name}=`))?.split('=')[1];
@@ -92,5 +94,7 @@ for (const file of LOCKFILES) {
   writeFileSync(file, `${JSON.stringify(json, null, 2)}\n`);
 }
 
-console.log(`Bumped from ${format(base)} to ${version} (highest existing version: ${format(base)}).`);
+console.log(
+  `Bumped from ${format(base)} to ${version} (highest existing version: ${format(base)}).`
+);
 console.log(`Next: commit, then \`git tag v${version} && git push origin HEAD v${version}\`.`);

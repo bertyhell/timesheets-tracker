@@ -1,20 +1,22 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { CreateTagDto } from './dto/create-tag.dto';
-import { DatabaseService } from '../database/database.service';
-import { v4 as uuid } from 'uuid';
-import type { Tag } from '../types/types';
-import { unflatten } from 'nested-objects-util';
 import { max, min } from 'date-fns';
+import { unflatten } from 'nested-objects-util';
+import { v4 as uuid } from 'uuid';
+
+import type { Tag } from '../types/types';
+
+import { DatabaseService } from '../database/database.service';
+import { CustomError } from '../shared/CustomError';
+import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
+import { createTag } from './queries/createTag';
+import { deleteTag } from './queries/deleteTag';
 import { findAllTags } from './queries/findAllTags';
 import { findOneTag } from './queries/findOneTag';
 import { findOverlappingTags } from './queries/findOverlappingTags';
-import { createTag } from './queries/createTag';
 import { updateTag } from './queries/updateTag';
-import { updateTagTime } from './queries/updateTagTime';
 import { updateTagNote } from './queries/updateTagNote';
-import { deleteTag } from './queries/deleteTag';
-import { CustomError } from '../shared/CustomError';
+import { updateTagTime } from './queries/updateTagTime';
 
 @Injectable()
 export class TagsService {

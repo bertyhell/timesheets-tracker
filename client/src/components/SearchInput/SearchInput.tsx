@@ -1,5 +1,6 @@
-import React from 'react';
 import { Search, X } from 'lucide-react';
+import React from 'react';
+
 import './SearchInput.css';
 
 interface SearchInputProps {

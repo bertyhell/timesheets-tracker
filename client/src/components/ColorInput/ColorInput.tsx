@@ -1,7 +1,7 @@
 import React from 'react';
 import { HexColorPicker } from 'react-colorful';
-import { COLOR_LIST } from '../Timeline/helpers/getColorForEvent';
 
+import { COLOR_LIST } from '../Timeline/helpers/getColorForEvent';
 import './ColorInput.css';
 
 interface ColorInputProps {

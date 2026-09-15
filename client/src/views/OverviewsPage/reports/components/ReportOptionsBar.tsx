@@ -1,5 +1,4 @@
 import './ReportOptionsBar.css';
-import React from 'react';
 import {
   AreaChart,
   BarChart3,
@@ -13,14 +12,9 @@ import {
   Table2,
   type LucideIcon,
 } from 'lucide-react';
+import React from 'react';
+
 import { Dropdown } from '../../../../components/Dropdown/Dropdown';
-import {
-  ChartType,
-  type ReportDefinition,
-  type ReportOptions,
-  SortMode,
-  SPLIT_NONE,
-} from '../report.types';
 import {
   BUCKET_LABELS,
   CHART_TYPE_LABELS,
@@ -30,6 +24,13 @@ import {
   SORT_LABELS,
   TOP_N_OPTIONS,
 } from '../helpers/report-state';
+import {
+  ChartType,
+  type ReportDefinition,
+  type ReportOptions,
+  SortMode,
+  SPLIT_NONE,
+} from '../report.types';
 
 const CHART_TYPE_ICONS: Record<ChartType, LucideIcon> = {
   [ChartType.Bar]: BarChart3,

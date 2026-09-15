@@ -11,6 +11,7 @@
  *   cd client && npm run dev:client  (frontend on port 55588)
  */
 
+import { spawn, type ChildProcess } from 'child_process';
 import {
   app,
   BrowserWindow,
@@ -23,9 +24,8 @@ import {
   shell,
 } from 'electron';
 import { autoUpdater } from 'electron-updater';
-import { spawn, ChildProcess } from 'child_process';
-import * as path from 'path';
 import * as fs from 'fs';
+import * as path from 'path';
 
 const UPDATE_CHECK_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000; // 1 week
 
@@ -106,7 +106,7 @@ async function waitForServer(url: string, timeoutMs = 120_000): Promise<void> {
     // If the backend already died there is nothing left to wait for.
     if (apiExitCode !== null) {
       throw new Error(
-        `The backend exited with code ${apiExitCode} before it became reachable.\n\n${apiStderr.trim()}`,
+        `The backend exited with code ${apiExitCode} before it became reachable.\n\n${apiStderr.trim()}`
       );
     }
     try {
@@ -176,7 +176,7 @@ function createTray(): Tray {
 // instead, which is what desktop environments actually read at login.
 const AUTOSTART_FILE = path.join(
   app.getPath('home'),
-  '.config/autostart/timesheets-tracker.desktop',
+  '.config/autostart/timesheets-tracker.desktop'
 );
 
 /** Path to re-launch: the AppImage itself when packaged that way, else the binary. */
@@ -456,7 +456,8 @@ function setupAutoUpdater(): void {
         cancelId: 1,
         title: 'Update Ready',
         message: `Version ${info.version} has been downloaded.`,
-        detail: 'Restart the app to apply it now, or it will be applied automatically the next time you quit.',
+        detail:
+          'Restart the app to apply it now, or it will be applied automatically the next time you quit.',
       })
       .then(({ response }) => {
         if (response === 0) {
@@ -608,7 +609,7 @@ app.whenReady().then(async () => {
     console.error('[electron]', error);
     dialog.showErrorBox(
       'Timesheets Tracker could not start',
-      error instanceof Error ? error.message : String(error),
+      error instanceof Error ? error.message : String(error)
     );
     quit();
     return;

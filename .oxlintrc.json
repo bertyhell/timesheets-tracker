@@ -1,0 +1,52 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc", "import", "react"],
+  "categories": {
+    "correctness": "error"
+  },
+  "ignorePatterns": [
+    "node_modules",
+    "dist",
+    "dist-ssr",
+    "release",
+    "*.local",
+    "client/src/generated",
+    "**/*.json"
+  ],
+  "rules": {
+    "import/no-duplicates": "error",
+    "typescript/no-explicit-any": "off",
+    "typescript/consistent-type-imports": [
+      "error",
+      {
+        "fixStyle": "inline-type-imports"
+      }
+    ],
+    "no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_"
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["client/**/*.ts", "client/**/*.tsx"],
+      "rules": {
+        "react/exhaustive-deps": "warn"
+      }
+    },
+    {
+      // The api compiles with `emitDecoratorMetadata`, and Nest DI, class-validator and
+      // Swagger all read those runtime types. A type-only import is erased from the emitted
+      // metadata, so rewriting an injected class to `import type` breaks dependency
+      // resolution at boot. Leave import kinds alone here.
+      "files": ["api/**/*.ts"],
+      "rules": {
+        "typescript/consistent-type-imports": "off"
+      }
+    }
+  ]
+}

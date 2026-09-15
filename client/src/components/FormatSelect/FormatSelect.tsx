@@ -1,10 +1,10 @@
-import React, { useCallback, useRef, useState } from 'react';
 import { Check, ChevronDown } from 'lucide-react';
+import React, { useCallback, useRef, useState } from 'react';
 
-import { useDismiss } from '../../helpers/use-dismiss';
 import type { FormatOption } from '../../helpers/csv-column-options';
 import type { CsvValueFormat } from '../../types/types';
 
+import { useDismiss } from '../../helpers/use-dismiss';
 import './FormatSelect.css';
 
 interface FormatSelectProps {

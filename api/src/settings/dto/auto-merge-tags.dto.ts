@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, Max, Min } from 'class-validator';
 import { Type } from 'class-transformer';
+import { IsInt, Max, Min } from 'class-validator';
 
 /** Effective value when the setting has never been saved (the historical hardcoded threshold). */
 export const DEFAULT_AUTO_MERGE_TAGS_MINUTES = 5;

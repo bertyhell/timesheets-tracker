@@ -1,6 +1,6 @@
 import './Dropdown.css';
-import React, { useCallback, useRef, useState, type ReactNode } from 'react';
 import { ChevronDown } from 'lucide-react';
+import React, { useCallback, useRef, useState, type ReactNode } from 'react';
 
 import { useDismiss } from '../../helpers/use-dismiss';
 

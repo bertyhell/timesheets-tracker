@@ -1,7 +1,8 @@
 import './ReportTable.css';
 import React from 'react';
-import { SortMode, type ReportResult } from '../report.types';
+
 import { formatValue } from '../helpers/format-values';
+import { SortMode, type ReportResult } from '../report.types';
 
 interface ReportTableProps {
   result: ReportResult;

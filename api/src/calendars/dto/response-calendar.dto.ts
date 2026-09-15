@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsString } from 'class-validator';
+
 import type { Calendar } from '../../types/types';
 
 export class CalendarDto implements Calendar {

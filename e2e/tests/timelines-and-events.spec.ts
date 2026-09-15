@@ -1,16 +1,12 @@
 import { test, expect, type Page } from '@playwright/test';
+
 import { uniqueName } from '../utils/unique-name';
 
 // Native activity tracking is disabled for e2e (DISABLE_ACTIVITY_TRACKING=true), so no
 // program/website/activeState rows are ever captured organically. Tests that need a
 // "captured activity" event to tag seed it directly via the same REST endpoint the real
 // window listener would call (see api/src/programs/programs.controller.ts).
-async function seedProgramEvent(
-  page: Page,
-  programName: string,
-  startedAt: Date,
-  endedAt: Date
-) {
+async function seedProgramEvent(page: Page, programName: string, startedAt: Date, endedAt: Date) {
   const response = await page.request.post('/api/programs', {
     data: {
       programName,
@@ -84,7 +80,9 @@ test.describe('Timelines and events page', () => {
     await expect(modal).not.toBeVisible();
 
     await timelineLabel(page, 'Tags').click();
-    await expect(eventsTable(page).getByRole('cell', { name: tagTitle, exact: true })).toBeVisible();
+    await expect(
+      eventsTable(page).getByRole('cell', { name: tagTitle, exact: true })
+    ).toBeVisible();
   });
 
   test('create, edit and delete a tag from a seeded program event', async ({ page }, testInfo) => {
@@ -98,11 +96,11 @@ test.describe('Timelines and events page', () => {
 
     await page.goto('/timelines-and-events');
     // "Programs" is selected by default on load.
-    await expect(eventsTable(page).getByRole('cell', { name: programName, exact: true })).toBeVisible();
+    await expect(
+      eventsTable(page).getByRole('cell', { name: programName, exact: true })
+    ).toBeVisible();
 
-    await eventsTable(page)
-      .getByRole('row', { name: programName })
-      .click({ button: 'right' });
+    await eventsTable(page).getByRole('row', { name: programName }).click({ button: 'right' });
     await contextMenuItem(page, 'Create tag').click();
 
     const createModal = page.locator('.c-edit-tag-modal');
@@ -192,6 +190,8 @@ test.describe('Timelines and events page', () => {
     // the row-selection step above, which wouldn't match anything in the Tags lane.
     await page.getByPlaceholder('Search events...').fill(tagTitle);
     await timelineLabel(page, 'Tags').click();
-    await expect(eventsTable(page).getByRole('cell', { name: tagTitle, exact: true }).first()).toBeVisible();
+    await expect(
+      eventsTable(page).getByRole('cell', { name: tagTitle, exact: true }).first()
+    ).toBeVisible();
   });
 });

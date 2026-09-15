@@ -1,13 +1,10 @@
 import './GrowAutoTagsModal.css';
-
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { parseISO } from 'date-fns';
 import React, { type FC, useMemo, useState } from 'react';
 import { Modal } from 'react-responsive-modal';
-import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import { parseISO } from 'date-fns';
 
-import Button, { ButtonVariant } from '../Button/Button';
-import ToggleButton from '../ToggleButton/ToggleButton';
 import type {
   AutoTagEventInfoDto,
   TagEventInfoDto,
@@ -16,15 +13,18 @@ import type {
   TimelineEventDto,
   TimelineWithEventsDto,
 } from '../../generated/api/types.gen';
+
 import {
   tagNamesControllerFindAllOptions,
   tagsControllerCreateMutation,
   tagsControllerRemoveMutation,
 } from '../../generated/api/@tanstack/react-query.gen';
-import { TimelineType } from '../Timeline/Timeline.types';
+import Button, { ButtonVariant } from '../Button/Button';
 import { getColorForEvent } from '../Timeline/helpers/getColorForEvent';
 import { getEventLabel } from '../Timeline/helpers/getEventLabel';
 import { formatHoursMinutes } from '../Timeline/helpers/prepareEvents';
+import { TimelineType } from '../Timeline/Timeline.types';
+import ToggleButton from '../ToggleButton/ToggleButton';
 import { GrowPreviewRuler, GrowPreviewTimeline, type PreviewBar } from './GrowPreviewTimeline';
 import {
   getEventBounds,
@@ -200,7 +200,15 @@ export const GrowAutoTagsModal: FC<GrowAutoTagsModalProps> = ({
   const boundsBars: PreviewBar[] = useMemo(
     () =>
       bounds
-        ? [{ id: 'bounds', startMs: bounds.minMs, endMs: bounds.maxMs, label: '', color: '#d1d5db' }]
+        ? [
+            {
+              id: 'bounds',
+              startMs: bounds.minMs,
+              endMs: bounds.maxMs,
+              label: '',
+              color: '#d1d5db',
+            },
+          ]
         : [],
     [bounds]
   );

@@ -1,16 +1,10 @@
-import React, { FC, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, Maximize, ZoomIn, ZoomOut } from 'lucide-react';
 import {
-  AutoTagEventInfoDto,
-  CalendarEventInfoDto,
-  TagEventInfoDto,
-  TimelineDto,
-  TimelineEventDto,
-  TimelinesControllerFindAllEventsResponse,
-  TimelineWithEventsDto,
-} from '../../generated/api';
-import Timeline from '../Timeline/Timeline';
-import { clamp, maxBy, minBy } from 'lodash-es';
+  type QueryObserverResult,
+  type RefetchOptions,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 import {
   addHours,
   addMilliseconds,
@@ -22,22 +16,32 @@ import {
   subHours,
   subMinutes,
 } from 'date-fns';
-import { TimelineRuler } from '../Timeline/TimelineRuler';
-import { prepareEvents, type PreparedEvent } from '../Timeline/helpers/prepareEvents';
-import { isApproxEqual } from '../../helpers/is-approx-equal';
-import { ROUTE_PARTS } from '../../App';
+import { clamp, maxBy, minBy } from 'lodash-es';
+import { ChevronLeft, ChevronRight, Maximize, ZoomIn, ZoomOut } from 'lucide-react';
+import React, {
+  type FC,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TagName } from '../../types/types';
+import { toast } from 'react-toastify';
+
 import type { ProminentCondition } from '../Timeline/helpers/getMostProminentConditions';
-import { TimelineType } from '../Timeline/Timeline.types';
-import { getOverlappingAutoTagNotes } from '../../helpers/get-overlapping-auto-tag-notes';
+
+import { ROUTE_PARTS } from '../../App';
 import {
-  QueryObserverResult,
-  RefetchOptions,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from '@tanstack/react-query';
+  type AutoTagEventInfoDto,
+  type CalendarEventInfoDto,
+  type TagEventInfoDto,
+  type TimelineDto,
+  type TimelineEventDto,
+  type TimelinesControllerFindAllEventsResponse,
+  type TimelineWithEventsDto,
+} from '../../generated/api';
 import {
   tagNamesControllerCountOptions,
   tagNamesControllerCreateMutation,
@@ -45,8 +49,14 @@ import {
   tagsControllerUpdateMutation,
   timelinesControllerFindAllEventsQueryKey,
 } from '../../generated/api/@tanstack/react-query.gen';
-import { toast } from 'react-toastify';
+import { getOverlappingAutoTagNotes } from '../../helpers/get-overlapping-auto-tag-notes';
+import { isApproxEqual } from '../../helpers/is-approx-equal';
+import { type TagName } from '../../types/types';
 import { GrowAutoTagsModal } from '../GrowAutoTagsModal/GrowAutoTagsModal';
+import { prepareEvents, type PreparedEvent } from '../Timeline/helpers/prepareEvents';
+import Timeline from '../Timeline/Timeline';
+import { TimelineType } from '../Timeline/Timeline.types';
+import { TimelineRuler } from '../Timeline/TimelineRuler';
 
 // Default visible window when opening the timelines view: 8:00 - 19:00
 const DEFAULT_VIEW_START_HOUR = 8;

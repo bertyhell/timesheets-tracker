@@ -1,6 +1,7 @@
 import React, { type FC } from 'react';
-import { formatHoursMinutes, formatTimeRange } from '../Timeline/helpers/prepareEvents';
+
 import { getTicks } from '../Timeline/helpers/getTicks';
+import { formatHoursMinutes, formatTimeRange } from '../Timeline/helpers/prepareEvents';
 
 interface GrowPreviewRulerProps {
   minMs: number;

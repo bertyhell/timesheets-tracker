@@ -1,7 +1,8 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Put } from '@nestjs/common';
 import { ApiExtraModels, ApiOkResponse, ApiTags, getSchemaPath } from '@nestjs/swagger';
-import { IntegrationsService } from './integrations.service';
+
 import { IntegrationDto, UpsertIntegrationDto } from './dto/integration.dto';
+import { IntegrationsService } from './integrations.service';
 
 @ApiTags('integrations')
 @ApiExtraModels(IntegrationDto)

@@ -1,11 +1,12 @@
-import autoTags from './ManicTime_AutoTags_2026-03-12.json';
+import { randomUUID } from 'node:crypto';
+
 import {
-  AutoTagCondition,
+  type AutoTagCondition,
   BooleanOperator,
   ConditionOperator,
   ConditionVariable,
 } from './api/src/types/types';
-import { randomUUID } from 'node:crypto';
+import autoTags from './ManicTime_AutoTags_2026-03-12.json';
 
 const tagnameMap: Record<string, string> = {
   hermes: 'cbd05d45-ff73-4772-ac9b-be79c2f739ef',

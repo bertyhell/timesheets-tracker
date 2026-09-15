@@ -1,13 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
-import { CreateActiveStateDto } from './dto/create-active-state.dto';
-import { UpdateActiveStateDto } from './dto/update-active-state.dto';
-import { ResponseActiveStateDto } from './dto/response-active-state.dto';
-import { ActiveStatesService } from './active-states.service';
-import { getIsActive } from './helpers/get-idle-state.helper';
 import { noop } from 'lodash';
-import { logger } from '../shared/logger';
+
 import { isActivityTrackingDisabled } from '../shared/is-activity-tracking-disabled';
+import { logger } from '../shared/logger';
+import { ActiveStatesService } from './active-states.service';
+import { CreateActiveStateDto } from './dto/create-active-state.dto';
+import { ResponseActiveStateDto } from './dto/response-active-state.dto';
+import { UpdateActiveStateDto } from './dto/update-active-state.dto';
+import { getIsActive } from './helpers/get-idle-state.helper';
 
 const ACTIVE_STATE_POLLING_INTERVAL_SECONDS = 2 * 60;
 

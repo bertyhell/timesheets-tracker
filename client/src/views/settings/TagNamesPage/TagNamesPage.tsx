@@ -1,18 +1,20 @@
 import './TagNamesPage.css';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { orderBy } from 'lodash-es';
+import React, { type ReactNode, useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
+import type { TagName } from '../../../types/types';
+
+import { ROUTE_PARTS } from '../../../App';
 import Button, { ButtonVariant } from '../../../components/Button/Button';
 import { PageHeader } from '../../../components/PageHeader/PageHeader';
-import type { TagName } from '../../../types/types';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { SearchInput } from '../../../components/SearchInput/SearchInput';
 import {
   tagNamesControllerFindAllOptions,
   tagNamesControllerRemoveMutation,
 } from '../../../generated/api/@tanstack/react-query.gen';
-import React, { type ReactNode, useEffect, useState } from 'react';
-import { ROUTE_PARTS } from '../../../App';
-import { toast } from 'react-toastify';
-import { orderBy } from 'lodash-es';
-import { SearchInput } from '../../../components/SearchInput/SearchInput';
 
 // interface TagNamesPageProps {}
 

@@ -1,13 +1,14 @@
 import { Injectable, type OnModuleInit, Logger, OnModuleDestroy } from '@nestjs/common';
-import * as path from 'path';
 import * as fs from 'fs';
 import * as fsPromise from 'fs/promises';
-import { DatabaseSync, StatementSync } from 'node:sqlite';
-import { CustomError } from '../shared/CustomError';
-import { SeedService } from '../seed/seed.service';
 import { resolve } from 'node:path';
-import { DbQueryParams } from './database.types';
+import { DatabaseSync, StatementSync } from 'node:sqlite';
+import * as path from 'path';
+
+import { SeedService } from '../seed/seed.service';
+import { CustomError } from '../shared/CustomError';
 import { resolveProjectPath } from '../shared/resolve-src-path';
+import { DbQueryParams } from './database.types';
 
 @Injectable()
 export class DatabaseService implements OnModuleInit, OnModuleDestroy {

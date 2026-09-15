@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+
 import { uniqueName } from '../utils/unique-name';
 
 test.describe('Timelines management', () => {
@@ -18,7 +19,9 @@ test.describe('Timelines management', () => {
       await modal.locator('input.c-input').nth(0).fill(title);
       // The 'Calendar ICS link' input only appears once type === 'Calendar'; the exact URL
       // value doesn't matter since CALENDAR_FALLBACK_ICS_FILE substitutes the fixture file.
-      await modal.getByPlaceholder('e.g. https://calendar.example.com/feed.ics').fill('https://example.com/fake.ics');
+      await modal
+        .getByPlaceholder('e.g. https://calendar.example.com/feed.ics')
+        .fill('https://example.com/fake.ics');
 
       await modal.getByRole('button', { name: 'Save' }).click();
       await expect(modal).not.toBeVisible();

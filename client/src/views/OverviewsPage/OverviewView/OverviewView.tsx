@@ -1,28 +1,30 @@
 import './OverviewView.css';
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import type * as echarts from 'echarts/core';
+
 import { useQuery } from '@tanstack/react-query';
 import { useSetAtom } from 'jotai';
-import type * as echarts from 'echarts/core';
-import { toast } from 'react-toastify';
 import { Copy, Download, Image, Pencil, Save } from 'lucide-react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
+import { overviewsApi } from '../../../api/overviews';
+import { ROUTE_PARTS } from '../../../App';
 import Button, { ButtonVariant } from '../../../components/Button/Button';
 import { Chart } from '../../../components/Chart/Chart';
 import { DateRangeSelect } from '../../../components/DateRangeSelect/DateRangeSelect';
-import { ROUTE_PARTS } from '../../../App';
+import { resolveDateRange } from '../../../helpers/resolve-date-range';
 import { headerActionsAtom } from '../../../store/store';
 import { DateRangeMode } from '../../../types/types';
-import { overviewsApi } from '../../../api/overviews';
-import { resolveDateRange } from '../../../helpers/resolve-date-range';
-import { ChartType, type ReportOptions } from '../reports/report.types';
-import { DEFAULT_REPORT_ID, findReport, REPORTS } from '../reports/report-catalog';
-import { resolveReportOptions, toReportState } from '../reports/helpers/report-state';
-import { toEChartsOption } from '../reports/helpers/to-echarts-option';
-import { getPreferredChartHeight } from '../reports/helpers/chart-height';
-import { downloadCsv, downloadDataUrl, reportToCsv } from '../reports/helpers/report-to-csv';
 import { ReportOptionsBar } from '../reports/components/ReportOptionsBar';
 import { ReportSummary } from '../reports/components/ReportSummary';
 import { ReportTable } from '../reports/components/ReportTable';
+import { getPreferredChartHeight } from '../reports/helpers/chart-height';
+import { resolveReportOptions, toReportState } from '../reports/helpers/report-state';
+import { downloadCsv, downloadDataUrl, reportToCsv } from '../reports/helpers/report-to-csv';
+import { toEChartsOption } from '../reports/helpers/to-echarts-option';
+import { DEFAULT_REPORT_ID, findReport, REPORTS } from '../reports/report-catalog';
+import { ChartType, type ReportOptions } from '../reports/report.types';
 
 export function OverviewView() {
   const { configId } = useParams();

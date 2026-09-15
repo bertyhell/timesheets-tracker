@@ -1,16 +1,18 @@
-import React from 'react';
-import './IntegrationsPage.css';
-import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueries, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'react-toastify';
+
+import './IntegrationsPage.css';
 import { Plus, Trash2, Pencil } from 'lucide-react';
-import { PageHeader } from '../../../components/PageHeader/PageHeader';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
+import { integrationsApi } from '../../../api/integrations';
+import excelCsvLogo from '../../../assets/integrations/excel-csv.svg';
+import jiraLogo from '../../../assets/integrations/jira.svg';
+import productiveLogo from '../../../assets/integrations/productive.svg';
 import Button, { ButtonVariant } from '../../../components/Button/Button';
 import { Dropdown } from '../../../components/Dropdown/Dropdown';
-import { integrationsApi } from '../../../api/integrations';
-import productiveLogo from '../../../assets/integrations/productive.svg';
-import jiraLogo from '../../../assets/integrations/jira.svg';
-import excelCsvLogo from '../../../assets/integrations/excel-csv.svg';
+import { PageHeader } from '../../../components/PageHeader/PageHeader';
 
 // Adding an integration is this entry plus its own settings page — everything below is driven off
 // this list rather than off the integration name.

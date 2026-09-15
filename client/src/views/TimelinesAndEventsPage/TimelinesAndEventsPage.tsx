@@ -1,19 +1,32 @@
 import './TimelinesAndEventsPage.css';
-import { toast } from 'react-toastify';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { endOfDay, format, startOfDay } from 'date-fns';
-import { TimelineType } from '../../components/Timeline/Timeline.types';
 import { useAtom } from 'jotai';
-import { sidebarCollapsedAtom, viewDateAtom } from '../../store/store';
-import { EventsTable } from '../../components/EventsTable/EventsTable';
-import { EventsTotalsTable } from '../../components/EventsTotalsTable/EventsTotalsTable';
+import { Loader2, Menu, Plus } from 'lucide-react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  Group as PanelGroup,
+  Panel,
+  Separator as PanelResizeHandle,
+  useDefaultLayout,
+} from 'react-resizable-panels';
+import { Outlet, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
 import type {
   TimelineEventDto,
   TimelineWithEventsDto,
   TimelinesControllerFindAllEventsResponse,
 } from '../../generated/api/types.gen';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+import { ROUTE_PARTS } from '../../App';
+import Button, { ButtonVariant } from '../../components/Button/Button';
+import DateSelect from '../../components/DateSelect/DateSelect';
+import { EventsTable } from '../../components/EventsTable/EventsTable';
+import { EventsTotalsTable } from '../../components/EventsTotalsTable/EventsTotalsTable';
+import GlobalSearchBar from '../../components/GlobalSearchBar/GlobalSearchBar';
+import { TimelineType } from '../../components/Timeline/Timeline.types';
+import { TimelinesViewer } from '../../components/TimelinesViewer/TimelinesViewer';
 import {
   tagsControllerRemoveMutation,
   timelinesControllerFindAllEventsOptions,
@@ -21,18 +34,7 @@ import {
   timelinesControllerFindAllOptions,
 } from '../../generated/api/@tanstack/react-query.gen';
 import { timelinesControllerFindAllEvents } from '../../generated/api/sdk.gen';
-import GlobalSearchBar from '../../components/GlobalSearchBar/GlobalSearchBar';
-import DateSelect from '../../components/DateSelect/DateSelect';
-import {
-  Group as PanelGroup,
-  Panel,
-  Separator as PanelResizeHandle,
-  useDefaultLayout,
-} from 'react-resizable-panels';
-import Button, { ButtonVariant } from '../../components/Button/Button';
-import { ROUTE_PARTS } from '../../App';
-import { Loader2, Menu, Plus } from 'lucide-react';
-import { TimelinesViewer } from '../../components/TimelinesViewer/TimelinesViewer';
+import { sidebarCollapsedAtom, viewDateAtom } from '../../store/store';
 
 const NO_EVENTS_MESSAGE_BY_TYPE: Record<TimelineType, string> = {
   [TimelineType.Calendar]: 'No calendar events',

@@ -1,6 +1,8 @@
 import type { LucideIcon } from 'lucide-react';
-import { DateRangeMode, OverviewSourceType } from '../../../types/types';
+
 import type { OverviewFlatRowDto } from '../../../api/overviews';
+
+import { type DateRangeMode, type OverviewSourceType } from '../../../types/types';
 
 export enum ChartType {
   Bar = 'bar',

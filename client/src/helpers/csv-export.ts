@@ -1,8 +1,9 @@
 import { format as formatDate } from 'date-fns';
 
+import type { TimelineEventDto } from '../generated/api/types.gen';
+
 import { CsvColumnValue, CsvValueFormat, type CsvExportColumn } from '../types/types';
 import { formatHours } from '../views/OverviewsPage/reports/helpers/format-values';
-import type { TimelineEventDto } from '../generated/api/types.gen';
 
 /** The tag fields the exporter reads off a timeline event, for both Tag and AutoTag timelines. */
 interface TagEventInfoLike {

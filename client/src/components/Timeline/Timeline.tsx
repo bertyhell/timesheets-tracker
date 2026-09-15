@@ -1,15 +1,4 @@
 import './Timeline.css';
-import React, { type MouseEvent, useEffect, useMemo, useRef, useState } from 'react';
-import { Modal } from 'react-responsive-modal';
-import Button, { ButtonVariant } from '../Button/Button';
-
-import { useNavigate } from 'react-router-dom';
-import { ROUTE_PARTS } from '../../App';
-import { ContextMenu } from '../ContextMenu/ContextMenu';
-import { contextMenuIcons } from '../ContextMenu/context-menu-icons';
-import { useAtom } from 'jotai';
-import { searchTermAtom } from '../../store/store';
-import Tooltip from '../Tooltip/Tooltip';
 import {
   addMilliseconds,
   differenceInMilliseconds,
@@ -20,26 +9,26 @@ import {
   parseISO,
   roundToNearestMinutes,
 } from 'date-fns';
-import { formatDuration } from '../../helpers/format-duration';
-import type { TagName } from '../../types/types';
-import TagSelectSingle from '../TagSelect/TagSelectSingle';
+import { useAtom } from 'jotai';
+import React, { type MouseEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { Modal } from 'react-responsive-modal';
+import { useNavigate } from 'react-router-dom';
+
 import type {
   AutoTagEventInfoDto,
   TimelineDto,
   TimelineEventDto,
 } from '../../generated/api/types.gen';
-import { getColorFromString, getRandomColor } from './helpers/getColorForEvent';
-import { getTicks } from './helpers/getTicks';
+import type { TagName } from '../../types/types';
 import type { PreparedEvent } from './helpers/prepareEvents';
-import { cullAndMergeEvents, summarizeMergedEvents } from './helpers/cullAndMergeEvents';
-import { formatMatchedCondition } from './helpers/formatMatchedCondition';
-import {
-  getMostProminentConditions,
-  type ProminentCondition,
-} from './helpers/getMostProminentConditions';
-import { TimelineType } from './Timeline.types';
+
+import { ROUTE_PARTS } from '../../App';
+import { formatDuration } from '../../helpers/format-duration';
+import { searchTermAtom } from '../../store/store';
+import Button, { ButtonVariant } from '../Button/Button';
 import { ColorInput } from '../ColorInput/ColorInput';
-import { SyncToProductiveModal } from '../SyncToProductiveModal/SyncToProductiveModal';
+import { contextMenuIcons } from '../ContextMenu/context-menu-icons';
+import { ContextMenu } from '../ContextMenu/ContextMenu';
 import { ExportToCsvModal } from '../ExportToCsvModal/ExportToCsvModal';
 import {
   CSV_OUTPUT_ID,
@@ -48,6 +37,18 @@ import {
   useSyncOutputs,
   writeLastSyncOutput,
 } from '../SyncOutputMenu/useSyncOutputs';
+import { SyncToProductiveModal } from '../SyncToProductiveModal/SyncToProductiveModal';
+import TagSelectSingle from '../TagSelect/TagSelectSingle';
+import Tooltip from '../Tooltip/Tooltip';
+import { cullAndMergeEvents, summarizeMergedEvents } from './helpers/cullAndMergeEvents';
+import { formatMatchedCondition } from './helpers/formatMatchedCondition';
+import { getColorFromString, getRandomColor } from './helpers/getColorForEvent';
+import {
+  getMostProminentConditions,
+  type ProminentCondition,
+} from './helpers/getMostProminentConditions';
+import { getTicks } from './helpers/getTicks';
+import { TimelineType } from './Timeline.types';
 
 interface ResizeState {
   tagId: string;

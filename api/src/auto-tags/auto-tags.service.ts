@@ -1,26 +1,27 @@
-import { CreateAutoTagDto } from './dto/create-auto-tag.dto';
 import { Inject, Injectable } from '@nestjs/common';
-import { DatabaseService } from '../database/database.service';
-import { v4 as uuid } from 'uuid';
-import { AutoTag, BooleanOperator, TimelineType } from '../types/types';
-import { unflatten } from 'nested-objects-util';
-import { UpdateAutoTagsDto } from './dto/update-auto-tags.dto';
-import { findAllAutoTags } from './queries/findAllAutoTags';
-import { findAllAutoTagsBySearchTerm } from './queries/findAllAutoTagsBySearchTerm';
-import { countAutoTags } from './queries/countAutoTags';
-import { findOneAutoTag } from './queries/findOneAutoTag';
-import { createAutoTag } from './queries/createAutoTag';
-import { updateAutoTag } from './queries/updateAutoTag';
-import { deleteAutoTag } from './queries/deleteAutoTag';
-import { reorderAutoTags, type ReorderAutoTagItem } from './queries/reorderAutoTags';
-import { TimelineDto } from '../timelines/dto/response-timeline.dto';
-import { calculateAutoTagEvents } from './helpers/auto-tags-analyzer';
 import { partition } from 'lodash';
-import { AutoTagDto, AutoTagMergeResultDto } from './dto/response-auto-tag.dto';
+import { unflatten } from 'nested-objects-util';
+import { v4 as uuid } from 'uuid';
+
+import { DatabaseService } from '../database/database.service';
+import { SettingsService } from '../settings/settings.service';
+import { CustomError } from '../shared/CustomError';
 import { TagNameDto } from '../tag-names/dto/response-tag-name.dto';
 import { TimelineWithEventsDto } from '../timelines/dto/response-timeline-events.dto';
-import { CustomError } from '../shared/CustomError';
-import { SettingsService } from '../settings/settings.service';
+import { TimelineDto } from '../timelines/dto/response-timeline.dto';
+import { AutoTag, BooleanOperator, TimelineType } from '../types/types';
+import { CreateAutoTagDto } from './dto/create-auto-tag.dto';
+import { AutoTagDto, AutoTagMergeResultDto } from './dto/response-auto-tag.dto';
+import { UpdateAutoTagsDto } from './dto/update-auto-tags.dto';
+import { calculateAutoTagEvents } from './helpers/auto-tags-analyzer';
+import { countAutoTags } from './queries/countAutoTags';
+import { createAutoTag } from './queries/createAutoTag';
+import { deleteAutoTag } from './queries/deleteAutoTag';
+import { findAllAutoTags } from './queries/findAllAutoTags';
+import { findAllAutoTagsBySearchTerm } from './queries/findAllAutoTagsBySearchTerm';
+import { findOneAutoTag } from './queries/findOneAutoTag';
+import { reorderAutoTags, type ReorderAutoTagItem } from './queries/reorderAutoTags';
+import { updateAutoTag } from './queries/updateAutoTag';
 
 /**
  * Two rules are merge candidates only when they target the same tag name AND cover the same

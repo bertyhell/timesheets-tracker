@@ -7,6 +7,8 @@
     "build": "tsc && vite build",
     "serve": "vite preview",
     "generate-api-helpers": "openapi-ts",
+    "lint": "cd .. && npm run lint",
+    "format": "cd .. && npm run format",
     "bump": "node ../scripts/bump-version.mjs"
   },
   "dependencies": {

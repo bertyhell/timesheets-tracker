@@ -1,3 +1,16 @@
+import { endOfDay, isEqual, isValid, parseISO, startOfDay } from 'date-fns';
+import { isNil } from 'es-toolkit';
+import { compact, uniq, uniqBy } from 'lodash';
+
+import { DEFAULT_AUTO_MERGE_TAGS_MINUTES } from '../../settings/dto/auto-merge-tags.dto';
+import { CustomError } from '../../shared/CustomError';
+import { TagNameDto } from '../../tag-names/dto/response-tag-name.dto';
+import {
+  AutoTagEventInfoDto,
+  MatchedAutoTagConditionDto,
+  TimelineEventDto,
+  TimelineWithEventsDto,
+} from '../../timelines/dto/response-timeline-events.dto';
 import {
   BooleanOperator,
   ConditionOperator,
@@ -5,18 +18,6 @@ import {
   TimelineType,
 } from '../../types/types';
 import { AutoTagConditionDto, AutoTagDto } from '../dto/response-auto-tag.dto';
-import {
-  AutoTagEventInfoDto,
-  MatchedAutoTagConditionDto,
-  TimelineEventDto,
-  TimelineWithEventsDto,
-} from '../../timelines/dto/response-timeline-events.dto';
-import { compact, uniq, uniqBy } from 'lodash';
-import { endOfDay, isEqual, isValid, parseISO, startOfDay } from 'date-fns';
-import { TagNameDto } from '../../tag-names/dto/response-tag-name.dto';
-import { CustomError } from '../../shared/CustomError';
-import { isNil } from 'es-toolkit';
-import { DEFAULT_AUTO_MERGE_TAGS_MINUTES } from '../../settings/dto/auto-merge-tags.dto';
 
 const DEFAULT_MAX_GROW_TIME_MINUTES = 5;
 

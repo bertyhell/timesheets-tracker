@@ -1,9 +1,10 @@
 import './TagSelect.css';
-
 import React from 'react';
 import AsyncCreatableSelect from 'react-select/async-creatable';
-import { tagNamesControllerFindAll } from '../../generated/api/sdk.gen';
+
 import type { TagName } from '../../types/types';
+
+import { tagNamesControllerFindAll } from '../../generated/api/sdk.gen';
 import { tagSelectStyles } from './tagSelectStyles';
 
 interface TagSelectProps {

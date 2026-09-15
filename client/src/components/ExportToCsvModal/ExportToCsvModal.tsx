@@ -1,18 +1,18 @@
+import { useQuery } from '@tanstack/react-query';
+import { X } from 'lucide-react';
 import React, { useMemo } from 'react';
 import { Modal } from 'react-responsive-modal';
-import { useQuery } from '@tanstack/react-query';
-import { toast } from 'react-toastify';
-import { X } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 import type { TimelineDto, TimelineEventDto } from '../../generated/api/types.gen';
-import { csvExportApi } from '../../api/csvExport';
-import { buildCsvGrid, buildCsvRows } from '../../helpers/csv-export';
-import { downloadCsv, toCsv, toCsvFileName, UTF8_BOM } from '../../helpers/csv';
-import { SyncOutputMenu } from '../SyncOutputMenu/SyncOutputMenu';
-import { CSV_OUTPUT_ID, useSyncOutputs } from '../SyncOutputMenu/useSyncOutputs';
 import type { CsvExportColumn } from '../../types/types';
 
+import { csvExportApi } from '../../api/csvExport';
+import { downloadCsv, toCsv, toCsvFileName, UTF8_BOM } from '../../helpers/csv';
+import { buildCsvGrid, buildCsvRows } from '../../helpers/csv-export';
+import { SyncOutputMenu } from '../SyncOutputMenu/SyncOutputMenu';
+import { CSV_OUTPUT_ID, useSyncOutputs } from '../SyncOutputMenu/useSyncOutputs';
 import './ExportToCsvModal.css';
 
 /**

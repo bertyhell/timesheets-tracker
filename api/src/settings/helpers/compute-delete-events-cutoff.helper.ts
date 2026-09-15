@@ -7,6 +7,7 @@ import {
   startOfMonth,
   startOfWeek,
 } from 'date-fns';
+
 import { DeleteEventsAfterUnit } from '../delete-events-after-unit.enum';
 
 /**

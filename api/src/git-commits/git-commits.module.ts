@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+
 import { GitCommitsService } from './git-commits.service';
 
 @Module({

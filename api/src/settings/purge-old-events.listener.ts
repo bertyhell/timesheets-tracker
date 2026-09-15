@@ -1,13 +1,14 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { noop } from 'lodash';
+
 import { DatabaseService } from '../database/database.service';
-import { SettingsService } from './settings.service';
-import { deleteOldPrograms } from './queries/deleteOldPrograms';
-import { deleteOldWebsites } from './queries/deleteOldWebsites';
 import { deleteOldActiveStates } from './queries/deleteOldActiveStates';
-import { deleteOldTags } from './queries/deleteOldTags';
 import { deleteOldCachedNetworkRequests } from './queries/deleteOldCachedNetworkRequests';
+import { deleteOldPrograms } from './queries/deleteOldPrograms';
+import { deleteOldTags } from './queries/deleteOldTags';
+import { deleteOldWebsites } from './queries/deleteOldWebsites';
+import { SettingsService } from './settings.service';
 
 @Injectable()
 export class PurgeOldEventsListener implements OnApplicationBootstrap {

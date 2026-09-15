@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
-import { DatabaseService } from './database.service';
+
 import { SeedModule } from '../seed/seed.module';
+import { DatabaseService } from './database.service';
 
 @Module({
   controllers: [],

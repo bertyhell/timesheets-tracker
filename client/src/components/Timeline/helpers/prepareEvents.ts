@@ -1,5 +1,7 @@
 import { parseISO } from 'date-fns';
+
 import type { TimelineDto, TimelineEventDto } from '../../../generated/api/types.gen';
+
 import { getColorForEvent, getDarkerTextColor } from './getColorForEvent';
 import { getEventLabel } from './getEventLabel';
 

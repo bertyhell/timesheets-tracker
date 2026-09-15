@@ -47,7 +47,8 @@ import { CustomError } from '../shared/CustomError';
 @Injectable()
 export class TimelinesService {
   constructor(
-    @Inject(ActiveStatesService) private activeStatesService: ActiveStatesService,
+    @Inject(ActiveStatesService)
+    private activeStatesService: ActiveStatesService,
     @Inject(AutoNotesService) private autoNotesService: AutoNotesService,
     @Inject(AutoTagsService) private autoTagsService: AutoTagsService,
     @Inject(CalendarsService) private calendarsService: CalendarsService,
@@ -146,7 +147,10 @@ export class TimelinesService {
       const allTimelines = findAllTimelines(db);
       reorderTimelines(
         db,
-        allTimelines.map((t, index) => ({ id: t.id as string, visualOrder: index }))
+        allTimelines.map((t, index) => ({
+          id: t.id as string,
+          visualOrder: index,
+        }))
       );
 
       return this.findOne(id);
@@ -211,7 +215,10 @@ export class TimelinesService {
       const allTimelines = findAllTimelines(db);
       reorderTimelines(
         db,
-        allTimelines.map((t, index) => ({ id: t.id as string, visualOrder: index }))
+        allTimelines.map((t, index) => ({
+          id: t.id as string,
+          visualOrder: index,
+        }))
       );
     } catch (err) {
       const error = new CustomError('Failed to delete timeline entry from the database', err, {
@@ -402,8 +409,11 @@ export class TimelinesService {
                 } catch (err) {
                   console.error(
                     new CustomError('Failed to fetch git commit events', err, {
-                      folderPath: (timelineInfo.eventProviderInfo as { folderPath?: string })
-                        ?.folderPath,
+                      folderPath: (
+                        timelineInfo.eventProviderInfo as {
+                          folderPath?: string;
+                        }
+                      )?.folderPath,
                       startedAt,
                       endedAt,
                     })

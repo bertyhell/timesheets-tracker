@@ -12,7 +12,7 @@ import {
   TimelineWithEventsDto,
 } from '../../timelines/dto/response-timeline-events.dto';
 import { compact, uniq, uniqBy } from 'lodash';
-import { endOfDay, isAfter, isBefore, isEqual, isValid, parseISO, startOfDay } from 'date-fns';
+import { endOfDay, isEqual, isValid, parseISO, startOfDay } from 'date-fns';
 import { TagNameDto } from '../../tag-names/dto/response-tag-name.dto';
 import { CustomError } from '../../shared/CustomError';
 import { isNil } from 'es-toolkit';
@@ -51,24 +51,79 @@ function splitConditionsOnOrOperators(conditions: AutoTagConditionDto[]): AutoTa
  * Returns the matched condition (including the event variable and value that triggered it)
  * or null when the condition does not match.
  */
+/** All variable prop names except the `anyVariable` placeholder itself. */
+const ALL_CONDITION_VARIABLES = Object.values(ConditionVariable).filter(
+  (conditionVariable) => conditionVariable !== ConditionVariable.anyVariable
+);
+
+/**
+ * A condition with everything that does not depend on the event hoisted out of the hot loop:
+ * the lowercased comparison value and the compiled regex. Both used to be recomputed for every
+ * event × variable combination, which dominated the auto-tag analysis on busy days.
+ */
+interface CompiledCondition {
+  condition: AutoTagConditionDto;
+  variablesToCheck: ConditionVariable[];
+  lowerValue: string;
+  regex: RegExp | null;
+}
+
+/** An auto tag with its OR-groups split and its conditions compiled, done once per analysis. */
+interface CompiledAutoTag {
+  autoTag: AutoTagDto;
+  groupedConditions: CompiledCondition[][];
+  /** Inclusive active window in epoch millis, ±Infinity when unbounded. */
+  fromMs: number;
+  untilMs: number;
+}
+
+function compileCondition(condition: AutoTagConditionDto): CompiledCondition {
+  let regex: RegExp | null = null;
+  if (
+    condition.operator === ConditionOperator.matchesRegex ||
+    condition.operator === ConditionOperator.doesNotMatchRegex
+  ) {
+    try {
+      // The `g` flag is deliberately absent: it makes `.test()` stateful via lastIndex, which would
+      // make a rule match or not depending on how many events came before it.
+      regex = new RegExp(condition.value);
+    } catch {
+      // Kept null so the invalid pattern still throws where it used to: while evaluating an event.
+      regex = null;
+    }
+  }
+  return {
+    condition,
+    variablesToCheck:
+      condition.variable === ConditionVariable.anyVariable
+        ? ALL_CONDITION_VARIABLES
+        : [condition.variable],
+    lowerValue: condition.value.toLowerCase(),
+    regex,
+  };
+}
+
+function compileAutoTag(autoTag: AutoTagDto): CompiledAutoTag {
+  return {
+    autoTag,
+    groupedConditions: splitConditionsOnOrOperators(autoTag.conditions).map((groupedCondition) =>
+      groupedCondition.map(compileCondition)
+    ),
+    ...getActiveBounds(autoTag),
+  };
+}
+
 function getMatchedCondition(
   event: TimelineEventDto,
-  condition: AutoTagConditionDto
+  compiledCondition: CompiledCondition
 ): MatchedAutoTagConditionDto | null {
+  const { condition } = compiledCondition;
   if (!condition.variable) {
     return null;
   }
 
-  const variablesToCheck =
-    condition.variable === ConditionVariable.anyVariable
-      ? // Check all variable prop names except for the anyVariable prop name that exist in the enum ConditionVariable
-        Object.values(ConditionVariable).filter(
-          (conditionVariable) => conditionVariable !== ConditionVariable.anyVariable
-        )
-      : [condition.variable];
-
-  const matchedVariable = variablesToCheck.find((conditionVariable) =>
-    doesConditionValueMatchEvent(event, condition, conditionVariable)
+  const matchedVariable = compiledCondition.variablesToCheck.find((conditionVariable) =>
+    doesConditionValueMatchEvent(event, compiledCondition, conditionVariable)
   );
   if (!matchedVariable) {
     return null;
@@ -84,29 +139,29 @@ function getMatchedCondition(
 
 function doesConditionValueMatchEvent(
   event: TimelineEventDto,
-  condition: AutoTagConditionDto,
+  compiledCondition: CompiledCondition,
   variable: ConditionVariable
 ): boolean {
   const rawValue = event.info[variable];
   if (isNil(rawValue)) {
     return false;
   }
+  const { condition, lowerValue, regex } = compiledCondition;
   const toCheckValue: string = String(rawValue);
   switch (condition.operator) {
     case ConditionOperator.contains:
-      return toCheckValue.toLowerCase().includes(condition.value.toLowerCase());
+      return toCheckValue.toLowerCase().includes(lowerValue);
     case ConditionOperator.doesNotContains:
-      return !toCheckValue.toLowerCase().includes(condition.value.toLowerCase());
+      return !toCheckValue.toLowerCase().includes(lowerValue);
     case ConditionOperator.isExact:
-      return toCheckValue.toLowerCase() === condition.value.toLowerCase();
+      return toCheckValue.toLowerCase() === lowerValue;
     case ConditionOperator.isNotExact:
-      return toCheckValue.toLowerCase() !== condition.value.toLowerCase();
-    // The `g` flag is deliberately absent: it makes `.test()` stateful via lastIndex, which would
-    // make a rule match or not depending on how many events came before it.
+      return toCheckValue.toLowerCase() !== lowerValue;
     case ConditionOperator.matchesRegex:
-      return new RegExp(condition.value).test(toCheckValue);
+      // A pattern that failed to compile rethrows here, the same place it used to throw.
+      return (regex ?? new RegExp(condition.value)).test(toCheckValue);
     case ConditionOperator.doesNotMatchRegex:
-      return !new RegExp(condition.value).test(toCheckValue);
+      return !(regex ?? new RegExp(condition.value)).test(toCheckValue);
     default:
       return false;
   }
@@ -118,11 +173,10 @@ function doesConditionValueMatchEvent(
  * Returns null when the auto tag does not match the event.
  */
 function getMatchedAutoTagConditions(
-  autoTag: AutoTagDto,
+  compiledAutoTag: CompiledAutoTag,
   event: TimelineEventDto
 ): MatchedAutoTagConditionDto[] | null {
-  const groupedConditions = splitConditionsOnOrOperators(autoTag.conditions);
-  for (const groupedCondition of groupedConditions) {
+  for (const groupedCondition of compiledAutoTag.groupedConditions) {
     const matchedConditions = groupedCondition.map((condition) =>
       getMatchedCondition(event, condition)
     );
@@ -142,48 +196,159 @@ function getMatchedAutoTagConditions(
  * event's start is what is compared, so an event straddling a bound belongs to the day it
  * started on rather than being split.
  */
-function isAutoTagActiveForEvent(autoTag: AutoTagDto, event: TimelineEventDto): boolean {
-  if (!autoTag.activeFrom && !autoTag.activeUntil) {
-    return true;
-  }
-
-  const eventStartedAt = parseISO(event.startedAt);
+/**
+ * The active bounds resolved to epoch millis once per auto tag, instead of re-parsing the
+ * yyyy-MM-dd strings for every event.
+ */
+function getActiveBounds(autoTag: AutoTagDto): {
+  fromMs: number;
+  untilMs: number;
+} {
+  let fromMs = -Infinity;
+  let untilMs = Infinity;
 
   if (autoTag.activeFrom) {
     const activeFrom = parseISO(autoTag.activeFrom);
-    if (isValid(activeFrom) && isBefore(eventStartedAt, startOfDay(activeFrom))) {
-      return false;
+    if (isValid(activeFrom)) {
+      fromMs = startOfDay(activeFrom).getTime();
     }
   }
 
   if (autoTag.activeUntil) {
     const activeUntil = parseISO(autoTag.activeUntil);
-    if (isValid(activeUntil) && isAfter(eventStartedAt, endOfDay(activeUntil))) {
-      return false;
+    if (isValid(activeUntil)) {
+      untilMs = endOfDay(activeUntil).getTime();
     }
   }
 
-  return true;
+  return { fromMs, untilMs };
 }
 
-function getEventsAtTimestamp(timelinesWithEvents: TimelineWithEventsDto[], timestamp: string) {
-  const currentTimestamp = parseISO(timestamp);
+function isAutoTagActiveForEvent(compiledAutoTag: CompiledAutoTag, event: IndexedEvent): boolean {
+  return event.startMs >= compiledAutoTag.fromMs && event.startMs <= compiledAutoTag.untilMs;
+}
+
+/**
+ * An event with its ISO timestamps resolved to epoch millis once. Re-parsing these inside the
+ * per-timestamp scan was the single most expensive thing this module did: the scan is quadratic
+ * in the number of events, so a busy day meant tens of millions of `parseISO` calls.
+ */
+interface IndexedEvent {
+  event: TimelineEventDto;
+  startedAt: string;
+  endedAt: string;
+  startMs: number;
+  endMs: number;
+}
+
+/**
+ * A timeline's events, plus whether they are ordered by start time. Providers hand us ordered
+ * events, which lets the per-timestamp lookup binary search instead of scanning. Events may still
+ * overlap, so the search widens by the timeline's longest event: any event containing a timestamp
+ * must have started within that span before it. When a provider hands us unordered events we fall
+ * back to the linear scan, so the result stays the event that comes first in the timeline's own
+ * order either way.
+ */
+interface IndexedTimeline {
+  events: IndexedEvent[];
+  isSorted: boolean;
+  maxDurationMs: number;
+}
+
+function indexTimelines(timelinesWithEvents: TimelineWithEventsDto[]): IndexedTimeline[] {
+  return timelinesWithEvents.map((timeline) => {
+    const events = timeline.events.map((event) => ({
+      event,
+      startedAt: event.startedAt,
+      endedAt: event.endedAt,
+      startMs: parseISO(event.startedAt).getTime(),
+      endMs: parseISO(event.endedAt).getTime(),
+    }));
+    let isSorted = true;
+    let maxDurationMs = 0;
+    events.forEach((indexedEvent, index) => {
+      if (index > 0 && events[index - 1].startMs > indexedEvent.startMs) {
+        isSorted = false;
+      }
+      const duration = indexedEvent.endMs - indexedEvent.startMs;
+      if (Number.isFinite(duration) && duration > maxDurationMs) {
+        maxDurationMs = duration;
+      }
+    });
+    return { events, isSorted, maxDurationMs };
+  });
+}
+
+/**
+ * Index of the last event whose start is at or before the timestamp, or -1. Only meaningful for a
+ * timeline that is ordered and non-overlapping, where it is the only event that can contain it.
+ */
+function findLastStartedAtOrBefore(events: IndexedEvent[], timestampMs: number): number {
+  let low = 0;
+  let high = events.length - 1;
+  let result = -1;
+  while (low <= high) {
+    const middle = (low + high) >>> 1;
+    if (events[middle].startMs <= timestampMs) {
+      result = middle;
+      low = middle + 1;
+    } else {
+      high = middle - 1;
+    }
+  }
+  return result;
+}
+
+function containsTimestamp(
+  indexedEvent: IndexedEvent,
+  timestamp: string,
+  timestampMs: number
+): boolean {
+  return (
+    (timestamp === indexedEvent.startedAt || timestampMs > indexedEvent.startMs) &&
+    (timestamp === indexedEvent.endedAt || timestampMs < indexedEvent.endMs)
+  );
+}
+
+function getEventsAtTimestamp(
+  indexedTimelines: IndexedTimeline[],
+  timestamp: string,
+  timestampMs: number
+): IndexedEvent[] {
   return compact(
-    timelinesWithEvents.map((timeline) => {
-      return timeline.events.find((event) => {
-        return (
-          (timestamp === event.startedAt || isAfter(currentTimestamp, parseISO(event.startedAt))) &&
-          (timestamp === event.endedAt || isBefore(currentTimestamp, parseISO(event.endedAt)))
+    indexedTimelines.map(({ events, isSorted, maxDurationMs }) => {
+      if (!isSorted) {
+        return events.find((indexedEvent) =>
+          containsTimestamp(indexedEvent, timestamp, timestampMs)
         );
-      });
+      }
+      // Events are ordered by start, so the array order the caller expects is also the index
+      // order: walking backwards and keeping the last hit yields the lowest-index match.
+      const index = findLastStartedAtOrBefore(events, timestampMs);
+      const earliestRelevantStartMs = timestampMs - maxDurationMs;
+      let match: IndexedEvent | undefined;
+      for (let i = index; i >= 0 && events[i].startMs >= earliestRelevantStartMs; i--) {
+        if (containsTimestamp(events[i], timestamp, timestampMs)) {
+          match = events[i];
+        }
+      }
+      // The event right after the window can still match on the `timestamp === startedAt` string
+      // check, but only counts when nothing at a lower index did.
+      if (!match && events[index + 1]) {
+        const next = events[index + 1];
+        if (containsTimestamp(next, timestamp, timestampMs)) {
+          match = next;
+        }
+      }
+      return match;
     })
   );
 }
 
-function getAllEventStartTimes(timelinesWithEvents: TimelineWithEventsDto[]): string[] {
+function getAllEventStartTimes(indexedTimelines: IndexedTimeline[]): string[] {
   return uniq(
-    timelinesWithEvents.flatMap((timeline) => {
-      return timeline.events.map((event) => event.startedAt);
+    indexedTimelines.flatMap(({ events }) => {
+      return events.map((indexedEvent) => indexedEvent.startedAt);
     })
   );
 }
@@ -306,29 +471,34 @@ export function calculateAutoTagEvents(
   maxGrowTimeMinutes = DEFAULT_MAX_GROW_TIME_MINUTES,
   combineGapMinutes = DEFAULT_AUTO_MERGE_TAGS_MINUTES
 ): TimelineEventDto[] {
-  const validAutoTags = autoTags.filter(
-    (autoTag) => !!autoTag.tagName && autoTag.conditions?.length
-  );
-  const allEventStartTimes = getAllEventStartTimes(timelinesWithEvents);
+  const validAutoTags = autoTags
+    .filter((autoTag) => !!autoTag.tagName && autoTag.conditions?.length)
+    .map(compileAutoTag);
+  const indexedTimelines = indexTimelines(timelinesWithEvents);
+  const allEventStartTimes = getAllEventStartTimes(indexedTimelines);
+  const tagNamesById = new Map(allTagNames.map((tagName) => [tagName.id, tagName]));
   const autoTagEvents: TimelineEventDto[] = [];
   allEventStartTimes.map((startTime) => {
-    const eventsAtTimestamp = getEventsAtTimestamp(timelinesWithEvents, startTime);
-    eventsAtTimestamp.find((event) => {
+    const startTimeMs = parseISO(startTime).getTime();
+    const eventsAtTimestamp = getEventsAtTimestamp(indexedTimelines, startTime, startTimeMs);
+    eventsAtTimestamp.find((indexedEvent) => {
+      const event = indexedEvent.event;
       let matchedConditions: MatchedAutoTagConditionDto[] | null = null;
-      const autoTag = validAutoTags.find((autoTag) => {
-        if (!isAutoTagActiveForEvent(autoTag, event)) {
+      const compiledAutoTag = validAutoTags.find((compiledAutoTag) => {
+        if (!isAutoTagActiveForEvent(compiledAutoTag, indexedEvent)) {
           matchedConditions = null;
           return false;
         }
-        matchedConditions = getMatchedAutoTagConditions(autoTag, event);
+        matchedConditions = getMatchedAutoTagConditions(compiledAutoTag, event);
         return !!matchedConditions;
       });
-      if (!autoTag || !matchedConditions) {
+      if (!compiledAutoTag || !matchedConditions) {
         return false;
       }
+      const autoTag = compiledAutoTag.autoTag;
       // Found a match between event and auto tag
       // Produce an autoTagEvent
-      const tagName = allTagNames.find((tagName) => tagName.id === autoTag.tagNameId);
+      const tagName = tagNamesById.get(autoTag.tagNameId);
       if (!tagName) {
         console.error(
           new CustomError('Found autotag for which no tagname was found', null, { autoTag, event })

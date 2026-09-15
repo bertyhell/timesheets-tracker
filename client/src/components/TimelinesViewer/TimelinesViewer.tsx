@@ -272,7 +272,7 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
   const { mutateAsync: createTagName } = useMutation({ ...tagNamesControllerCreateMutation() });
   const { mutateAsync: createTag } = useMutation({ ...tagsControllerCreateMutation() });
 
-  const { data: tagNamesCount, refetch: refetchTagNamesCount } = useQuery({
+  const { refetch: refetchTagNamesCount } = useQuery({
     ...tagNamesControllerCountOptions(),
   });
 

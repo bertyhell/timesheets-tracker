@@ -1,8 +1,6 @@
 import RealIdle, { IdleState } from '@paymoapp/real-idle';
 import * as dbus from 'dbus-next';
 
-import { logger } from '../../shared/logger';
-
 const IDLE_STATE_TO_IS_ACTIVE: Record<string, boolean> = {
   [IdleState.active]: true,
   [IdleState.idlePrevented]: true,
@@ -41,7 +39,7 @@ async function getIsActiveWayland(thresholdSeconds: number): Promise<boolean> {
   // Fallback: systemd-logind IdleHint / LockedHint properties
   try {
     return await getIsActiveViaLogind();
-  } catch (err) {
+  } catch {
     // ignore errors
     return false;
   }

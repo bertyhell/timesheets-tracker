@@ -1,5 +1,3 @@
-import type { AutoTagConditionDto } from '../client/src/generated/api/types.gen';
-
 import { type TimelineType } from '../client/src/components/Timeline/Timeline.types';
 
 export interface Program {

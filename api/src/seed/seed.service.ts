@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import { DatabaseSync } from 'node:sqlite';
-import * as path from 'path';
 
 import { CustomError } from '../shared/CustomError';
 import { resolveProjectPath } from '../shared/resolve-src-path';

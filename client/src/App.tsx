@@ -1,20 +1,7 @@
 import './App.css';
 import { useAtom } from 'jotai';
-import {
-  Clock,
-  BarChart2,
-  Calendar,
-  List,
-  Tag,
-  Zap,
-  Filter,
-  FileText,
-  Settings,
-  User,
-  ChevronDown,
-  LayoutGrid,
-} from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import { BarChart2, List, Tag, Zap, FileText, Settings, LayoutGrid } from 'lucide-react';
+import React from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';

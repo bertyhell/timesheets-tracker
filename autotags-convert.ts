@@ -4,7 +4,6 @@ import {
   type AutoTagCondition,
   BooleanOperator,
   ConditionOperator,
-  ConditionVariable,
 } from './api/src/types/types';
 import autoTags from './ManicTime_AutoTags_2026-03-12.json';
 

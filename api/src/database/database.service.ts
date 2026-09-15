@@ -1,7 +1,6 @@
 import { Injectable, type OnModuleInit, Logger, OnModuleDestroy } from '@nestjs/common';
 import * as fs from 'fs';
 import * as fsPromise from 'fs/promises';
-import { resolve } from 'node:path';
 import { DatabaseSync, StatementSync } from 'node:sqlite';
 import * as path from 'path';
 

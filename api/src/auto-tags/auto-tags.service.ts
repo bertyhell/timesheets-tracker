@@ -8,7 +8,6 @@ import { SettingsService } from '../settings/settings.service';
 import { CustomError } from '../shared/CustomError';
 import { TagNameDto } from '../tag-names/dto/response-tag-name.dto';
 import { TimelineWithEventsDto } from '../timelines/dto/response-timeline-events.dto';
-import { TimelineDto } from '../timelines/dto/response-timeline.dto';
 import { AutoTag, BooleanOperator, TimelineType } from '../types/types';
 import { CreateAutoTagDto } from './dto/create-auto-tag.dto';
 import { AutoTagDto, AutoTagMergeResultDto } from './dto/response-auto-tag.dto';

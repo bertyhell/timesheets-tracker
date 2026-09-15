@@ -1,4 +1,4 @@
-import { endOfDay, isEqual, isValid, parseISO, startOfDay } from 'date-fns';
+import { endOfDay, isValid, parseISO, startOfDay } from 'date-fns';
 import { isNil } from 'es-toolkit';
 import { compact, uniq, uniqBy } from 'lodash';
 
@@ -15,7 +15,6 @@ import {
   BooleanOperator,
   ConditionOperator,
   ConditionVariable,
-  TimelineType,
 } from '../../types/types';
 import { AutoTagConditionDto, AutoTagDto } from '../dto/response-auto-tag.dto';
 

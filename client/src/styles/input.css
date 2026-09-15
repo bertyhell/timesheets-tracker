@@ -23,6 +23,38 @@
       border-color: var(--focus-color);
     }
   }
+
+  /* Live validity feedback for fields that are checked as you type (e.g. regex inputs). Nested so
+     these win over the plain :focus border above, which uses the `border` shorthand. */
+  &.c-input--valid {
+    border-color: #86efac;
+
+    &:focus {
+      border-color: #16a34a;
+      box-shadow: 0 0 0 1px #16a34a;
+    }
+  }
+
+  &.c-input--invalid {
+    border-color: #fca5a5;
+
+    &:focus {
+      border-color: #dc2626;
+      box-shadow: 0 0 0 1px #dc2626;
+    }
+  }
+}
+
+.c-regex-status {
+  display: block;
+  font-size: 0.6875rem;
+  line-height: 1.3;
+  color: #16a34a;
+  overflow-wrap: anywhere;
+}
+
+.c-regex-status--invalid {
+  color: #dc2626;
 }
 
 .c-form {

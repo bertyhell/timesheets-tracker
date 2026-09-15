@@ -1,6 +1,6 @@
 import './EditAutoNoteModal.css';
 
-import React, { type ChangeEvent, useEffect, useState } from 'react';
+import React, { type ChangeEvent, useEffect, useMemo, useState } from 'react';
 import Button, { ButtonVariant } from '../Button/Button';
 import { Modal } from 'react-responsive-modal';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -16,6 +16,7 @@ import {
   autoNotesControllerUpdateMutation,
   tagNamesControllerFindAllOptions,
 } from '../../generated/api/@tanstack/react-query.gen';
+import { checkRegex } from '../../helpers/check-regex';
 import { type SelectOption } from '../../helpers/select-option.types';
 // ConditionVariable used to be pulled from the repo-root types/ copy here as well, which had
 // drifted out of sync with this one; there is one client-side source for it now.
@@ -32,6 +33,11 @@ export function EditAutoNoteModal() {
   const [useRegex, setUseRegex] = useState<boolean>(false);
   const [extractRegex, setExtractRegex] = useState<string>('(.*)');
   const [extractRegexReplacement, setExtractRegexReplacement] = useState<string>('$1');
+
+  const regexCheck = useMemo(
+    () => (useRegex ? checkRegex(extractRegex) : null),
+    [useRegex, extractRegex]
+  );
 
   const { data: tags } = useQuery({ ...tagNamesControllerFindAllOptions({ query: { term: '' } }) });
   const { mutateAsync: createNote } = useMutation({ ...autoNotesControllerCreateMutation() });
@@ -214,10 +220,22 @@ export function EditAutoNoteModal() {
             <h4 className="mt-4">Match regex</h4>
             <span>eg: jira.com/issues/(ABC-[0-9]+)</span>
             <input
-              className="c-input c-edit-note__regex-input"
+              className={
+                'c-input c-edit-note__regex-input' +
+                (regexCheck ? ` c-input--${regexCheck.valid ? 'valid' : 'invalid'}` : '')
+              }
+              aria-invalid={regexCheck ? !regexCheck.valid : undefined}
               value={extractRegex}
               onChange={(evt) => setExtractRegex(evt.target.value)}
             />
+            {regexCheck && (
+              <span
+                role="status"
+                className={'c-regex-status' + (regexCheck.valid ? '' : ' c-regex-status--invalid')}
+              >
+                {regexCheck.message}
+              </span>
+            )}
 
             <h4 className="mt-4">Extract capture group as note</h4>
             <span>eg: $1</span>

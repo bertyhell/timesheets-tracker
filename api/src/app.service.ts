@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import pkg from '../package.json';
 

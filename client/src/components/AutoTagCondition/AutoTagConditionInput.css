@@ -73,6 +73,36 @@
   box-shadow: 0 0 0 3px var(--primary-4);
 }
 
+/* The status line grows below the input rather than pushing it sideways, so the columns stay
+   aligned with the header while a row is being edited. */
+.c-auto-tag-condition__value-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+/* Restated at this component's specificity: the rule above sets a gray border at the same weight
+   as the shared .c-input--valid/--invalid one, so which wins would depend on stylesheet order.
+   The focus ring is 3px here rather than the 1px the global inputs use. */
+.c-auto-tag-condition__value.c-input--valid {
+  border-color: #86efac;
+}
+
+.c-auto-tag-condition__value.c-input--valid:focus {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px #dcfce7;
+}
+
+.c-auto-tag-condition__value.c-input--invalid {
+  border-color: #fca5a5;
+}
+
+.c-auto-tag-condition__value.c-input--invalid:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px #fee2e2;
+}
+
 .c-auto-tag-condition__actions {
   display: flex;
   justify-content: flex-end;

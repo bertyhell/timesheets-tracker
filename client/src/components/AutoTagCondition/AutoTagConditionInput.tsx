@@ -4,6 +4,7 @@ import { Trash2Icon } from 'lucide-react';
 import React from 'react';
 import Select, { type GroupBase, type StylesConfig } from 'react-select';
 
+import { checkRegex } from '../../helpers/check-regex';
 import { type SelectOption } from '../../helpers/select-option.types';
 import * as types from '../../types/types';
 import {
@@ -98,6 +99,11 @@ function AutoTagConditionInput({
   onDelete,
   showDelete,
 }: AutoTagConditionInputProps) {
+  const regexCheck = React.useMemo(
+    () => (isRegexOperator(operator) ? checkRegex(value) : null),
+    [operator, value]
+  );
+
   return (
     <div className="c-auto-tag-condition-grid c-auto-tag-condition">
       <div>
@@ -161,13 +167,27 @@ function AutoTagConditionInput({
         styles={conditionSelectStyles}
       />
 
-      <input
-        className="c-input c-auto-tag-condition__value"
-        aria-label="Value"
-        placeholder={isRegexOperator(operator) ? 'e.g. ^Timesheet.*' : 'Text to match'}
-        value={value}
-        onChange={(evt) => onChange(booleanOperator, variable, operator, evt.target.value)}
-      />
+      <div className="c-auto-tag-condition__value-cell">
+        <input
+          className={
+            'c-input c-auto-tag-condition__value' +
+            (regexCheck ? ` c-input--${regexCheck.valid ? 'valid' : 'invalid'}` : '')
+          }
+          aria-label="Value"
+          aria-invalid={regexCheck ? !regexCheck.valid : undefined}
+          placeholder={isRegexOperator(operator) ? 'e.g. ^Timesheet.*' : 'Text to match'}
+          value={value}
+          onChange={(evt) => onChange(booleanOperator, variable, operator, evt.target.value)}
+        />
+        {regexCheck && (
+          <span
+            role="status"
+            className={'c-regex-status' + (regexCheck.valid ? '' : ' c-regex-status--invalid')}
+          >
+            {regexCheck.message}
+          </span>
+        )}
+      </div>
 
       <div className="c-auto-tag-condition__actions">
         {showDelete && (

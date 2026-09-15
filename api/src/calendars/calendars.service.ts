@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import { createHash } from 'node:crypto';
 import * as ical from 'node-ical';
 import { CalendarResponse } from 'node-ical';
 
+import { CachedNetworkRequestsService } from '../database/cached-network-requests.service';
 import { CustomError } from '../shared/CustomError';
 import { CalendarEventDto } from './dto/calendar-event.dto';
 
@@ -23,19 +25,18 @@ type ICalEvent = {
  * clock for the whole events request whenever the provider is slow. Short enough that an event
  * added elsewhere still appears on its own; the refresh button bypasses it entirely.
  */
-const ICS_CACHE_TTL_MS = 5 * 60 * 1000;
+const ICS_CACHE_TTL_SECONDS = 5 * 60;
+
+/** Groups the per-url entries so a refresh can drop them together. */
+const ICS_CACHE_PREFIX = 'calendar-ics-';
 
 @Injectable()
 export class CalendarsService {
-  /**
-   * Kept in memory rather than in `cachedNetworkRequests`: a parsed calendar is large, it is only
-   * worth holding for minutes, and losing it on restart costs one download.
-   */
-  private readonly icsCache = new Map<string, { fetchedAt: number; events: CalendarResponse }>();
+  constructor(private readonly cachedNetworkRequests: CachedNetworkRequestsService) {}
 
   /** Drops the downloaded calendars, so a refresh in the UI re-downloads them. */
   clearIcsCache(): void {
-    this.icsCache.clear();
+    this.cachedNetworkRequests.deleteByPrefix(ICS_CACHE_PREFIX);
   }
 
   async getEvents(
@@ -85,14 +86,26 @@ export class CalendarsService {
       return ical.async.parseFile(icsFile);
     }
 
-    const cached = this.icsCache.get(icsUrl);
-    if (cached && Date.now() - cached.fetchedAt < ICS_CACHE_TTL_MS) {
-      return cached.events;
-    }
+    // The ics body is cached rather than the parsed calendar: parsing produces Date objects, which
+    // a JSON round-trip through the cache table would hand back as strings. Re-parsing is local
+    // work, and the download is what this is here to avoid.
+    const ics = await this.cachedNetworkRequests.cached(
+      `${ICS_CACHE_PREFIX}${CalendarsService.fingerprint(icsUrl)}`,
+      async () => {
+        const response = await fetch(icsUrl);
+        if (!response.ok) {
+          throw new Error(`ics request failed: ${response.status} ${response.statusText}`);
+        }
+        return response.text();
+      },
+      { ttlSeconds: ICS_CACHE_TTL_SECONDS }
+    );
 
-    // parse the real url
-    const events = await ical.async.fromURL(icsUrl);
-    this.icsCache.set(icsUrl, { fetchedAt: Date.now(), events });
-    return events;
+    return ical.async.parseICS(ics);
+  }
+
+  /** An ics url can carry a secret, so it is hashed rather than stored as part of the cache key. */
+  private static fingerprint(icsUrl: string): string {
+    return createHash('sha256').update(icsUrl).digest('hex').slice(0, 16);
   }
 }

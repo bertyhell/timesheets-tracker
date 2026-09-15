@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 
+import { CachedNetworkRequestsService } from '../database/cached-network-requests.service';
 import { DatabaseService } from '../database/database.service';
 import { IntegrationsService } from '../integrations/integrations.service';
 import { TimelineEventDto } from '../timelines/dto/response-timeline-events.dto';
@@ -100,7 +101,8 @@ interface ProductiveBooking {
 export class ProductiveService {
   constructor(
     private readonly integrationsService: IntegrationsService,
-    private readonly databaseService: DatabaseService
+    private readonly databaseService: DatabaseService,
+    private readonly cachedNetworkRequests: CachedNetworkRequestsService
   ) {}
 
   async getEventsForDay(
@@ -108,18 +110,15 @@ export class ProductiveService {
     timelineId: string,
     clearCache = false
   ): Promise<TimelineEventDto[]> {
-    const db = this.databaseService.getDb();
     // The `-v2` suffix retires the caches written before deal/company were
     // sideloaded, so old rows are not replayed without those names.
     const cacheKey = `${date}-v2`; // yyyy-MM-dd
 
     if (!clearCache) {
-      const cached = db
-        .prepare('SELECT responseJson FROM cachedNetworkRequests WHERE cacheKey = ?')
-        .get(cacheKey) as { responseJson: string } | undefined;
+      const cached = this.cachedNetworkRequests.read<Record<string, unknown>>(cacheKey);
 
       if (cached) {
-        const bookingsJson = JSON.parse(cached.responseJson) as Record<string, unknown>;
+        const bookingsJson = cached;
         const bookings: ProductiveBooking[] = (bookingsJson.data as ProductiveBooking[]) ?? [];
         const included: JsonApiResource[] = (bookingsJson.included as JsonApiResource[]) ?? [];
         return this.mapBookingsToEvents(bookings, included, date, timelineId);
@@ -165,9 +164,7 @@ export class ProductiveService {
     ].join('-');
 
     if (date < todayKey) {
-      db.prepare(
-        'INSERT OR REPLACE INTO cachedNetworkRequests (cacheKey, responseJson) VALUES (?, ?)'
-      ).run(cacheKey, JSON.stringify(bookingsJson));
+      this.cachedNetworkRequests.write(cacheKey, bookingsJson);
     }
 
     const bookings: ProductiveBooking[] = (bookingsJson.data as ProductiveBooking[]) ?? [];
@@ -262,40 +259,19 @@ export class ProductiveService {
   private static readonly SERVICE_TREE_CACHE_TTL_SECONDS = 5 * 60;
 
   /**
-   * Reads a cached list. `ttlSeconds` treats rows older than that as a miss;
-   * the age check runs in SQL so it compares against the same UTC clock that
-   * `createdAt`'s `datetime('now')` default was written with. Without a TTL the
-   * entry lives until clearListCache() drops it.
+   * Reads a cached list. Without a TTL the entry lives until clearListCache() drops it.
    */
   private readListCache<T>(cacheKey: string, ttlSeconds?: number): T | null {
-    const db = this.databaseService.getDb();
-    const row = (
-      ttlSeconds === undefined
-        ? db
-            .prepare('SELECT responseJson FROM cachedNetworkRequests WHERE cacheKey = ?')
-            .get(cacheKey)
-        : db
-            .prepare(
-              "SELECT responseJson FROM cachedNetworkRequests WHERE cacheKey = ? AND createdAt > datetime('now', ?)"
-            )
-            .get(cacheKey, `-${ttlSeconds} seconds`)
-    ) as { responseJson: string } | undefined;
-    return row ? (JSON.parse(row.responseJson) as T) : null;
+    return this.cachedNetworkRequests.read<T>(cacheKey, ttlSeconds);
   }
 
   private writeListCache(cacheKey: string, value: unknown): void {
-    const db = this.databaseService.getDb();
-    db.prepare(
-      'INSERT OR REPLACE INTO cachedNetworkRequests (cacheKey, responseJson) VALUES (?, ?)'
-    ).run(cacheKey, JSON.stringify(value));
+    this.cachedNetworkRequests.write(cacheKey, value);
   }
 
   /** Clear the cached company/deal/service lists (invoked on a frontend refresh). */
   clearListCache(): void {
-    const db = this.databaseService.getDb();
-    db.prepare('DELETE FROM cachedNetworkRequests WHERE cacheKey LIKE ?').run(
-      `${ProductiveService.LIST_CACHE_PREFIX}%`
-    );
+    this.cachedNetworkRequests.deleteByPrefix(ProductiveService.LIST_CACHE_PREFIX);
   }
 
   /**

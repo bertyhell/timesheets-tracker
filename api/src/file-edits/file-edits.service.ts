@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { DatabaseService } from '../database/database.service';
+import { CachedNetworkRequestsService } from '../database/cached-network-requests.service';
 import { TimelineEventDto } from '../timelines/dto/response-timeline-events.dto';
 import { isNoisePath } from './helpers/is-noise-path';
 import { parseLocalHistory, RawFileEdit } from './helpers/local-history-parser';
@@ -44,7 +44,7 @@ export class FileEditsService {
   /** Stale-version caches are dropped once per process, on the first scan that needs the db. */
   private hasPrunedStaleCaches = false;
 
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(private readonly cachedNetworkRequests: CachedNetworkRequestsService) {}
 
   /** Drops the in-process scan, so the next request re-reads the stores from disk. */
   clearScanCache(): void {
@@ -181,10 +181,7 @@ export class FileEditsService {
     if (this.hasPrunedStaleCaches) return;
     this.hasPrunedStaleCaches = true;
 
-    const db = this.databaseService.getDb();
-    db.prepare(
-      'DELETE FROM cachedNetworkRequests WHERE cacheKey LIKE ? AND cacheKey NOT LIKE ?'
-    ).run(`${CACHE_KEY_PREFIX}%`, `%-${CACHE_KEY_VERSION}`);
+    this.cachedNetworkRequests.deleteByPrefix(CACHE_KEY_PREFIX, `%-${CACHE_KEY_VERSION}`);
   }
 
   /**
@@ -238,17 +235,10 @@ export class FileEditsService {
   }
 
   private readDayCache(dayKey: string): FileEditSessionDto[] | null {
-    const db = this.databaseService.getDb();
-    const row = db
-      .prepare('SELECT responseJson FROM cachedNetworkRequests WHERE cacheKey = ?')
-      .get(this.getCacheKey(dayKey)) as { responseJson: string } | undefined;
-    return row ? (JSON.parse(row.responseJson) as FileEditSessionDto[]) : null;
+    return this.cachedNetworkRequests.read<FileEditSessionDto[]>(this.getCacheKey(dayKey));
   }
 
   private writeDayCache(dayKey: string, sessions: FileEditSessionDto[]): void {
-    const db = this.databaseService.getDb();
-    db.prepare(
-      'INSERT OR REPLACE INTO cachedNetworkRequests (cacheKey, responseJson) VALUES (?, ?)'
-    ).run(this.getCacheKey(dayKey), JSON.stringify(sessions));
+    this.cachedNetworkRequests.write(this.getCacheKey(dayKey), sessions);
   }
 }

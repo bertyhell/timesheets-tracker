@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { createHash } from 'node:crypto';
 
+import { CachedNetworkRequestsService } from '../database/cached-network-requests.service';
 import { DatabaseService } from '../database/database.service';
 import { IntegrationsService } from '../integrations/integrations.service';
 import { ProgramsService } from '../programs/programs.service';
@@ -103,6 +104,7 @@ export class JiraService {
   constructor(
     private readonly integrationsService: IntegrationsService,
     private readonly databaseService: DatabaseService,
+    private readonly cachedNetworkRequests: CachedNetworkRequestsService,
     private readonly websitesService: WebsitesService,
     private readonly programsService: ProgramsService
   ) {}
@@ -397,12 +399,9 @@ export class JiraService {
    * cached alongside the other network caches.
    */
   private async getSprintFieldId(): Promise<string | null> {
-    const db = this.databaseService.getDb();
-    const cached = db
-      .prepare('SELECT responseJson FROM cachedNetworkRequests WHERE cacheKey = ?')
-      .get(SPRINT_FIELD_CACHE_KEY) as { responseJson: string } | undefined;
+    const cached = this.cachedNetworkRequests.read<string>(SPRINT_FIELD_CACHE_KEY);
     if (cached) {
-      return JSON.parse(cached.responseJson) as string | null;
+      return cached;
     }
 
     const allFields = await this.request<JiraFieldResponse[]>(JIRA_PROBE_PATH);
@@ -414,9 +413,7 @@ export class JiraService {
     // without a sprint until the cache was cleared by hand. Re-asking costs one request per batch
     // of issues on a site that genuinely has no sprint field.
     if (sprintFieldId) {
-      db.prepare(
-        'INSERT OR REPLACE INTO cachedNetworkRequests (cacheKey, responseJson) VALUES (?, ?)'
-      ).run(SPRINT_FIELD_CACHE_KEY, JSON.stringify(sprintFieldId));
+      this.cachedNetworkRequests.write(SPRINT_FIELD_CACHE_KEY, sprintFieldId);
     }
     return sprintFieldId;
   }
@@ -431,10 +428,7 @@ export class JiraService {
    * stale: the cache key includes a fingerprint of the token, so a new token re-probes on its own.
    */
   clearFieldCache(): void {
-    this.databaseService
-      .getDb()
-      .prepare('DELETE FROM cachedNetworkRequests WHERE cacheKey = ?')
-      .run(SPRINT_FIELD_CACHE_KEY);
+    this.cachedNetworkRequests.delete(SPRINT_FIELD_CACHE_KEY);
   }
 
   /**
@@ -453,13 +447,10 @@ export class JiraService {
     token: string,
     headers: Record<string, string>
   ): Promise<string> {
-    const db = this.databaseService.getDb();
     const cacheKey = `${CLOUD_ID_CACHE_PREFIX}${new URL(siteUrl).host}-${JiraService.fingerprint(token)}`;
-    const cached = db
-      .prepare('SELECT responseJson FROM cachedNetworkRequests WHERE cacheKey = ?')
-      .get(cacheKey) as { responseJson: string } | undefined;
+    const cached = this.cachedNetworkRequests.read<string>(cacheKey);
     if (cached) {
-      return JSON.parse(cached.responseJson) as string;
+      return cached;
     }
 
     const candidates: string[] = [];
@@ -475,9 +466,7 @@ export class JiraService {
         .catch(() => false);
       if (accepted) {
         logger.info(`[Jira] token accepted on ${candidate}, using it for this site`);
-        db.prepare(
-          'INSERT OR REPLACE INTO cachedNetworkRequests (cacheKey, responseJson) VALUES (?, ?)'
-        ).run(cacheKey, JSON.stringify(candidate));
+        this.cachedNetworkRequests.write(cacheKey, candidate);
         return candidate;
       }
       logger.info(`[Jira] token not accepted on ${candidate}`);

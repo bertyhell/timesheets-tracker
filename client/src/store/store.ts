@@ -3,15 +3,18 @@ import type { ReactNode } from 'react';
 import { format, isValid, parseISO } from 'date-fns';
 import { atom } from 'jotai';
 import { atomWithLocation } from 'jotai-location';
-import { atomWithStorage } from 'jotai/utils';
+import { atomWithStorage, createJSONStorage } from 'jotai/utils';
 
 const DATE_PARAM = 'date';
 
 const locationAtom = atomWithLocation({ replace: true });
 
+// Session-scoped so a fresh app start always opens on today.
 const lastSelectedDateAtom = atomWithStorage<string | null>(
   'timesheetTracker.lastSelectedDate',
-  null
+  null,
+  createJSONStorage<string | null>(() => sessionStorage),
+  { getOnInit: true }
 );
 
 export const viewDateAtom = atom(

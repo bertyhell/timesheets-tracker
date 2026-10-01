@@ -521,6 +521,11 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
         });
       } else if (selectionStartPercent !== null) {
         setSelectionEndPercent(clamp(posX, 0, 100));
+        // A drag selection replaces any selected events, otherwise the tag dropdown stays hidden.
+        setSelectedTimelineAndEvent({
+          selectedTimelineId: timelineId,
+          selectedEventIds: [],
+        });
       }
     },
     [selectionStartPercent, setSelectedTimelineAndEvent]

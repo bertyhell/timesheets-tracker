@@ -5,13 +5,15 @@ export interface IntegrationDto {
   baseUrl: string;
   organisationId: string;
   userId: string;
-  token: string;
+  /** The API never sends the stored token back, only whether there is one */
+  hasToken: boolean;
 }
 
 export interface UpsertIntegrationPayload {
   baseUrl: string;
   organisationId: string;
   userId: string;
+  /** Empty keeps the stored token */
   token: string;
 }
 

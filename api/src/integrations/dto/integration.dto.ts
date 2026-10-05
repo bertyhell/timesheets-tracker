@@ -1,6 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class IntegrationDto {
   @IsString()
@@ -23,10 +23,10 @@ export class IntegrationDto {
   @ApiProperty({ type: String, description: 'User ID' })
   userId: string;
 
-  @IsString()
-  @Type(() => String)
-  @ApiProperty({ type: String, description: 'API token' })
-  token: string;
+  // The token itself is never sent back to the client, only whether one is stored
+  @IsBoolean()
+  @ApiProperty({ type: Boolean, description: 'Whether an API token is stored' })
+  hasToken: boolean;
 }
 
 export class UpsertIntegrationDto {
@@ -45,8 +45,12 @@ export class UpsertIntegrationDto {
   @ApiProperty({ type: String, description: 'User ID' })
   userId: string;
 
+  @IsOptional()
   @IsString()
   @Type(() => String)
-  @ApiProperty({ type: String, description: 'API token' })
-  token: string;
+  @ApiPropertyOptional({
+    type: String,
+    description: 'API token. Leave empty to keep the stored token',
+  })
+  token?: string;
 }

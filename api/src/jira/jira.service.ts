@@ -511,7 +511,7 @@ export class JiraService {
     };
 
     const url = `${await this.getApiBaseUrl(baseUrl, token, headers)}${path}`;
-    logger.info('[Jira] fetching: ' + url);
+    logger.debug('[Jira] fetching: ' + url);
     const response = await fetch(url, { headers });
 
     if (!response.ok) {

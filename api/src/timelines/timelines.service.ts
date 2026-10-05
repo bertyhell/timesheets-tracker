@@ -360,7 +360,9 @@ export class TimelinesService {
                 } catch (err) {
                   console.error(
                     new CustomError('Failed to fetch events from calendar', err, {
-                      icsUrl: (timelineInfo.eventProviderInfo as { icsUrl?: string })?.icsUrl,
+                      icsUrl: CalendarsService.redactIcsUrl(
+                        (timelineInfo.eventProviderInfo as { icsUrl?: string })?.icsUrl
+                      ),
                       startedAt,
                       endedAt,
                     })

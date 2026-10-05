@@ -17,7 +17,7 @@ export class IntegrationsController {
   })
   @Get(':type')
   findOne(@Param('type') type: string): IntegrationDto | null {
-    return this.integrationsService.findOne(type);
+    return this.integrationsService.findOnePublic(type);
   }
 
   @ApiOkResponse({ type: IntegrationDto })

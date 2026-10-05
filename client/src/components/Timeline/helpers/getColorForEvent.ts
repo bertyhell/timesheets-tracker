@@ -1,7 +1,7 @@
 import {
   type ActiveStateEventInfoDto,
   type AutoTagEventInfoDto,
-  type CalendarEventDto,
+  type CalendarEventInfoDto,
   type ProgramEventInfoDto,
   type TagEventInfoDto,
   type TimelineDto,
@@ -74,7 +74,7 @@ export function getColorForEvent(timelineInfo: TimelineDto, event: TimelineEvent
     }
 
     case TimelineType.Calendar: {
-      return getColorFromString((event.info as CalendarEventDto)?.summary);
+      return getColorFromString((event.info as CalendarEventInfoDto)?.summary);
     }
 
     case TimelineType.ActiveState: {

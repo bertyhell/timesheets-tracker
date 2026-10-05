@@ -65,10 +65,10 @@ export function useSyncOutputs(): { outputs: SyncOutput[]; isLoading: boolean } 
       {
         id: PRODUCTIVE_OUTPUT_ID,
         name: 'Productive',
-        meta: productive.data?.token
+        meta: productive.data?.hasToken
           ? endpointHost(productive.data.baseUrl)
           : 'Not connected — add in Settings',
-        isReady: !!productive.data?.token,
+        isReady: !!productive.data?.hasToken,
       },
       {
         id: CSV_OUTPUT_ID,

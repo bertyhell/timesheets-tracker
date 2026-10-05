@@ -127,7 +127,7 @@ export function JiraSettingsPage() {
 
   useEffect(() => {
     if (existing) {
-      setForm({ baseUrl: existing.baseUrl, userId: existing.userId, token: existing.token });
+      setForm({ baseUrl: existing.baseUrl, userId: existing.userId, token: '' });
     }
   }, [existing]);
 
@@ -180,7 +180,7 @@ export function JiraSettingsPage() {
     upsertMutation.mutate(toPayload(form));
   };
 
-  const isComplete = !!form.baseUrl && !!form.userId && !!form.token;
+  const isComplete = !!form.baseUrl && !!form.userId && (!!form.token || !!existing?.hasToken);
 
   if (isLoading) return null;
 
@@ -260,8 +260,8 @@ export function JiraSettingsPage() {
                 <input
                   className="c-input flex-1"
                   type={showToken ? 'text' : 'password'}
-                  required
-                  placeholder="••••••••"
+                  required={!existing?.hasToken}
+                  placeholder={existing?.hasToken ? 'Saved — leave empty to keep' : '••••••••'}
                   value={form.token}
                   onChange={(e) => setForm((f) => ({ ...f, token: e.target.value }))}
                 />

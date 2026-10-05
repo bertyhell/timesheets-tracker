@@ -471,7 +471,9 @@ export function calculateAutoTagEvents(
   maxGrowTimeMinutes = DEFAULT_MAX_GROW_TIME_MINUTES,
   combineGapMinutes = DEFAULT_AUTO_MERGE_TAGS_MINUTES
 ): TimelineEventDto[] {
-  const validAutoTags = autoTags
+  // The first matching auto tag wins, so they must be checked in priority order (0 = top of the list)
+  const validAutoTags = [...autoTags]
+    .sort((a, b) => a.priority - b.priority)
     .filter((autoTag) => !!autoTag.tagName && autoTag.conditions?.length)
     .map(compileAutoTag);
   const indexedTimelines = indexTimelines(timelinesWithEvents);

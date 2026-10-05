@@ -147,7 +147,6 @@ export class ProductiveService {
     ].join('&');
     const bookingsUrl = `${baseUrl}/bookings?${query}`;
 
-    console.log('[Productive] fetching:', bookingsUrl);
     const bookingsRes = await fetch(bookingsUrl, { headers });
     if (!bookingsRes.ok) {
       const body = await bookingsRes.text().catch(() => '');

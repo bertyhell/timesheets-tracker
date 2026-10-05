@@ -35,7 +35,7 @@ export class WebsitesController {
     required: true,
   })
   async create(@Body() createWebsiteDto: CreateWebsiteDto): Promise<Website | null> {
-    logger.info('tracking website: ' + createWebsiteDto.websiteUrl);
+    logger.debug('tracking website: ' + createWebsiteDto.websiteUrl);
     const existingWebsite = await this.websitesService.findOneByStartTime(
       createWebsiteDto.startedAt
     );

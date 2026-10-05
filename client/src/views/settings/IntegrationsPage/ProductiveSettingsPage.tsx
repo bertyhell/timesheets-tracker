@@ -49,7 +49,7 @@ export function ProductiveSettingsPage() {
         baseUrl: existing.baseUrl,
         organisationId: existing.organisationId,
         userId: existing.userId,
-        token: existing.token,
+        token: '',
       });
     }
   }, [existing]);
@@ -89,7 +89,11 @@ export function ProductiveSettingsPage() {
     upsertMutation.mutate(form);
   };
 
-  const isComplete = !!form.baseUrl && !!form.organisationId && !!form.userId && !!form.token;
+  const isComplete =
+    !!form.baseUrl &&
+    !!form.organisationId &&
+    !!form.userId &&
+    (!!form.token || !!existing?.hasToken);
 
   if (isLoading) return null;
 
@@ -142,8 +146,8 @@ export function ProductiveSettingsPage() {
                 <input
                   className="c-input flex-1"
                   type={showToken ? 'text' : 'password'}
-                  required
-                  placeholder="••••••••"
+                  required={!existing?.hasToken}
+                  placeholder={existing?.hasToken ? 'Saved — leave empty to keep' : '••••••••'}
                   value={form.token}
                   onChange={(e) => setForm((f) => ({ ...f, token: e.target.value }))}
                 />

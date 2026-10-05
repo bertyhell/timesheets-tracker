@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { createHash } from 'node:crypto';
 import * as ical from 'node-ical';
 import { CalendarResponse } from 'node-ical';
+import { createHash } from 'node:crypto';
 
 import { CachedNetworkRequestsService } from '../database/cached-network-requests.service';
 import { CustomError } from '../shared/CustomError';
@@ -72,7 +72,7 @@ export class CalendarsService {
       );
     } catch (err) {
       throw new CustomError('Failed to get events from ics url', err, {
-        icsUrl,
+        icsUrl: CalendarsService.redactIcsUrl(icsUrl),
         startedAt,
         endedAt,
       });
@@ -102,6 +102,16 @@ export class CalendarsService {
     );
 
     return ical.async.parseICS(ics);
+  }
+
+  /** An ics url can carry a secret (Google/Outlook put it in the path), so only the host is logged. */
+  static redactIcsUrl(icsUrl: string | undefined): string | undefined {
+    if (!icsUrl) return icsUrl;
+    try {
+      return new URL(icsUrl).host + '/…';
+    } catch {
+      return '<invalid url>';
+    }
   }
 
   /** An ics url can carry a secret, so it is hashed rather than stored as part of the cache key. */

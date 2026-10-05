@@ -10,6 +10,7 @@ export type FindOverlappingTagsResult = {
   tagNameId: string;
   startedAt: string;
   endedAt: string;
+  note: string | null;
 };
 
 export function findOverlappingTags(
@@ -17,7 +18,7 @@ export function findOverlappingTags(
   params: FindOverlappingTagsParams
 ): FindOverlappingTagsResult[] {
   const sql = `
-	SELECT id, tagNameId, startedAt, endedAt
+	SELECT id, tagNameId, startedAt, endedAt, note
 	FROM tags
 	WHERE startedAt < ? AND endedAt > ?
 	`;
@@ -29,5 +30,6 @@ export function findOverlappingTags(
       tagNameId: row.tagNameId,
       startedAt: row.startedAt,
       endedAt: row.endedAt,
+      note: row.note ?? null,
     }));
 }

@@ -36,6 +36,7 @@ export function findAllAutoTagsBySearchTerm(
 	FROM autoTags
 	LEFT JOIN tagNames ON tagNames.id = autoTags.tagNameId
 	WHERE autoTags.title like '%' || ? || '%'
+	ORDER BY autoTags.priority
 	`;
   return db
     .prepare(sql)

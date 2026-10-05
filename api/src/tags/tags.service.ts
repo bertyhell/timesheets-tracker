@@ -65,9 +65,12 @@ export class TagsService {
       let effectiveStart = min([new Date(createTagDto.startedAt), new Date(createTagDto.endedAt)]);
       let effectiveEnd = max([new Date(createTagDto.startedAt), new Date(createTagDto.endedAt)]);
 
-      // ── Pass 1: iteratively merge same-tagName overlaps ──────────────────
+      // ── Pass 1: iteratively merge overlaps with the same tagName and note ─
+      // Tags with the same name but a different note are kept separate (cut in pass 2),
+      // otherwise one of the notes would be lost.
       // The merge may extend the range, which can uncover more same-name tags,
       // so repeat until the range stabilises.
+      const newNote = normalizeNote(createTagDto.note);
       let changed = true;
       while (changed) {
         changed = false;
@@ -77,7 +80,12 @@ export class TagsService {
         });
 
         for (const existing of overlapping) {
-          if (existing.tagNameId !== createTagDto.tagNameId) continue;
+          if (
+            existing.tagNameId !== createTagDto.tagNameId ||
+            normalizeNote(existing.note) !== newNote
+          ) {
+            continue;
+          }
 
           const existingStart = new Date(existing.startedAt);
           const existingEnd = new Date(existing.endedAt);
@@ -94,15 +102,13 @@ export class TagsService {
         }
       }
 
-      // ── Pass 2: cut different-tagName overlaps ────────────────────────────
+      // ── Pass 2: cut all remaining overlaps (different tagName or note) ────
       const remainingOverlaps = findOverlappingTags(db, {
         startedAt: effectiveStart.toISOString(),
         endedAt: effectiveEnd.toISOString(),
       });
 
       for (const existing of remainingOverlaps) {
-        if (existing.tagNameId === createTagDto.tagNameId) continue; // already handled
-
         const existingStart = new Date(existing.startedAt);
         const existingEnd = new Date(existing.endedAt);
 
@@ -121,6 +127,7 @@ export class TagsService {
             tagNameId: existing.tagNameId,
             startedAt: effectiveEnd.toISOString(),
             endedAt: existing.endedAt,
+            note: existing.note,
           });
         } else if (!coversLeft && !coversRight) {
           // Old tag sits entirely inside new tag → delete it
@@ -219,4 +226,9 @@ export class TagsService {
       throw error;
     }
   }
+}
+
+/** Treats a missing note and an empty or whitespace-only note as the same note. */
+function normalizeNote(note: string | null | undefined): string {
+  return note?.trim() ?? '';
 }

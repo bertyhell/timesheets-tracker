@@ -10,3 +10,4 @@ SELECT
 FROM autoTags
 LEFT JOIN tagNames ON tagNames.id = autoTags.tagNameId
 WHERE autoTags.title like '%' || :searchTerm || '%'
+ORDER BY autoTags.priority

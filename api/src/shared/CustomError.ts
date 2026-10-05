@@ -1,25 +1,43 @@
-export class CustomError {
-  private error: Error;
+/**
+ * An Error that carries the error it wraps (as the standard `cause`) plus extra debugging info.
+ * It doesn't log itself: whoever handles it (a caller's console.error or the global exception
+ * filter) logs it once.
+ */
+export class CustomError extends Error {
   constructor(
-    private message: string,
-    private cause: any | null = null,
-    private additionalInfo: any | null = null
+    message: string,
+    cause: unknown = null,
+    public readonly additionalInfo: unknown = null
   ) {
-    this.error = new Error();
-    console.log(this.toString());
+    super(message, cause == null ? undefined : { cause });
+    this.name = 'CustomError';
   }
 
-  public toString = () => {
-    console.log('triggering custom error tostring');
-    return JSON.stringify(
-      {
-        message: this.message,
-        innerException: this.cause.message + ' ' + JSON.stringify(this.cause, null, 2),
-        additionalInfo: this.additionalInfo,
-        stack: this.error.stack,
-      },
-      null,
-      2
-    );
-  };
+  public override toString(): string {
+    return safeStringify({
+      message: this.message,
+      innerException: describeCause(this.cause),
+      additionalInfo: this.additionalInfo,
+      stack: this.stack,
+    });
+  }
+}
+
+function describeCause(cause: unknown): string | null {
+  if (cause == null) {
+    return null;
+  }
+  if (cause instanceof Error) {
+    return cause.toString() + (cause.stack ? '\n' + cause.stack : '');
+  }
+  return safeStringify(cause);
+}
+
+function safeStringify(value: unknown): string {
+  try {
+    return JSON.stringify(value, null, 2);
+  } catch {
+    // circular structures
+    return String(value);
+  }
 }

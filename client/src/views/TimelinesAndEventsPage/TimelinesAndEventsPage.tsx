@@ -28,12 +28,14 @@ import GlobalSearchBar from '../../components/GlobalSearchBar/GlobalSearchBar';
 import { TimelineType } from '../../components/Timeline/Timeline.types';
 import { TimelinesViewer } from '../../components/TimelinesViewer/TimelinesViewer';
 import {
-  tagsControllerRemoveMutation,
   timelinesControllerFindAllEventsOptions,
   timelinesControllerFindAllEventsQueryKey,
   timelinesControllerFindAllOptions,
 } from '../../generated/api/@tanstack/react-query.gen';
-import { timelinesControllerFindAllEvents } from '../../generated/api/sdk.gen';
+import {
+  tagsControllerRemove,
+  timelinesControllerFindAllEvents,
+} from '../../generated/api/sdk.gen';
 import { sidebarCollapsedAtom, viewDateAtom } from '../../store/store';
 
 const NO_EVENTS_MESSAGE_BY_TYPE: Record<TimelineType, string> = {
@@ -81,9 +83,12 @@ export function TimelinesAndEventsPage() {
     },
   });
 
-  const { mutateAsync: deleteTag } = useMutation({
-    ...tagsControllerRemoveMutation(),
-    onMutate: async ({ path: { id: tagId } }) => {
+  // Takes a list so deleting a multi-selection does one optimistic update and one refetch
+  const { mutateAsync: deleteTags } = useMutation({
+    mutationFn: (tagIds: string[]) =>
+      Promise.all(tagIds.map((id) => tagsControllerRemove({ path: { id }, throwOnError: true }))),
+    onMutate: async (tagIds) => {
+      const tagIdSet = new Set(tagIds);
       await queryClient.cancelQueries({ queryKey: eventsQueryKey });
       const previous =
         queryClient.getQueryData<TimelinesControllerFindAllEventsResponse>(eventsQueryKey);
@@ -92,7 +97,7 @@ export function TimelinesAndEventsPage() {
         (old) =>
           old?.map((timeline) => ({
             ...timeline,
-            events: timeline.events?.filter((e) => e.id !== tagId) ?? [],
+            events: timeline.events?.filter((e) => !tagIdSet.has(e.id)) ?? [],
           })) ?? []
       );
       return { previous };
@@ -101,7 +106,7 @@ export function TimelinesAndEventsPage() {
       if (context?.previous) {
         queryClient.setQueryData(eventsQueryKey, context.previous);
       }
-      toast('Failed to delete tag', { type: 'error' });
+      toast('Failed to delete tags', { type: 'error' });
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: eventsQueryKey });
@@ -124,13 +129,6 @@ export function TimelinesAndEventsPage() {
       ) || null,
     [timelinesWithEvents, selectedTimelineAndEvent.selectedTimelineId]
   );
-  const selectedTimelineEvents: TimelineEventDto[] = useMemo(
-    () =>
-      selectedTimeline?.events?.filter((event) =>
-        selectedTimelineAndEvent.selectedEventIds.includes(event.id)
-      ) ?? [],
-    [selectedTimeline, selectedTimelineAndEvent.selectedEventIds]
-  );
 
   useEffect(() => {
     if (!timelineInfos?.length || selectedTimelineAndEvent.selectedTimelineId !== null) {
@@ -141,45 +139,12 @@ export function TimelinesAndEventsPage() {
     setSelectedTimelineAndEvent({ selectedTimelineId: defaultTimeline.id, selectedEventIds: [] });
   }, [timelineInfos]);
 
-  useEffect(() => {
-    document.addEventListener('keyup', handleKeyUpEvent);
-
-    return () => {
-      document.removeEventListener('keyup', handleKeyUpEvent);
-    };
-  }, []);
-
-  const handleKeyUpEvent = async (evt: KeyboardEvent) => {
-    if (!(evt.target as Element)?.closest('.c-timelines')) {
-      return;
-    }
-    // Use state setter function to get latest state, since this event handler happens outside the react
-    setSelectedTimelineAndEvent(() => {
-      if (evt.key === 'Delete') {
-        // Delete selected events
-        if (selectedTimelineEvents.length && selectedTimeline?.type === TimelineType.Tag) {
-          (async () => {
-            for (const event of selectedTimelineEvents) {
-              await deleteTag({ path: { id: event.id } });
-            }
-            toast(selectedTimelineEvents.length > 1 ? 'Tags were deleted' : 'Tag was deleted', {
-              type: 'success',
-            });
-          })();
-        } else {
-          toast('No tag was selected', { type: 'warning' });
-        }
-      }
-      return {
-        selectedTimelineId: selectedTimeline?.id || null,
-        selectedEventIds: [],
-      };
-    });
-  };
-
-  const handleDeleteTag = useCallback(
-    (tagId: string) => deleteTag({ path: { id: tagId } }),
-    [deleteTag]
+  const handleDeleteTags = useCallback(
+    async (tagIds: string[]) => {
+      await deleteTags(tagIds);
+      setSelectedTimelineAndEvent((current) => ({ ...current, selectedEventIds: [] }));
+    },
+    [deleteTags]
   );
 
   const handleRefreshEvents = useCallback(async () => {
@@ -223,7 +188,7 @@ export function TimelinesAndEventsPage() {
             selectedTimelineAndEvent={selectedTimelineAndEvent}
             setSelectedTimelineAndEvent={setSelectedTimelineAndEvent}
             refetchTimelinesWithEvents={refetchTimelinesWithEvents}
-            onDeleteTag={handleDeleteTag}
+            onDeleteTags={handleDeleteTags}
             onRefreshEvents={handleRefreshEvents}
           ></TimelinesViewer>
         </Panel>
@@ -278,7 +243,7 @@ export function TimelinesAndEventsPage() {
                     )
                   }
                   onDeleteTag={async (eventId) => {
-                    await deleteTag({ path: { id: eventId } });
+                    await handleDeleteTags([eventId]);
                     toast('Tag was deleted', { type: 'success' });
                   }}
                   onCreateTagFromEvent={(startedAt, endedAt) => {

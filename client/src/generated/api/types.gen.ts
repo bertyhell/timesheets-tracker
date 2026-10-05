@@ -129,7 +129,7 @@ export type CreateTagNameDto = {
      */
     note?: string;
     /**
-     * Whether auto tags for this tag name may be stretched into neighbouring free time by the "grow auto tags" action
+     * Whether auto tags for this tag name may be stretched into neighbouring free time by the "grow auto tags" action. Defaults to true when omitted.
      */
     canGrow?: boolean;
 };
@@ -179,7 +179,7 @@ export type UpdateTagNameDto = {
      */
     note?: string;
     /**
-     * Whether auto tags for this tag name may be stretched into neighbouring free time by the "grow auto tags" action
+     * Whether auto tags for this tag name may be stretched into neighbouring free time by the "grow auto tags" action. Defaults to true when omitted.
      */
     canGrow?: boolean;
 };
@@ -316,13 +316,6 @@ export type UpdateAutoTagsDto = {
     activeUntil?: string | null;
 };
 
-export type SettingsResponseDto = {
-    /**
-     * Absolute path to the SQLite database file
-     */
-    databasePath: string;
-};
-
 export type SettingDto = {
     /**
      * Setting key
@@ -340,6 +333,13 @@ export type SettingDto = {
      * Last update timestamp
      */
     updatedAt: string;
+};
+
+export type SettingsResponseDto = {
+    /**
+     * Absolute path to the SQLite database file
+     */
+    databasePath: string;
 };
 
 export type UpsertSettingDto = {
@@ -512,37 +512,6 @@ export type UpdateAutoNoteDto = {
      * The regex match group to keep. eg: $1, empty string to take the whole variable
      */
     extractRegexReplacement?: string;
-};
-
-export type CalendarEventDto = {
-    /**
-     * Event ID
-     */
-    id: string;
-    /**
-     * Event summary/title
-     */
-    summary: string;
-    /**
-     * Event description
-     */
-    description: string;
-    /**
-     * Event location
-     */
-    location: string;
-    /**
-     * Event start time in ISO format
-     */
-    startedAt: string;
-    /**
-     * Event end time in ISO format
-     */
-    endedAt: string;
-    /**
-     * Whether the event is an all-day event
-     */
-    allDay: boolean;
 };
 
 export type ActiveStateEventInfoDto = {
@@ -988,9 +957,9 @@ export type IntegrationDto = {
      */
     userId: string;
     /**
-     * API token
+     * Whether an API token is stored
      */
-    token: string;
+    hasToken: boolean;
 };
 
 export type UpsertIntegrationDto = {
@@ -1007,9 +976,9 @@ export type UpsertIntegrationDto = {
      */
     userId: string;
     /**
-     * API token
+     * API token. Leave empty to keep the stored token
      */
-    token: string;
+    token?: string;
 };
 
 export type ProductiveConnectionDto = {
@@ -1398,7 +1367,7 @@ export type CsvExportColumnDto = {
     /**
      * How the value is rendered. Empty for the text values, which have no format.
      */
-    format?: 'duration:HH:mm:ss' | 'duration:HH:mm' | 'duration:HH.H' | 'duration:HH.HH' | 'duration:m' | 'duration:human' | 'time:HH:mm' | 'time:HH:mm:ss' | 'time:yyyy-MM-dd HH:mm' | 'time:iso' | 'date:yyyy-MM-dd' | 'date:dd/MM/yyyy' | 'date:MM/dd/yyyy' | 'date:dd-MM-yyyy' | '';
+    format?: 'duration:HH:mm:ss' | 'duration:HH:mm' | 'duration:HH.H' | 'duration:HH.HH' | 'duration:m' | 'duration:human' | 'time:HH:mm' | 'time:HH:mm:ss' | 'time:yyyy-MM-dd HH:mm' | 'time:iso' | 'date:yyyy-MM-dd' | 'date:dd/MM/yyyy' | 'date:MM/dd/yyyy' | 'date:dd-MM-yyyy' | 'date:EEE dd/MM/yyyy' | 'date:EEEE dd/MM/yyyy' | '';
     /**
      * Constant written in every row, used only when value is "staticText"
      */
@@ -1886,7 +1855,7 @@ export type SettingsControllerGetSettingByKeyData = {
 };
 
 export type SettingsControllerGetSettingByKeyResponses = {
-    200: SettingDto | unknown;
+    200: SettingDto | null;
 };
 
 export type SettingsControllerGetSettingByKeyResponse = SettingsControllerGetSettingByKeyResponses[keyof SettingsControllerGetSettingByKeyResponses];
@@ -2174,33 +2143,6 @@ export type AutoNotesControllerUpdateResponses = {
     200: unknown;
 };
 
-export type CalendarsControllerGetEventsData = {
-    body?: never;
-    path: {
-        id: string;
-    };
-    query: {
-        /**
-         * Start timestamp in ISO format
-         */
-        startedAt: string;
-        /**
-         * End timestamp in ISO format
-         */
-        endedAt: string;
-    };
-    url: '/api/calendars/{id}/events';
-};
-
-export type CalendarsControllerGetEventsResponses = {
-    /**
-     * Get events from a calendar for a given time range
-     */
-    200: Array<CalendarEventDto>;
-};
-
-export type CalendarsControllerGetEventsResponse = CalendarsControllerGetEventsResponses[keyof CalendarsControllerGetEventsResponses];
-
 export type TimelinesControllerFindAllData = {
     body?: never;
     path?: never;
@@ -2371,7 +2313,7 @@ export type IntegrationsControllerFindOneData = {
 };
 
 export type IntegrationsControllerFindOneResponses = {
-    200: IntegrationDto | unknown;
+    200: IntegrationDto | null;
 };
 
 export type IntegrationsControllerFindOneResponse = IntegrationsControllerFindOneResponses[keyof IntegrationsControllerFindOneResponses];

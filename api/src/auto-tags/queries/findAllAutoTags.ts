@@ -28,6 +28,7 @@ export function findAllAutoTags(db: DatabaseSync): FindAllAutoTagsResult[] {
 	    tagNames.color as "tagName.color"
 	FROM autoTags
 	LEFT JOIN tagNames ON tagNames.id = autoTags.tagNameId
+	ORDER BY autoTags.priority
 	`;
   return db
     .prepare(sql)

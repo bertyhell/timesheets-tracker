@@ -89,7 +89,7 @@ interface TimelineProps {
   isActive: boolean;
   onSelectTimeline: (timelineId: string) => void;
   onTagResized?: (tagId: string, newStartedAt: string, newEndedAt: string) => void;
-  onDeleteTag?: (tagId: string) => void;
+  onDeleteTags?: (tagIds: string[]) => void;
   onEditTag?: (tagId: string) => void;
   onEditAutoTagRule?: (autoTagId: string) => void;
   onCreateTagFromEvent?: (startedAt: string, endedAt: string) => void;
@@ -152,7 +152,7 @@ function Timeline({
   isActive,
   onSelectTimeline,
   onTagResized,
-  onDeleteTag,
+  onDeleteTags,
   onEditTag,
   onEditAutoTagRule,
   onCreateTagFromEvent,
@@ -212,7 +212,7 @@ function Timeline({
   const selectedEventIdSet = useMemo(() => new Set(selectedEventIds), [selectedEventIds]);
 
   useEffect(() => {
-    if (timelineInfo.timelineType !== TimelineType.Tag || !onDeleteTag) return;
+    if (timelineInfo.timelineType !== TimelineType.Tag || !onDeleteTags) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key !== 'Delete' && e.key !== 'Backspace') return;
       const activeEl = document.activeElement;
@@ -223,13 +223,21 @@ function Timeline({
           (activeEl as HTMLElement).isContentEditable)
       )
         return;
-      const ownSelectedEvents = events.filter((ev) => selectedEventIdSet.has(ev.id));
-      if (!ownSelectedEvents.length) return;
-      ownSelectedEvents.forEach((ev) => onDeleteTag(ev.id));
+      const ownSelectedIds = events
+        .filter((ev) => selectedEventIdSet.has(ev.id))
+        .map((ev) => ev.id);
+      if (!ownSelectedIds.length) return;
+      // Backspace is easy to hit by accident, and a deleted tag can't be restored
+      const message =
+        ownSelectedIds.length === 1
+          ? 'Delete the selected tag?'
+          : `Delete the ${ownSelectedIds.length} selected tags?`;
+      if (!window.confirm(message)) return;
+      onDeleteTags(ownSelectedIds);
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [timelineInfo.timelineType, onDeleteTag, selectedEventIdSet, events]);
+  }, [timelineInfo.timelineType, onDeleteTags, selectedEventIdSet, events]);
 
   const lastSelectedEventIdRef = useRef<string | null>(null);
 
@@ -932,7 +940,7 @@ function Timeline({
                   {
                     label: 'Delete tag',
                     icon: contextMenuIcons.delete,
-                    onClick: () => onDeleteTag?.(contextMenu.eventId),
+                    onClick: () => onDeleteTags?.([contextMenu.eventId]),
                     variant: 'danger' as const,
                   },
                 ]

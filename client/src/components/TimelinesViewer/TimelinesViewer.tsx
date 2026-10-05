@@ -79,7 +79,7 @@ interface TimelinesViewerProps {
   refetchTimelinesWithEvents: (
     options?: RefetchOptions
   ) => Promise<QueryObserverResult<Array<TimelineWithEventsDto>>>;
-  onDeleteTag: (tagId: string) => Promise<unknown>;
+  onDeleteTags: (tagIds: string[]) => Promise<unknown>;
   onRefreshEvents: () => void;
 }
 
@@ -100,7 +100,7 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
   selectedTimelineAndEvent,
   setSelectedTimelineAndEvent,
   refetchTimelinesWithEvents,
-  onDeleteTag,
+  onDeleteTags,
   onRefreshEvents,
 }) => {
   const navigate = useNavigate();
@@ -744,12 +744,12 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
     [setSelectedTimelineAndEvent]
   );
 
-  const handleDeleteTagWithToast = useCallback(
-    async (tagId: string) => {
-      await onDeleteTag(tagId);
-      toast('Tag was deleted', { type: 'success' });
+  const handleDeleteTagsWithToast = useCallback(
+    async (tagIds: string[]) => {
+      await onDeleteTags(tagIds);
+      toast(tagIds.length > 1 ? 'Tags were deleted' : 'Tag was deleted', { type: 'success' });
     },
-    [onDeleteTag]
+    [onDeleteTags]
   );
 
   const handleEditTag = useCallback(
@@ -917,7 +917,7 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
           isActive={selectedTimeline?.id === timelineInfo.id}
           onSelectTimeline={handleSelectTimeline}
           onTagResized={handleTagResized}
-          onDeleteTag={handleDeleteTagWithToast}
+          onDeleteTags={handleDeleteTagsWithToast}
           onEditTag={handleEditTag}
           onEditAutoTagRule={handleEditAutoTagRule}
           onCreateTagFromEvent={handleCreateTagFromEvent}
@@ -948,7 +948,7 @@ export const TimelinesViewer: FC<TimelinesViewerProps> = ({
     selectedTimeline?.id,
     handleSelectTimeline,
     handleTagResized,
-    handleDeleteTagWithToast,
+    handleDeleteTagsWithToast,
     handleEditTag,
     handleEditAutoTagRule,
     handleCreateTagFromEvent,

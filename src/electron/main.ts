@@ -16,8 +16,8 @@ import {
   app,
   BrowserWindow,
   dialog,
-  globalShortcut,
   ipcMain,
+  type IpcMainInvokeEvent,
   Menu,
   Tray,
   nativeImage,
@@ -132,8 +132,32 @@ function createWindow(): BrowserWindow {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+      sandbox: true,
       preload: PRELOAD_PATH,
     },
+  });
+
+  // Links with target="_blank" would otherwise open in a new Electron window that also gets the
+  // preload bridge, giving an external site access to window.electron. Open them in the browser.
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    openExternalIfWeb(url);
+    return { action: 'deny' };
+  });
+  win.webContents.on('will-navigate', (event, url) => {
+    if (!isAppUrl(url)) {
+      event.preventDefault();
+      openExternalIfWeb(url);
+    }
+  });
+
+  // DevTools shortcut without a menu bar. Scoped to this window: a globalShortcut would take
+  // Ctrl+Shift+I away from every other application while the app runs in the tray.
+  win.webContents.on('before-input-event', (event, input) => {
+    const isModifierDown = process.platform === 'darwin' ? input.meta : input.control;
+    if (input.type === 'keyDown' && isModifierDown && input.shift && input.code === 'KeyI') {
+      event.preventDefault();
+      win.webContents.toggleDevTools();
+    }
   });
 
   win.loadURL(APP_URL);
@@ -320,14 +344,8 @@ function updateTrayMenu(): void {
 // ── Application menu ──────────────────────────────────────────────────────────
 function setAppMenu(): void {
   // Remove the native menu bar — all options live in the tray right-click menu.
+  // The DevTools shortcut is handled per window in createWindow().
   Menu.setApplicationMenu(null);
-
-  // Keep the DevTools shortcut working without a menu bar.
-  app.whenReady().then(() => {
-    globalShortcut.register('CmdOrCtrl+Shift+I', () => {
-      mainWindow?.webContents.toggleDevTools();
-    });
-  });
 }
 
 // ── Cleanup ──────────────────────────────────────────────────────────────────
@@ -480,14 +498,40 @@ function checkForUpdates(manual: boolean): void {
 }
 
 // ── IPC handlers ─────────────────────────────────────────────────────────────
-ipcMain.handle('dialog:openDirectory', async () => {
+function isAppUrl(url: string | undefined): boolean {
+  return !!url && (url === APP_URL || url.startsWith(APP_URL + '/'));
+}
+
+function openExternalIfWeb(url: string): void {
+  if (url.startsWith('https://') || url.startsWith('http://')) {
+    shell.openExternal(url);
+  }
+}
+
+/**
+ * ipcMain.handle that only answers the app's own pages, so a frame showing anything else
+ * (an external site, an iframe) can't open dialogs or write files.
+ */
+function handleFromApp<Args extends unknown[], Result>(
+  channel: string,
+  handler: (event: IpcMainInvokeEvent, ...args: Args) => Result
+): void {
+  ipcMain.handle(channel, (event, ...args) => {
+    if (!isAppUrl(event.senderFrame?.url)) {
+      throw new Error(`Blocked IPC call to ${channel} from ${event.senderFrame?.url}`);
+    }
+    return handler(event, ...(args as Args));
+  });
+}
+
+handleFromApp('dialog:openDirectory', async () => {
   const result = await dialog.showOpenDialog({
     properties: ['openDirectory'],
   });
   return result.canceled ? null : (result.filePaths[0] ?? null);
 });
 
-ipcMain.handle('dialog:openFile', async () => {
+handleFromApp('dialog:openFile', async () => {
   const result = await dialog.showOpenDialog({
     properties: ['openFile'],
     filters: [{ name: 'SQLite Database', extensions: ['sqlite3', 'db', 'sqlite'] }],
@@ -495,7 +539,7 @@ ipcMain.handle('dialog:openFile', async () => {
   return result.canceled ? null : (result.filePaths[0] ?? null);
 });
 
-ipcMain.handle('dialog:saveFile', async (_event, defaultPath?: string) => {
+handleFromApp('dialog:saveFile', async (_event, defaultPath?: string) => {
   const result = await dialog.showSaveDialog({
     defaultPath: defaultPath ?? 'timesheets-tracker-database.sqlite3',
     filters: [{ name: 'SQLite Database', extensions: ['sqlite3', 'db', 'sqlite'] }],
@@ -508,7 +552,7 @@ ipcMain.handle('dialog:saveFile', async (_event, defaultPath?: string) => {
  * `dialog:saveFile` above stays as it is: it only returns a path, and its caller has the backend
  * do the writing.
  */
-ipcMain.handle(
+handleFromApp(
   'dialog:saveTextFile',
   async (
     _event,
@@ -525,18 +569,21 @@ ipcMain.handle(
     if (result.canceled || !result.filePath) {
       return null;
     }
-    fs.writeFileSync(result.filePath, options.contents, 'utf-8');
+    await fs.promises.writeFile(result.filePath, options.contents, 'utf-8');
     return result.filePath;
   }
 );
 
-ipcMain.handle('shell:showItemInFolder', (_event, targetPath: string) => {
+handleFromApp('shell:showItemInFolder', (_event, targetPath: unknown) => {
+  if (typeof targetPath !== 'string' || !path.isAbsolute(targetPath)) {
+    throw new Error('showItemInFolder expects an absolute path');
+  }
   shell.showItemInFolder(targetPath);
 });
 
-ipcMain.handle('updates:getStatus', () => updateStatus);
+handleFromApp('updates:getStatus', () => updateStatus);
 
-ipcMain.handle('updates:check', async () => {
+handleFromApp('updates:check', async () => {
   if (!updateStatus.supported) {
     return { ...updateStatus, state: 'unsupported' as const };
   }
@@ -563,7 +610,7 @@ ipcMain.handle('updates:check', async () => {
   return updateStatus;
 });
 
-ipcMain.handle('updates:download', async () => {
+handleFromApp('updates:download', async () => {
   if (!updateStatus.supported) {
     return { ...updateStatus, state: 'unsupported' as const };
   }
@@ -582,7 +629,7 @@ ipcMain.handle('updates:download', async () => {
   return updateStatus;
 });
 
-ipcMain.handle('updates:install', () => {
+handleFromApp('updates:install', () => {
   if (updateStatus.state !== 'downloaded') return false;
   isQuitting = true;
   // Defer so the IPC reply reaches the renderer before the app tears down.
@@ -646,7 +693,6 @@ app.on('window-all-closed', () => {
 
 app.on('before-quit', () => {
   isQuitting = true;
-  globalShortcut.unregisterAll();
   if (serverProcess) {
     try {
       serverProcess.kill();

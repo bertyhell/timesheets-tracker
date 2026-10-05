@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { exec } from 'child_process';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { execFile } from 'child_process';
 import * as fg from 'fast-glob';
 import * as path from 'path';
 import { promisify } from 'util';
@@ -7,7 +7,7 @@ import { v4 as uuid } from 'uuid';
 
 import { CustomError } from '../shared/CustomError';
 
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 
 const SEARCH_DEPTH = 3;
 const IGNORE_PATTERNS = ['node_modules/**', 'dist/**'];
@@ -39,11 +39,21 @@ export class GitCommitsService {
     startedAt: string,
     endedAt: string
   ): Promise<GitCommitEvent[]> {
-    const { stdout: authorEmail } = await execAsync('git config user.email', { cwd: repoPath });
-    // %H = full hash, %ai = author date ISO 8601, %s = subject
-    const command = `git log --all --author="${authorEmail.trim()}" --since="${startedAt}" --until="${endedAt}" --pretty=format:"%ai|%s"`;
+    const { stdout: authorEmail } = await execFileAsync('git', ['config', 'user.email'], {
+      cwd: repoPath,
+    });
+    // execFile passes arguments directly to git (no shell), so request input can't inject commands
+    // %ai = author date ISO 8601, %s = subject
+    const args = [
+      'log',
+      '--all',
+      `--author=${authorEmail.trim()}`,
+      `--since=${startedAt}`,
+      `--until=${endedAt}`,
+      '--pretty=format:%ai|%s',
+    ];
     try {
-      const { stdout } = await execAsync(command, { cwd: repoPath });
+      const { stdout } = await execFileAsync('git', args, { cwd: repoPath });
       const trimmed = stdout.trim();
       if (!trimmed) return [];
 
@@ -87,6 +97,9 @@ export class GitCommitsService {
   ): Promise<GitCommitEvent[]> {
     try {
       if (!folderPath) return [];
+      if (isNaN(Date.parse(startedAt)) || isNaN(Date.parse(endedAt))) {
+        throw new BadRequestException('startedAt and endedAt must be valid dates');
+      }
 
       const repoPaths = this.findGitRepoPaths(folderPath);
       const results = await Promise.all(

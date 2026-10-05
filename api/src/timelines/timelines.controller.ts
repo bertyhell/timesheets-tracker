@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Query, Param, Patch, Delete, HttpCode } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiExtraModels, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { type Timeline } from '../types/types';
@@ -87,6 +98,9 @@ export class TimelinesController {
     @Query('timelineIds') timelineIds?: string[],
     @Query('clearCache') clearCache?: string
   ) {
+    if (isNaN(Date.parse(startedAt ?? '')) || isNaN(Date.parse(endedAt ?? ''))) {
+      throw new BadRequestException('startedAt and endedAt must be valid dates');
+    }
     return this.timelinesService.findAllEvents(
       startedAt,
       endedAt,

@@ -1,5 +1,6 @@
 import dbus from 'dbus-next';
 import { EventEmitter } from 'events';
+import { safeSessionBus } from '../../shared/safe-dbus';
 
 const DBUS_DEST = 'org.gnome.Shell';
 const DBUS_PATH = '/org/gnome/shell/extensions/FocusedWindow';
@@ -25,7 +26,7 @@ export class WaylandActiveWindow extends EventEmitter {
 
   async connect(): Promise<WaylandWindowInfo | null> {
     try {
-      this.bus = dbus.sessionBus();
+      this.bus = safeSessionBus();
       const obj = await this.bus.getProxyObject(DBUS_DEST, DBUS_PATH);
       this.iface = obj.getInterface(DBUS_IFACE);
 

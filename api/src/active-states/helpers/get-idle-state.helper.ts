@@ -1,5 +1,6 @@
 import RealIdle, { IdleState } from '@paymoapp/real-idle';
 import * as dbus from 'dbus-next';
+import { safeSessionBus, safeSystemBus } from '../../shared/safe-dbus';
 
 const IDLE_STATE_TO_IS_ACTIVE: Record<string, boolean> = {
   [IdleState.active]: true,
@@ -46,7 +47,7 @@ async function getIsActiveWayland(thresholdSeconds: number): Promise<boolean> {
 }
 
 async function getIsActiveViaGnomeMutter(thresholdSeconds: number): Promise<boolean> {
-  const bus = dbus.sessionBus();
+  const bus = safeSessionBus();
   try {
     const obj = await bus.getProxyObject(
       'org.gnome.Mutter.IdleMonitor',
@@ -62,7 +63,7 @@ async function getIsActiveViaGnomeMutter(thresholdSeconds: number): Promise<bool
 }
 
 async function getIsActiveViaLogind(): Promise<boolean> {
-  const bus = dbus.systemBus();
+  const bus = safeSystemBus();
   try {
     // /session/auto resolves to the caller's current session (systemd 230+)
     const obj = await bus.getProxyObject(

@@ -587,7 +587,7 @@ function Timeline({
                   const autoTagInfo = isAutoTagTimeline
                     ? (event.info as AutoTagEventInfoDto)
                     : null;
-                  const matchedConditions = autoTagInfo?.matchedConditions ?? [];
+                  const matchedConditionGroups = autoTagInfo?.matchedConditionGroups ?? [];
                   const isProductiveTimeline =
                     timelineInfo.timelineType === TimelineType.Productive;
                   const merged = event.mergedFrom ? summarizeMergedEvents(event.mergedFrom) : null;
@@ -643,25 +643,37 @@ function Timeline({
                               <b>Note:</b> {autoTagInfo.tagNameNote}
                             </li>
                           )}
-                          {!!matchedConditions.length && (
+                          {!!matchedConditionGroups.length && (
                             <li className="c-timeline__event__tooltip__conditions">
-                              <b>{matchedConditions.length > 1 ? 'Conditions' : 'Condition'}:</b>
-                              <ul>
-                                {matchedConditions.map((condition, conditionIndex) => (
-                                  <li
-                                    key={
-                                      'c-timeline__' +
-                                      timelineInfo.title +
-                                      '__event__' +
-                                      event.id +
-                                      '__condition__' +
-                                      conditionIndex
-                                    }
-                                  >
-                                    {formatMatchedCondition(condition)}
-                                  </li>
-                                ))}
-                              </ul>
+                              <b>
+                                {matchedConditionGroups.length > 1 ||
+                                matchedConditionGroups[0].conditions.length > 1
+                                  ? 'Conditions'
+                                  : 'Condition'}
+                                :
+                              </b>
+                              {matchedConditionGroups.map((group, groupIndex) => (
+                                <React.Fragment
+                                  key={
+                                    'c-timeline__' +
+                                    timelineInfo.title +
+                                    '__event__' +
+                                    event.id +
+                                    '__condition-group__' +
+                                    groupIndex
+                                  }
+                                >
+                                  {groupIndex > 0 && <b>OR</b>}
+                                  <ul>
+                                    {group.conditions.map((condition, conditionIndex) => (
+                                      <li key={conditionIndex}>
+                                        {conditionIndex > 0 && <b>AND </b>}
+                                        {formatMatchedCondition(condition)}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </React.Fragment>
+                              ))}
                             </li>
                           )}
                         </>

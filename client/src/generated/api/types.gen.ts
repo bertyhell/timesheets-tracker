@@ -608,6 +608,13 @@ export type MatchedAutoTagConditionDto = {
     matchedValue: string;
 };
 
+export type MatchedAutoTagConditionGroupDto = {
+    /**
+     * Conditions that were joined with AND and all matched
+     */
+    conditions: Array<MatchedAutoTagConditionDto>;
+};
+
 export type AutoTagEventInfoDto = {
     /**
      * Id of the auto tag rule that produced this event
@@ -642,9 +649,9 @@ export type AutoTagEventInfoDto = {
      */
     priority: number;
     /**
-     * The conditions of the auto tag rule that were triggered by the source event. Empty for events that originate from a manual tag.
+     * The AND-groups of the auto tag rule that were triggered by the source events. Groups are alternatives (OR), the conditions inside a group all matched (AND). More than one group only occurs when merged events matched through different OR branches. Empty for events that originate from a manual tag.
      */
-    matchedConditions?: Array<MatchedAutoTagConditionDto>;
+    matchedConditionGroups?: Array<MatchedAutoTagConditionGroupDto>;
 };
 
 export type GitCommitEventInfoDto = {

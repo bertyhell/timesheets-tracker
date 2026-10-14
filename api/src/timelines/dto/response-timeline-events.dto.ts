@@ -220,6 +220,18 @@ export class MatchedAutoTagConditionDto {
   matchedValue: string;
 }
 
+export class MatchedAutoTagConditionGroupDto {
+  @IsArray()
+  @Type(() => MatchedAutoTagConditionDto)
+  @ApiProperty({
+    type: MatchedAutoTagConditionDto,
+    isArray: true,
+    description: 'Conditions that were joined with AND and all matched',
+    required: true,
+  })
+  conditions: MatchedAutoTagConditionDto[];
+}
+
 export class AutoTagEventInfoDto {
   @IsString()
   @Type(() => String)
@@ -307,15 +319,15 @@ export class AutoTagEventInfoDto {
 
   @IsArray()
   @IsOptional()
-  @Type(() => MatchedAutoTagConditionDto)
+  @Type(() => MatchedAutoTagConditionGroupDto)
   @ApiProperty({
-    type: MatchedAutoTagConditionDto,
+    type: MatchedAutoTagConditionGroupDto,
     isArray: true,
     description:
-      'The conditions of the auto tag rule that were triggered by the source event. Empty for events that originate from a manual tag.',
+      'The AND-groups of the auto tag rule that were triggered by the source events. Groups are alternatives (OR), the conditions inside a group all matched (AND). More than one group only occurs when merged events matched through different OR branches. Empty for events that originate from a manual tag.',
     required: false,
   })
-  matchedConditions?: MatchedAutoTagConditionDto[];
+  matchedConditionGroups?: MatchedAutoTagConditionGroupDto[];
 }
 
 export class ProductiveEventInfoDto {

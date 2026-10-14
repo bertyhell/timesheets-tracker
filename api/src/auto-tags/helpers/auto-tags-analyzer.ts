@@ -8,6 +8,7 @@ import { TagNameDto } from '../../tag-names/dto/response-tag-name.dto';
 import {
   AutoTagEventInfoDto,
   MatchedAutoTagConditionDto,
+  MatchedAutoTagConditionGroupDto,
   TimelineEventDto,
   TimelineWithEventsDto,
 } from '../../timelines/dto/response-timeline-events.dto';
@@ -23,26 +24,19 @@ const DEFAULT_MAX_GROW_TIME_MINUTES = 5;
 /**
  * Takes a list of conditions and splits them based on the OR operators
  * Returns an array of arrays with all conditions inside a single array having the AND operator or being singular conditions
+ * A condition's booleanOperator joins it with the previous condition (that is how the editor shows it),
+ * so the first condition's operator is ignored.
  * @param conditions
  */
 function splitConditionsOnOrOperators(conditions: AutoTagConditionDto[]): AutoTagConditionDto[][] {
   const groupedConditions: AutoTagConditionDto[][] = [];
-  let currentGroup: AutoTagConditionDto[] = [];
-
-  let currentIndex = 0;
-  do {
-    const currentCondition = conditions[currentIndex];
-    currentGroup.push(currentCondition);
-    if (currentCondition.booleanOperator === BooleanOperator.OR) {
-      groupedConditions.push(currentGroup);
-      currentGroup = [];
+  conditions.forEach((condition, index) => {
+    if (index === 0 || condition.booleanOperator === BooleanOperator.OR) {
+      groupedConditions.push([condition]);
+    } else {
+      groupedConditions[groupedConditions.length - 1].push(condition);
     }
-    currentIndex++;
-  } while (currentIndex < conditions.length);
-
-  if (currentGroup.length > 0) {
-    groupedConditions.push(currentGroup);
-  }
+  });
   return groupedConditions;
 }
 
@@ -401,16 +395,23 @@ export function growAutoTagEvents(
   return sortedAutoTagEvents;
 }
 
+function getConditionGroupKey(group: MatchedAutoTagConditionGroupDto): string {
+  return group.conditions
+    .map((condition) => `${condition.variable}|${condition.operator}|${condition.value}`)
+    .join('&');
+}
+
 /**
- * Unions the matched conditions of merged auto-tag events, deduplicating on the rule itself
- * (variable + operator + value) so the first matched value is kept.
+ * Unions the matched AND-groups of merged auto-tag events, deduplicating on the rules themselves
+ * (variable + operator + value) so the first matched values are kept. Groups stay separate,
+ * because conditions from different OR branches never matched together.
  */
-function mergeMatchedConditions(
-  ...conditionLists: (MatchedAutoTagConditionDto[] | undefined)[]
-): MatchedAutoTagConditionDto[] {
+function mergeMatchedConditionGroups(
+  ...groupLists: (MatchedAutoTagConditionGroupDto[] | undefined)[]
+): MatchedAutoTagConditionGroupDto[] {
   return uniqBy(
-    conditionLists.flatMap((conditions) => conditions ?? []),
-    (condition) => `${condition.variable}|${condition.operator}|${condition.value}`
+    groupLists.flatMap((groups) => groups ?? []),
+    getConditionGroupKey
   );
 }
 
@@ -447,9 +448,9 @@ function combineAutoTagEvents(
           endedAt: currentAutoTagEvent.endedAt,
           info: {
             ...lastCombinedInfo,
-            matchedConditions: mergeMatchedConditions(
-              lastCombinedInfo.matchedConditions,
-              currentInfo.matchedConditions
+            matchedConditionGroups: mergeMatchedConditionGroups(
+              lastCombinedInfo.matchedConditionGroups,
+              currentInfo.matchedConditionGroups
             ),
           },
         };
@@ -516,7 +517,7 @@ export function calculateAutoTagEvents(
         tagNameNote: tagName.note || undefined,
         tagNameCanGrow: !!tagName.canGrow,
         priority: autoTag.priority,
-        matchedConditions,
+        matchedConditionGroups: [{ conditions: matchedConditions }],
       };
       autoTagEvents.push({
         id: crypto.randomUUID(),

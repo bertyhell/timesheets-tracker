@@ -147,17 +147,29 @@ export function TimelinesAndEventsPage() {
     [deleteTags]
   );
 
+  // The cache-clearing fetch goes around react-query, so its isFetching never flips: track it here
+  // to still show the loading indicator.
+  const [isRefreshingEvents, setIsRefreshingEvents] = useState(false);
+
   const handleRefreshEvents = useCallback(async () => {
     const query = {
       startedAt: startOfDay(viewDate).toISOString(),
       endedAt: endOfDay(viewDate).toISOString(),
       clearCache: true,
     };
-    const result = await timelinesControllerFindAllEvents({ query });
-    queryClient.setQueryData<TimelinesControllerFindAllEventsResponse>(eventsQueryKey, result.data);
-    // The backend cleared its cached Productive lists; drop the client caches too
-    // so the sync modal refetches them fresh.
-    await queryClient.invalidateQueries({ queryKey: ['productive'] });
+    setIsRefreshingEvents(true);
+    try {
+      const result = await timelinesControllerFindAllEvents({ query });
+      queryClient.setQueryData<TimelinesControllerFindAllEventsResponse>(
+        eventsQueryKey,
+        result.data
+      );
+      // The backend cleared its cached Productive lists; drop the client caches too
+      // so the sync modal refetches them fresh.
+      await queryClient.invalidateQueries({ queryKey: ['productive'] });
+    } finally {
+      setIsRefreshingEvents(false);
+    }
   }, [viewDate, eventsQueryKey, queryClient]);
 
   const totalEventCount = selectedTimeline?.events?.length ?? 0;
@@ -338,10 +350,12 @@ export function TimelinesAndEventsPage() {
         </div>
 
         <div className="p-page-header-right">
-          {isFetchingTimelineEvents && (
+          {(isFetchingTimelineEvents || isRefreshingEvents) && (
             <Loader2 className="p-loading-indicator animate-spin" size={16} />
           )}
-          {isFetchingTimelineEvents && <div className="p-header-divider" />}
+          {(isFetchingTimelineEvents || isRefreshingEvents) && (
+            <div className="p-header-divider" />
+          )}
           <DateSelect />
           <div className="p-header-divider" />
           <GlobalSearchBar />

@@ -30,6 +30,7 @@ export enum ROUTE_PARTS {
   excelCsv = 'excel-csv',
   updates = 'updates',
   backup = 'backup',
+  aiAssistant = 'ai-assistant',
 }
 
 const OVERVIEW_NAV = [{ to: ROUTE_PARTS.timelinesAndEvents, label: 'Overview', icon: BarChart2 }];

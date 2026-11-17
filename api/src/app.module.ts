@@ -11,8 +11,10 @@ import { AutoNotesModule } from './auto-notes/auto-notes.module';
 import { AutoTagsModule } from './auto-tags/auto-tags.module';
 import { CalendarsModule } from './calendars/calendars.module';
 import { CsvExportModule } from './csv-export/csv-export.module';
+import { DatabaseBackupsModule } from './database-backups/database-backups.module';
 import { DatabaseModule } from './database/database.module';
 import { IntegrationsModule } from './integrations/integrations.module';
+import { McpModule } from './mcp/mcp.module';
 import { OverviewsModule } from './overviews/overviews.module';
 import { ProgramsModule } from './programs/programs.module';
 import { SettingsModule } from './settings/settings.module';
@@ -52,6 +54,8 @@ logger.info('client folder: ' + clientDistFolder);
     OverviewsModule,
     IntegrationsModule,
     CsvExportModule,
+    DatabaseBackupsModule,
+    McpModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,4 +1,4 @@
-import { ArrowDownUp, Database, Plug, RefreshCw, Zap } from 'lucide-react';
+import { ArrowDownUp, Bot, Database, Plug, RefreshCw, Zap } from 'lucide-react';
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 
@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { to: '/settings/auto-tags', label: 'Auto tags', icon: Zap },
   { to: '/settings/integrations', label: 'Integrations', icon: Plug },
   { to: '/settings/backup', label: 'Import & export', icon: ArrowDownUp },
+  { to: '/settings/ai-assistant', label: 'AI assistant', icon: Bot },
   { to: '/settings/updates', label: 'Updates', icon: RefreshCw },
 ];
 

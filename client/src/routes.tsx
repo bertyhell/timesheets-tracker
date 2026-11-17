@@ -12,6 +12,7 @@ import { EditTimelineModal } from './components/EditTimelineModal/EditTimelineMo
 import { OverviewsPage } from './views/OverviewsPage/OverviewsPage';
 import { OverviewView } from './views/OverviewsPage/OverviewView/OverviewView';
 import { DEFAULT_REPORT_ID } from './views/OverviewsPage/reports/report-catalog';
+import { AiAssistantPage } from './views/settings/AiAssistantPage/AiAssistantPage';
 import { AutoTagsPage } from './views/settings/AutoTagsPage/AutoTagsPage';
 import { AutoTagsSettingsPage } from './views/settings/AutoTagsSettingsPage/AutoTagsSettingsPage';
 import { BackupSettingsPage } from './views/settings/BackupSettingsPage/BackupSettingsPage';
@@ -111,6 +112,10 @@ export const routes: RouteObject[] = [
           {
             path: ROUTE_PARTS.backup,
             element: <BackupSettingsPage />,
+          },
+          {
+            path: ROUTE_PARTS.aiAssistant,
+            element: <AiAssistantPage />,
           },
           {
             path: ROUTE_PARTS.updates,

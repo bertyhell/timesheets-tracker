@@ -1400,6 +1400,53 @@ export type CsvExportConfigDto = {
     columns: Array<CsvExportColumnDto>;
 };
 
+export type DatabaseBackupDto = {
+    /**
+     * Identifier of the backup, which is also its file name
+     */
+    id: string;
+    /**
+     * Short label given when the backup was made, slugified
+     */
+    label: string | null;
+    /**
+     * When the backup was made, ISO format
+     */
+    createdAt: string;
+    /**
+     * Size of the backup file in bytes
+     */
+    sizeBytes: number;
+    /**
+     * Absolute path of the backup file
+     */
+    filePath: string;
+};
+
+export type CreateDatabaseBackupDto = {
+    /**
+     * Optional short label to recognise the backup by, eg: "before cleanup"
+     */
+    label?: string;
+};
+
+export type RestoreDatabaseBackupResultDto = {
+    /**
+     * The backup that was restored
+     */
+    restoredFrom: DatabaseBackupDto;
+    /**
+     * Backup of the state right before the restore, so the restore can be undone
+     */
+    safetyBackup: DatabaseBackupDto;
+    /**
+     * Number of rows restored per table
+     */
+    restoredRowCounts: {
+        [key: string]: number;
+    };
+};
+
 export type AppControllerStatusData = {
     body?: never;
     path?: never;
@@ -2568,3 +2615,68 @@ export type CsvExportControllerSaveConfigResponses = {
 };
 
 export type CsvExportControllerSaveConfigResponse = CsvExportControllerSaveConfigResponses[keyof CsvExportControllerSaveConfigResponses];
+
+export type DatabaseBackupsControllerFindAllData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/database-backups';
+};
+
+export type DatabaseBackupsControllerFindAllResponses = {
+    /**
+     * List the database backups, newest first
+     */
+    200: Array<DatabaseBackupDto>;
+};
+
+export type DatabaseBackupsControllerFindAllResponse = DatabaseBackupsControllerFindAllResponses[keyof DatabaseBackupsControllerFindAllResponses];
+
+export type DatabaseBackupsControllerCreateData = {
+    body: CreateDatabaseBackupDto;
+    path?: never;
+    query?: never;
+    url: '/api/database-backups';
+};
+
+export type DatabaseBackupsControllerCreateResponses = {
+    /**
+     * Write a backup of the whole database to the backup folder
+     */
+    200: DatabaseBackupDto;
+};
+
+export type DatabaseBackupsControllerCreateResponse = DatabaseBackupsControllerCreateResponses[keyof DatabaseBackupsControllerCreateResponses];
+
+export type DatabaseBackupsControllerRestoreData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/database-backups/{id}/restore';
+};
+
+export type DatabaseBackupsControllerRestoreResponses = {
+    /**
+     * Restore the tag names, tags, auto tags and auto notes from a backup. Recorded events are kept as they are.
+     */
+    200: RestoreDatabaseBackupResultDto;
+};
+
+export type DatabaseBackupsControllerRestoreResponse = DatabaseBackupsControllerRestoreResponses[keyof DatabaseBackupsControllerRestoreResponses];
+
+export type DatabaseBackupsControllerRemoveData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/database-backups/{id}';
+};
+
+export type DatabaseBackupsControllerRemoveResponses = {
+    204: void;
+};
+
+export type DatabaseBackupsControllerRemoveResponse = DatabaseBackupsControllerRemoveResponses[keyof DatabaseBackupsControllerRemoveResponses];

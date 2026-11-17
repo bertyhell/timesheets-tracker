@@ -14,6 +14,7 @@ import {
 import Button, { ButtonVariant } from '../../../components/Button/Button';
 import { PageHeader } from '../../../components/PageHeader/PageHeader';
 import { downloadJson, pickTextFile, toJsonFileName } from '../../../helpers/json-file';
+import { DatabaseBackupsSection } from './DatabaseBackupsSection';
 
 /** Electron can put the file where the user asks; a browser can only hand it to the downloads folder. */
 const isElectron = typeof window.electron?.saveTextFile === 'function';
@@ -95,7 +96,7 @@ export function BackupSettingsPage() {
     <div className="p-backup-settings">
       <PageHeader
         title="Import &amp; export"
-        description="Move your configuration between machines or keep a copy of it as a backup."
+        description="Move your configuration between machines, or back up the database and restore it."
       />
 
       <div className="px-6 mt-4 max-w-2xl">
@@ -169,6 +170,8 @@ export function BackupSettingsPage() {
             )}
           </section>
         )}
+
+        <DatabaseBackupsSection />
       </div>
     </div>
   );

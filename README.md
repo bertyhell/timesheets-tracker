@@ -43,6 +43,22 @@ Then open the app normally.
 
 If that command fails with `Operation not permitted`, your terminal app needs Full Disk Access: System Settings → Privacy & Security → Full Disk Access → enable it for your terminal app (Terminal, iTerm, etc.), then fully quit and reopen the terminal and try the command again.
 
+# AI assistant (MCP)
+
+The backend serves a [Model Context Protocol](https://modelcontextprotocol.io) server at `/mcp` (streamable HTTP, loopback only), so an AI assistant can manage your tags and auto tag rules:
+
+* read tracked events (`query_events`, `summarize_events` — events themselves are read only)
+* create, update and delete tag names, tags, auto tag rules and auto notes
+* back up the database (`create_database_backup`) and restore tag names, tags, auto tags and auto notes from a backup; tracked activity is never rolled back
+
+Connect Claude Code while the app is running (Settings → AI assistant shows the exact address for your install):
+
+```shell
+claude mcp add --transport http timesheets-tracker http://localhost:55577/mcp
+```
+
+Backups are stored in a `timesheets-tracker-backups` folder next to the database and can also be made, restored and deleted from Settings → Import & export.
+
 Still TODO:
 
 - add export options

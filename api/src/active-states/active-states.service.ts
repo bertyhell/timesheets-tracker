@@ -33,7 +33,20 @@ export class ActiveStatesService {
         startedAt,
         endedAt,
       });
-      return results.map(this.adapt);
+      // Blocks can span the range edges (eg: one long away block overnight); trim them to the range
+      // so totals per day/week don't count the same time twice.
+      const rangeStart = new Date(startedAt).getTime();
+      const rangeEnd = new Date(endedAt).getTime();
+      return results.map((raw) => {
+        const activeState = this.adapt(raw);
+        if (!Number.isNaN(rangeStart) && new Date(activeState.startedAt).getTime() < rangeStart) {
+          activeState.startedAt = new Date(rangeStart).toISOString();
+        }
+        if (!Number.isNaN(rangeEnd) && new Date(activeState.endedAt).getTime() > rangeEnd) {
+          activeState.endedAt = new Date(rangeEnd).toISOString();
+        }
+        return activeState;
+      });
     } catch (err) {
       const error = new CustomError('Failed to fetch all active-states from the database', err, {
         startedAt,

@@ -21,7 +21,7 @@ export function findAllActiveStates(
 	FROM (
 	    SELECT *, ROW_NUMBER() OVER (PARTITION BY startedAt ORDER BY (julianday(endedAt) - julianday(startedAt)) DESC) as rn
 	    FROM activeStates
-	    WHERE startedAt > ? AND endedAt < ?
+	    WHERE endedAt > ? AND startedAt < ?
 	)
 	WHERE rn = 1
 	`;

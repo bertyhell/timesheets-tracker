@@ -1,6 +1,6 @@
 {
   "name": "api",
-  "version": "0.4.0",
+  "version": "0.5.1",
   "private": true,
   "description": "Backend service for collecting and serving data for timesheet tracker",
   "license": "MIT",

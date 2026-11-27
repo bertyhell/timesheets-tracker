@@ -18,7 +18,7 @@ function addIfPresent(
   }
 }
 
-export function getMostProminentConditions(
+function getConditionsForEvent(
   timelineInfo: TimelineDto,
   event: TimelineEventDto
 ): ProminentCondition[] {
@@ -63,4 +63,29 @@ export function getMostProminentConditions(
       break;
   }
   return conditions;
+}
+
+/**
+ * Conditions for one or more events, e.g. the events hidden behind a merged bar. The conditions of
+ * a new rule are OR-ed together, so every unique value becomes its own row. Rows are grouped by
+ * variable (all program names, then all window titles, ...) in the order the variables first
+ * appear, and duplicates are dropped case-insensitively since matching ignores case.
+ */
+export function getMostProminentConditions(
+  timelineInfo: TimelineDto,
+  events: TimelineEventDto | TimelineEventDto[]
+): ProminentCondition[] {
+  const byVariable = new Map<ConditionVariable, ProminentCondition[]>();
+  const seen = new Set<string>();
+  for (const event of Array.isArray(events) ? events : [events]) {
+    for (const condition of getConditionsForEvent(timelineInfo, event)) {
+      const key = `${condition.variable}\u0000${condition.value.toLowerCase()}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const group = byVariable.get(condition.variable) ?? [];
+      group.push(condition);
+      byVariable.set(condition.variable, group);
+    }
+  }
+  return [...byVariable.values()].flat();
 }

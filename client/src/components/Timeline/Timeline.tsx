@@ -61,7 +61,7 @@ interface ContextMenuState {
   x: number;
   y: number;
   eventId: string;
-  event: TimelineEventDto;
+  event: PreparedEvent;
   eventStartedAt?: string;
   eventEndedAt?: string;
 }
@@ -904,9 +904,11 @@ function Timeline({
                     label: 'Create autotag rule',
                     icon: contextMenuIcons.createAutoTagRule,
                     onClick: () => {
+                      // A merged bar stands in for several events: offer a condition for
+                      // every unique value among them, not just the first event's.
                       const conditions = getMostProminentConditions(
                         timelineInfo,
-                        contextMenu.event
+                        contextMenu.event.mergedFrom ?? contextMenu.event
                       );
                       onCreateAutoTagRuleFromEvent(conditions);
                     },
